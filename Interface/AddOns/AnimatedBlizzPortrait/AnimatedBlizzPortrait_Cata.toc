@@ -1,0 +1,11 @@
+## Interface: 40402
+## Title: Animated Blizzard Portraits
+## Notes: Replaces all Blizzard unit frame portraits with live 3D animated character models.
+## Author: GI-Ka
+## Version: 1.2.24
+## SavedVariables: AnimatedBlizzPortraitDB
+## IconTexture: Interface\AddOns\AnimatedBlizzPortrait\ABP Icon
+## Category-enUS: Unit Frames
+
+AnimatedBlizzPortrait.xml
+AnimatedBlizzPortrait.lua

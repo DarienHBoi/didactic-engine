@@ -1,0 +1,42 @@
+## Interface: 16001
+## Title: |cffffd778GearWise|r |cffc69b54Forever|r
+## Notes: Equipment enhancements, requirements and shopping lists for WoW Forever.
+## Notes-deDE: Ausrüstungsverbesserungen, Voraussetzungen und Einkaufsliste für WoW Forever.
+## Notes-frFR: Améliorations, conditions et listes d’achats pour WoW Forever.
+## Notes-esES: Mejoras de equipo, requisitos y listas de compra para WoW Forever.
+## Notes-esMX: Mejoras de equipo, requisitos y listas de compra para WoW Forever.
+## Notes-ruRU: Улучшения снаряжения, требования и список покупок для WoW Forever.
+## Author: MaeX78
+## Version: 1.10.3-forever
+## SavedVariables: GearWiseDB
+## OptionalDeps: Auctionator
+## IconTexture: Interface\AddOns\GearWise\Assets\GearWiseScroll.png
+
+Locales\Locale.lua
+Locales\enUS.lua
+Locales\frFR.lua
+Locales\esES.lua
+Locales\ruRU.lua
+Bootstrap.lua
+Data\ForeverCatalog.lua
+Data\ForeverStats.lua
+Data\ForeverDB2.lua
+Data\ForeverRecommendations.lua
+Data\ForeverProcs.lua
+Data\ForeverItems.lua
+Engine\ForeverRules.lua
+Engine\ForeverInventory.lua
+Engine\ForeverRecipeInfo.lua
+Engine\ForeverShopping.lua
+Engine\ForeverAdvice.lua
+Engine\ForeverImpact.lua
+Engine\ForeverProcs.lua
+Engine\ForeverPlanner.lua
+UI\ForeverTheme.lua
+UI\ForeverPresentation.lua
+UI\ForeverPanel.lua
+UI\ForeverSlots.lua
+UI\ForeverPlanner.lua
+UI\ForeverUpgradePlan.lua
+UI\ForeverSettings.lua
+Integration\ForeverRecipes.lua

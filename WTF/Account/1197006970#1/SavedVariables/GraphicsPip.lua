@@ -1,0 +1,33 @@
+
+GraphicsPipDB = {
+["reapply"] = true,
+["angle"] = -148.1875102049604,
+["values"] = {
+["weatherDensity"] = 3,
+["groundEffectFade"] = 500,
+["reflectionMode"] = 3,
+["groundEffectDist"] = 1000,
+["lodObjectFadeScale"] = 300,
+["cameraDistanceMaxZoomFactor"] = 4,
+["lodObjectCullSize"] = 50,
+["HDRFactor"] = 3,
+["HDROutput"] = 1,
+["terrainLodDist"] = 2000,
+["ResampleAlwaysSharpen"] = 1,
+["groundEffectDensity"] = 256,
+},
+["originals"] = {
+["weatherDensity"] = 3,
+["groundEffectFade"] = 600,
+["reflectionMode"] = 3,
+["groundEffectDist"] = 300,
+["lodObjectFadeScale"] = 150,
+["cameraDistanceMaxZoomFactor"] = 2.6,
+["lodObjectCullSize"] = 14,
+["HDRFactor"] = 2,
+["HDROutput"] = 0,
+["ResampleAlwaysSharpen"] = 0,
+["terrainLodDist"] = 650,
+["groundEffectDensity"] = 256,
+},
+}

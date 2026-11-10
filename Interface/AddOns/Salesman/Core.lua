@@ -1,0 +1,3 @@
+local _, S = ...
+S.name = "Salesman"
+S.modules = {}

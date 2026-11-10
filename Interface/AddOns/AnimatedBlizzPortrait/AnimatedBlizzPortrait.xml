@@ -1,0 +1,8 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<!--
+		ABPModelTemplate: a PlayerModel that inherits its parent frame's level
+		so the 3D model renders correctly on top of the background but below
+		the frame chrome (health bars, borders, etc.)
+	-->
+	<PlayerModel name="ABPModelTemplate" useParentLevel="true" virtual="true"/>
+</Ui>

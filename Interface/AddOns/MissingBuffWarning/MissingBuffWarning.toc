@@ -1,0 +1,11 @@
+## Interface: 16001
+## Title: Missing Buff Warning
+## Notes: Flashes a big icon and text in the centre of the screen when one of your class buffs is missing (out of combat). /mbw for options.
+## Author: Nectar
+## Version: 0.1.0
+## IconTexture: Interface\Icons\Spell_Holy_InnerFire
+## SavedVariables: MissingBuffWarningDB
+
+Core.lua
+Options.lua
+MinimapButton.lua

@@ -1,0 +1,30 @@
+## Interface: 120105, 11509, 16001
+## Title: Disenchant Helper
+## Notes: Minimap button and queued profession processing helper for bag items.
+## Notes-deDE: Minimap-Button und Warteschlangen-Helfer zur Berufsverarbeitung von Taschen-Items.
+## Author: Rokzan (formerly Rakuga)
+## Version: 1.9.1
+## IconTexture: 136244
+## Category: Professions
+## SavedVariables: DisenchantHelperDB
+
+# Libraries first - load order is dependency order:
+# LibStub (version registry) -> CallbackHandler (event helper) ->
+# LibDataBroker (registry) -> LibDBIcon (button rendering)
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+
+Locales.lua
+UpdateNotice.lua
+PriceProviders.lua
+SavedData.lua
+Learning.lua
+EraReference.lua
+Prediction.lua
+Stats.lua
+ExternalTooltips.lua
+Mail.lua
+MailUI.lua
+DisenchantHelper.lua

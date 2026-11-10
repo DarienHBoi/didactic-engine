@@ -1,0 +1,8 @@
+## Interface: 16001, 120105, 120100
+## Title: Graphics Pip
+## Notes: Minimap button with a small menu to adjust graphics console variables.
+## Author: Nectar
+## Version: 1.0.0
+## SavedVariables: GraphicsPipDB
+
+GraphicsPip.lua

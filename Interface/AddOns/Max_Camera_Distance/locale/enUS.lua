@@ -1,0 +1,574 @@
+local addonName, ns = ...
+local LibStub = _G.LibStub
+ns.LocaleData = ns.LocaleData or {}
+local L = {}
+ns.LocaleData["enUS"] = L
+
+local AceLocale = LibStub and LibStub("AceLocale-3.0", true)
+local AceTable = AceLocale and AceLocale:NewLocale(addonName, "enUS", true, true)
+
+-- ============================================================================
+-- General
+-- ============================================================================
+L["GENERAL_SETTINGS"] = "General Settings"
+L["VERSION_PREFIX"] = "Version: "
+
+L["MAX_ZOOM_FACTOR"] = "Max Camera Distance"
+L["MAX_ZOOM_FACTOR_DESC"] = "Set the absolute maximum allowed camera distance (in yards) for the game client."
+
+L["MOVE_VIEW_DISTANCE"] = "Manual Wheel Zoom Speed"
+L["MOVE_VIEW_DISTANCE_DESC"] = "How fast the camera zooms in and out when using the mouse wheel or zoom hotkeys. This affects manual wheel zoom only."
+
+L["ZOOM_TRANSITION"] = "Smart Zoom Transition Time"
+L["ZOOM_TRANSITION_DESC"] = "Time in seconds for automatic Smart Zoom transitions between |cffff5555Combat|r, |cff66ccffMount|r, AFK, Dragonrace, and Normal camera states. This does not control mouse-wheel zoom."
+L["YAW_MOVE_SPEED"] = "Horizontal Rotation Speed"
+L["YAW_MOVE_SPEED_DESC"] = "Adjust the speed of horizontal camera rotation (Yaw) when turning with the mouse."
+
+L["PITCH_MOVE_SPEED"] = "Vertical Rotation Speed"
+L["PITCH_MOVE_SPEED_DESC"] = "Adjust the speed of vertical camera rotation (Pitch) when looking up or down."
+
+-- UI / Profile
+L["WARNING_TEXT"] = "|cffffd100Warning:|r this addon extends the camera distance limit beyond the default Blizzard slider to improve visibility in raids, dungeons, and PvP."
+L["RELOAD_BUTTON"] = "Reload UI"
+L["RELOAD_BUTTON_DESC"] = "Reloads the user interface to apply critical changes."
+
+L["RESET_BUTTON"] = "Reset Defaults"
+L["RESET_BUTTON_DESC"] = "Resets all settings in this profile to their default values."
+
+L["SETTINGS_CHANGED"] = "Camera settings have been updated."
+L["SETTINGS_RESET"] = "Profile has been reset to default values."
+L["DB_NOT_READY"] = "Database not initialized yet."
+
+-- Minimap
+L["SHOW_MINIMAP_BUTTON"] = "Show Minimap Button"
+L["SHOW_MINIMAP_BUTTON_DESC"] = "Toggles the minimap icon."
+
+-- Common states
+L["ENABLED"] = "|cff00ff00Enabled|r"
+L["DISABLED"] = "|cffff0000Disabled|r"
+
+-- ============================================================================
+-- Smart Zoom (Combat & Mount)
+-- ============================================================================
+L["COMBAT_SETTINGS"] = "Smart Zoom System"
+L["COMBAT_SETTINGS_WARNING"] = "|cffffd100System Logic:|r Camera distance adjusts automatically based on your state.\n\n|cffffd100Priority:|r |cffff5555Combat|r  >  |cff66ccffMount|r  >  |cffffffffNormal|r"
+-- Combat
+L["AUTO_ZOOM_COMBAT"] = "Enable Smart Combat Zoom"
+L["AUTO_ZOOM_COMBAT_DESC"] = "Automatically zooms out to the configured distance when entering combat. |cffff5555Highest priority.|r"
+L["MAX_COMBAT_ZOOM_FACTOR"] = "Combat Distance"
+L["MAX_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while you are |cffff5555IN combat|r."
+L["MIN_COMBAT_ZOOM_FACTOR"] = "Normal Distance"
+L["MIN_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while |cffffffffOUT of combat|r and |cff66ccffNOT mounted|r."
+-- Zones
+L["ZONES_HEADER"] = "Combat Zones"
+L["ZONES_DESC"] = "Select zones where the addon will |cff00ff00force max combat zoom|r.\n|cff888888Disable zones to keep camera control more relaxed.|r"
+L["ZONE_PARTY"] = "Dungeons"
+L["ZONE_RAID"] = "Raids"
+L["ZONE_ARENA"] = "Arenas"
+L["ZONE_BG"] = "Battlegrounds"
+L["ZONE_SCENARIO"] = "Scenarios / Delves"
+
+-- (Missing in your snippet but referenced by options in some setups)
+L["ZONE_WORLD"] = "Open World Combat"
+L["ZONE_WORLD_DESC"] = "Zooms out for |cffff5555ANY combat|r in the open world. |cffffd100Warning:|r may feel aggressive while questing."
+L["ZONE_WORLD_BOSS"] = "World Bosses / Events"
+L["ZONE_WORLD_BOSS_DESC"] = "Zooms out only during boss encounters in the open world (IsEncounterInProgress)."
+
+-- Mount / Travel
+L["MOUNT_SETTINGS_HEADER"] = "Mount & Travel Settings"
+L["AUTO_MOUNT_ZOOM"] = "Enable Auto Zoom on Mount"
+L["AUTO_MOUNT_ZOOM_DESC"] = "Automatically zooms out when mounted or in travel form (Druid/Shaman/Evoker). Active only |cffffffffout of combat|r."
+L["MOUNT_ZOOM_FACTOR"] = "Mount Distance"
+L["MOUNT_ZOOM_FACTOR_DESC"] = "Target camera distance while mounted/traveling."
+
+-- Delay
+L["DISMOUNT_DELAY"] = "Mount Return Delay"
+L["DISMOUNT_DELAY_DESC"] = "Delay before returning to Normal after leaving mount or travel form."
+
+-- Messages used by Functions.lua
+L["SMART_ZOOM_MSG"] = "Smart Zoom: state=%s, target=%.1f yards"
+L["SMART_ZOOM_DISABLED_MSG"] = "Smart Zoom is disabled. Using manual max distance settings."
+
+-- ============================================================================
+-- Advanced
+-- ============================================================================
+L["ADVANCED_SETTINGS"] = "Advanced Settings"
+
+L["REDUCE_UNEXPECTED_MOVEMENT"] = "Reduce Unexpected Movement"
+L["REDUCE_UNEXPECTED_MOVEMENT_DESC"] = "Reduces camera jumps when the camera collides with terrain or objects (Smart Pivot)."
+
+L["INDIRECT_VISIBILITY"] = "Reduced Camera Collision"
+L["INDIRECT_VISIBILITY_DESC"] = "Turns on Blizzard's reduced camera collision behavior. This is a global client setting and applies everywhere."
+L["INDIRECT_OFFSET"] = "Collision Sensitivity"
+L["INDIRECT_OFFSET_DESC"] = "Controls Blizzard's reduced camera collision sensitivity. |cff66ccff0.0|r is the minimum and |cffff555510.0|r is the maximum. The addon's default follows the current game client's own default. Higher values tolerate more obstruction before the camera moves in."
+L["COLLISION_HEADER"] = "Camera Collision"
+L["COLLISION_DESC"] = "General camera collision behavior. These settings are |cffffd100global|r and apply everywhere, not per combat context."
+L["COLLISION_SUMMARY_TEXT"] = "|cff66ccffReduced Camera Collision:|r %s\n|cff66ccffCollision Offset:|r %s\n|cff66ccffShow Silhouette when Obstructed:|r %s\n|cff66ccffReduce Unexpected Movement:|r %s\n|cff888888These settings are global and apply everywhere.|r"
+L["VISUAL_UTILITY_HEADER"] = "Visual Utility"
+
+L["RESAMPLE_ALWAYS_SHARPEN"] = "Always Sharpen (FSR)"
+L["RESAMPLE_ALWAYS_SHARPEN_DESC"] = "Forces the game to apply a sharpness filter (FidelityFX), making the image crisper even without upscaling."
+
+L["SOFT_TARGET_INTERACT"] = "Soft Target Interact Icons"
+L["SOFT_TARGET_INTERACT_DESC"] = "Displays interaction icons over game objects (mailboxes, herbs, portals, NPCs) for easier targeting."
+
+-- ============================================================================
+-- Extra Features
+-- ============================================================================
+L["EXTRA_FEATURES"] = "Extra Features"
+
+-- Quest Tracker
+L["UNTRACK_QUESTS_BUTTON"] = "Untrack All Quests"
+L["UNTRACK_QUESTS_DESC"] = "Instantly removes all quests from the objective tracker to reduce clutter."
+L["QUEST_TRACKER_EMPTY"] = "Quest tracker is already empty."
+L["QUEST_TRACKER_CLEARED"] = "Stopped tracking %d quests."
+
+-- ActionCam
+L["ACTION_CAM_HEADER"] = "Action Cam"
+L["ACTION_CAM_DESC"] = "Enables Blizzard's hidden ActionCam settings for a modern RPG camera feel."
+
+L["ACTION_CAM_SHOULDER_NAME"] = "Over-Shoulder View"
+L["ACTION_CAM_SHOULDER_DESC"] = "Offsets the camera slightly to the side (test_cameraOverShoulder). Includes Smart Offset that recenters when zooming in close."
+
+L["ACTION_CAM_PITCH_NAME"] = "Dynamic Pitch"
+L["ACTION_CAM_PITCH_DESC"] = "Adjusts camera angle based on movement (test_cameraDynamicPitch)."
+
+L["CONFLICT_FIX_MSG"] = "ActionCam: Disabled 'Keep Character Centered' to prevent camera jitter."
+
+-- AFK
+L["AFK_MODE_HEADER"] = "AFK Mode"
+L["AFK_MODE_DESC_SAFE"] = "|cff00ff00Safe Mode:|r If the UI is hidden, pressing |cffffd100ESC|r will immediately restore it and exit AFK mode."
+L["AFK_MODE_ENABLE"] = "Enable AFK Rotation"
+L["AFK_MODE_ENABLE_DESC"] = "Automatically zooms out and rotates the camera while AFK. Uses safe state checks and does not overwrite your yaw-speed CVar."
+L["AFK_HIDE_UI_NAME"] = "Hide UI in AFK mode"
+L["AFK_HIDE_UI_DESC"] = "Hides the full UI for a cinematic AFK mode. |cffffd100ESC|r safely restores it without waiting for the AFK flag to clear."
+L["AFK_ZOOM_OUT_NAME"] = "Zoom out while AFK"
+L["AFK_ZOOM_OUT_DESC"] = "Pushes the camera to the maximum managed distance when AFK mode starts."
+L["AFK_DELAY_NAME"] = "Start delay"
+L["AFK_DELAY_DESC"] = "How many seconds to wait after the game marks you AFK before the cinematic mode starts."
+L["AFK_DIRECTION_NAME"] = "Rotation direction"
+L["AFK_DIRECTION_DESC"] = "Chooses the camera rotation direction used in AFK mode."
+L["AFK_DIRECTION_LEFT"] = "Left"
+L["AFK_DIRECTION_RIGHT"] = "Right"
+L["AFK_SPEED_NAME"] = "Rotation speed"
+L["AFK_SPEED_DESC"] = "Normalized MoveView speed used by AFK rotation. Lower values are calmer."
+L["AFK_SKIP_MOUNTED_NAME"] = "Do not start on mounts"
+L["AFK_SKIP_MOUNTED_DESC"] = "Prevents AFK mode from starting while mounted."
+L["AFK_SKIP_FLYING_NAME"] = "Do not start while flying"
+L["AFK_SKIP_FLYING_DESC"] = "Prevents AFK mode from starting while the character is flying."
+L["AFK_RESUME_AFTER_COMBAT_NAME"] = "Resume after combat"
+L["AFK_RESUME_AFTER_COMBAT_DESC"] = "If AFK mode is interrupted by combat, it starts again after combat ends as long as you are still AFK."
+
+-- Messages used by AFK logic
+L["AFK_ENTER_MSG"] = "AFK Mode: enabled (cinematic rotation)."
+L["AFK_EXIT_MSG"] = "AFK Mode: disabled (restored UI and camera)."
+
+-- ============================================================================
+-- Commands / Help
+-- ============================================================================
+
+-- Optional (if used anywhere in other files)
+L["ZOOM_SET_MESSAGE"] = "Zoom set to %s (%.1f yards)"
+
+-- ============================================================================
+-- Hook / System Messages
+-- ============================================================================
+L["HOOK_DISABLED_BY_ADDON"] = "|cffff0000Disabled by MaxCameraDistance|r"
+L["HOOK_MOUSE_SPEED_DESC"] = "Mouse look speed is controlled separately (Horizontal/Vertical) in the addon settings:"
+L["HOOK_MOUSE_SPEED_PATH"] = "/mcd config -> General Settings"
+
+-- ============================================================================
+-- Debug
+-- ============================================================================
+L["ENABLE_DEBUG_LOGGING"] = "Enable Logging"
+L["ENABLE_DEBUG_LOGGING_DESC"] = "Prints debug information to chat about state changes |cffff5555(Combat/Mount/AFK)|r and CVar updates."
+L["DEBUG_LEVEL"] = "Debug Level"
+L["DEBUG_LEVEL_DESC"] = "Select the verbosity of logs."
+L["DEBUG_LEVEL_ERROR"] = "Error"
+L["DEBUG_LEVEL_WARNING"] = "Warning"
+L["DEBUG_LEVEL_INFO"] = "Info"
+L["DEBUG_LEVEL_DEBUG"] = "Verbose"
+
+-- Additional localized UI labels
+L["COMBAT_HEADER"] = "Combat"
+L["ZONE_CATEGORY_PVP"] = "PvP"
+L["ZONE_CATEGORY_PVE"] = "PvE"
+L["ZONE_ZOOM_FACTOR"] = "Zone Distance"
+L["ZONE_ZOOM_FACTOR_DESC"] = "Target camera distance in enabled raid, dungeon, arena, battleground, or scenario zones. Lets you keep a smaller combat distance elsewhere."
+L["DELAY_HEADER"] = "Return Hysteresis"
+L["ACTION_CAM_SHOULDER_IN_COMBAT_NAME"] = "Over-Shoulder in Combat"
+L["ACTION_CAM_SHOULDER_IN_COMBAT_DESC"] = "Enable over-shoulder camera while in combat."
+L["ACTION_CAM_SHOULDER_OUT_OF_COMBAT_NAME"] = "Over-Shoulder out of Combat"
+L["ACTION_CAM_SHOULDER_OUT_OF_COMBAT_DESC"] = "Enable over-shoulder camera while out of combat."
+
+L["WORLD_COMBAT_ZOOM_FACTOR"] = "Open World Combat Distance"
+L["WORLD_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while you are in combat in the open world."
+L["PARTY_COMBAT_ZOOM_FACTOR"] = "Party Combat Distance"
+L["PARTY_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while you are in combat in a party, dungeon, delve, or similar small-group content."
+L["RAID_COMBAT_ZOOM_FACTOR"] = "Raid Combat Distance"
+L["RAID_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while you are in combat in a raid or other large-group content."
+L["GROUP_COMBAT_ZOOM_FACTOR"] = "Raid / Party Combat Distance"
+L["GROUP_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while you are in combat in a party, dungeon, raid, or similar group content."
+L["PVP_COMBAT_ZOOM_FACTOR"] = "PvP Combat Distance"
+L["PVP_COMBAT_ZOOM_FACTOR_DESC"] = "Target camera distance while you are in combat in PvP content."
+
+L["PROFILES"] = "Profiles"
+
+L["PROFILES_MISSING_LIB_DESC"] = "AceDBOptions-3.0 was not found, so advanced profile controls are unavailable."
+
+
+L["ZONE_CONTEXT_HEADER"] = "Context Rules"
+L["ZONE_CONTEXT_DESC"] = "These toggles decide whether party, raid, battleground, arena, and scenario combat should use their own preset or fall back to the open-world combat distance."
+L["ZONE_PARTY_DESC"] = "Use the Party Combat Distance in dungeon and party content. Disable it to fall back to the Open World Combat Distance instead."
+L["ZONE_RAID_DESC"] = "Use the Raid Combat Distance in raid content. Disable it to fall back to the Open World Combat Distance instead."
+L["ZONE_ARENA_DESC"] = "Use the PvP Combat Distance in arenas. Disable it to fall back to the Open World Combat Distance instead."
+L["ZONE_BG_DESC"] = "Use the PvP Combat Distance in battlegrounds. Disable it to fall back to the Open World Combat Distance instead."
+L["ZONE_SCENARIO_DESC"] = "Use the Party Combat Distance in scenarios and delves. Disable it to fall back to the Open World Combat Distance instead."
+
+L["STATUS_HEADER"] = "Live Status"
+L["STATUS_DESC"] = "Shows the current resolved zoom decision and why it was chosen."
+L["STATUS_UNAVAILABLE"] = "Live status is unavailable right now."
+L["STATUS_ZOOM_STATE"] = "Zoom State"
+L["STATUS_CONTEXT"] = "Resolved Context"
+L["STATUS_RAW_CONTEXT"] = "Raw Context"
+L["STATUS_ZONE_SOURCE"] = "Zone Source"
+L["STATUS_TARGET_DISTANCE"] = "Target Distance"
+L["STATUS_COLLISION_ENABLED"] = "Reduced Camera Collision"
+L["STATUS_COLLISION_OFFSET"] = "Collision Sensitivity"
+L["STATUS_SMART_PIVOT"] = "Reduce Unexpected Movement"
+L["STATUS_WORLD_FALLBACK"] = "Using World Fallback"
+L["STATUS_REASON_FLAGS"] = "Reason Flags"
+L["STATUS_ZONE_FLAGS"] = "Zone Flags"
+L["STATUS_YES"] = "Yes"
+L["STATUS_NO"] = "No"
+L["STATUS_STATE_NONE"] = "None"
+L["STATUS_STATE_MOUNT"] = "Mount"
+L["STATUS_STATE_COMBAT"] = "Combat"
+L["STATUS_CONTEXT_WORLD"] = "World"
+L["STATUS_CONTEXT_PARTY"] = "Party"
+L["STATUS_CONTEXT_RAID"] = "Raid"
+L["STATUS_CONTEXT_PVP"] = "PvP"
+L["STATUS_ZONE_SOURCE_WORLD"] = "World"
+L["STATUS_ZONE_SOURCE_PARTY"] = "Party"
+L["STATUS_ZONE_SOURCE_RAID"] = "Raid"
+L["STATUS_ZONE_SOURCE_ARENA"] = "Arena"
+L["STATUS_ZONE_SOURCE_BG"] = "Battleground"
+L["STATUS_ZONE_SOURCE_SCENARIO"] = "Scenario / Delve"
+
+L["STATUS_REASON_PLAYER"] = "Player"
+L["STATUS_REASON_GROUP"] = "Group"
+L["STATUS_REASON_THREAT"] = "Threat"
+L["STATUS_REASON_MOUNTED"] = "Mounted"
+L["STATUS_REASON_WORLD_BOSS"] = "World Boss"
+
+
+L["PRESET_SETTINGS"] = "Presets"
+L["PRESET_SECTION_HEADER"] = "Distance Presets"
+L["PRESET_SECTION_DESC"] = "Presets convert high-level choices into real distances. If a preset other than |cffffd100Manual|r is selected, the matching slider is |cffff5555locked|r automatically."
+L["PRESET_MANUAL_GROUP_HEADER"] = "Manual / Normal"
+L["PRESET_COMBAT_GROUP_HEADER"] = "Combat Presets"
+L["PRESET_MOUNT_GROUP_HEADER"] = "Mount / Travel"
+L["PRESET_MANUAL"] = "Manual"
+L["PRESET_CLIENT_DEFAULT"] = "Game Default"
+L["PRESET_CLOSE"] = "Close"
+L["PRESET_BALANCED"] = "Balanced"
+L["PRESET_FAR"] = "Far"
+L["PRESET_MAX"] = "Maximum"
+L["PRESET_STATUS_UNAVAILABLE"] = "Preset status is unavailable."
+L["PRESET_STATUS_MANUAL"] = "Manual control is active. Slider value: %.1f yd."
+L["PRESET_STATUS_LOCKED"] = "Preset: %s. Effective distance: %.1f yd. Matching manual control is locked until you switch back to Manual."
+L["PRESET_UNKNOWN"] = "Unknown"
+L["MANUAL_SECTION_HEADER"] = "Manual Camera Controls"
+L["MANUAL_SECTION_DESC"] = "Manual controls stay available only when the matching preset is set to |cffffd100Manual|r."
+L["MANUAL_COMBAT_HEADER"] = "Manual Distances"
+L["MANUAL_COMBAT_DESC"] = "These sliders are used only when their matching preset is set to Manual."
+L["MANUAL_MAX_PRESET"] = "Manual Max Distance Preset"
+L["NORMAL_ZOOM_PRESET"] = "Normal Distance Preset"
+L["WORLD_COMBAT_PRESET"] = "Open World Combat Preset"
+L["PARTY_COMBAT_PRESET"] = "Party Combat Preset"
+L["RAID_COMBAT_PRESET"] = "Raid Combat Preset"
+L["PVP_COMBAT_PRESET"] = "PvP Combat Preset"
+L["MOUNT_ZOOM_PRESET"] = "Mount Distance Preset"
+
+L["STATUS_DISTANCE_SOURCE"] = "Distance Source"
+
+
+L["DEBUG_SETTINGS"] = "Status & Debug"
+L["DEBUG_LOGGING_HEADER"] = "Chat Logging"
+L["DEBUG_LOGGING_DESC"] = "These options control what gets printed to chat. The |cffffd100Live Status|r block above is always available even with logging disabled."
+L["COMBAT_TRIGGER_HEADER"] = "Combat Triggers"
+L["COMBAT_TRIGGER_DESC"] = "Choose which events are allowed to activate combat zoom."
+L["COMBAT_TRIGGER_PLAYER"] = "Zoom when I enter combat"
+L["COMBAT_TRIGGER_PLAYER_DESC"] = "Triggers combat zoom when your character enters combat."
+L["COMBAT_TRIGGER_GROUP"] = "Zoom when party or raid enters combat"
+L["COMBAT_TRIGGER_GROUP_DESC"] = "Triggers combat zoom when your party or raid is fighting, even if you are not actively in combat yet."
+L["COMBAT_TRIGGER_THREAT"] = "Zoom on threat only"
+L["COMBAT_TRIGGER_THREAT_DESC"] = "Triggers combat zoom when you have threat, even if the normal combat flag has not settled yet."
+L["STATUS_TRIGGER_RULES"] = "Trigger Rules"
+L["STATUS_ACTIVE_TRIGGERS"] = "Active Triggers"
+
+
+L["DELAY_HEADER_DESC"] = "Combat zoom-out is instant. Returning to |cffffffffNormal|r is delayed per context to avoid camera flicker."
+L["WORLD_COMBAT_RETURN_DELAY"] = "Open World Return Delay"
+L["WORLD_COMBAT_RETURN_DELAY_DESC"] = "Delay before returning to Normal after open-world combat ends."
+L["PARTY_COMBAT_RETURN_DELAY"] = "Party Return Delay"
+L["PARTY_COMBAT_RETURN_DELAY_DESC"] = "Delay before returning to Normal after party or dungeon combat ends."
+L["RAID_COMBAT_RETURN_DELAY"] = "Raid Return Delay"
+L["RAID_COMBAT_RETURN_DELAY_DESC"] = "Delay before returning to Normal after raid combat ends."
+L["STATUS_RETURN_DELAYS"] = "Return Delays"
+L["STATUS_PENDING_RETURN"] = "Pending Return"
+L["STATUS_PENDING_RETURN_NONE"] = "No delayed return is pending."
+L["STATUS_PENDING_RETURN_ACTIVE"] = "%s: %s, %.1fs remaining (total %.1fs)."
+L["STATUS_RETURN_KIND_COMBAT"] = "Combat Return"
+L["STATUS_RETURN_KIND_MOUNT"] = "Mount Return"
+
+L["OCCLUDED_SILHOUETTE_PLAYER"] = "Show Silhouette when Obstructed"
+L["OCCLUDED_SILHOUETTE_PLAYER_DESC"] = "Turns on Blizzard's character silhouette when your player is blocked by objects. This is a global client setting and applies everywhere."
+L["STATUS_SILHOUETTE"] = "Show Silhouette when Obstructed"
+L["HOOK_SILHOUETTE_DESC"] = "Character silhouette visibility is controlled in the addon settings:"
+L["HOOK_SILHOUETTE_PATH"] = "/mcd config -> Advanced Settings -> Visual Utility"
+L["HOOK_SILHOUETTE_LABEL_OBSTRUCTED"] = "Show Silhouette when Obstructed"
+L["HOOK_SILHOUETTE_LABEL_OBSCURED"] = "Show Silhouette when Obscured"
+
+L["MOUNT_ZOOM_MODE_NAME"] = "Mount Zoom Mode"
+L["MOUNT_ZOOM_MODE_DESC"] = "Choose whether Auto Mount Zoom should apply to all mounts and travel forms, only to flying mounts, only to Skyriding, or only to travel forms."
+L["MOUNT_ZOOM_MODE_ALL"] = "All mounts and travel forms"
+L["MOUNT_ZOOM_MODE_FLYING"] = "Flying mounts only"
+L["MOUNT_ZOOM_MODE_SKYRIDING"] = "Skyriding only"
+L["MOUNT_ZOOM_MODE_FORMS"] = "Travel forms only"
+L["DRAGON_RACE_FP_NAME"] = "First-Person during Dragonriding Races"
+L["DRAGON_RACE_FP_DESC"] = "Temporarily switches to first-person when a Dragonriding race aura is active, then restores Smart Zoom control when the race ends."
+L["STATUS_MOUNT_MODE"] = "Mount Zoom Mode"
+L["STATUS_TRAVEL_SIGNALS"] = "Travel Signals"
+L["STATUS_MOUNT_ZOOM_ACTIVE"] = "Mount Zoom Active"
+L["STATUS_FLYING_MOUNT"] = "Flying Mount"
+L["STATUS_SKYRIDING"] = "Skyriding"
+L["STATUS_DRAGON_RACE"] = "Dragonriding Race"
+L["STATUS_DRAGON_RACE_FP"] = "Race First Person"
+
+
+L["ZOOM_RESTORE_SETTING"] = "Restore Zoom Behavior"
+L["ZOOM_RESTORE_SETTING_DESC"] = "Controls how Smart Zoom restores a previously used zoom value. |cffffd100Never|r = always use configured targets. |cffffd100Adaptive|r = restore the last zoom only when returning to the state you came from. |cffffd100Always|r = always prefer the last stored zoom for that state when it fits within the state cap."
+L["ZOOM_RESTORE_NEVER"] = "Never"
+L["ZOOM_RESTORE_ADAPTIVE"] = "Adaptive"
+L["ZOOM_RESTORE_ALWAYS"] = "Always"
+L["RESPECT_MANUAL_STATE_ZOOM"] = "Respect Manual Zoom in Smart States"
+L["RESPECT_MANUAL_STATE_ZOOM_DESC"] = "When Smart Zoom is active for Mount or Combat, manual mouse-wheel zoom is preserved until the state changes instead of being forced back every refresh."
+L["STATUS_DYNAMIC_BEHAVIOR"] = "Dynamic Behavior"
+
+L["LANGUAGE_SETTING"] = 'Addon Language'
+L["LANGUAGE_SETTING_DESC"] = "Choose the addon language. |cffffd100Client Default|r follows the game client language. The UI |cffff5555reloads immediately|r after changing this option."
+L["LANGUAGE_CLIENT_DEFAULT"] = 'Client Default'
+L["ADDON_TITLE"] = 'Max Camera Distance'
+L["MINIMAP_TOOLTIP_OPEN_SETTINGS"] = 'Click to open settings'
+L["SETTINGS_APPLIED_FULL"] = "|cff00ff00Applied|r — distance: %.1f |cff888888(transition %.2fs)|r"
+
+-- Runtime diagnostics and slash commands
+L["CMD_USAGE"] = 'Usage: /mcd config | autozoom | automount | status | deps | fastzoom | slowzoom | reset | debug on | debug off'
+L["STATUS_STATE_AFK"] = 'AFK'
+L["STATUS_STATE_DRAGONRACE_FIRST_PERSON"] = 'Dragon Race First Person'
+L["STATUS_STATE_NORMAL"] = 'Normal'
+L["STATUS_STATE_MANUAL"] = 'Manual'
+L["STATUS_RUNTIME_GUARDS"] = 'Runtime Guards'
+L["STATUS_ACTIONCAM_SHOULDER"] = 'ActionCam Shoulder'
+L["STATUS_DYNAMIC_PITCH"] = 'Dynamic Pitch'
+
+
+-- Normal Distance baseline header
+L["NORMAL_DISTANCE_HEADER"] = "Normal Distance"
+L["NORMAL_DISTANCE_HEADER_DESC"] = "The distance the camera returns to when you are neither in combat nor mounted. Every activity below is a deviation from this baseline."
+
+
+-- Adaptive combat return delay
+L["ADAPTIVE_RETURN"] = "Adaptive Return Delay"
+L["ADAPTIVE_RETURN_DESC"] = "While you keep pulling, the camera measures how long the lulls between mobs are and waits long enough to cover them, instead of zooming in and straight back out on every pull. It returns to your configured delay on its own once you stop."
+L["ADAPTIVE_RETURN_MAX"] = "Adaptive Delay Ceiling"
+L["ADAPTIVE_RETURN_MAX_DESC"] = "The longest the adaptive delay is ever allowed to grow. Your configured per-activity delay stays the floor."
+
+
+-- Per-activity combat contexts (PvE / PvP split)
+L["CONTEXT_GROUP_NEUTRAL"] = "Outside Activities"
+L["CONTEXT_GROUP_PVP"] = "PvP Activities"
+L["CONTEXT_GROUP_PVE"] = "PvE Activities"
+L["CONTEXT_WORLD"] = "Open World"
+L["CONTEXT_WORLD_PVP"] = "World PvP"
+L["CONTEXT_ARENA"] = "Arena"
+L["CONTEXT_BATTLEGROUND"] = "Battleground"
+L["CONTEXT_DUNGEON"] = "Dungeon"
+L["CONTEXT_MYTHIC_PLUS"] = "Mythic+"
+L["CONTEXT_RAID"] = "Raid"
+L["CONTEXT_SCENARIO"] = "Scenarios & Delves"
+L["CONTEXT_WORLD_DESC"] = "Distance used in open-world combat outside any activity."
+L["CONTEXT_WORLD_PVP_DESC"] = "Distance used outdoors while flagged for PvP or with War Mode active."
+L["CONTEXT_ARENA_DESC"] = "Distance used inside arenas."
+L["CONTEXT_BATTLEGROUND_DESC"] = "Distance used inside battlegrounds and rated battlegrounds."
+L["CONTEXT_DUNGEON_DESC"] = "Distance used inside normal, heroic and mythic dungeons."
+L["CONTEXT_MYTHIC_PLUS_DESC"] = "Distance used inside an active Mythic+ keystone run."
+L["CONTEXT_RAID_DESC"] = "Distance used inside raids and against world bosses."
+L["CONTEXT_SCENARIO_DESC"] = "Distance used inside scenarios, delves and other instanced activities."
+L["CONTEXT_WORLD_DELAY_DESC"] = "Delay before returning to Normal after open-world combat ends."
+L["CONTEXT_WORLD_PVP_DELAY_DESC"] = "Delay before returning to Normal after world PvP combat ends."
+L["CONTEXT_ARENA_DELAY_DESC"] = "Delay before returning to Normal after arena combat ends."
+L["CONTEXT_BATTLEGROUND_DELAY_DESC"] = "Delay before returning to Normal after battleground combat ends."
+L["CONTEXT_DUNGEON_DELAY_DESC"] = "Delay before returning to Normal after dungeon combat ends."
+L["CONTEXT_MYTHIC_PLUS_DELAY_DESC"] = "Delay before returning to Normal after Mythic+ combat ends."
+L["CONTEXT_RAID_DELAY_DESC"] = "Delay before returning to Normal after raid combat ends."
+L["CONTEXT_SCENARIO_DELAY_DESC"] = "Delay before returning to Normal after scenario or delve combat ends."
+L["WORLD_PVP_ZOOM"] = "Treat World PvP as its own activity"
+L["WORLD_PVP_ZOOM_DESC"] = "When on, being flagged for PvP or having War Mode active outdoors uses the World PvP distance instead of the Open World distance. Turn this off if you are permanently flagged and want a single open-world distance."
+
+-- Reactive Zoom (ported from DynamicCam)
+L["REACTIVE_ZOOM_HEADER"] = "Reactive Zoom"
+L["REACTIVE_ZOOM_DESC"] = "Makes the mouse wheel cover more distance while you keep spinning it, instead of stepping one fixed notch at a time. Based on the Reactive Zoom feature of DynamicCam."
+L["REACTIVE_ZOOM"] = "Enable Reactive Zoom"
+L["REACTIVE_ZOOM_TOGGLE_DESC"] = "Replaces the client's fixed zoom steps with an accelerating, eased zoom."
+L["REACTIVE_ZOOM_ALWAYS"] = "Extra Steps (always)"
+L["REACTIVE_ZOOM_ALWAYS_DESC"] = "Added to every wheel notch. Raise this to make a single notch travel further."
+L["REACTIVE_ZOOM_EXTRA"] = "Extra Steps (while spinning)"
+L["REACTIVE_ZOOM_EXTRA_DESC"] = "Added on top when the camera has not caught up yet, which is what makes fast spinning travel much further than slow clicking."
+L["REACTIVE_ZOOM_THRESHOLD"] = "Spin Detection Threshold"
+L["REACTIVE_ZOOM_THRESHOLD_DESC"] = "How far behind the camera must be before the extra steps kick in. Lower reacts sooner."
+L["REACTIVE_ZOOM_MAX_TIME"] = "Maximum Zoom Time"
+L["REACTIVE_ZOOM_MAX_TIME_DESC"] = "Upper bound on how long one eased zoom may take. Lower feels snappier, higher feels smoother."
+L["CAMERA_ZOOM_SPEED"] = "Client Zoom Speed"
+L["CAMERA_ZOOM_SPEED_DESC"] = "Blizzard's own cameraZoomSpeed CVar. Reactive Zoom uses it to work out how long a zoom should take."
+L["REACTIVE_ZOOM_EASING"] = "Zoom Curve"
+L["REACTIVE_ZOOM_EASING_DESC"] = "How the eased zoom is distributed over time. Out curves leave immediately and slow into the target, which feels the most responsive on a wheel."
+L["REACTIVE_ZOOM_EASING_OUTQUAD"] = "Responsive (Out Quad)"
+L["REACTIVE_ZOOM_EASING_OUTCUBIC"] = "Very Responsive (Out Cubic)"
+L["REACTIVE_ZOOM_EASING_INOUTQUAD"] = "Smooth (In-Out Quad)"
+L["REACTIVE_ZOOM_EASING_LINEAR"] = "Constant (Linear)"
+
+-- WoW: Forever-only volumetric fog
+L["FOREVER_FOG_HEADER"] = "WoW: Forever — Volumetric Fog"
+L["FOREVER_FOG_DESC"] = "Forever-only graphics controls. Defaults are read from the game client; changing them writes the matching CVar immediately."
+L["FOREVER_VOLUME_FOG"] = "Volumetric Fog"
+L["FOREVER_VOLUME_FOG_DESC"] = "Controls volumeFog. 0 = disabled, 1 = enabled. Game default: %s."
+L["FOREVER_VOLUME_FOG_INTERIOR"] = "Interior Volumetric Fog"
+L["FOREVER_VOLUME_FOG_INTERIOR_DESC"] = "Controls volumeFogInterior. 0 = disabled, 1 = enabled. Game default: %s."
+L["FOREVER_VOLUME_FOG_LEVEL"] = "Volumetric Fog Quality"
+L["FOREVER_VOLUME_FOG_LEVEL_DESC"] = "Controls volumeFogLevel. Supported values are 0 through 3. Game default: %d."
+L["FOREVER_VOLUME_FOG_LEVEL_0"] = "0 — Minimum"
+L["FOREVER_VOLUME_FOG_LEVEL_1"] = "1 — Level 1"
+L["FOREVER_VOLUME_FOG_LEVEL_2"] = "2 — Level 2"
+L["FOREVER_VOLUME_FOG_LEVEL_3"] = "3 — Maximum"
+
+-- WoW: Forever-only advanced environment controls
+L["FOREVER_ENVIRONMENT_HEADER"] = "WoW: Forever — Advanced Environment"
+L["FOREVER_ENVIRONMENT_DESC"] = "Raw ground-effect controls beyond the normal graphics sliders. Blizzard's Ground Clutter slider can overwrite these values; external changes are mirrored back into this profile instead of being fought by the addon."
+L["FOREVER_GROUND_EFFECT_OVERRIDE"] = "Manage Advanced Ground Effects"
+L["FOREVER_GROUND_EFFECT_OVERRIDE_DESC"] = "Off by default. When enabled, the addon first captures the client's current raw ground-effect values so enabling it does not change your graphics, then manages the three controls below. Disabling management restores all three CVars to the Forever client defaults."
+L["FOREVER_RESET_DEFAULT"] = "Reset"
+L["FOREVER_RESET_DEFAULT_DESC"] = "Restore this setting to the Forever client's built-in default."
+L["FOREVER_GROUND_EFFECT_DENSITY"] = "Ground Effect Density"
+L["FOREVER_GROUND_EFFECT_DENSITY_DESC"] = "Raw groundEffectDensity CVar. Range: 16-256. Game default: %d."
+L["FOREVER_GROUND_EFFECT_DIST"] = "Ground Effect Distance"
+L["FOREVER_GROUND_EFFECT_DIST_DESC"] = "Raw groundEffectDist CVar. Range: 32-600. Values above the normal Ground Clutter preset extend flora/ground-object draw distance. Game default: %d."
+L["FOREVER_GROUND_EFFECT_FADE"] = "Ground Effect Fade Distance"
+L["FOREVER_GROUND_EFFECT_FADE_DESC"] = "Raw groundEffectFade CVar. Practical range exposed here: 0-600. Matching this to groundEffectDist reduces early flora fading. Game default: %d."
+
+-- ============================================================================
+-- ActionCam shoulder shaping
+-- ============================================================================
+L["ACTION_CAM_SHOULDER_OFFSET_NAME"] = "Shoulder Offset"
+L["ACTION_CAM_SHOULDER_OFFSET_DESC"] = "How far the camera sits off your character's centre line (test_cameraOverShoulder). Higher values give a more extreme over-the-shoulder view; negative values move the camera to the other shoulder. The addon default is 1.0."
+L["ACTION_CAM_SHOULDER_RESET"] = "Reset"
+L["ACTION_CAM_SHOULDER_RESET_DESC"] = "Restore the shoulder offset to the addon's default of 1.0."
+L["ACTION_CAM_SHOULDER_COMPENSATION_NAME"] = "Compensate for Model Size"
+L["ACTION_CAM_SHOULDER_COMPENSATION_DESC"] = "Blizzard scales the shoulder offset by the width of your current model, so the same value looks very different on a Tauren, a Gnome, a druid form or a mount. Leave this on for a consistent offset everywhere; turn it off to send the raw value straight to the CVar."
+L["ACTION_CAM_SHOULDER_FADE_NAME"] = "Recentre When Zoomed In"
+L["ACTION_CAM_SHOULDER_FADE_DESC"] = "Fades the offset back to centre as you zoom in, so looting and interacting stay aimed at your character. Turn this off for a constant offset at every camera distance."
+L["ACTION_CAM_SHOULDER_FADE_END_NAME"] = "Fully Centred Below"
+L["ACTION_CAM_SHOULDER_FADE_END_DESC"] = "Camera distance in yards at which the offset reaches zero."
+L["ACTION_CAM_SHOULDER_FADE_START_NAME"] = "Full Offset Above"
+L["ACTION_CAM_SHOULDER_FADE_START_DESC"] = "Camera distance in yards at which the offset reaches its full value. Must be larger than the centred distance."
+
+-- ============================================================================
+-- Gamepad
+-- ============================================================================
+L["GAMEPAD_HEADER"] = "Gamepad"
+L["GAMEPAD_DESC_ACTIVE"] = "Forever Gamepad UI (Alpha) is active. Action Camera is configured first below; gamepad-only CVar controls are shown only when Blizzard does not already expose them in its own settings."
+L["GAMEPAD_DESC_INACTIVE"] = "Forever Gamepad UI (Alpha) is disabled. Addon gamepad overrides stay inactive and managed CVars are returned to client defaults until that mode is enabled."
+L["GAMEPAD_MANAGE_SPEED_NAME"] = "Manage Gamepad Camera Speed"
+L["GAMEPAD_MANAGE_SPEED_DESC"] = "Lets this addon set GamePadCameraYawSpeed and GamePadCameraPitchSpeed. Off by default, so the addon never retunes your controller behind your back. Switching it off hands both CVars back to the client's own defaults."
+L["GAMEPAD_YAW_MULTIPLIER_NAME"] = "Gamepad Horizontal Speed"
+L["GAMEPAD_YAW_MULTIPLIER_DESC"] = "Multiplier applied to the client's own default gamepad yaw speed. Stored as a multiplier rather than an absolute number so it stays correct if Blizzard retunes the defaults."
+L["GAMEPAD_PITCH_MULTIPLIER_NAME"] = "Gamepad Vertical Speed"
+L["GAMEPAD_PITCH_MULTIPLIER_DESC"] = "Multiplier applied to the client's own default gamepad pitch speed."
+L["GAMEPAD_SPEED_RESOLVED"] = "Resolves to:"
+L["GAMEPAD_SPEED_CLIENT_DEFAULT"] = "client default"
+L["GAMEPAD_FACE_MOVEMENT_NAME"] = "Disable Face-Movement with Shoulder Cam"
+L["GAMEPAD_FACE_MOVEMENT_DESC"] = "Temporarily disables gamepad face-movement while the shoulder camera is active. Current clients use GamePadFaceMovementMaxAngle / Combat; the legacy GamePadFaceMovement switch is only a fallback. Original values are restored afterwards."
+L["GAMEPAD_WARN_NO_CAMERA_STICK"] = "|cffff5555No stick is assigned to the gamepad camera (GamePadCameraStick is 0), so the client is sending no camera input at all. Assign one in Options > Gamepad.|r"
+L["GAMEPAD_WARN_STICK_COLLISION"] = "|cffffcc00The gamepad camera shares a physical stick with movement or the cursor. Camera input will feel unresponsive until they are separated.|r"
+L["GAMEPAD_SPEED_HEADER"] = "Camera Speed"
+L["GAMEPAD_ACTIONCAM_HEADER"] = "Action Camera"
+L["GAMEPAD_ACTIONCAM_DESC"] = "Action Camera is the first camera layer for Forever gamepad mode. Shoulder and Dynamic Pitch are resolved before gamepad-only movement compatibility and speed overrides."
+L["GAMEPAD_ACTIONCAM_INACTIVE"] = "|cffffcc00Action Camera is paused until Enable Gamepad UI (Alpha) is turned on in the Forever client.|r"
+L["GAMEPAD_ACTIONCAM_BLOCKED_CENTERED"] = "|cffff5555Action Camera is blocked by CameraKeepCharacterCentered. MCD clears it before applying shoulder/pitch and restores your original value when Action Camera is no longer requested.|r"
+L["GAMEPAD_ACTIONCAM_BLOCKED_REDUCE"] = "|cffff5555Shoulder Camera is blocked by CameraReduceUnexpectedMovement. MCD clears it before applying the shoulder offset and restores your original value afterwards.|r"
+L["GAMEPAD_ACTIONCAM_BLOCKED_GENERIC"] = "|cffff5555Action Camera compatibility is not ready (%s). Shoulder/pitch are held at zero until the blocker clears.|r"
+L["GAMEPAD_PANEL_HEADER"] = "This Panel"
+L["GAMEPAD_AUTO_OPEN_NAME"] = "Open This Panel When a Gamepad Is Enabled"
+L["GAMEPAD_AUTO_OPEN_DESC"] = "Shows this panel the first time a gamepad becomes active on this character, so the camera settings that apply to it are not buried. It never opens during combat, and never opens twice unless you switch it back on here."
+L["GAMEPAD_SPEED_IN_GAME_UI"] = "|cff88ff88Camera speed is already available in the game's own Gamepad settings, so it is not duplicated here.|r"
+L["GAMEPAD_ADVANCED_HEADER"] = "Not in the Game's Settings"
+L["GAMEPAD_ADVANCED_DESC"] = "Camera CVars that exist in the API but have no control in the game's Gamepad panel. If Blizzard adds one, it disappears from here automatically."
+L["GAMEPAD_ADVANCED_OVERRIDE_NAME"] = "Manage These Settings"
+L["GAMEPAD_ADVANCED_OVERRIDE_DESC"] = "Off by default. These API-only values start from the client's built-in defaults. Enabling management applies those defaults first; disabling it restores the same client defaults."
+L["GAMEPAD_PUSH_CAMERA_NAME"] = "Cursor Edge Camera Push"
+L["GAMEPAD_PUSH_CAMERA_DESC"] = "GamePadCursorPushCamera: how fast the camera turns when the gamepad cursor reaches the edge of the window. 0 disables the push entirely."
+L["GAMEPAD_TANK_TURN_NAME"] = "Tank-Turn Speed"
+L["GAMEPAD_TANK_TURN_DESC"] = "GamePadTankTurnSpeed: when non-zero, the character turns in place like a tank instead of strafing. 0 keeps the default movement."
+
+if AceTable then
+    for key, value in pairs(L) do
+        AceTable[key] = value
+    end
+end
+
+L["GAMEPAD_ACTIONCAM_COMPAT_HEADER"] = "Gamepad Compatibility"
+
+L["GAMEPAD_ACTIONCAM_COMPAT_DESC"] = "Controller movement can fight an over-shoulder camera on some configurations. This compatibility option is applied only while Action Camera actually wants the shoulder offset."
+
+-- ActionCam ownership / controller bindings
+L["ACTION_CAM_SHOULDER_SWAP"] = "Swap Shoulder"
+L["ACTION_CAM_SHOULDER_SWAP_DESC"] = "Mirror the current shoulder offset to the opposite side."
+L["ACTION_CAM_SHOULDER_CENTER"] = "Center"
+L["ACTION_CAM_SHOULDER_CENTER_DESC"] = "Set the shoulder offset to zero without disabling ActionCam."
+L["BINDING_HEADER_MAXCAMDISTANCE"] = "Max Camera Distance"
+L["BINDING_TOGGLE_SHOULDER"] = "Toggle shoulder camera (current context)"
+L["BINDING_SWAP_SHOULDER"] = "Swap shoulder side"
+L["BINDING_CENTER_SHOULDER"] = "Center shoulder camera"
+L["BINDING_OPEN_CAMERA_SETTINGS"] = "Open camera settings"
+
+-- Native settings window
+L["UI_OVERVIEW"] = "Overview"
+L["UI_SEARCH"] = "Search settings…"
+L["UI_SEARCH_RESULTS"] = "Search results"
+L["UI_NO_RESULTS"] = "No matching settings are available on this client."
+L["UI_HELP_TITLE"] = "Camera settings"
+L["UI_HELP_DESC"] = "Hover a setting to read its description. Changes apply immediately. Drag the title bar to move this window."
+L["UI_DISABLED"] = "This setting is unavailable with the current mode."
+L["UI_CURRENT_PROFILE"] = "Profile"
+L["UI_SELECT_PROFILE"] = "Select profile"
+L["UI_NEW_PROFILE"] = "New profile name"
+L["UI_NEW_PROFILE_DESC"] = "Create and switch to a profile. Use 1–80 bytes for the name. An existing name opens that profile."
+L["UI_COPY_PROFILE"] = "Copy settings from"
+L["UI_COPY_PROFILE_DESC"] = "Replace the current profile settings with those of the selected profile."
+L["UI_DELETE_PROFILE"] = "Delete profile"
+L["UI_CONFIRM"] = "Confirm"
+L["UI_CANCEL"] = "Cancel"
+L["UI_CONFIRM_DESC"] = "This will change or remove saved settings."
+L["UI_INVALID"] = "Invalid value. Please check the input."
+L["UI_SELECT"] = "Select…"
+L["UI_CREATE"] = "Create / open"
+L["UI_CLOSE"] = "Close"
+L["UI_DISTANCE"] = "Distance"
+
+L["UI_ACTIVITY_PRESET"] = "Distance preset"
+L["UI_RETURN_DELAY"] = "Return delay (seconds)"
+L["UI_FOREVER_GRAPHICS"] = "Forever graphics"
+
+L["UI_YARDS"] = "yards"
+L["CONTEXT_SCENARIO_CLASSIC"] = "Scenarios"

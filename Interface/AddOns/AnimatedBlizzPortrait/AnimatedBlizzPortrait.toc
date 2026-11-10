@@ -1,0 +1,11 @@
+## Interface: 120107, 120105, 120005, 120007, 120100, 16001, 20505, 20506, 11507, 11508, 30405, 40402, 50503, 50504
+## Title: Animated Blizzard Portraits
+## Notes: Replaces all Blizzard unit frame portraits (Player, Target, ToT, Focus, Party, Pet, Boss, Arena) with live 3D animated character models.
+## Author: GI-Ka
+## Version: 1.2.24
+## SavedVariables: AnimatedBlizzPortraitDB
+## IconTexture: Interface\AddOns\AnimatedBlizzPortrait\ABP Icon
+## Category-enUS: Unit Frames
+
+AnimatedBlizzPortrait.xml
+AnimatedBlizzPortrait.lua

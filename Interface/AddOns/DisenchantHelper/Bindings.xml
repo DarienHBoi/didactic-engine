@@ -1,0 +1,8 @@
+<Bindings>
+    <!-- One key press = one click on the queue button = one cast.
+         The button (global name DisenchantHelper_QueueButton) is created in
+         DisenchantHelper.lua; the display texts BINDING_HEADER_* and
+         BINDING_NAME_* are defined there as well. -->
+    <Binding name="CLICK DisenchantHelper_QueueButton:LeftButton" category="DISENCHANTHELPER">
+    </Binding>
+</Bindings>

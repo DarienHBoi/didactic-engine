@@ -1,0 +1,43 @@
+## Interface: 16001
+## Title: Salesman
+## Notes: Price your enchants from Auctionator and post a one-click advert.
+## Author: Nectar
+## Version: 0.1.0
+## OptionalDeps: Auctionator
+## SavedVariables: SalesmanDB
+## SavedVariablesPerCharacter: SalesmanCharDB
+
+Core.lua
+Money.lua
+Pricing.lua
+Message.lua
+Channels.lua
+SendGuard.lua
+DB.lua
+Recipes.lua
+Breakdown.lua
+Group.lua
+Sales.lua
+Scale.lua
+Ledger.lua
+Tracker.lua
+Stats.lua
+StatsData.lua
+Profit.lua
+Stock.lua
+CategoryRank.lua
+Customers.lua
+Match.lua
+Queue.lua
+Wording.lua
+MinimapMath.lua
+Adapters.lua
+Prices.lua
+UI\Theme.lua
+UI\Rows.lua
+UI\Detail.lua
+UI\Customers.lua
+UI\Window.lua
+UI\Hooks.lua
+UI\Minimap.lua
+Main.lua

@@ -1,0 +1,112 @@
+
+ShortestPathForeverCharDB = {
+["bind"] = {
+["map"] = 1,
+["x"] = 1633.5,
+["name"] = "Orgrimmar",
+["y"] = -4440.2001953125,
+},
+["progress"] = {
+["flightsTaken"] = 42,
+["walkedYards"] = 279633.7015669329,
+["milestones"] = {
+["routes:10"] = 1794150965,
+["transports:1"] = 1793914361,
+["distance:100000"] = 1794056638,
+["distance:1000"] = 1793904545,
+["flights:10"] = 1794085753,
+["distance:10000"] = 1793908473,
+["routes:1"] = 1794018848,
+["flights:1"] = 1794005054,
+},
+["portalsUsed"] = 0,
+["routesCompleted"] = 24,
+["transportsUsed"] = 7,
+["peers"] = {
+["spf"] = {
+["SkeletonBone"] = {
+["flights_taken"] = {
+["all"] = {
+["value"] = 42,
+["eventUnix"] = 1794270105,
+},
+},
+["distance_yards"] = {
+["all"] = {
+["value"] = 279587,
+["eventUnix"] = 1794270782,
+},
+},
+["portals_used"] = {
+["all"] = {
+["value"] = 0,
+["eventUnix"] = 1794264161,
+},
+},
+["routes_completed"] = {
+["all"] = {
+["value"] = 24,
+["eventUnix"] = 1794269835,
+},
+},
+["transports_used"] = {
+["all"] = {
+["value"] = 7,
+["eventUnix"] = 1794264161,
+},
+},
+},
+},
+},
+},
+["taxi"] = {
+[61] = true,
+[25] = true,
+[29] = true,
+[38] = true,
+[80] = true,
+[10] = true,
+[20] = true,
+[11] = true,
+[22] = true,
+[23] = true,
+[77] = true,
+},
+["taxiVersion"] = 2,
+["taxiNames"] = {
+[75] = "Thorium Point, Searing Gorge",
+[76] = "Revantusk Village, The Hinterlands",
+[10] = "The Sepulcher, Silverpine Forest",
+[55] = "Brackenwall Village, Dustwallow Marsh",
+[20] = "Grom'gol, Stranglethorn",
+[3242] = "Tainted Foothills, Mount Hyjal",
+[40] = "Gadgetzan, Tanaris",
+[48] = "Bloodvenom Post, Felwood",
+[3203] = "Rog'mar, Riverglades",
+[80] = "Ratchet, The Barrens",
+[559] = "Summit of Eternity, Mount Hyjal",
+[17] = "Hammerfall, Arathi",
+[21] = "Kargath, Badlands",
+[25] = "Crossroads, The Barrens",
+[29] = "Sun Rock Retreat, Stonetalon Mountains",
+[42] = "Camp Mojache, Feralas",
+[58] = "Zoram'gar Outpost, Ashenvale",
+[68] = "Light's Hope Chapel, Eastern Plaguelands",
+[69] = "Moonglade",
+[11] = "Undercity, Tirisfal",
+[13] = "Tarren Mill, Hillsbrad",
+[70] = "Flame Crest, Burning Steppes",
+[22] = "Thunder Bluff, Mulgore",
+[30] = "Freewind Post, Thousand Needles",
+[44] = "Valormok, Azshara",
+[72] = "Cenarion Hold, Silithus",
+[56] = "Stonard, Swamp of Sorrows",
+[79] = "Marshal's Refuge, Un'Goro Crater",
+[38] = "Shadowprey Village, Desolace",
+[53] = "Everlook, Winterspring",
+[61] = "Splintertree Post, Ashenvale",
+[77] = "Camp Taurajo, The Barrens",
+[23] = "Orgrimmar, Durotar",
+[18] = "Booty Bay, Stranglethorn",
+},
+}
