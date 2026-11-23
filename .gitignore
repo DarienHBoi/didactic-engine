@@ -1,12 +1,12 @@
 # Only Interface/AddOns and WTF settings are tracked; everything else in the game folder is ignored.
 /*
 !/.gitignore
+!/.gitattributes
 !/Interface/
 /Interface/*
 !/Interface/AddOns/
 !/WTF/
 # Keep out of the repo: login email/account list, console logs, caches, backups.
-/WTF/Config.wtf
 /WTF/SavedVariables/Blizzard_Console.lua*
 *.bak
 *.old
