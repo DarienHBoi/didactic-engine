@@ -1,0 +1,2 @@
+-- Gold Ledger is now part of ZugDAQ. This stub exists only so the game loads GoldLedgerDB (your saved history)
+-- before ZugDAQ, which takes it over the first time it loads. Delete the folder once ZugDAQ has your history.

@@ -1,23 +1,48 @@
 
 MissingBuffWarningDB = {
-["classes"] = {
-["PRIEST"] = {
-["enabled"] = {
-["SHADOWPROT"] = false,
-["SPIRIT"] = false,
-["SHADOWFORM"] = false,
-},
-["manual"] = {
-},
-},
-},
-["locked"] = true,
-["probe"] = {
-"button=LeftButton\nshift=false\naddBoxFocus=nil\nFRAME0 name=SpellbookMicroButton type=Button fields: OnEnter=function; DoModeChange=function; dirtyCallback=function; ShouldShowTooltip=function; QuickKeybindButtonOnLeave=function; OnShow=function; GetAnyPvpTalentAlert=function; commandName=\"TOGGLESPELLBOOK\"; deferredCallbacks={}; ShouldShowSpellBookAlert=function; EvaluateTooltipVisibility=function; EvaluateAlertVisibility=function; GetCallbacksByEvent=function; UnregisterEvents=function; ReconcileDeferredCallbacks=function; FlashContent=<frame>; MainMenuBarMicroButton_OnLoad=function; OnLoad=function; isLoaded=true; Event={OnDisable=\"OnDisable\", OnEnable=\"OnEnable\", OnBeginPulse=\"OnBeginPulse\", OnNewNotification=\"OnNewNotification\", OnDismissedNotification=\"OnDismissedNotification\", OnEndPulse=\"OnEndPulse\"}; GetAnyTalentAlert=function; OnEnable=function; IsPulsing=function; CanPlayerUseHeroTalentSpecUI=function; FlashBorder=<frame>; MarkDirty=function; CopyDeferredCallbacks=function; SetNormal=function; oldSpecID=1; layoutIndex=3; executingEvents={}; SetHasNotification=function; OnClick=function; callbackTables={1=table, 2=table}; QuickKeybindButtonSetTooltip=function; GenerateCallbackEvents=function; DoesFrameHaveEvent=function; newbieText=\"To prepare a spell or ability for use, open the Spellbook & \"; QuickKeybindHighlightTexture=<frame>; SetPushed=function; GetAnySpellBookAlert=function; RegisterCallback=function; textureName=\"SpellbookAbilities\"; SetUndefinedEventsAllowed=function; UnregisterCallback=function; UpdateMicroButton=function; UpdateMouseWheelHandler=function; RegisterCallbackWithHandle=function; QuickKeybindButtonOnMouseWheel=function; GetTalentUnlockLevel=function; PushedBackground=<frame>; ShouldShowTalentAlerts=function; OnMouseUp=function; QuickKeybindButtonOnShow=function; spellbookOnly=true; QuickKeybindButtonOnClick=function; GetCallbackTables=function; QuickKeybindButtonOnUpdate=function; PostAddButtonCallback=function; QuickKeybindButtonOnHide=function; tooltipText=\"Spellbook |cffffd200(P)|r\"; SetDirtyMethod=function; OnMouseDown=function; Background=<frame>; GetMutableCallbacksByEvent=function; GetCallbackTable=function; OnDisable=function; OnLeave=function; UnregisterEventsByEventTable=function; SetTextureAndTooltip=function\nFRAME1 name=MicroMenu type=Frame fields: IsLayoutFrame=function; GetEdgeButton=function; ShouldUpdateLayout=function; ApplyMicroMenuOverrides=function; MarkDirty=function; GetMaximumWidth=function; SetHeightPadding=function; SetNormalScale=function; ClearFixedSize=function; OnCleaned=function; oldGridSettings={stride=12, childXPadding=-5, layoutFramesGoingRight=true, childYPadding=-5, isHorizontal=true, layoutChildren=table, layoutFramesGoingUp=false}; SetWidthPadding=function; OnUpdate=function; GetAdditionalRegions=function; GetFixedSize=function; GetChildWidth=function; GetChildSize=function; GetHeightPadding=function; UpdateFramerateFrameAnchor=function; GetFixedWidth=function; normalScale=1; dirty=false; GetChildHeight=function; GetWidthPadding=function; stride=12; MarkClean=function; childYPadding=-5; BackgroundArt=<frame>; SetOverrideScale=function; ResetMicroMenuPosition=function; GetMinimumWidth=function; SetFixedWidth=function; InitializeButtons=function; UpdateScale=function; layoutFramesGoingUp=false; GetFixedHeight=function; layoutFramesGoingRight=true; AddLayoutChildren=function; isHorizontal=true; SetFixedHeight=function; childXPadding=-5; AnchorToMenuContainer=function; SetFixedSize=function; GetLayoutChildren=function; numButtons=12; GenerateButtonInfos=function; UpdateHelpTicketButtonAnchor=function; ClearOverrideScale=function; IsDirty=function; OnLoad=function; BorderArt=<frame>; Layout=function; CacheLayoutSettings=function; OnShow=function; ShouldClearOnUpdateAfterClean=function; SetMaximumWidth=function; AddButton=function; MarkIgnoreInLayout=function; SetMinimumWidth=function; OverrideMicroMenuPosition=function; IgnoreLayoutIndex=function\nFRAME2 name=MicroMenuContainer type=Frame fields: OnAnyEditModeSystemAnchorChanged=function; UpdateMagnetismRegistration=function; AnySettingsDirty=function; GetSettingValue=function; systemInfo={settings=table, anchorInfo=table, isInDefaultPosition=true, system=13}; dirtySettings={}; settingMap={1=table, 2=table, 0=table}; OnDragStart=function; TrySetCompositeNumberSettingValue=function; UpdateClampOffsets=function; downKeys={}; BreakFrameSnap=function; settingDisplayInfoMap={1=table, 2=table, 0=table}; GetCombinedSelectionOffset=function; GetTopOffset=function; OnDragStop=function; settingsDialogAnchor={relativeTo=<frame>, point=\"BOTTOMRIGHT\", Init=function, SetFromPoint=function, GetRelativeTo=function, SetOffsets=function, y=200, x=-250, SetRelativeTo=function, relativePoint=\"BOTTOMRIGHT\", Get=function, Set=function, SetPoint=function, SetPointWithExtraOffset=function}; Hide=function; IsInDefaultPosition=function; GetSelectionOffset=function; SetupVisibilityFunctionOverrides=function; ShowEditInstructions=function; ResetToDefaultPosition=function; ConvertSettingDisplayValueToRawValue=function; ShouldShowSetting=function; SetSnappedToFrame=function; SelectSystem=function; savedSystemInfo={system=13, isInDefaultPosition=true, settings=table, anchorInfo=table}; UseSettingAltName=function; GetFrameMagneticEligibility=function; ClearDirtySetting=function; IsInitialized=function; UpdateSystemSetting=function; BreakFromFrameManager=function; SetShown=function; UpdateSystemSettingOrientation=function; MarkAllSettingsDirty=function; IsEditModeDragging=function; SetShownBase=function; SetScaleBase=function; HasActiveChanges=function; SetPoint=function; GetScaledCenter=function; ClearHighlight=function; systemNameString=\"Menu\"; DoesSettingDisplayValueEqual=function; OnLoad=function; HideOverride=function; UpdateDisplayInfoOptions=function; ClearAllPointsBase=function; OnEditModeEnter=function; GetSystemName=function; ProcessMovementKey=function; GetSettingValueBool=function; OnKeyUp=function; RemoveSnappedFrame=function; GetCompositeNumberSettingValue=function; IsHorizontallyAlignedWithFrame=function; OnEvent=function; Layout=function; DoesSettingValueEqual=function; system=13; UpdateSystemSettingSize=function; OnSystemHide=function; UpdateSystemSettingOrder=function; ShouldResetSettingsDialogAnchors=function; GetScaledSelectionCenter=function; CanBeMoved=function; Selection=<frame>; HasCompositeNumberSetting=function\nFRAME3 name=UIParent type=Frame fields: GamepadPersistentInputLegend=<frame>; SettingsCheckboxDropdownControlinputLegend=<frame>; Tabs={1=<frame>, 2=<frame>, 3=<frame>, 4=<frame>, 5=<frame>, 6=<frame>, 7=<frame>, 8=<frame>, 9=<frame>, 10=<frame>}; GamepadMainActionBarFrame=<frame>; SettingsCheckboxSliderControlinputLegend=<frame>; SettingsSliderControlinputLegend=<frame>; SettingsCheckboxWithColorSwatchControlinputLegend=<frame>; SettingsDropdownControlinputLegend=<frame>\ntooltip:GetSpell=nil,nil",
-},
-["scale"] = 1.14583353151878,
+["fontSize"] = 10,
+["bgAlpha"] = 0.6,
+["scale"] = 1.209464467796354,
 ["minimap"] = {
 ["hidden"] = false,
-["angle"] = 359.9066329147177,
+["angle"] = 238.3701974854797,
 },
+["showWho"] = true,
+["headerColor"] = "gold",
+["locked"] = true,
+["redEdge"] = true,
+["onlyInGroup"] = false,
+["layout"] = "strip",
+["showInCombat"] = true,
+["whenNone"] = "hide",
+["classes"] = {
+["PALADIN"] = {
+["manual"] = {
+},
+["groups"] = {
+},
+["enabled"] = {
+},
+},
+["PRIEST"] = {
+["manual"] = {
+},
+["groups"] = {
+},
+["enabled"] = {
+["SHADOWPROT"] = false,
+["SPIRIT"] = true,
+["SHADOWFORM"] = false,
+},
+},
+},
+["growUp"] = false,
+["version"] = 2,
+["spacing"] = 0,
+["showBorder"] = false,
+["iconSize"] = 32,
+["collapsed"] = {
+["ALL"] = false,
+},
+["showBg"] = false,
 }

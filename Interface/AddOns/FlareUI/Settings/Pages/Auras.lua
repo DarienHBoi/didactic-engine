@@ -1,0 +1,57 @@
+local _, ns = ...
+local S = ns.Settings
+local L = ns.L
+
+--------------------------------------------------
+-- BUFFS & DEBUFFS
+-- Settings for the player's buff and debuff frames (Modules/Auras.lua).
+--------------------------------------------------
+local function Refresh()
+    if ns.Auras and ns.Auras.Refresh then ns.Auras:Refresh() end
+end
+
+local function Holder(kind)
+    return function() return ns.Auras and ns.Auras.GetFrame and ns.Auras:GetFrame(kind) end
+end
+
+S:Module{
+    key = "au", group = "combat", order = 50, enabled = "auras.enabled",
+    tabs = { { key = "settings" }, { key = "fonts" } },
+    editMode = Holder("buffs"),
+    editFrames = { Holder("buffs"), Holder("debuffs") },
+}
+
+-- the sample icons show on this page, so Timer, Icon Shape and Swipe can be seen
+S:On("PageShown", function(key)
+    if ns.Auras and ns.Auras.SetSettingsPreview then ns.Auras:SetSettingsPreview(key == "au") end
+end)
+
+S:Row{ key = "au.shape", kind = "choice", path = "auras.style", choices = { "round", "square" }, apply = Refresh }
+S:Row{ key = "au.swipe", kind = "choice", path = "auras.swipe", choices = { "icon", "border", "both", "none" }, apply = Refresh }
+S:Row{ key = "au.timer", kind = "choice", path = "auras.timer", choices = { "below", "bottom", "middle", "none" }, apply = Refresh }
+S:Row{ key = "au.timerColor", path = "auras.timerColor", apply = Refresh,
+    disabled = function() return S:GetPath("auras.timer") == "none" end }
+S:Row{ key = "au.arrive", path = "auras.arrive", apply = Refresh }
+
+local function NoMineFirst()
+    local sort = S:GetPath("auras.sort")
+    return sort ~= "time" and sort ~= "name"
+end
+S:Row{ key = "au.sort", kind = "choice", path = "auras.sort", choices = { "default", "applied", "time", "name" }, apply = Refresh }
+S:Row{ key = "au.reverse", path = "auras.reverse", apply = Refresh }
+S:Row{ key = "au.mineFirst", path = "auras.mineFirst", apply = Refresh, disabled = NoMineFirst }
+
+-- (Buff Reminders: its own page since 11-12, Settings/Pages/BuffReminders.lua)
+
+-- FONTS (11-13, back from Edit Mode): Buffs and Debuffs each in a section
+for _, kind in ipairs({ "buffs", "debuffs" }) do
+    local function Font(key)
+        return {
+            key = key == "font" and "timer" or "count",
+            font = function() return ns.Auras.KindFont(kind, key) end,
+            default = function() return S:DefaultPath("auras." .. kind .. "." .. key) end,
+        }
+    end
+    S:FontRows{ module = "au", tab = "fonts", section = kind == "buffs" and "au.fontsBuffs" or "au.fontsDebuffs",
+        prefix = kind, apply = Refresh, fonts = { Font("font"), Font("countFont") } }
+end

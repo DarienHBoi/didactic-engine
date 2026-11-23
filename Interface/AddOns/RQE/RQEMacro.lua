@@ -1,0 +1,1620 @@
+--[[ 
+
+RQEMacro.lua
+Quest macro generation, deferred updates, Magic Button state, and tooltip behavior
+
+]]
+
+
+--------------------------------------------------
+-- #1. 📦 Macro Namespace, Constants & Queues
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #1a. Namespace & Client-Specific Tooltip Marker
+	-------------------------------------------------------
+
+	RQEMacro = RQEMacro or {}
+	local isRetail = RQE.IsRetail == true
+	local cancelAuraTooltipItemID = isRetail and 67097 or 54068
+
+	-------------------------------------------------------
+	-- #1b. Cancel-Aura Macro Recognition
+	-------------------------------------------------------
+
+	-- The dedicated item marker identifies a cancel-aura macro on each client.
+	local function IsCancelAuraTooltipMacro(macroBody)
+		return type(macroBody) == "string"
+			and tonumber(macroBody:match("^%s*#showtooltip%s+item:(%d+)")) == cancelAuraTooltipItemID
+	end
+
+	-- Function to identify macros that contain an executable cancel-aura command
+	local function HasCancelAuraCommand(macroBody)
+		if type(macroBody) ~= "string" then return false end
+		local lowerBody = macroBody:lower()
+		return lowerBody:match("^%s*/cancelaura%s+") ~= nil
+			or lowerBody:match("[\r\n]%s*/cancelaura%s+") ~= nil
+	end
+
+	-------------------------------------------------------
+	-- #1c. Deferred Operation Queues & Macro Limits
+	-------------------------------------------------------
+
+	RQEMacro.pendingMacroSets = RQEMacro.pendingMacroSets or {} -- Queue for macro set operations
+	RQEMacro.pendingMacroOperations = RQEMacro.pendingMacroOperations or {}
+	RQEMacro.pendingMacroClears = RQEMacro.pendingMacroClears or {}  -- Queue to hold macro names pending clearance
+	RQEMacro.pendingMacroSequence = RQEMacro.pendingMacroSequence or 0
+
+	RQEMacro.MAX_ACCOUNT_MACROS, RQEMacro.MAX_CHARACTER_MACROS = 120, 18 -- Adjust these values according to the game's current limits
+	RQEMacro.QUEST_MACRO_PREFIX = "RQEQuest" -- Prefix for macro names to help identify them
+
+	-------------------------------------------------------
+	-- #1d. Ordered Queue Insertion
+	-------------------------------------------------------
+
+	-- Function to queue protected macro work once while preserving replay order
+	local function QueuePendingMacroOperation(self, queue, operation)
+		self.pendingMacroSequence = self.pendingMacroSequence + 1
+		operation.order = self.pendingMacroSequence
+		table.insert(queue, operation)
+	end
+
+
+--------------------------------------------------
+-- #2. ✅ Macro Validation & Magic Button State
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #2a. Current Quest-Step Macro Validation
+	-------------------------------------------------------
+
+	-- Function that forces a check on the RQE Macro
+	function RQE.ForceCheckCurrentMacroContents()
+		RQE.isCheckingMacroContents = true
+		
+		local isMacroCorrect = RQE.CheckCurrentMacroContents()
+		RQE.CheckCurrentMacroContents()
+
+		-- Previous Blizzard call changed 2026.09.25: C_Timer.After(0.2, function()
+		-- Releases the macro-content inspection guard after the short delay.
+		RQE.API.Client.C_Timer.After(0.2, function()
+			if RQE.isCheckingMacroContents then
+				RQE.isCheckingMacroContents = false
+			end
+		end)
+	end
+
+
+	-- Function to check if the current RQE Macro matches the expected contents based on the current super-tracked quest step
+	function RQE.CheckCurrentMacroContents()
+		-- Search previews own their macro until pickup or an explicit step change.
+		-- Do not compare them to the unrelated Blizzard super-tracked quest.
+		-- Previous condition (2026.11.09): only Retail protected searched preview macros.
+		-- if isRetail and RQE.CanNavigateSearchedQuestSteps
+		if RQE.CanNavigateSearchedQuestSteps
+			and RQE:CanNavigateSearchedQuestSteps(RQE.searchedQuestID) then return true end
+
+		-- Prevent re-entry if the function is already in progress
+		if RQE.isCheckingMacroContents then
+			return false
+		end
+
+		-- Ensure that `RQE.AddonSetStepIndex` is initialized and maintained properly
+		if not RQE.AddonSetStepIndex then
+			RQE.debugLog("RQE.AddonSetStepIndex was nil; setting to 1 by default.")
+			RQE.AddonSetStepIndex = 1 -- Initialize to the first step by default
+		end
+
+		-- Check if a quest is being super-tracked
+		RQE.isPlayerSuperTrackingQuest() -- Check to see if anything is being super tracked
+		local isSuperTracking = RQE.API.IsSuperTrackingQuest()
+
+		if not RQE.isSuperTracking or not isSuperTracking then
+			RQE.debugLog("No quest is currently being super-tracked.")
+			return false
+		end
+
+		-- Get the quest ID of the currently super-tracked quest
+		local questID = RQE.API.GetSuperTrackedQuestID()
+		if not questID then
+			RQE.debugLog("Super-tracked quest ID not found.")
+			return false
+		end
+
+		-- Retrieve the quest data from the database
+		local questData = RQE.getQuestData(questID)
+		if not questData then
+			RQE.debugLog("Quest data not found for quest ID:", questID)
+			return false
+		end
+
+		-- Fetch the current step index the player is on
+		local stepIndex = RQE.AddonSetStepIndex
+		if not stepIndex or stepIndex < 1 then
+			RQE.debugLog("Invalid or missing step index. Defaulting to 1.")
+			stepIndex = 1 -- Default to the first step if no valid step index is found
+			RQE.AddonSetStepIndex = stepIndex
+		end
+
+		RQE.debugLog("Current step index:", stepIndex)
+
+		-- Fetch the macro data for the current step
+		local questStep = questData[stepIndex]
+		if not questStep or not questStep.macro then
+			RQE.debugLog("No macro data found for step index:", stepIndex)
+			return false
+		end
+
+		-- Combine the macro data into a single string
+		local expectedMacroBody = type(questStep.macro) == "table" and table.concat(questStep.macro, "\n") or questStep.macro
+
+		-- Get the current macro contents
+		-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName("RQE Macro")
+		local macroIndex = RQE.API.Client.GetMacroIndexByName("RQE Macro")
+		if not macroIndex or macroIndex == 0 then
+			RQE.debugLog("Macro 'RQE Macro' not found.")
+			return false
+		end
+
+		-- Previous Blizzard call changed 2026.09.25: local _, _, currentMacroBody = GetMacroInfo(macroIndex)
+		local _, _, currentMacroBody = RQE.API.Client.GetMacroInfo(macroIndex)
+		if not currentMacroBody then
+			RQE.debugLog("Failed to retrieve current macro contents.")
+			return false
+		end
+
+		-- Compare the current and expected macro contents
+		if currentMacroBody == expectedMacroBody then
+			RQE.infoLog("True - Current Macro matches expected contents for stepIndex: " .. tostring(stepIndex))
+			return true
+		else
+			RQE.infoLog("False - Current Macro does not match. Expected for stepIndex: " .. tostring(stepIndex))
+			-- Reset the step index to the first step if the macro does not match
+			RQE.SetInitialWaypointToOne()
+			return false
+		end
+	end
+
+
+	-------------------------------------------------------
+	-- #2b. Macro Clear Eligibility
+	-------------------------------------------------------
+
+	-- Function to check if the macro contains any content
+	function RQE:ShouldClearMacro(macroName)
+		-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName(macroName)
+		local macroIndex = RQE.API.Client.GetMacroIndexByName(macroName)
+		if not macroIndex or macroIndex == 0 then
+			-- No macro exists
+			return false
+		end
+
+		-- Fetch the current macro content
+		-- Previous Blizzard call changed 2026.09.25: local _, _, macroBody = GetMacroInfo(macroIndex)
+		local _, _, macroBody = RQE.API.Client.GetMacroInfo(macroIndex)
+
+		-- Check if macro body has any content
+		if macroBody and macroBody ~= "" then
+			return true -- Macro has content
+		else
+			return false -- Macro is empty
+		end
+	end
+
+
+	-------------------------------------------------------
+	-- #2c. Magic Button Icon Synchronization
+	-------------------------------------------------------
+
+	-- Function for Updating the RQE Magic Button Icon to match with RQE macro
+	RQE.Buttons.UpdateMagicButtonIcon = function()
+		-- Previous Blizzard call changed 2026.09.25: if not isRetail and InCombatLockdown() then
+		if not isRetail and RQE.API.Client.InCombatLockdown() then
+			RQE.RefreshMagicButtonAfterCombat = true
+			return
+		end
+
+		-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName("RQE Macro")
+		local macroIndex = RQE.API.Client.GetMacroIndexByName("RQE Macro")
+		if macroIndex and macroIndex > 0 then
+			-- Previous Blizzard call changed 2026.09.25: local _, iconID, macroBody = GetMacroInfo(macroIndex)
+			local _, iconID, macroBody = RQE.API.Client.GetMacroInfo(macroIndex)
+			if iconID then
+				local MagicButton = RQE.MagicButton --_G["RQEMagicButton"]
+				if MagicButton then
+					MagicButton:SetNormalTexture(iconID)
+					MagicButton:SetHighlightTexture(iconID, "ADD")
+					if RQE.UI then RQE.UI:UpdateMagicButtonActionIcon(MagicButton, macroBody) end
+				end
+			end
+		elseif RQE.UI and RQE.MagicButton then
+			RQE.UI:UpdateMagicButtonActionIcon(RQE.MagicButton, nil)
+		end
+	end
+
+
+--------------------------------------------------
+-- #3. 📜 Quest Macro Generation
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #3a. Quest-Step Macro Assembly
+	-------------------------------------------------------
+
+	-- Function to create or update a macro for a quest step
+	function RQEMacro:SetQuestStepMacro(questID, stepIndex, macroContent, perCharacter)
+		-- Timer callbacks captured before Search > Track can still arrive here.
+		-- Only the active searched quest and selected preview step may replace it.
+		-- Previous condition (2026.11.09): only Retail rejected stale search/step callbacks.
+		-- if isRetail and RQE.CanNavigateSearchedQuestSteps
+		if RQE.CanNavigateSearchedQuestSteps
+			and RQE:CanNavigateSearchedQuestSteps(RQE.searchedQuestID) then
+			local selectedStep = tonumber(RQE.ManualPreviewStepIndex or RQE.AddonSetStepIndex) or 0
+			if tonumber(questID) ~= tonumber(RQE.searchedQuestID) or tonumber(stepIndex) ~= selectedStep then return end
+		end
+		local macroName = "RQE Macro"
+		local iconFileID = "INV_MISC_QUESTIONMARK"
+		local macroBody = ""
+
+		-- Case 1: New array macro { { macro="/click ...", spellIDTooltip=215173, iconFileID="Inv_helm_..." } }
+		if type(macroContent) == "table" and type(macroContent[1]) == "table" and macroContent[1].macro then
+			local entry = macroContent[1]
+			macroBody = entry.macro or ""
+
+			-- Choose the icon
+			if entry.iconFileID then
+				iconFileID = entry.iconFileID
+			elseif entry.spellIDTooltip then
+				-- Previous Blizzard call changed 2026.09.25: local spellInfo = C_Spell.GetSpellInfo(entry.spellIDTooltip)
+				local spellInfo = RQE.API.Client.C_Spell.GetSpellInfo(entry.spellIDTooltip)
+				if spellInfo and spellInfo.iconID then
+					iconFileID = spellInfo.iconID
+				end
+			end
+
+		-- Case 2: Legacy macros
+		elseif macroContent then
+			macroBody = type(macroContent) == "table" and table.concat(macroContent, "\n") or macroContent
+		end
+
+		-- Normalize numeric IDs
+		if type(iconFileID) == "number" then
+			iconFileID = tostring(iconFileID)
+		end
+
+		-- Previous Blizzard call changed 2026.09.25: if InCombatLockdown() then
+		if RQE.API.Client.InCombatLockdown() then
+			if isRetail then
+				-- Queue for after combat.
+				table.insert(self.pendingMacroSets, {
+					name = macroName,
+					iconFileID = iconFileID,
+					body = macroBody,
+					perCharacter = perCharacter
+				})
+			else
+				QueuePendingMacroOperation(self, self.pendingMacroSets, {
+					name = macroName,
+					iconFileID = iconFileID,
+					body = macroBody,
+					perCharacter = perCharacter
+				})
+				return
+			end
+		else
+			return self:SetMacro(macroName, iconFileID, macroBody, perCharacter)
+		end
+
+		-- Retail preserves its existing immediate refresh after queueing a macro.
+		if isRetail and RQEMacro and RQEMacro.UpdateMagicButtonTooltip then
+			RQEMacro:UpdateMagicButtonTooltip()
+		end
+
+		return nil
+	end
+
+
+	-------------------------------------------------------
+	-- #3b. Shared Pickup Sources, Item Binding & Macros
+	-------------------------------------------------------
+
+	-- Exports pickup arrays without changing saved sources; unknown givers retain a blank NPC placeholder.
+	function RQE.PrintQuestPickupSources(questData, emit, escapeText)
+		emit = emit or print
+		questData = type(questData) == "table" and questData or {}
+		-- Escapes pickup names and IDs when the caller has no specialized string serializer.
+		local function EscapeText(value)
+			if escapeText then return escapeText(value) end
+			return tostring(value or ""):gsub("\\", "\\\\"):gsub("\r\n", "\n")
+				:gsub("\r", "\n"):gsub("\n", "\\n"):gsub("\t", "\\t"):gsub('"', '\\"')
+		end
+		local sources = {}
+		-- Copies supported pickup metadata and normalizes an unknown source ID to x99.
+		local function AddSource(kind, name, id, source)
+			if type(name) ~= "string" then return end
+			name = name:match("^%s*(.-)%s*$")
+			if name == "" then return end
+			local numericID = tonumber(id)
+			if numericID and numericID > 0 and numericID < math.huge and numericID % 1 == 0 then
+				id = numericID
+			elseif kind == "object" and type(id) == "string" and id:match("^[%w_-]+$")
+				and id:lower() ~= "x99" then
+				-- Named object IDs remain strings for the object viewer.
+			else
+				id = "x99"
+			end
+			sources[#sources + 1] = {
+				kind = kind, name = name, id = id,
+				hostile = kind == "npc" and source and source.hostile,
+				auction = kind == "item" and source and source.auction,
+			}
+		end
+		for _, source in ipairs(type(questData.npcs) == "table" and questData.npcs or {}) do
+			if type(source) == "table" then
+				local kind = source.object ~= nil and "object" or (source.item ~= nil and "item" or "npc")
+				local name = source[kind]
+				if kind == "npc" and name == nil then name = source.name end
+				AddSource(kind, name, source.id, source)
+			end
+		end
+		if #sources == 0 then
+			local legacy = type(questData.npc) == "table" and questData.npc or { questData.npc }
+			for _, name in ipairs(legacy) do
+				if type(name) == "string" then
+					for rawLine in name:gsub("\\n", "\n"):gmatch("[^\r\n]+") do
+						local line = rawLine:match("^%s*(.-)%s*$"):gsub("^/tar%s+", ""):gsub("^/target%s+", "")
+						if line:sub(1, 1) ~= "/" then AddSource("npc", line) end
+					end
+				end
+			end
+		end
+		if #sources == 0 then sources[1] = { kind = "npc", name = "", id = "x99" } end
+		emit("\t\t\tnpcs = {")
+		for index, source in ipairs(sources) do
+			local id = type(source.id) == "number" and string.format("%.0f", source.id)
+				or ('"' .. EscapeText(source.id) .. '"')
+			local metadata = source.hostile == true and ", hostile = true" or ""
+			if source.kind == "item" and type(source.auction) == "boolean" then
+				metadata = metadata .. ", auction = " .. tostring(source.auction)
+			end
+			local separator = index < #sources and "," or ""
+			emit(string.format('\t\t\t\t{ %s = "%s", id = %s%s }%s',
+				source.kind, EscapeText(source.name), id, metadata, separator))
+		end
+		emit("\t\t\t},")
+	end
+
+	-- Normalize mixed pickup sources without changing the stored DB entry.
+	-- Structured entries take precedence; legacy /tar lines remain plain names.
+	function RQE:GetQuestPickupSources(questID)
+		local questData = self.getQuestData(questID)
+		local sources, seen = {}, {}
+		if not questData then return sources end
+
+		-- Adds a distinct pickup source while preserving hostility and explicit AH opt-outs.
+		local function AddSource(kind, name, id, hostile, auction)
+			if type(name) ~= "string" then return end
+			name = name:match("^%s*(.-)%s*$")
+			if name == "" or name:find("[\r\n]") or name:sub(1, 1) == "/" then return end
+			-- x99 marks an unknown pickup ID: retain the name/type, but omit viewer links.
+			if type(id) == "string" and id:match("^%s*(.-)%s*$"):lower() == "x99" then
+				id = nil
+			end
+			if kind == "object" then
+				-- Match authored {object:key:name} tags, including custom keys such as tf001.
+				id = (type(id) == "string" or type(id) == "number") and tostring(id):match("^%s*(.-)%s*$") or nil
+				if not id or not id:match("^[%a%d]+$") then id = nil end
+			else
+				id = tonumber(id)
+				if not id or id <= 0 or id ~= math.floor(id) then id = nil end
+			end
+			local key = kind .. ":" .. name
+			hostile = kind == "npc" and hostile == true or nil
+			if seen[key] then
+				if id then seen[key].id = id end
+				if hostile then seen[key].hostile = true end
+				if auction == false then seen[key].auction = false end
+				return
+			end
+			local entry = { kind = kind, name = name, id = id, hostile = hostile }
+			if kind == "item" and auction == false then entry.auction = false end
+			sources[#sources + 1] = entry
+			seen[key] = entry
+		end
+
+		if type(questData.npcs) == "table" then
+			for _, entry in ipairs(questData.npcs) do
+				if type(entry) == "table" then
+					if entry.object ~= nil then
+						AddSource("object", entry.object, entry.id)
+					elseif entry.item ~= nil then
+						AddSource("item", entry.item, entry.id, nil, entry.auction)
+					else
+						AddSource("npc", entry.npc or entry.name, entry.id, entry.hostile)
+					end
+				end
+			end
+		end
+		if #sources == 0 and type(questData.npc) == "table" then
+			for _, legacyName in ipairs(questData.npc) do
+				if type(legacyName) == "string" then
+					for line in legacyName:gmatch("[^\r\n]+") do
+						line = line:match("^%s*(.-)%s*$")
+						AddSource("npc", line:match("^/tar%s+(.+)$") or line:match("^/target%s+(.+)$") or line)
+					end
+				end
+			end
+		end
+		return sources
+	end
+
+	-- Targeting macros retain an NPC-only list even when objects occur between NPCs.
+	function RQE:GetQuestPickupNPCs(questID)
+		local npcs = {}
+		for _, entry in ipairs(self:GetQuestPickupSources(questID)) do
+			if entry.kind == "npc" then npcs[#npcs + 1] = entry end
+		end
+		return npcs
+	end
+
+	-- Returns the quest pickup source text. noAuctionAdvice omits the Auction House suffix from item sources.
+	function RQE:GetQuestPickupSourceText(questID, useLinks, npcOnly, hostileOnly, sourceFilter, noAuctionAdvice)
+	-- Previous code (commented out 2026.11.02): added noAuctionAdvice so kill-and-loot wording can omit the AH suffix
+	-- function RQE:GetQuestPickupSourceText(questID, useLinks, npcOnly, hostileOnly, sourceFilter)
+		local names = {}
+		local sources = npcOnly and self:GetQuestPickupNPCs(questID) or self:GetQuestPickupSources(questID)
+		for _, entry in ipairs(sources) do
+			if (not sourceFilter or (sourceFilter == "item") == (entry.kind == "item"))
+				and (hostileOnly == nil or (entry.hostile == true) == hostileOnly) then
+				if entry.kind == "item" then
+					-- Pass the suffix opt-out through to the item formatter.
+					names[#names + 1] = self:GetQuestPickupItemText(entry, questID, useLinks, noAuctionAdvice)
+					-- Previous code (commented out 2026.11.02): item text always carried the AH suffix
+					-- names[#names + 1] = self:GetQuestPickupItemText(entry, questID, useLinks)
+				else
+					names[#names + 1] = useLinks and entry.id
+						and (entry.kind == "object" and string.format("{object:%s:%s}", entry.id, entry.name)
+							or string.format("{npc:%d:%s}", entry.id, entry.name)) or entry.name
+				end
+			end
+		end
+		if #names <= 1 then return names[1] end
+		return table.concat(names, ", ", 1, #names - 1) .. " or " .. names[#names]
+	end
+
+	-- Preserve the NPC-only text helper for callers that do not display objects.
+	function RQE:GetQuestPickupNPCText(questID, useLinks)
+		return self:GetQuestPickupSourceText(questID, useLinks, true)
+	end
+
+	-- The same pickup text is used by the direction row and virtual focus step 0.
+	function RQE:GetSearchedQuestPickupText(questID)
+		local questData = self.getQuestData(questID)
+		local sourceText = self:GetQuestPickupSourceText(questID, true, false, false, "nonitem")
+		local hostileText = self:GetQuestPickupSourceText(questID, true, true, true)
+		local itemText = self:GetQuestPickupSourceText(questID, true, false, false, "item")
+		-- Looted quest starters come from the kill itself, so kill-and-loot wording omits the AH suffix.
+		local lootItemText = self:GetQuestPickupSourceText(questID, true, false, false, "item", true)
+		local destination
+		if questData then
+			local _, _, mapID, continentID = self.GetPrimaryLocation(questData)
+			-- Item-source guidance prefers a listed zone when the primary resolver selected only a continent.
+			if itemText and not mapID and type(questData.locations) == "table" then
+				for _, location in ipairs(questData.locations) do
+					if type(location) == "table" and location.mapID then
+						mapID, continentID = location.mapID, nil
+						break
+					end
+				end
+			end
+			local finalMapID = mapID
+			if not finalMapID and continentID then
+				local playerMapID = self.API.Client.C_Map.GetBestMapForUnit("player")
+				local playerMapInfo = playerMapID and self.API.Client.C_Map.GetMapInfo(playerMapID)
+				if playerMapInfo and playerMapInfo.parentMapID == continentID then
+					finalMapID = continentID
+				end
+			end
+			if finalMapID then
+				local mapInfo = self.API.Client.C_Map.GetMapInfo(finalMapID)
+				if mapInfo then
+					destination = mapInfo.name or "Unknown"
+					local parentInfo = mapInfo.parentMapID and mapInfo.parentMapID > 0
+						and self.API.Client.C_Map.GetMapInfo(mapInfo.parentMapID)
+					if parentInfo and parentInfo.name then
+						destination = destination .. ", " .. parentInfo.name
+					end
+				end
+			end
+		end
+		if itemText and not sourceText and not hostileText then
+			return "Pick up the quest from clicking on the " .. itemText .. "."
+		end
+		-- Hostile NPCs paired with items describe a kill-and-loot source rather than independent pickup alternatives.
+		if itemText and hostileText and not sourceText then
+			-- Kill-and-loot sentences use the suffix-free item text.
+			return "Kill the " .. hostileText .. (destination and (" at " .. destination) or "")
+				.. ", loot and interact with the " .. lootItemText .. "."
+			-- Previous code (commented out 2026.11.02): itemText carried the AH suffix into the kill sentence
+			-- return "Kill the " .. hostileText .. (destination and (" at " .. destination) or "")
+			--	.. ", loot and interact with the " .. itemText .. "."
+		end
+		local action = sourceText and ("pick up the quest from " .. sourceText)
+		if hostileText then
+			-- Kill-and-loot alternatives use the suffix-free item text.
+			local killAction = itemText and ("kill the " .. hostileText .. ", loot and interact with the " .. lootItemText)
+				or ("kill " .. hostileText .. " to start the quest")
+			-- Previous code (commented out 2026.11.02): itemText carried the AH suffix into the kill alternative
+			-- local killAction = itemText and ("kill the " .. hostileText .. ", loot and interact with the " .. itemText)
+			--	or ("kill " .. hostileText .. " to start the quest")
+			action = action and (action .. " or " .. killAction) or killAction
+		end
+		if itemText and not hostileText then
+			local useAction = "interacting with the " .. itemText
+			action = action and (action .. " or " .. useAction) or useAction
+		end
+		if destination then
+			return "Travel to " .. destination .. (action and ((itemText and ", and " or " and ") .. action .. ".") or "")
+		end
+		return action and (action:gsub("^%l", string.upper) .. ".") or "Pick up the quest."
+	end
+
+	-- Refreshes loaded item guidance only while its original quest pickup is still displayed.
+	function RQE:RefreshQuestPickupItemData(questID, expectedData)
+		questID = tonumber(questID)
+		if not questID or tonumber(self.searchedQuestID) ~= questID
+			or not self:CanNavigateSearchedQuestSteps(questID)
+			or self.getQuestData(questID) ~= expectedData then return end
+		if self.ManualPreviewQuestID and tonumber(self.ManualPreviewQuestID) ~= questID then return end
+		local step = tonumber(self.ManualPreviewStepIndex or self.AddonSetStepIndex
+			or self.CurrentDisplayedStepIndex) or 0
+		if step ~= 0 then return end
+		local displayed = tonumber(self.DisplayedQuestID or self.CurrentDisplayedQuestID)
+		if displayed and displayed ~= questID then return end
+		if self.API.Client.InCombatLockdown() then
+			self.PendingPickupItemRefreshes = self.PendingPickupItemRefreshes or {}
+			self.PendingPickupItemRefreshes[questID] = expectedData
+			self:GetQuestPickupItemLoadFrame():RegisterEvent("PLAYER_REGEN_ENABLED")
+			return
+		end
+		if self.DirectionTextFrame and self.RenderTextWithItemsSteps then
+			local text = self:GetSearchedQuestPickupText(questID)
+			local style = self.db.profile.textSettings.DirectionTextFrame or {}
+			RQEFrame.DirectionText = text
+			self.DirectionTextFrame._rqeRenderingPickup = true
+			self.RenderTextWithItemsSteps(self.DirectionTextFrame, text, style.font, style.size,
+				style.color, self.DirectionTextFrame:GetParent())
+			self.DirectionTextFrame._rqeRenderingPickup = nil
+		end
+		if self.UpdateSeparateFocusFrame then self:UpdateSeparateFocusFrame() end
+		self:SetSearchedQuestPickupMacro(questID)
+	end
+
+	-- Reuses one item-data listener and discards late updates for replaced quests or preview steps.
+	function RQE:GetQuestPickupItemLoadFrame()
+		if self.PickupItemLoadFrame then return self.PickupItemLoadFrame end
+		local frame = CreateFrame("Frame")
+		self.PickupItemLoadFrame = frame
+		-- Rebuilds eligible pickup views after item loading or deferred combat work completes.
+		frame:SetScript("OnEvent", function(_, event, itemID, success)
+			if event == "PLAYER_REGEN_ENABLED" then
+				local pending = self.PendingPickupItemRefreshes or {}
+				self.PendingPickupItemRefreshes = nil
+				for questID, data in pairs(pending) do self:RefreshQuestPickupItemData(questID, data) end
+			else
+				local requests = self.PickupItemLoadRequests or {}
+				local pending = requests[itemID]
+				if pending then
+					local getInfo = self.API.ResolveClientAPI("C_Item.GetItemInfo")
+					local bindType = getInfo and select(14, getInfo(itemID))
+					if bindType ~= nil or success == false then
+						requests[itemID] = nil
+						if bindType ~= nil then
+							for questID, data in pairs(pending) do self:RefreshQuestPickupItemData(questID, data) end
+						end
+					end
+				end
+			end
+			if not next(self.PickupItemLoadRequests or {}) and not next(self.PendingPickupItemRefreshes or {}) then
+				frame:UnregisterAllEvents()
+			end
+		end)
+		return frame
+	end
+
+	-- Requests uncached item metadata once and records each quest that needs its binding information.
+	function RQE:RequestQuestPickupItemData(itemID, questID)
+		questID = tonumber(questID)
+		if not questID then return end
+		self.PickupItemLoadRequests = self.PickupItemLoadRequests or {}
+		local requests = self.PickupItemLoadRequests
+		local existing = requests[itemID]
+		local pending = existing or {}
+		pending[questID] = self.getQuestData(questID)
+		requests[itemID] = pending
+		local frame = self:GetQuestPickupItemLoadFrame()
+		frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+		frame:RegisterEvent("ITEM_DATA_LOAD_RESULT")
+		if not existing then
+			local requestLoad = self.API.ResolveClientAPI("C_Item.RequestLoadItemDataByID")
+			if requestLoad then requestLoad(itemID) end
+		end
+	end
+
+	-- Allows AH pickup advice only for known unbound, bind-on-equip, or bind-on-use items without an opt-out.
+	function RQE:IsQuestPickupItemAuctionEligible(source, questID)
+		local id = tonumber(source.id)
+		if source.auction == false or not id or id <= 0 or id % 1 ~= 0 then return false end
+		local getInfo = self.API.ResolveClientAPI("C_Item.GetItemInfo")
+		if not getInfo then return false end
+		local bindType = select(14, getInfo(id))
+		if bindType == nil then
+			self:RequestQuestPickupItemData(id, questID)
+			return false
+		end
+		return bindType == 0 or bindType == 2 or bindType == 3
+	end
+
+	-- Formats one pickup item and adds conditional AH advice using the same policy as its generated macro.
+	-- Retail says "available"; pre-Cataclysm clients say "purchasable". noAuctionAdvice skips the suffix entirely.
+	function RQE:GetQuestPickupItemText(source, questID, useLinks, noAuctionAdvice)
+	-- Previous code (commented out 2026.11.02): one suffix wording for every client and no way to omit it
+	-- function RQE:GetQuestPickupItemText(source, questID, useLinks)
+		local text = useLinks and source.id
+			and string.format("{item:%d:%s}", source.id, source.name) or source.name
+		-- Eligibility is always evaluated so uncached item data is still requested for later refreshes.
+		local eligible = self:IsQuestPickupItemAuctionEligible(source, questID)
+		if eligible and not noAuctionAdvice then
+			text = text .. (self.IsRetail and " (may be available from Auction House)"
+				or " (may be purchasable from Auction House)")
+		end
+		-- Previous code (commented out 2026.11.02): see above
+		-- if self:IsQuestPickupItemAuctionEligible(source, questID) then
+		--	text = text .. " (may be purchasable from Auction House)"
+		-- end
+		return text
+	end
+
+	-- Builds the exact pickup-item macro shared by step-0 generation and Magic Button tooltip recognition.
+	function RQE:GetQuestPickupItemMacro(source, questID)
+		local id = source.id
+		local lines = { "#showtooltip item:" .. (id or (self.IsRetail and 153541 or 1165)) }
+		if self:IsQuestPickupItemAuctionEligible(source, questID) then
+			lines[#lines + 1] = string.format(
+				"/run if RQE.API.Client.C_Item.GetItemCount(%d)==0 then RQE:SearchPreparePurchaseConfirmAH(%d,1) end",
+				id, id)
+		end
+		lines[#lines + 1] = id and ("/use item:" .. id) or ("/use " .. source.name)
+		return table.concat(lines, "\n")
+	end
+
+	-- Pickup is virtual step 0; actual DB steps retain their own macros.
+	function RQE:SetSearchedQuestPickupMacro(questID)
+		if isRetail then
+			if not self.CanNavigateSearchedQuestSteps or not self:CanNavigateSearchedQuestSteps(questID) then
+				return false
+			end
+			local npcs = self:GetQuestPickupNPCs(questID)
+			if #npcs == 0 then
+				for _, source in ipairs(self:GetQuestPickupSources(questID)) do
+					if source.kind == "item" then
+						local macroLines = self:GetQuestPickupItemMacro(source, questID)
+						RQEMacro:SetQuestStepMacro(questID, 0, macroLines, true)
+						-- Updates the magic button visibility.
+						self.API.Client.C_Timer.After(0.35, function()
+							RQE.Buttons.UpdateMagicButtonVisibility()
+						end)
+						return true
+					end
+				end
+				return false
+			end
+			local macroLines = { "#showtooltip item:153541" }
+			local hasAlternatives = #npcs > 1
+			local hasHostile, hasFriendly = false, false
+			for _, entry in ipairs(npcs) do
+				if entry.hostile then hasHostile = true else hasFriendly = true end
+			end
+			if hasAlternatives and hasFriendly then
+				-- Friendly pickup alternatives start fresh; hostile-only alternatives keep a living target.
+				macroLines[#macroLines + 1] = "/cleartarget"
+			end
+			for _, entry in ipairs(npcs) do
+				local targetCommand = hasAlternatives and "/tar [noexists][dead] " or "/tar "
+				macroLines[#macroLines + 1] = targetCommand .. entry.name
+			end
+			if hasHostile then
+				macroLines[#macroLines + 1] = "/cleartarget [dead]"
+				-- Mixed lists choose the marker for the selected unit; hostile-only lists
+				-- use the authored skull convention without replacing an existing marker.
+				macroLines[#macroLines + 1] = hasFriendly and "/tm [harm] ~8; 3" or "/tm ~8"
+			else
+				macroLines[#macroLines + 1] = "/tm 3"
+			end
+			RQEMacro:SetQuestStepMacro(questID, 0, macroLines, true)
+			-- Updates the magic button visibility.
+			self.API.Client.C_Timer.After(0.35, function()
+				RQE.Buttons.UpdateMagicButtonVisibility()
+			end)
+			return true
+		end
+
+		-- Classic pickup refreshes must still belong to the selected quest and virtual pickup step.
+		if not self.CanNavigateSearchedQuestSteps or not self:CanNavigateSearchedQuestSteps(questID) then return false end
+		local selectedStep = tonumber(self.ManualPreviewStepIndex or self.AddonSetStepIndex) or 0
+		if selectedStep ~= 0 then return false end
+		local pickupItem = RQE.GetSearchedQuestPickupItem and RQE:GetSearchedQuestPickupItem(questID)
+		if pickupItem then
+			local macroLines = self:GetQuestPickupItemMacro(pickupItem, questID)
+			RQEMacro:SetQuestStepMacro(questID, 0, macroLines, true)
+			-- Updates the magic button visibility.
+			RQE.API.Client.C_Timer.After(0.35, function()
+				RQE.Buttons.UpdateMagicButtonVisibility()
+			end)
+			return true
+		end
+
+		-- Retain item-first Classic behavior, then resolve structured or legacy NPC alternatives.
+		local npcs = self:GetQuestPickupNPCs(questID)
+		if #npcs == 0 then
+			RQEMacro:SetQuestStepMacro(questID, 0, {}, true)
+			RQE.Buttons.UpdateMagicButtonVisibility()
+			return false
+		end
+
+		local macroLines = { "#showtooltip item:1165" }
+		local hasAlternatives = #npcs > 1
+		local hasHostile, hasFriendly = false, false
+		for _, entry in ipairs(npcs) do
+			if entry.hostile then hasHostile = true else hasFriendly = true end
+		end
+		if hasAlternatives and hasFriendly then macroLines[#macroLines + 1] = "/cleartarget" end
+		for _, entry in ipairs(npcs) do
+			local targetCommand = hasAlternatives and "/tar [noexists][dead] " or "/tar "
+			macroLines[#macroLines + 1] = targetCommand .. entry.name
+		end
+		if hasHostile then
+			macroLines[#macroLines + 1] = "/cleartarget [dead]"
+			macroLines[#macroLines + 1] = hasFriendly and "/tm [harm] ~8; 3" or "/tm ~8"
+		else
+			macroLines[#macroLines + 1] = "/tm 3"
+		end
+		-- Previous code (2026.11.09): only the first legacy npc entry produced a pickup macro.
+		-- local questData = RQE.getQuestData(questID)
+		-- if not questData or not questData.npc or #questData.npc == 0 or questData.npc[1] == "" then
+		-- 	return false
+		-- end
+		-- local npcName = questData.npc[1]
+		-- if not npcName or npcName == "" then return false end
+		-- local macroLines = { "#showtooltip item:1165", "/tar " .. npcName, "/tm 3" }
+		-- if RQE.db.profile.debugLevel == "INFO+" then
+		-- 	print("Creating macro for searched NPC:", npcName)
+		-- end
+		RQEMacro:SetQuestStepMacro(questID, 0, macroLines, true)
+
+		-- Previous Blizzard call changed 2026.09.25: C_Timer.After(0.35, function()
+		-- Updates the magic button visibility.
+		RQE.API.Client.C_Timer.After(0.35, function()
+			RQE.Buttons.UpdateMagicButtonVisibility()
+		end)
+		return true
+	end
+
+
+	-------------------------------------------------------
+	-- #3c. Retail Searched Quest NPC Macro
+	-------------------------------------------------------
+
+	-- Generates a macro on a searched quest from the DB file if it is valid and player doesn't yet have the searched quest (and wasn't flagged as completed)
+	function RQE:GenerateNpcMacroIfNeeded(questID)
+		-- Check if quest is in player log
+		-- Previous Blizzard call changed 2026.09.25: if C_QuestLog.IsQuestFlaggedCompleted(questID) or C_QuestLog.GetLogIndexForQuestID(questID) then
+		if RQE.API.Client.C_QuestLog.IsQuestFlaggedCompleted(questID) or RQE.API.Client.C_QuestLog.GetLogIndexForQuestID(questID) then
+			return -- Player already has or completed the quest
+		end
+
+		-- Previous code (2026.11.09): Classic returned before validating the selected preview step.
+		-- if not isRetail then
+		-- 	return RQE:SetSearchedQuestPickupMacro(questID)
+		-- end
+
+		-- Delayed search/event refreshes must not replace a manually selected
+		-- preview step's macro with the pickup targets.
+		if not self.CanNavigateSearchedQuestSteps or not self:CanNavigateSearchedQuestSteps(questID) then return end
+		local stepIndex = tonumber(self.ManualPreviewStepIndex or self.AddonSetStepIndex) or 0
+		if stepIndex ~= 0 then return end
+		return self:SetSearchedQuestPickupMacro(questID)
+	end
+
+
+--------------------------------------------------
+-- #4. 💾 Macro Persistence & Deferred Operations
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #4a. Create or Update Macro Content
+	-------------------------------------------------------
+
+	-- Updated to use the existing structure
+	function RQEMacro:SetMacro(name, iconFileID, body, perCharacter)
+		-- Previous Blizzard call changed 2026.09.25: if InCombatLockdown() then
+		if RQE.API.Client.InCombatLockdown() then
+			-- Queue the macro operation for after combat
+			if isRetail then
+				table.insert(self.pendingMacroOperations, {name = name, iconFileID = iconFileID, body = body, perCharacter = perCharacter})
+			else
+				QueuePendingMacroOperation(self, self.pendingMacroOperations, {name = name, iconFileID = iconFileID, body = body, perCharacter = perCharacter})
+			end
+			return
+		end
+
+		self:ActuallySetMacro(name, iconFileID, body, perCharacter)
+	end
+
+
+	-- Internal function that actually creates the macro content
+	function RQEMacro:ActuallySetMacro(name, iconFileID, body, perCharacter)
+		-- Normalize numeric icon IDs
+		if type(iconFileID) == "number" then
+			iconFileID = tostring(iconFileID)
+		end
+
+		-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName(name)
+		local macroIndex = RQE.API.Client.GetMacroIndexByName(name)
+		if macroIndex == 0 then -- Macro doesn't exist, create a new one
+			-- Previous Blizzard call changed 2026.09.25: local numAccountMacros, numCharacterMacros = GetNumMacros()
+			local numAccountMacros, numCharacterMacros = RQE.API.Client.GetNumMacros()
+			if perCharacter and numCharacterMacros < self.MAX_CHARACTER_MACROS then
+				-- Previous Blizzard call changed 2026.09.25: macroIndex = CreateMacro(name, iconFileID, body, 1)
+				macroIndex = RQE.API.Client.CreateMacro(name, iconFileID, body, 1)
+			elseif not perCharacter and numAccountMacros < self.MAX_ACCOUNT_MACROS then
+				-- Previous Blizzard call changed 2026.09.25: macroIndex = CreateMacro(name, iconFileID, body, nil)
+				macroIndex = RQE.API.Client.CreateMacro(name, iconFileID, body, nil)
+			else
+				RQE.debugLog("Cannot create macro. Maximum number of macros reached.")
+				return nil
+			end
+		else -- Macro exists, update it
+			if not isRetail then
+				-- Previous Blizzard call changed 2026.09.25: local _, _, currentBody = GetMacroInfo(macroIndex)
+				local _, _, currentBody = RQE.API.Client.GetMacroInfo(macroIndex)
+				if currentBody == body then
+					return macroIndex
+				end
+			end
+
+			-- Previous Blizzard call changed 2026.09.25: EditMacro(macroIndex, name, iconFileID, body)
+			RQE.API.Client.EditMacro(macroIndex, name, iconFileID, body)
+		end
+		return macroIndex
+	end
+
+
+	-------------------------------------------------------
+	-- #4b. Clear Macro Content
+	-------------------------------------------------------
+
+	-- Function to clear a specific macro by name
+	function RQEMacro:ClearMacroContentByName(macroName)
+		-- Previous Blizzard call changed 2026.09.25: if InCombatLockdown() then
+		if RQE.API.Client.InCombatLockdown() then
+			-- Queue the macro clear request for after combat
+			if isRetail then
+				table.insert(self.pendingMacroClears, macroName)
+			else
+				QueuePendingMacroOperation(self, self.pendingMacroClears, {name = macroName})
+			end
+			return
+		end
+
+		local isMacroCorrect = RQE.CheckCurrentMacroContents()
+
+		self:ActuallyClearMacroContentByName(macroName)
+	end
+
+
+	-- Internal function that actually clears the macro content
+	function RQEMacro:ActuallyClearMacroContentByName(macroName)
+		-- Check for being inside an instance with a raid or party
+		-- Previous Blizzard call changed 2026.09.25: local isInInstance, instanceType = IsInInstance()
+		local isInInstance, instanceType = RQE.API.Client.IsInInstance()
+
+		-- Adds a check if player is in party or raid instance, if so, will not allow macro check to run further
+		if isInInstance and (instanceType == "party" or instanceType == "raid") then
+			return
+		end
+
+		-- Previous Blizzard call changed 2026.09.25: if InCombatLockdown() then
+		if RQE.API.Client.InCombatLockdown() then
+			return
+		end
+
+		-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName(macroName)
+		local macroIndex = RQE.API.Client.GetMacroIndexByName(macroName)
+		if macroIndex ~= 0 then
+			if not isRetail then
+				-- Previous Blizzard call changed 2026.09.25: local _, _, currentBody = GetMacroInfo(macroIndex)
+				local _, _, currentBody = RQE.API.Client.GetMacroInfo(macroIndex)
+				if not currentBody or currentBody:match("^%s*$") then
+					return
+				end
+			end
+
+			-- Macro found, clear its content
+			-- Previous Blizzard call changed 2026.09.25: EditMacro(macroIndex, nil, nil, " ")
+			RQE.API.Client.EditMacro(macroIndex, nil, nil, " ")
+		else
+			-- Macro not found, log this
+			RQE.debugLog("Macro not found: " .. macroName)
+		end
+	end
+
+
+	-------------------------------------------------------
+	-- #4c. Post-Combat Operation Replay
+	-------------------------------------------------------
+
+	-- Replays Classic/TBC macro work queued during combat. Their EventManager
+	-- calls this from PLAYER_REGEN_ENABLED; Retail keeps its existing queue flow.
+	function RQEMacro:ProcessPendingMacroOperations()
+		-- Previous Blizzard call changed 2026.09.25: if isRetail or InCombatLockdown() then
+		if isRetail or RQE.API.Client.InCombatLockdown() then
+			return false
+		end
+
+		local pending = {}
+		-- Function to append queued set or clear operations to the ordered replay list
+		local function AppendOperations(kind, operations)
+			for _, operation in ipairs(operations) do
+				-- Older sessions may contain a bare macro name in the clear queue.
+				if type(operation) == "string" then
+					operation = { name = operation }
+				end
+				table.insert(pending, {
+					kind = kind,
+					operation = operation,
+					order = operation.order or 0,
+				})
+			end
+		end
+
+		AppendOperations("set", self.pendingMacroSets)
+		AppendOperations("set", self.pendingMacroOperations)
+		AppendOperations("clear", self.pendingMacroClears)
+
+		self.pendingMacroSets = {}
+		self.pendingMacroOperations = {}
+		self.pendingMacroClears = {}
+
+		-- Orders pending macro operations by their original request sequence.
+		table.sort(pending, function(left, right)
+			return left.order < right.order
+		end)
+
+		for _, entry in ipairs(pending) do
+			local operation = entry.operation
+			if entry.kind == "clear" then
+				self:ActuallyClearMacroContentByName(operation.name)
+			else
+				self:ActuallySetMacro(operation.name, operation.iconFileID, operation.body, operation.perCharacter)
+			end
+		end
+
+		return #pending > 0
+	end
+
+
+	-- Previous code (commented out 2026.10.31): replaced by existing ClearMacroContentByName/CreateMacroForCurrentStep calls in EventManager's handlePlayerRegenEnabled
+	-- -- Retail and Forever never replay the macro work queued during combat, so the
+	-- -- macro could keep a finished quest's step after combat ended. Macros are
+	-- -- protected and stay unchanged during combat; once combat ends, this discards
+	-- -- the stale queue and sets the macro from what the RQEFrame shows now: the
+	-- -- searched quest's preview macro, the supertracked quest's current step macro,
+	-- -- or nothing when the frame is empty or the step has no macro.
+	-- function RQEMacro:SyncMacroWithFrameAfterCombat()
+	-- 	if RQE.API.Client.InCombatLockdown() then return end
+	-- 	self.pendingMacroSets = {}
+	-- 	self.pendingMacroOperations = {}
+	-- 	self.pendingMacroClears = {}
+	--
+	-- 	-- A searched quest's preview owns the macro while it is displayed
+	-- 	local searchedQuestID = tonumber(RQE.searchedQuestID)
+	-- 	if RQE.CanNavigateSearchedQuestSteps and RQE:CanNavigateSearchedQuestSteps(searchedQuestID) then
+	-- 		self:CreateMacroForCurrentStep()
+	-- 		return
+	-- 	end
+	--
+	-- 	local displayedQuestID = tonumber(RQE.DisplayedQuestID)
+	-- 	if not displayedQuestID or displayedQuestID == 0 then
+	-- 		self:ClearMacroContentByName("RQE Macro")
+	-- 		return
+	-- 	end
+	--
+	-- 	local superTrackedQuestID = RQE.API.GetSuperTrackedQuestID()
+	-- 	if displayedQuestID == superTrackedQuestID then
+	-- 		local questData = RQE.getQuestData(superTrackedQuestID)
+	-- 		local stepIndex = tonumber(RQE.AddonSetStepIndex)
+	-- 		local stepData = questData and stepIndex and questData[stepIndex]
+	-- 		if stepData and (stepData.macro or stepData.macroArray) then
+	-- 			self:CreateMacroForCurrentStep()
+	-- 		else
+	-- 			self:ClearMacroContentByName("RQE Macro")
+	-- 		end
+	-- 	elseif displayedQuestID ~= searchedQuestID then
+	-- 		-- The frame still shows a quest that is neither supertracked nor searched,
+	-- 		-- such as one completed in combat. ShouldClearFrame clears the frame and
+	-- 		-- the macro together when that quest no longer belongs there.
+	-- 		RQE:ShouldClearFrame()
+	-- 	end
+	-- end
+
+
+	-------------------------------------------------------
+	-- #4d. Macro Deletion
+	-------------------------------------------------------
+
+	-- Function to delete a macro by name
+	function RQEMacro:DeleteMacroByName(name)
+		-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName(name)
+		local macroIndex = RQE.API.Client.GetMacroIndexByName(name)
+		if macroIndex ~= 0 then
+			-- Previous Blizzard call changed 2026.09.25: DeleteMacro(macroIndex)
+			RQE.API.Client.DeleteMacro(macroIndex)
+		end
+	end
+
+
+--------------------------------------------------
+-- #5. 📡 Macro Update Events
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #5a. UPDATE_MACROS Refresh Hook
+	-------------------------------------------------------
+
+	-- Event frame for capturing macro updates
+	RQE.Buttons.EventFrame = CreateFrame("Frame")
+	RQE.Buttons.EventFrame:RegisterEvent("UPDATE_MACROS")
+	-- Updates the magic button icon.
+	RQE.Buttons.EventFrame:SetScript("OnEvent", function(self, event, ...)
+		if event == "UPDATE_MACROS" then
+			RQE.Buttons.UpdateMagicButtonIcon()
+			RQEMacro:UpdateMagicButtonTooltip()
+		end
+	end)
+
+
+--------------------------------------------------
+-- #6. 💬 Macro Tooltip Helpers
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #6a. Wrapped Macro Text Tooltip
+	-------------------------------------------------------
+
+	-- Helper to show long macro text in a tooltip without truncating lines.
+	local function RQEShowWrappedMacroTooltip(owner, title, macroBody)
+		local titleBlueR, titleBlueG, titleBlueB = 51 / 255, 153 / 255, 1
+		local yellowR, yellowG, yellowB = 1, 230 / 255, 0
+		GameTooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT")
+		-- GameTooltip:SetWidth(420)
+		GameTooltip:SetMinimumWidth(420)
+
+		-- Clear existing tooltip contents before rebuilding it line-by-line.
+		GameTooltip:ClearLines()
+
+		if title and title ~= "" then
+			GameTooltip:AddLine(title, titleBlueR, titleBlueG, titleBlueB, true)
+			GameTooltip:AddLine(" ", 1, 1, 1, true)
+		end
+
+		-- GameTooltip can elide a long unbroken command even with wrapText set.
+		-- Split at command punctuation or spaces, keeping UTF-8 bytes intact.
+		local function addMacroLine(line)
+			if line == "" then
+				GameTooltip:AddLine(" ", 1, 1, 1, true)
+				return
+			end
+			while #line > 30 do
+				local cut
+				for index = 30, 1, -1 do
+					local char = line:sub(index, index)
+					if char == " " or char == "," or char == "." or char == "(" or char == ")" then
+						cut = index
+						break
+					end
+				end
+				if not cut then
+					cut = 30
+					while cut > 1 do
+						local nextByte = line:byte(cut + 1)
+						if not nextByte or nextByte < 128 or nextByte >= 192 then break end
+						cut = cut - 1
+					end
+				end
+				GameTooltip:AddLine(line:sub(1, cut), yellowR, yellowG, yellowB, true)
+				line = line:sub(cut + 1)
+			end
+			if line ~= "" then GameTooltip:AddLine(line, yellowR, yellowG, yellowB, true) end
+		end
+
+		for line in tostring(macroBody or ""):gmatch("([^\n]*)\n?") do
+			addMacroLine(line)
+		end
+
+		GameTooltip:Show()
+		RQE.UI:ApplyTooltipBackground("macroBody")
+	end
+
+	-------------------------------------------------------
+	-- #6b. Cancel-Aura Spell Tooltip
+	-------------------------------------------------------
+
+	-- Put the action label above Blizzard's spell details for cancel-aura arrays.
+	local function RQEShowCancelAuraSpellTooltip(owner, spellID, macroBody)
+		GameTooltip:SetOwner(owner, "ANCHOR_BOTTOMLEFT")
+		GameTooltip:SetMinimumWidth(0)
+
+		-- AddSpellByID appends the native spell tooltip after our first line when
+		-- the client provides it, preserving range, channeling, and spell text.
+		if type(GameTooltip.AddSpellByID) == "function" then
+			GameTooltip:SetText("Cancel Aura:", 51 / 255, 153 / 255, 1)
+			GameTooltip:AddSpellByID(spellID)
+			if GameTooltip:NumLines() > 1 then
+				GameTooltip:Show()
+				return
+			end
+		end
+
+		-- Legacy fallback: retain the native spell tooltip and place the label
+		-- above its title inside the first text region.
+		GameTooltip:ClearLines()
+		GameTooltip:SetSpellByID(spellID)
+		local tooltipName = GameTooltip:GetName()
+		local titleLine = tooltipName and _G[tooltipName .. "TextLeft1"]
+		local spellTitle = titleLine and titleLine:GetText()
+		if spellTitle and spellTitle ~= "" then
+			titleLine:SetText("|cff3399ffCancel Aura:|r\n" .. spellTitle)
+			GameTooltip:Show()
+			return
+		end
+
+		-- An unknown spell ID can still show the actionable macro text.
+		RQEShowWrappedMacroTooltip(owner, "Cancel Aura:", macroBody)
+	end
+
+
+--------------------------------------------------
+-- #7. ✨ Magic Button Tooltip & Live Action State
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #7a. Dynamic Tooltip, Item Count & Cooldown Updates
+	-------------------------------------------------------
+
+	-- Function to update the Magic Button Tooltip dynamically
+	function RQEMacro:UpdateMagicButtonTooltip()
+		-------------------------------------------------------
+		-- #7a.i. Combat Deferral & Button Validation
+		-------------------------------------------------------
+
+		-- Previous Blizzard call changed 2026.09.25: if not isRetail and InCombatLockdown() then
+		if not isRetail and RQE.API.Client.InCombatLockdown() then
+			RQE.RefreshMagicButtonAfterCombat = true
+			return
+		end
+
+		local MagicButton = RQE.MagicButton -- Reference to the magic button
+		if not MagicButton then return end
+
+		-------------------------------------------------------
+		-- #7a.ii. Spell-Backed Macro Array Tooltip
+		-------------------------------------------------------
+
+		-- >>> NEW: check if current macroArray step defines a spell tooltip
+		local questID = RQE.API.GetSuperTrackedQuestID()
+		-- Previous condition (2026.11.09): Classic tooltip lookup used the unrelated tracked quest.
+		-- if isRetail and RQE.CanNavigateSearchedQuestSteps
+		if RQE.CanNavigateSearchedQuestSteps
+			and RQE:CanNavigateSearchedQuestSteps(RQE.searchedQuestID) then
+			questID = tonumber(RQE.searchedQuestID)
+		end
+		if questID and RQE and RQE.getQuestData then
+			local questData = RQE.getQuestData(questID)
+			local stepIndex = RQE.AddonSetStepIndex
+			local step = questData and stepIndex and questData[stepIndex]
+
+			if step and step.macroArray and type(step.macroArray) == "table" then
+				local entry = step.macroArray[1]
+				-- Spell-backed arrays take precedence over an item marker; plain
+				-- marked macros still use the full macro-text tooltip below.
+				if entry and entry.spellIDTooltip then
+					local spellID = entry.spellIDTooltip
+
+					-- Read the current macro on hover so UPDATE_MACROS timing cannot
+					-- leave an old cancel-aura classification on the button.
+					MagicButton:SetScript("OnEnter", function(self)
+						GameTooltip:Hide()
+						-- Previous Blizzard call changed 2026.09.25: local hoverMacroIndex = GetMacroIndexByName("RQE Macro")
+						local hoverMacroIndex = RQE.API.Client.GetMacroIndexByName("RQE Macro")
+						local hoverMacroBody
+						if hoverMacroIndex and hoverMacroIndex > 0 then
+							-- Previous Blizzard call changed 2026.09.25: local _, _, body = GetMacroInfo(hoverMacroIndex)
+							local _, _, body = RQE.API.Client.GetMacroInfo(hoverMacroIndex)
+							hoverMacroBody = body
+						end
+						if hoverMacroBody and (RQE.db.profile.debugLevel == "INFO+"
+							or RQE.API.Client.IsShiftKeyDown()) then
+							RQEShowWrappedMacroTooltip(self, "Macro:", hoverMacroBody)
+						elseif HasCancelAuraCommand(hoverMacroBody) then
+							RQEShowCancelAuraSpellTooltip(self, spellID, hoverMacroBody)
+						else
+							GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+							GameTooltip:SetSpellByID(spellID)
+							GameTooltip:Show()
+						end
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					MagicButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+					-- ✅ End here so we don't run the old logic afterward
+					return
+				end
+			end
+		end
+
+		-------------------------------------------------------
+		-- #7a.iii. Exception Items & Count Overlay
+		-------------------------------------------------------
+
+		-- List of exception itemIDs
+		local exceptionItemIDs
+		if isRetail then
+			exceptionItemIDs = {
+				[841] = true, [2554] = true, [4588] = true, [4787] = true,
+				[5061] = true, [5830] = true, [23784] = true, [28372] = true,
+				[28885] = true, [30817] = true, [28912] = true, [45786] = true,
+				[67097] = true, [118474] = true, [143680] = true, [153541] = true,
+			}
+		else
+			exceptionItemIDs = {
+				[841] = true, [2554] = true, [4588] = true, [4787] = true,
+				[5061] = true, [5830] = true, [2058] = true, [11753] = true,
+				[206995] = true, [4382] = true, [21561] = true, [20337] = true,
+				[7270] = true, [3081] = true, [1165] = true, [54068] = true,
+			}
+		end
+
+		-- Create or reuse the count text overlay
+		if not MagicButton.CountText then
+			MagicButton.CountText = MagicButton:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+			MagicButton.CountText:SetPoint("BOTTOMRIGHT", MagicButton, "BOTTOMRIGHT", -5, 5)
+			MagicButton.CountText:SetJustifyH("RIGHT")
+			MagicButton.CountText:SetText("") -- Initialize empty
+		end
+
+		-------------------------------------------------------
+		-- #7a.iv. Hover Tooltip Resolution
+		-------------------------------------------------------
+
+		MagicButton:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
+
+			-- Get the macro index and contents
+			-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName("RQE Macro")
+			local macroIndex = RQE.API.Client.GetMacroIndexByName("RQE Macro")
+			if not macroIndex or macroIndex == 0 then
+				GameTooltip:SetText("Macro 'RQE Macro' not found.")
+				GameTooltip:Show()
+				return
+			end
+
+			-- Previous Blizzard call changed 2026.09.25: local _, _, macroBody = GetMacroInfo(macroIndex)
+			local _, _, macroBody = RQE.API.Client.GetMacroInfo(macroIndex)
+			if not macroBody or macroBody == "" then
+				GameTooltip:SetText("Macro content not found.")
+				GameTooltip:Show()
+				return
+			end
+
+			-- Item-started searched quests use the item itself instead of the
+			-- generic pickup macro tooltip. Match the current macro so a stale
+			-- quest or an authored step cannot borrow the item tooltip.
+			local pickupItem
+			local pickupQuestID = tonumber(RQE.searchedQuestID)
+			local previewStep = tonumber(RQE.ManualPreviewStepIndex or RQE.AddonSetStepIndex) or 0
+			if RQE.CanNavigateSearchedQuestSteps
+				and RQE:CanNavigateSearchedQuestSteps(pickupQuestID) and previewStep == 0 then
+				if isRetail and #RQE:GetQuestPickupNPCs(pickupQuestID) == 0 then
+					for _, source in ipairs(RQE:GetQuestPickupSources(pickupQuestID)) do
+						if source.kind == "item" then
+							local expected = RQE:GetQuestPickupItemMacro(source, pickupQuestID)
+							if macroBody == expected then pickupItem = source end
+							break
+					end
+					end
+				elseif not isRetail and RQE.GetSearchedQuestPickupItem then
+					local source = RQE:GetSearchedQuestPickupItem(pickupQuestID)
+					if source then
+						local expected = RQE:GetQuestPickupItemMacro(source, pickupQuestID)
+						if macroBody == expected then pickupItem = source end
+					end
+				end
+			end
+
+			-- Debug mode: Show raw macro text
+			-- Previous Blizzard call changed 2026.09.25: if RQE.db.profile.debugLevel == "INFO+" or IsShiftKeyDown() then
+			if RQE.db.profile.debugLevel == "INFO+" or RQE.API.Client.IsShiftKeyDown() then
+				RQEShowWrappedMacroTooltip(self, pickupItem and "Use Item:" or "Macro:", macroBody)
+				return
+			end
+			if pickupItem and pickupItem.id then
+				GameTooltip:SetItemByID(pickupItem.id)
+				GameTooltip:Show()
+				return
+			end
+			if pickupItem then
+				RQEShowWrappedMacroTooltip(self, "Use Item:", macroBody)
+				return
+			end
+
+			-- Extract item ID from the macro body for `#showtooltip item:X`
+			local itemID = tonumber(macroBody:match("#showtooltip%s+item:(%d+)"))
+			if itemID then
+				-- Check if the item is an exception
+				if exceptionItemIDs[itemID] then
+					-- Show the macro body and icon for the exception
+					if itemID == 841 then
+						RQEShowWrappedMacroTooltip(self, "Pull Timer!", macroBody)
+					elseif itemID == 2554 then
+						RQEShowWrappedMacroTooltip(self, "Turn in the quest", macroBody)
+					elseif itemID == cancelAuraTooltipItemID and IsCancelAuraTooltipMacro(macroBody) then
+						RQEShowWrappedMacroTooltip(self, "Cancel Aura", macroBody)
+					elseif itemID == 4588 then
+						RQEShowWrappedMacroTooltip(self, "Kill Mob(s)", macroBody)
+					elseif itemID == 4787 then
+						RQEShowWrappedMacroTooltip(self, "Collect/Loot Item from Mob(s)", macroBody)
+					elseif itemID == 5061 then
+						RQEShowWrappedMacroTooltip(self, "Purchase Item(s)", macroBody)
+					elseif (isRetail and itemID == 30817) or (not isRetail and itemID == 4382) then
+						RQEShowWrappedMacroTooltip(self, "Purchase Item(s)", macroBody)
+					elseif itemID == 5830 then
+						RQEShowWrappedMacroTooltip(self, "Speak/Interact with NPC", macroBody)
+					elseif (isRetail and itemID == 23784) or (not isRetail and itemID == 2058) then
+						RQEShowWrappedMacroTooltip(self, "Press this macro to close RQE temporarily and turn in via Blizzard Objective Tracker", macroBody)
+					elseif (isRetail and itemID == 28372) or (not isRetail and itemID == 11753) then
+						RQEShowWrappedMacroTooltip(self, "Look At/Near an NPC", macroBody)
+					elseif (isRetail and itemID == 28885) or (not isRetail and itemID == 206995) then
+						RQEShowWrappedMacroTooltip(self, "Use Emote", macroBody)
+					elseif (isRetail and itemID == 28912) or (not isRetail and itemID == 21561) then
+						RQEShowWrappedMacroTooltip(self, "Learn ability", macroBody)
+					elseif (isRetail and itemID == 45786) or (not isRetail and itemID == 20337) then
+						RQEShowWrappedMacroTooltip(self, "Set CVAR", macroBody)
+					elseif (isRetail and itemID == 118474) or (not isRetail and itemID == 7270) then
+						RQEShowWrappedMacroTooltip(self, "Look/Follow/Escort/Track an NPC", macroBody)
+					elseif (isRetail and itemID == 143680) or (not isRetail and itemID == 3081) then
+						RQEShowWrappedMacroTooltip(self, "Weaken", macroBody)
+					elseif (isRetail and itemID == 153541) or (not isRetail and itemID == 1165) then
+						local heading = "Pickup the quest"
+						local pickupQuestID = tonumber(RQE.searchedQuestID)
+						local previewStep = tonumber(RQE.ManualPreviewStepIndex or RQE.AddonSetStepIndex) or 0
+						-- Resolve pickup state on hover so switching quests or steps cannot retain a hostile label.
+						if isRetail and RQE.CanNavigateSearchedQuestSteps
+							and RQE:CanNavigateSearchedQuestSteps(pickupQuestID) and previewStep == 0 then
+							for _, entry in ipairs(RQE:GetQuestPickupNPCs(pickupQuestID)) do
+								if entry.hostile then
+									heading = "Kill + Pickup the quest"
+									break
+								end
+							end
+						end
+						RQEShowWrappedMacroTooltip(self, heading, macroBody)
+					else
+						RQEShowWrappedMacroTooltip(self, "Macro:", macroBody)
+					end
+					return
+				else
+					-- Display the item tooltip if not an exception
+					-- Previous Blizzard call changed 2026.09.25: local itemLink = select(2, C_Item.GetItemInfo(itemID))
+					local itemLink = select(2, RQE.API.Client.C_Item.GetItemInfo(itemID))
+					if itemLink then
+						GameTooltip:SetHyperlink(itemLink)
+						GameTooltip:Show()
+						return
+					end
+				end
+			end
+
+			-- Extract item or spell from the macro body if no exception logic applies
+			local useTarget = macroBody:match("/use%s+(.+)")
+				or macroBody:match("/cast%s+(.+)")
+				or macroBody:match("#showtooltip%s+(.+)")
+
+			if useTarget then
+				-- Attempt to resolve as an item
+				-- Previous Blizzard call changed 2026.09.25: local itemLink = select(2, C_Item.GetItemInfo(useTarget))
+				local itemLink = select(2, RQE.API.Client.C_Item.GetItemInfo(useTarget))
+				if not itemLink then
+					-- Previous Blizzard call changed 2026.09.25: local itemID = tonumber(useTarget) or select(1, C_Item.GetItemInfoInstant(useTarget))
+					local itemID = tonumber(useTarget) or select(1, RQE.API.Client.C_Item.GetItemInfoInstant(useTarget))
+					if itemID then
+						itemLink = "item:" .. itemID
+					end
+				end
+
+				if itemLink then
+					GameTooltip:SetHyperlink(itemLink)
+					GameTooltip:Show()
+					return
+				end
+
+				-- Attempt to resolve as a spell
+				-- Previous Blizzard call changed 2026.09.25: local spellInfo = C_Spell.GetSpellInfo(useTarget)
+				local spellInfo = RQE.API.Client.C_Spell.GetSpellInfo(useTarget)
+				if spellInfo then
+					GameTooltip:SetSpellByID(spellInfo.spellID)
+					GameTooltip:Show()
+					return
+				end
+			end
+
+			-- Fallback: Show raw macro body if no item or spell is resolved
+			RQEShowWrappedMacroTooltip(self, "Macro:", macroBody)
+		end)
+
+		-------------------------------------------------------
+		-- #7a.v. Cooldown Tooltip Hook
+		-------------------------------------------------------
+
+		---------------------------------------------------------------------
+		-- Cooldown handler (visual greying + tooltip update)
+		---------------------------------------------------------------------
+		if not MagicButton.CooldownUpdater then
+			MagicButton.CooldownUpdater = CreateFrame("Cooldown", nil, MagicButton, "CooldownFrameTemplate")
+			MagicButton.CooldownUpdater:SetAllPoints(MagicButton)
+			MagicButton.CooldownUpdater:SetDrawEdge(false)
+			MagicButton.CooldownUpdater:SetSwipeColor(0, 0, 0, 0.6)
+		end
+
+		-- Hook tooltip refresh so the remaining cooldown shows live
+		MagicButton:HookScript("OnEnter", function(self)
+			-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName("RQE Macro")
+			local macroIndex = RQE.API.Client.GetMacroIndexByName("RQE Macro")
+			if not macroIndex or macroIndex == 0 then return end
+			-- Previous Blizzard call changed 2026.09.25: local _, _, macroBody = GetMacroInfo(macroIndex)
+			local _, _, macroBody = RQE.API.Client.GetMacroInfo(macroIndex)
+			if not macroBody or macroBody == "" then return end
+
+			local spellName = macroBody:match("/cast%s+(.+)")
+			local itemName = macroBody:match("/use%s+(.+)")
+
+			local cdStart, cdDur, cdEnable
+
+			-- 12.0 fix for tooltips not being able to update when in combat, but this will update once combat ends
+			if spellName then
+				-- Previous Blizzard call changed 2026.09.25: if not InCombatLockdown() then
+				if not RQE.API.Client.InCombatLockdown() then
+					-- Previous Blizzard call changed 2026.09.25: local spellInfo = C_Spell.GetSpellInfo(spellName)
+					local spellInfo = RQE.API.Client.C_Spell.GetSpellInfo(spellName)
+					if spellInfo then
+						-- Previous Blizzard call changed 2026.09.25: local cd = C_Spell.GetSpellCooldown(spellInfo.spellID)
+						local cd = RQE.API.Client.C_Spell.GetSpellCooldown(spellInfo.spellID)
+						if cd and cd.isEnabled then
+							cdStart, cdDur, cdEnable = cd.startTime, cd.duration, cd.isEnabled
+						end
+					end
+				end
+			elseif itemName then
+				-- Previous Blizzard call changed 2026.09.25: cdStart, cdDur, cdEnable = C_Item.GetItemCooldown(itemName)
+				cdStart, cdDur, cdEnable = RQE.API.Client.C_Item.GetItemCooldown(itemName)
+			end
+
+			if cdEnable and cdDur and cdDur > 1 then
+				GameTooltip:AddLine(string.format("|cff00ffffCooldown remaining: %.0f sec|r",
+					-- Previous Blizzard call changed 2026.09.25: math.max(0, (cdStart + cdDur) - GetTime())), 1, 1, 1)
+					math.max(0, (cdStart + cdDur) - RQE.API.Client.GetTime())), 1, 1, 1)
+				GameTooltip:Show()
+			end
+		end)
+
+		-------------------------------------------------------
+		-- #7a.vi. Live Item Count & Cooldown Refresh
+		-------------------------------------------------------
+
+		-- ✅ Unified OnUpdate: Handles both item count + cooldown greyout
+		MagicButton:SetScript("OnUpdate", function(self, elapsed)
+			-- The cooldown widget animates itself; item counts/macro parsing do not
+			-- need to run at the rendering frame rate.
+			self.rqeStateElapsed = (self.rqeStateElapsed or 0) + elapsed
+			if self.rqeStateElapsed < 0.1 then return end
+			self.rqeStateElapsed = 0
+			-- Previous Blizzard call changed 2026.09.25: local macroIndex = GetMacroIndexByName("RQE Macro")
+			local macroIndex = RQE.API.Client.GetMacroIndexByName("RQE Macro")
+			if not macroIndex or macroIndex == 0 then
+				if self.CountText then self.CountText:SetText("") end
+				if self.CooldownUpdater then self.CooldownUpdater:Clear() end
+				self:SetAlpha(1)
+				return
+			end
+
+			-- Previous Blizzard call changed 2026.09.25: local _, _, macroBody = GetMacroInfo(macroIndex)
+			local _, _, macroBody = RQE.API.Client.GetMacroInfo(macroIndex)
+			if not macroBody or macroBody == "" then
+				if self.CountText then self.CountText:SetText("") end
+				if self.CooldownUpdater then self.CooldownUpdater:Clear() end
+				self:SetAlpha(1)
+				return
+			end
+
+			----------------------------------------------------------
+			-- 🧩 ITEM COUNT HANDLER
+			----------------------------------------------------------
+			local itemID = tonumber(macroBody:match("#showtooltip%s+item:(%d+)"))
+			if not itemID then
+				local itemName = macroBody:match("/use%s+(.+)")
+				if itemName then
+					-- Previous Blizzard call changed 2026.09.25: itemID = C_Item.GetItemInfoInstant(itemName)
+					itemID = RQE.API.Client.C_Item.GetItemInfoInstant(itemName)
+				end
+			end
+
+			if itemID then
+				-- Previous Blizzard call changed 2026.09.25: local itemCount = C_Item.GetItemCount(itemID)
+				local itemCount = RQE.API.Client.C_Item.GetItemCount(itemID)
+				if itemCount and itemCount > 0 then
+					if itemCount > 999 then itemCount = 999 end
+					self.CountText:SetText(itemCount)
+				else
+					self.CountText:SetText("")
+				end
+			else
+				self.CountText:SetText("")
+			end
+
+			----------------------------------------------------------
+			-- 🧩 COOLDOWN & GREYOUT HANDLER
+			----------------------------------------------------------
+			local spellName = macroBody:match("/cast%s+(.+)")
+			local itemName = macroBody:match("/use%s+(.+)")
+			local cdStart, cdDur, cdEnable
+
+			-- Fixed display of CD when during combat if the macro is a 'spell' vs an 'item'
+			if spellName then
+				-- Previous Blizzard call changed 2026.09.25: if not InCombatLockdown() then
+				if not RQE.API.Client.InCombatLockdown() then
+					-- Previous Blizzard call changed 2026.09.25: local spellInfo = C_Spell.GetSpellInfo(spellName)
+					local spellInfo = RQE.API.Client.C_Spell.GetSpellInfo(spellName)
+					if spellInfo then
+						-- Previous Blizzard call changed 2026.09.25: local cd = C_Spell.GetSpellCooldown(spellInfo.spellID)
+						local cd = RQE.API.Client.C_Spell.GetSpellCooldown(spellInfo.spellID)
+						if cd and cd.isEnabled then
+							cdStart, cdDur, cdEnable = cd.startTime, cd.duration, cd.isEnabled
+						end
+					end
+				else
+					if RQE.db.profile.debugLevel == "INFO+" then
+						print("|cFFFF3333[RQE] Spell CD not available for RQE Button until after combat has ended|r")
+					end
+				end
+			elseif itemName then
+				-- Previous Blizzard call changed 2026.09.25: cdStart, cdDur, cdEnable = C_Item.GetItemCooldown(itemName)
+				cdStart, cdDur, cdEnable = RQE.API.Client.C_Item.GetItemCooldown(itemName)
+			end
+
+			if cdEnable and cdDur and cdDur > 1 then
+				self.CooldownUpdater:SetCooldown(cdStart, cdDur)
+				self:SetAlpha(0.5) -- grey out while on cooldown
+			else
+				self.CooldownUpdater:Clear()
+				self:SetAlpha(1)
+			end
+		end)
+
+		-------------------------------------------------------
+		-- #7a.vii. Tooltip Cleanup
+		-------------------------------------------------------
+
+		MagicButton:SetScript("OnLeave", function()
+			GameTooltip:Hide()
+		end)
+	end

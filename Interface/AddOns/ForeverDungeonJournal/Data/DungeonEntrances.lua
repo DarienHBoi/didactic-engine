@@ -11,6 +11,37 @@ local entrances = {
         detail = "Enter through the city's sewers: drop through a grate in the streets and follow the Underbelly pipe to the portal",
         markerType = "dungeon",
     },
+    ["The Drowned City"] = {
+        mapID = 1434, x = 0.214, y = 0.279,
+        label = "The Drowned City Entrance",
+        detail = "Underwater west of the Vile Reef: swim to Sunken Hollow by the island with the water elementals; the cave has a large tablet beside it",
+        markerType = "dungeon",
+    },
+    -- Forever's new dungeons (entrance guides, Nov 2026).
+    ["Krol'dok Stronghold"] = {
+        mapID = 2548, x = 0.375, y = 0.373,
+        label = "Krol'dok Stronghold Entrance",
+        detail = "Northern Riverglades, on the hill above Sunnyglade: not the big fortress gates but the small cave just west of them",
+        markerType = "dungeon",
+    },
+    ["Alcaz Prison"] = {
+        mapID = 1445, x = 0.753, y = 0.141,
+        label = "Alcaz Prison Entrance",
+        detail = "On Alcaz Island, off north-east Dustwallow Marsh: from the dock take the path up the hill to the prison building at the north end; the portal is in its cellar",
+        markerType = "dungeon",
+    },
+    ["Blackmaw Hold"] = {
+        mapID = 1447, x = 0.386, y = 0.332,
+        label = "Blackmaw Hold Entrance",
+        detail = "Northern Azshara, at the old furbolg gate: follow the long tunnel into the mountain; the portal is at its far end, under Darkwhisper Gorge by the Winterspring border",
+        markerType = "dungeon",
+    },
+    ["Shaper's Terrace"] = {
+        mapID = 1449, x = 0.481, y = 0.061,
+        label = "Shaper's Terrace Entrance",
+        detail = "Northern rim of Un'Goro Crater, on the hill right above Marshal's Refuge: climb the stairs to the titan temple",
+        markerType = "dungeon",
+    },
     ["Gnomeregan"] = {
         mapID = 1426, x = 0.243, y = 0.398,
         label = "Gnomeregan Entrance",
@@ -24,7 +55,10 @@ local entrances = {
         markerType = "dungeon",
     },
     ["Scarlet Monastery: Library"] = {
-        mapID = 1420, x = 0.826, y = 0.338,
+        -- smlibrary (2.0.16): the Library's own door inside the Monastery
+        -- (measured in the game: Systems/ScarletWing.lua), where its route's
+        -- walked way ends.
+        mapID = 1420, x = 0.8535, y = 0.3239,
         label = "Scarlet Monastery Entrance",
         detail = "Inside the Scarlet Monastery; the Library has its own portal door",
         markerType = "dungeon",
@@ -126,7 +160,9 @@ local entrances = {
         markerType = "dungeon",
     },
     ["Scarlet Monastery: Graveyard"] = {
-        mapID = 1420, x = 0.826, y = 0.338,
+        -- smhorde (2.0.12): the Graveyard's own door (measured in the game:
+        -- Systems/ScarletWing.lua), where its route's walked way ends.
+        mapID = 1420, x = 0.8480, y = 0.3037,
         label = "Scarlet Monastery Entrance",
         detail = "Inside the Scarlet Monastery courtyard; the Graveyard is the portal on the right",
         markerType = "dungeon",

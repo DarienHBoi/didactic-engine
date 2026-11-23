@@ -1,0 +1,1009 @@
+---------------------------------------------------------------------------------------
+--  UI/Changelog/ChangelogData.lua - changelog body for in-game viewer
+--  Regenerate from CHANGELOG.md:  scripts\sync-changelog-to-lua.ps1
+---------------------------------------------------------------------------------------
+local _G = _G
+local CM = _G.CM
+
+CM.Config = CM.Config or {}
+CM.Config.ChangelogText = [[
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [5.5.0] - 2026-11-11
+
+### Added
+
+- **Support Mode**, a toggle with its own options tab and keybind (needs Reticle Targeting). It switches your main action bar to a dedicated support page and lets helpful spells on your click-cast buttons target the friendly unit under your crosshair, else your friendly target (such as an **Ally Cycle** pick), else the ally the game soft-targets in front of you. With no ally to take the spell, the game's own Self Cast setting decides whether it lands on you (Auto Self Cast and the Self Cast key both work). Friendly soft targeting is switched on while the mode is on. Harmful spells keep targeting enemies. It works in combat.
+  - **Prioritize Crosshair Target** (off by default) puts the ally under your crosshair ahead of other friendly targets, such as an Ally Cycle pick (Target Lock still comes first), and the ally who takes the heal becomes your target. Leave it off to prioritize your selected target; the heal then leaves your target alone.
+  - **Target Lock** works on allies while the mode is on. The Target Lock key locks your friendly target, or the ally you aim at, and the **Cycle Lock** keys move the lock to the next or previous nearby friendly unit. Helpful spells on your click-cast buttons go to the locked ally first, and the lock marker takes the Support color. With **Auto Target Lock** on, the ally you heal with a click-cast button is locked automatically, the way an enemy is when you attack; harmful spells don't lock enemies while the mode is on. Switching modes drops a lock the new mode can't use: a hostile lock when you enter Support Mode, a friendly one when you leave it.
+  - **Support Bar Page** is the main action bar page shown while the mode is on (page 2 by default). Place your support abilities there; leaving the mode returns to page 1.
+  - **Nameplate Behavior** picks which nameplates show while Support Mode is on: friendly only (the default), friendly and enemy, none, or your own settings unchanged. Your settings come back when you leave.
+  - The crosshair shows the mode: it switches to a **Support** texture (pick another, or turn it off, in **Appearance** on the Crosshair tab) and turns a mint green while idle (the new **Support** tab of **Reaction Colors**). Entering and leaving the mode swaps the reticle with a lock-out of the old look and a lock-in of the new one.
+  - **Tint Vignette** gives the Vignette that same color while Support Mode is on, as a soft, slowly breathing glow. It shows only when your Vignette does.
+  - The **Setup Wizard** has a **Support Mode** step, with screenshots and a check for your Support Mode key.
+- **Reset All Colors** button in the **Reaction Colors** editor, to clear every custom crosshair color at once.
+- **Also Cycle Through** on the **Ally Cycle** tab: add **Your Pet** and/or **Party Pets** (everyone else's pets) to the cycle, after the group members. The Ally HUD shows a targeted pet with a gold paw-print crest in place of the role icon, and the count includes them. **Your Pet** is on by default.
+- A small gold **"i" button** beside each section header and option that the **Setup Wizard** covers. Click it to read that feature's explanation, with its screenshots, in a popup, without running the tour.
+
+### Changed
+
+- The tab list in the options sidebar now scrolls when the window is too short to show every tab, and selecting a tab (from search, What's New or the wizard) scrolls it into view.
+- The help buttons in the options (beside dropdowns and keybinds, and in the code boxes) now use a gold round "?" button, matching the character-specific "C" badge.
+- The **Reticle CVar** editor explains every CVar in full: hover a row for what its values mean, what Action Combat Mode sets and why, and which features depend on it (including how **SoftTargetMatchLocked** and **SoftTargetWithLocked** differ).
+- **Ignore Friendlies** is gone: Reticle Targeting now always skips friendly units. Use **Ally Cycle**, **Support Mode** and the **Party Wheel** to target allies. Friendly soft targeting is no longer switched on by that option; set **SoftTargetFriend** in the Reticle CVar editor (it stays on for characters that had Ignore Friendlies off). The **Toggle Focus Any** click-cast action is replaced by **Toggle Focus Enemy**, and the Prelines editor shows one preline per Auto Target Lock state.
+
+### Fixed
+
+- Pet ground abilities such as **Move To** now free your cursor so you can place the marker, then lock Mouse Look again once you click or press Escape. Before, the marker appeared but the cursor stayed locked.
+- **Target Lock** no longer locks a friendly NPC. After interacting with an NPC (it becomes your target), pressing Target Lock locked it anyway.
+
+## [5.4.7] - 2026-11-09
+
+### Changed
+
+- **Close Windows With Mouse Look** moved to the Mouse Look section of the General tab.
+
+### Fixed
+
+- The **Reticle CVar** editor now uses the game's help text for CVars without a written description.
+- The **Target Lock** marker now stays centered on the nameplate's health bar with Plater and similar nameplate addons, instead of drifting sideways as the enemy loses health.
+
+## [5.4.6] - 2026-11-08
+
+### Added
+
+- **Auto Cursor Unlock** also watches the Social window on Forever.
+- **Close Windows With Mouse Look** option in the General tab (off by default). Automatically closes all open windows, such as bags, the character panel or menus, when you toggle Mouse Look on with the **Mouse Look Keybind**.
+
+### Changed
+
+- While the **Interactable Indicator** is on, Action Combat Mode now hides Blizzard's own friend, interact and game object icons (`SoftTargetIconFriend`, `SoftTargetIconInteract`, `SoftTargetIconGameObject`), since the indicator already shows them. Turn the indicator off and your own values come back. All three, and the enemy icon, are listed in the **Reticle CVar** editor.
+- **Account-Wide Binds** in Click Casting is now on by default for new characters, so they share one set of binds. Existing characters keep their current setting.
+- **Target Mouseover** in the Click Casting action list is now **Target Crosshair** and sits in the **Action Combat Mode** section. New characters (and new binding sets) default **Alt + Left Click** to Target Crosshair and **Alt + Right Click** to Clear Target; existing binds are unchanged.
+
+## [5.4.5] - 2026-11-06
+
+### Added
+
+- **Auto Cursor Unlock** now watches the panels WoW Forever added, such as the Spellbook & Talents window, Legacy, Transmog, Stable, Guild Bank, Group Finder listings and the housing windows, so Mouse Look releases the cursor while they are open.
+- **Radial Menu** has new **Spellbook** and **Legacy** actions for Forever.
+- **Disable Player Interaction** option in the General tab (off by default). Turn it on to stop the **Interact Keybind** from opening player menus and hide the **Player Interaction Prompt**, which fixes the key doing nothing while aiming at a driver on multi-passenger mounts.
+
+### Changed
+
+- The **Interface** wheel preset on Forever is now Character Info, Professions, All Bags, Talents, Legacy, Quest Log, Group Finder and Account Collections.
+- **Radial Menu** actions you can't use yet, such as Talents below the unlock level or Legacy before you have renown, now show greyed out and do nothing.
+
+### Fixed
+
+- **Radial Menu** no longer offers Housing Dashboard, Achievements or Great Vault on clients that can't open them, which caused a Lua error on Forever.
+- Fixed a repeated Lua error from **Auto Cursor Unlock** when a watched window was forbidden to addons.
+
+## [5.4.4] - 2026-11-06
+
+### Changed
+
+- The player context menu on the **Interact Keybind** now opens only when you hold the key while aiming at a player, so a quick tap no longer pops it up. The **Interact Keybind** and **Player Interaction Prompt** descriptions say so.
+
+## [5.4.3] - 2026-11-06
+
+### Fixed
+
+- Fixed a Lua error on login that stopped the welcome message from printing.
+
+## [5.4.2] - 2026-11-06
+
+### Fixed
+
+- When **Mouse Look** turns off, the cursor now appears on the **Crosshair** instead of wherever it was before locking, so the **Radial Menu** opens with the cursor at its centre. The camera no longer jolts when Mouse Look turns on, which is what kept cursor centering disabled since patch 10.2 ([#189](https://github.com/ThericGames/combatmode/issues/189)).
+
+## [5.4.1] - 2026-11-06
+
+### Fixed
+
+- **Party Wheel Spells** and the other spell lists (Excluded Spells, Cast at Crosshair) now accept every rank of a spell on Forever and Classic. Before, adding one rank hid the others. Each suggestion shows its rank on the right, and the added spell shows it too.
+
+## [5.4.0] - 2026-11-04
+
+### Added
+
+- **Action Combat Mode** is now translated into German, Spanish (Spain and Latin America), French, Italian, Korean, Brazilian Portuguese, Russian and Simplified and Traditional Chinese. The options window, **Setup Wizard**, editors, **Radial Menu**, chat messages and the Key Bindings screen follow your game language. The translations are machine-drafted, so corrections are welcome (see CONTRIBUTING).
+
+### Changed
+
+- Wheel names on the **Radial Menu** are now shortened by characters instead of bytes, so Cyrillic and Chinese names are no longer cut in the middle of a letter.
+- Buttons, sidebar tabs and the **Setup Wizard** balloon make room for longer translations.
+- Keyboard keybinds on the **Assist HUD** use your game language's font, so Korean, Russian and Chinese key names draw correctly.
+
+## [5.3.3] - 2026-11-03
+
+### Changed
+
+- The **Setup Wizard**'s **Party Wheel** step shows one more screenshot.
+
+## [5.3.2] - 2026-10-31
+
+### Added
+
+- **Vignette Shows When** (Mouse Look tab, Additional Features) replaces the Vignette Effect toggle: check **Mouse Look is on**, **In combat** and/or **Talking to an NPC**, and use **Vignette Match** to show it when **Any** or **All** of them are true. Uncheck everything to turn it off. Your current setting carries over.
+- The **Setup Wizard** shows in-game screenshots of each feature as a short slideshow above the explanation.
+- The **Setup Wizard** has a new step for **Party Wheel Spells**.
+
+### Changed
+
+- Keybinds on the **Assist HUD** are shortened the way most action bar addons do it: Shift+F shows as "SF", mouse button 4 as "B4", mouse wheel up as "WU". The **Interact** key on the Interaction HUD uses the same short labels.
+- The **Setup Wizard** is shorter: the Excluded Spells and Advanced steps are gone. Both settings are still on their tabs.
+- The **Ally Cycle HUD** preview on the Ally Cycle tab now cycles through four example allies ("Ally 1" to "Ally 4"), each with its own class colour and role, instead of showing your name. It also no longer shows the Assist HUD, only the crosshair and the Ally Cycle HUD.
+- The **Ally Cycle HUD** **Position** can now only be **Top** or **Bottom**, so it never overlaps the Assist HUD. If yours was set to Left or Right, it moves to Bottom.
+
+## [5.3.1] - 2026-10-30
+
+### Added
+
+- When aiming the crosshair at a player outside of combat for more than a second, the **Interact** key now opens that player's context menu and frees the cursor (with Auto Unlock enabled). Interactions with NPCs and objects still work as before.
+- The Assist HUD now shows a prompt when you aim at a player for at least a second. Turn it off with **Player Interaction Prompt**, under **Assist HUD**.
+- **Show Tooltips With** (Mouse Look tab, Additional Features): with **Hide Tooltips** on, hold Alt (default), Ctrl or Shift to see the tooltip of what you're aiming at (out of combat only).
+- **What's New** button in the options window, next to the version: opens a list of every new option and tab. Click an entry to jump straight to it; the list stays open.
+
+## [5.3.0] - 2026-10-30
+
+### Added
+
+- **Party Wheel** (Radial Menu tab): add helpful spells to **Party Wheel Spells**, then hold one of their keys to open a wheel of your group. Flick toward a member and release to cast on them, or tap to cast normally. Each member shows their health, role and name, with the same warnings as the **Ally Cycle HUD**. In a raid, scroll to page through members.
+- Right-click now cancels the **Radial Menu** and the Party Wheel, like Esc.
+
+### Changed
+
+- The **Ally Cycle HUD** shows first names only, so follower and companion NPCs ("Brann") fit.
+- Cycling allies now plays the same click as aiming a **Radial Menu** slice, so it's easier to hear.
+- The **Ally Cycle HUD** shows "Dead" or "Offline" in place of the name. An offline target is desaturated like a dead one, keeping their last known health.
+
+## [5.2.5] - 2026-10-26
+
+### Fixed
+
+- **Radial Menu** no longer shows tooltips for whatever is under the cursor while the wheel is open and you are picking a slice.
+
+## [5.2.4] - 2026-10-25
+
+### Fixed
+
+- The **Interaction HUD** no longer throws a "numeric conversion on a secret number value" error when leaving a dungeon or other instance.
+
+## [5.2.3] - 2026-10-24
+
+### Added
+
+- **Minimum Zoom** slider in the Camera Features section of the **Mouse Look** tab: the camera stops at the chosen distance when you zoom in (defaults to 3, 0 turns it off). It works with DynamicCam and SteadyCam too.
+
+### Changed
+
+- Every section of the options window now has a short description of the feature under its heading.
+- **Prelines Editor** now shows a live character counter under each preline, like the Macro Composer.
+- **Setup Wizard** step text is split into short paragraphs with the key terms highlighted in the accent color, so it is easier to read.
+- **Mouse Look** tab: Cursor Pulse, Vignette Effect, Hide Tooltips and Auto Sheath moved into a new **Additional Features** section below Camera Features.
+
+### Fixed
+
+- **Radial Menu** editor: the pip tooltip no longer shows while you click and hold or drag a pip to reorder your wheels.
+
+## [5.2.2] - 2026-10-22
+
+### Added
+
+- Two new crosshair textures in the **Crosshair Textures** editor (Pack #200 and #201).
+
+### Changed
+
+- **Radial Menu** slices now use Blizzard's gamepad action bar button art: the slice you aim at lights up with a glowing ring, and slices that can't be used right now turn grey.
+- **Radial Menu** has a new style option: **Minimal** (default) uses Blizzard's radial menu background (soft vignette, centre ring and thin dividers) with its focus glow on the aimed slice, **Forever** keeps the original wheel.
+- **Radial Menu** UI shortcuts (Character Info, Spellbook, Talents, World Map, Bags, Professions, Quest Log, Guild, Group Finder, Collections, Adventure Guide, Calendar, Friends, Game Menu, Macros and a few more) now show Blizzard's own radial menu icon art in place of the round slot, and commands like Ready Check, Duel or Inspect use that art as the icon inside the round slot.
+- **Radial Menu** editor shows one pip per wheel under the wheel name: click a pip to select that wheel, drag it to reorder your wheels.
+
+### Fixed
+
+- A **Force Lock** condition that is often true no longer breaks the vignette, **Shoulder Offset** and **Sheath Weapons with Mouse Look**: tapping the Mouse Look key while Force Lock is active is ignored (unless **Force Lock Once** is on), so the vignette and offset stay with Mouse Look and weapons are no longer sheathed while it is on.
+
+## [5.2.1] - 2026-10-21
+
+### Added
+
+- **Sounds** section in the Advanced tab: switch off the cue sounds of Mouse Look, Target Lock, Radial Menu or Ally Cycle, one toggle per feature. All stay on by default.
+
+### Changed
+
+- **Target Outline** is now disabled on clients other than Retail, where it drew no outline. Action Combat Mode no longer changes the outline CVars there.
+- **Ally Cycle** is available again on Forever, now that the client provides `loadstring_untainted`.
+
+## [5.2.0] - 2026-10-21
+
+### Added
+
+- **Radial Menu**: hold a key, move the mouse toward a slice and release to use it. Build up to 5 wheels of 8 slices (saved per character) in the new **Radial Menu** tab, which shows the wheel: click a slice to choose what it does, drop a spell, item, toy, mount or macro on it, drag it onto another to reorder, right-click to remove it, and use the centre **-** to remove a wheel or **+** to add one from the Interface, Emotes or Misc presets or a blank wheel. Each wheel can be renamed and has its own highlight colour, page dots under the name show which wheel is open, and scrolling the mouse wheel switches wheels while it is open (Escape cancels). New characters start with Interface, Emotes and Misc wheels. Unbound by default: pick a key in the tab. Subtle sounds play when the wheel opens, closes, changes slice or wheel, and when you use a slice.- Soft click sounds now play when Mouse Look turns on and off.
+- **Swap Shoulder** keybind: mirrors your **Shoulder Offset** to the other side of the character, easing across. Find it in the Key Bindings under Action Combat Mode.
+- The **Action** dropdown in Click Casting now groups its choices under **Action Combat Mode**, **Modified Blizzard Actions** and **Blizzard Actions** headers.
+
+### Changed
+
+- **Next-cast Suggestion** is now disabled on clients other than Retail, where Blizzard's Assisted Highlight does not exist.
+- **Excluded Spells** and **Cast at Crosshair** now start empty on a fresh install, and **Unlock Mounts** is only prefilled with the known vendor mounts on Retail (other clients start empty). Existing lists are kept.
+- **Pitch Strength** now defaults to 0 for new installs (it was 0.4). Anyone who already set a value keeps it.
+- Config tabs are reordered: Mouse Look, Crosshair, Reticle Targeting, Click Casting, Radial Menu, Ally Cycle, Auto Unlock, Advanced.
+- The setup wizard follows the new tab order, and its Click Casting, Radial Menu and Auto Unlock parts first highlight the whole section before walking through its options. Click Casting now explains switching modifier tabs and choosing Left and Right Click actions, and Auto Unlock no longer has a separate toggle step.
+
+### Fixed
+
+- The options window and its editors stay open when you open the spellbook, bags or other game panels, so you can drag spells and items from them straight onto a Radial Menu slice. Esc still closes the window.
+- **Toggle Focus Any** and **Toggle Focus Enemy** click-cast actions now follow **Target Lock Behavior** (tap to lock or hold) and update when you change it.
+
+## [5.1.3] - 2026-10-20
+
+### Added
+
+- The **Toggle Focus Any** and **Toggle Focus Enemy** click-cast actions are back in the Click Casting list. They always tap to lock and tap again to unlock, whatever Target Lock Behavior is set to. New installs get Alt + Right Click on Toggle Focus Any again; slots turned off since 5.1.0 stay off until you pick an action.
+
+## [5.1.2] - 2026-10-19
+
+### Added
+
+- **Crosshair Textures editor**: **Appearance** (Crosshair tab) and **Situational Appearance** (Advanced tab) now open a texture browser instead of a dropdown. Pick the **Inactive** and **Active** texture separately from over 200 new crosshairs (plus the existing ones), or apply one of five preset pairs (Arrows, Default, Diamond, Ornated, Triangle) in one click. Appearance also gets separate **Mounted** and **Disabled** textures for the reticle shown while mounted or while Target Lock holds it (the Dot by default). Every state has an **eye button** (top-right of its card) that hides the crosshair for just that state; this replaces the Invisible situational choice (hiding both states does the same). The older Bracket, Cross, Dot, Inverted Y, Line, Split, Square and X presets are gone (the new set has equivalents); anyone who had one selected falls back to Default.
+
+## [5.1.1] - 2026-10-19
+
+### Fixed
+
+- The Assist HUD frame stays copper in both modes. The blue next-cast tint now applies only to the glow, and the animation keeps its original colors.
+- Pressing **Esc** with the **Run MACRO** dropdown open now closes only the dropdown. Before, it closed the whole options window and left the dropdown open.
+- **Ally Cycle** is turned off again on WoW Forever. Forever still cannot run the secure code it needs, which caused errors; the Ally Cycle tab shows it as unavailable there.
+
+## [5.1.0] - 2026-10-18
+
+### Added
+
+- **Reticle Targeting Macros** (Reticle Targeting tab): a list of your macros that begin with the Reticle Targeting logic, shown as icons. Drag one onto an action bar (or click it to pick it up) and it follows your bar swaps. Right-click an icon to edit it. Macros on action bars cannot inherit Reticle Targeting on their own, so this replaces having to copy the preline into them by hand.
+- **Macro Composer**: press **+** at the end of the Reticle Targeting Macros list to write a macro. The preline matching your current Reticle Targeting settings is added automatically as a locked, highlighted first line, with a live character counter for the 255-character macro limit. Saving creates a real WoW macro (a character macro, or a general one with Account-Wide Binds), and editing it can also rename or delete it. Macros made this way are updated automatically when Ignore Friendlies, Auto Target Lock or the preline changes.
+- The click-cast **Run MACRO** dropdown now lists your existing macros with their icons, and tags the ones that carry Reticle Targeting.
+- The Interaction HUD and Combat Assist are now a single **Assist HUD** (Crosshair tab). On a hostile (hard target or under the crosshair) it shows the Assisted Highlight's next-cast suggestion with your keybind. On an interactable it shows the interaction icon, its name and your Interact key, with a glow and a short animation when it appears.
+- The **Next-cast Suggestion** fades out while the suggested spell is out of range of your target.
+- **Ally Cycle** now skips group members who are offline or in another zone or instance, since you can't cast on them. Someone far away in the same zone is still included. Changes are picked up out of combat, so a member who disconnects mid-fight is skipped once combat ends.
+- **Target Lock Behavior** (Reticle Targeting): choose **Toggle** (tap to lock, tap again to unlock, as before) or **Switch Target** (tap while aiming at a unit to move the lock to it, tap with nothing under the crosshair to unlock). Made for arenas and battlegrounds where you need to switch locks in one press.
+- A **Flip Camera** keybind in the Mouse Look section, below the Interact Unit option. Like Mouse Look it works both ways: tap to flip the camera around your character and press again to flip back, or hold to flip it only while the key is held.
+- **Ally Cycle** is available on WoW Forever again. Forever's early beta could not run the secure code it needs, so it was turned off there; that has since been fixed.
+
+### Changed
+
+- **Target Outline** and **Selection Circle** moved to their own **Targeting Indicators** section at the bottom of the Reticle Targeting tab. In Target Lock, **Target Lock Behavior** now sits below the Cycle Lock keys.
+- **Combat Assist** is now the **Next-cast Suggestion** dropdown: **Always**, **Only In Combat** or **Hidden** (it was an on/off toggle). An existing On becomes Always, so it now also shows outside combat.
+- The **Toggle Focus Any / Enemy** click-cast actions are removed; the Target Lock key replaces them. A click-cast slot that used one (including the old default Alt + Right Click) is turned off.
+- **Interaction HUD** is now the **Interactable Indicator** toggle. It and the Next-cast Suggestion share one Position, Scale and Distance setting.
+- New look for the Assist HUD: a copper glow, animation and frame matching the options window, and the keybind and name text now use the window's text colors with an outline.
+- The **Shoulder Offset** slider now goes from -15 to 15 (it was -2 to 2).
+- The Blizzard art the addon draws with (window frame, health bar, icons, HUD ring and more) is now shipped with the addon instead of read from the game, so it looks the same on every client. The `Assets` folder is organized into `branding`, `crosshair`, `assisthud`, `ui` and `atlas`.
+- The setup wizard has new steps for Excluded Spells, Cast at Crosshair, Reticle Targeting Macros, Targeting Indicators, Unlock Mounts and Extra Frames, and updated Target Lock text.
+- The setup wizard now leaves the crosshair and HUD previews undimmed and outlined (one element per step: the crosshair, the Assist HUD or the Ally HUD), and moves its balloon out of their way.
+- The **setup wizard** now runs once for existing installs too, not just new ones: the first time you log in after updating, it starts on its own, and the changelog opens when you finish or skip it. The welcome and the wizard are now remembered per account instead of per character, so your other characters don't repeat them.
+
+### Fixed
+
+- The crosshair now returns to its base (white) look when the unit under it is dead, instead of staying red or colored. A corpse you can loot shows the yellow interactable look.
+- Interactable icons on the Assist HUD (quests, mining, herbs, skinning, locks and more) are centered in the ring; the game's own cursor art is off-center.
+
+## [5.0.4] - 2026-10-16
+
+### Fixed
+
+- The red selection circle under your target is back. The **Hide Soft Targeting Indicator** option from 5.0.3 hid it for every target.
+- **Uninstall** now also puts back Blizzard's settings for options added after you first installed the addon, such as the selection circle.
+
+### Changed
+
+- **Hide Soft Targeting Indicator** is now **Selection Circle** (Reticle Targeting). By default your selected target gets its circle; you can also limit it to your Target Lock, show Blizzard's own soft target circle and name, or hide it.
+
+## [5.0.3] - 2026-10-15
+
+### Added
+
+- **Target Outline** (Reticle Targeting): shows an outline effect on your target.
+- **Hide Soft Targeting Indicator** (Advanced › Reticle Targeting): hides the indicator Blizzard shows on your soft target, which can sit off the crosshair with a high Shoulder Offset.
+
+### Changed
+
+- **Reticle Targeting:** your soft target now stays on your hard target while you have one.
+- The cursor now appears and disappears instantly when you pick up, place or cancel a ground-targeted spell.
+
+## [5.0.2] - 2026-10-14
+
+### Added
+
+- **Frame picker** for **Extra Frames** (Auto Unlock). Click the inspect button at the top right of the field, then click any window on screen to add it; everything else is dimmed and the frame under your cursor is named in a popup.
+- The **setup wizard** now asks for the essentials before moving on: your Mouse Look, Interact, Target Lock, Cycle Lock and Ally Cycle keys show up as check marks that fill in once the key is bound, and Next stays disabled until they are.
+
+### Changed
+
+- **Extra Frames** (Auto Unlock) is now a pill list like Unlock Mounts. Type to get suggestions from Blizzard and addon frames; each frame shows the WoW logo (Blizzard) or its addon's icon, and suggestions tell you which frames are open right now. Your saved frames carry over, and new installs start with an empty list.
+- The **Targeting Macro Prelines** editor now allows **140** characters per preline (was 129): the trailing `/click` line leaves out arguments the game already defaults to.
+- **Auto Target Lock** (with Ignore Friendlies) no longer picks up a dead hostile under your crosshair, and the Ally Cycle "restore after a harmful cast" macro now clears a dead Target Lock too when there is room for it.
+- Combat Mode no longer creates `CM_...` macros in your macro list. Its click-cast actions (Clear Target, Clear Focus, Start Attack, Pet Attack, Toggle Focus) now run from hidden buttons, and leftover unmodified `CM_` macros from older versions are removed once (edited ones, or ones on an action bar, are kept).
+- The **Ping, Attack, Warning, On My Way and Assist** actions in **Click Casting** now ping the unit under your crosshair. The **raid marker** actions mark your target, or the unit under the crosshair when you have no target. Combat Mode's own actions (copper) and these changed Blizzard ones (blue) are listed first in the action dropdown.
+- Rewrote and tightened the setup wizard's text, gave its last step an accent-colored **Finish** button, and made it fade smoothly between steps.
+
+## [5.0.1] - 2026-10-14
+
+### Added
+
+- **Code block diagnostics.** The custom Lua code blocks now show a one-line message under the code when it has a syntax error (with the line number) or uses a name that does not exist in the WoW API, with a "did you mean" suggestion. Unknown names are tinted red.
+- **Name suggestions** in the code blocks. Typing a name (or a `C_` / `Enum` member after the dot) lists matching WoW API names; pick one with Up / Down and Tab / Enter, or click it.
+- Blizzard API names in the code blocks are now highlighted in yellow so they stand out.
+- **Line numbers** on the left of the custom code blocks.
+- **Setup wizard.** On first install it now guides you through the options window: it scrolls to each major section (Mouse Look, Camera Features, Crosshair, Interaction HUD, Combat Assist, Reticle Targeting, Target Lock, Click Casting, Auto Unlock, Ally Cycle and Advanced), dims everything else and explains what it does, while you change settings right there. A new cog button between the version number and the search button runs it again.
+
+### Changed
+
+- **Enemies Only** is now **Ignore Friendlies** (Reticle Targeting), including in the Targeting Macro Prelines editor. Your setting is kept.
+- The **General** tab is now **Mouse Look**. **Interact Keybind** and **Interact Unit** now sit right under the Mouse Look keybind, and **Turn Speed** moved to Camera Features, below Motion Sickness Protection.
+- The Target Lock keybind no longer says it follows Reticle Targeting settings. A red warning under **Target Lock** now explains that it uses your Focus Target, so anything else that sets your focus will interfere with it.
+
+### Fixed
+
+- The Assisted Combat (single-button) action no longer fails to target the unit under the crosshair after patch 12.1.5.
+
+## [5.0.0] - 2026-10-13
+
+### Added
+
+- **Search** in the options window header. It starts as a magnifier button and expands when clicked. Type to find options by name, description, section or tab; picking a result switches to its tab, scrolls to it and highlights it. Searching a section (such as **Force Lock**) or a tab lists everything inside it and highlights the whole section. Up, Down and Enter work too.
+- The **version number** in the header is now a button that opens the changelog.
+- Dropdowns open in place, as an expanded version of the select, with a search box on long lists.
+- Lua syntax highlighting and auto-indent in the custom code blocks, including their placeholder code.
+- Spell and mount list suggestions now have round icons.
+
+### Changed
+
+- **Breaking:** Combat Mode is now **Action Combat Mode**. The slash commands are now `/acm` and `/actioncombatmode`; `/cm` and `/combatmode` no longer work. Key binding assignments are unaffected.
+- New look for the whole options window and its editors, dialogs and changelog: copper accent, dark gradient panels, a metal frame with a drop shadow, new background art, a branded header with the logo, and consistent buttons, toggles, sliders, inputs and scroll bars.
+- Click Casting hides the Macro Name field until the action is set to Run Macro.
+- The Changelog button moved out of the sidebar (use the version number).
+- Switching tabs is instant.
+
+### Removed
+
+- The Changelog button in the options sidebar.
+
+## [4.8.2] - 2026-10-03
+
+### Added
+
+- **Help button** to custom code blocks. Takes you to the WoW API documentation.
+- Support for **Steady Cam** addon.
+
+## [4.8.1] - 2026-10-03
+
+### Fixed
+
+- Options slider thumbs now travel the whole bar (this is a visual fix only; it was already properly modifying the values).
+- Right-clicking an options slider resets it to the default again. Only a left click moves the thumb.
+
+## [4.8.0] - 2026-10-03
+
+### Added
+
+- **Advanced** options tab. Holds Force Lock, Force Unlock, the crosshair situational appearance and condition, and the Reticle CVar / Targeting Macro Prelines editors.
+- **Force Lock**: custom Lua that keeps Mouse Look locked while it returns true. It beats a tap/hold unlock and the Force Unlock snippet only. Bags, watched frames, mounts, feign, pet battles, ground targeting, and cinematics still unlock.
+- **Lock Once** and **Unlock Once**: the force applies the first time its condition becomes true. A manual unlock (Lock Once) or manual lock (Unlock Once) sticks until that condition goes false and then true again.
+- **Invisible** situational crosshair appearance. Hides the center reticle while the situational condition is true.
+- **−** and **+** on options sliders, stepping by that slider's existing step.
+- **Pitch Strength** (General → Camera Features): how far Dynamic Pitch tilts the camera, from 0 to 1 (default 0.4, same tilt as before). Lower values keep your character higher on screen. The flying tilt scales with the slider at the same ratio as the old ground/flying defaults. The game clamps the flying camera setting, so flying stops getting stronger once the slider passes about 0.45; ground tilt can still increase up to 1.
+
+### Changed
+
+- Auto Unlock's custom condition now lives under Advanced → **Force Unlock**. Frame watch, mounts, and extra frames stay on the Auto Unlock tab.
+- Crosshair situational appearance and condition moved from the Crosshair tab to Advanced.
+- Reticle CVar editor and Targeting Macro Prelines editor moved from Reticle Targeting to Advanced.
+
+## [4.7.6] - 2026-09-28
+
+### Fixed
+
+- Opening options on **Classic clients** no longer errors when Ally Cycle checks healer spec.
+- **Ally Cycle** click-cast help/harm routing now applies while solo, not only in a group.
+- Helpful click-cast no longer requires **Ally Cycle** keybinds to keep a friendly hard target (e.g. Fortitude while aiming at a hostile). Forever / unbound users get the same Enemies Only helpful path as Retail with cycle keys bound.
+- With Reticle Targeting on, custom **macros** on a paged, bonus, or secondary action bar (the bar that replaces the main 1–12 keys) fire from their keybinds again. Combat Mode was classifying those slots from main-bar page 1, so the key stayed on the nested-`/click` proxy and the macro silently no-op'd; mouse clicks were unaffected. Spells on those bars still get reticle targeting.
+
+### Changed
+
+- With **Enemies Only** enabled, helpful spells now cast on the current friendly hard target if one exists. It still ignores friendly targets under the crosshair when selecting targets.
+- With **Enemies Only** disabled, helpful spells can now hard-target friendlies under the reticle. Aiming the crosshair at a friendly unit and casting a helpful spell will override an **Ally Cycle** selection.
+
+## [4.7.5] - 2026-09-25
+
+### Added
+
+- **Start Attack** click-cast action. Replaces Blizzard's raw Start Attack in the dropdown so we can inject reticle targeting logic into it.
+
+### Fixed
+
+- **Auto Attack / Auto Shot / Shoot / Pet Attack** click-cast no longer toggles off when swapping to a new target under the reticle.
+
+## [4.7.4] - 2026-09-24
+
+### Fixed
+
+- **Ally HUD** no longer flashes when pressing Interact on a friendly NPC.
+
+## [4.7.3] - 2026-09-23
+
+### Added
+
+- **Ally HUD**: cycling Previous travels an up arrow beside the index; Next travels a down arrow.
+
+### Fixed
+
+- Fixed issue where **Ally HUD** could error out on potential non-existant friendly target under specific scenarios.
+
+## [4.7.2] - 2026-09-23
+
+### Fixed
+
+- **WoW Forever**: Ally Cycle no longer errors on login, reload, or throughout combat. Forever Beta is missing Blizzard's secure-snippet compiler (`loadstring_untainted`); cycling is disabled there until that ships. Mainline is unchanged.
+
+## [4.7.1] - 2026-09-23
+
+### Fixed
+
+- CurseForge and Wago now list **WoW Forever** as a supported client. 4.7.0 was uploaded as Mainline-only; releases now tag both 12.1.0 and 1.60.1.
+
+## [4.7.0] - 2026-09-22
+
+### Added
+
+- **Ally Cycle**: bind Up/Down to hard-target the next or previous party/raid member (group/index order; skips you) without unlocking Mouse Look. Huge thank you to user `Ataxium` for the concept/suggestion.
+- **Simultaneous attack + assist**: while an ally is selected, helpful Click Casting spells go to that ally; harmful spells still prefer your hostile Crosshair / Target Lock target.
+- **Ally HUD** (dedicated options tab): companion beside the crosshair for the selected ally — class-colored name, role icon, health bar, raid marker, and cycle index (`n/total`, excluding you). Configurable position, scale, and **Distance**.
+- **Distance** sliders on Interaction HUD, Combat Assist, and Ally HUD: gap past the reticle edge (default 24, same as before).
+- Right-clicking an **options slider** now resets it to its default value.
+
+### Fixed
+
+- Settings toggles on **WoW Forever** now load correctly. Forever can persist booleans as `1`/`0`; Combat Mode coerces those back to real `true`/`false` on load wherever defaults declare a boolean (Mainline unchanged).
+
+### Changed
+
+- Declared **WoW Forever** support (`## Interface` includes `16001` alongside Mainline) so the Forever client no longer marks the addon out of date.
+
+### Removed
+
+- **Party Radial** has been removed in favour of the new Ally Cycle feature.
+
+## [4.6.8] - 2026-09-16
+
+### Changed
+
+- Reticle Targeting preset sets `SoftTargetWithLocked` to `2` so soft selection stays active while a hard target is locked (more Action Targeting feel; hard target still wins for casts).
+- **Interact Unit** defaults to Soft Targeted Unit (More Forgiving).
+
+## [4.6.7] - 2026-09-08
+
+### Fixed
+
+- Interaction HUD shows quest-type soft icons on quest giver NPCs again (was falling back to the gear atlas when Blizzard suppressed low-priority soft icons behind quest effects).
+
+## [4.6.6] - 2026-09-07
+
+### Added
+
+- **Motion Sickness Protection** (General → Camera Features, default off): when on, Combat Mode never overrides Blizzard's Motion Sickness settings. Dynamic Pitch, Shoulder Offset, and Focus Locked Target will not take effect while this is on.
+
+### Changed
+
+- General → **Camera Features** groups Motion Sickness Protection, Dynamic Pitch, Shoulder Offset, and Disable Offset With Mouselook. Those ActionCam controls grey out while Motion Sickness Protection is on (or DynamicCam owns them).
+- **Focus Locked Target** defaults to off.
+- Combat Mode no longer writes `SoftTargetIconInteract` / `SoftTargetIconGameObject` (including uninstall). Blizzard's Accessibility Interaction Key Icons setting can now stick after a reload. `SoftTargetIconEnemy` remains forced off so it does not stack with the reticle.
+
+## [4.6.5] - 2026-09-07
+
+### Fixed
+
+- With **Dynamic Pitch** off (no DynamicCam), toggling Mouse Look while skyriding no longer snaps the camera (motion-sickness ActionCam gates are no longer flipped by freelook alone).
+
+## [4.6.4] - 2026-09-07
+
+### Changed
+
+- **Auto Target Lock** moved under Target Lock on the Reticle Targeting tab.
+
+### Fixed
+
+- **Autofocus Locked Target** works when **DynamicCam** is loaded (no longer relinquished; Target Focus CVars sync with focus, and motion-sickness gates are forced off while autofocus is active).
+- Options / editor windows block mouse so tooltips behind the panel no longer show through.
+
+## [4.6.3] - 2026-09-07
+
+### Added
+
+- **Disable Offset With Mouselook** (General → Mouse Look, default off): Eases **Shoulder Offset** to 0 when disabling Mouse Look. When off, **Shoulder Offset** stays constant at all times.
+
+### Changed
+
+- Default click-cast binds: **Alt+Left** is **Ping**, **Alt+Right** remains **Toggle Focus Any** (new installs / reset defaults).
+
+## [4.6.2] - 2026-09-06
+
+### Added
+
+- **Mouse Look camera** on General → Mouse Look: **Shoulder Offset**, **Dynamic Pitch**, and **Vignette Effect**.
+- Shoulder and vignette ease together with Mouse Look camera chrome (stay up through hold-to-unlock; clear only on permanent unlock). Shoulder is forced to **0** while mounted.
+- **Dynamic Pitch** follows its option (sticky), independent of freelook lock/unlock.
+
+### Changed
+
+- Camera chrome is owned by Mouse Look instead of a separate Action Camera preset.
+- With **DynamicCam** loaded, turn speed, shoulder, dynamic pitch, and Target Focus relinquish to that addon; permanent unlock still eases shoulder to **0** and restores the prior value on re-lock.
+- **Target Lock** controls moved from General to Reticle Targeting (above Advanced).
+- Legacy Action Camera DB keys migrate once into `char.shoulderOffset` / `global.dynamicPitch`, then are cleared.
+
+### Removed
+
+- **Action Camera** tab and preset. Dev note: I was trying to reinvent the wheel; use **DynamicCam** instead.
+
+## [4.6.1] - 2026-09-03
+
+### Added
+
+- **Situational Appearance** (Crosshair tab): choose which reticle texture to use while the Situational Condition returns true (default **Arrows**).
+
+### Fixed
+
+- Action Camera situation **Initial Zoom** / FOV no longer drift across situation changes. Zoom now follows DynamicCam/LibCamera: full transition duration (not a short distance/speed burst that overshot to 0), InOutQuad MoveView, and a CVar miss-correction; numeric CVars snap exactly to their targets when the blend completes.
+- Action Camera no longer re-applies zoom / max-zoom when Mouse Look re-locks after a toggle or **Auto Cursor Unlock** (map, bags, vendors, etc.) — including when the Action Camera preset is **off** (FreeLook was still calling situation Resume).
+- Turning the Action Camera preset off now shuts down the situation driver and reactive zoom, and restores max zoom / FOV from your pre–Combat Mode CVar snapshot when available (avoids being stuck at ~20 yards).
+- **Disable with Mouse Look** no longer yanks camera distance on re-lock (Resume restores pitch/shoulder without forcing setZoom) and clears shoulder offset while Mouse Look is off.
+
+### Changed
+
+- **Disable with Mouse Look** defaults to **off** for new installs / reset defaults.
+- **Vignette Effect** is gated on the Action Camera preset (options + runtime); it cannot stay on as a standalone effect with the preset disabled.
+
+## [4.6.0] - 2026-09-03
+
+### Added
+
+- **Action Camera situations** — Base / Combat / Mounted profiles with priority (Mounted > Combat > Base), smooth CVar cross-fades between situations, and per-situation Field of View, Initial Zoom, Shoulder Offset, and Head Tracking Strength.
+- **Reactive zoom** while Action Camera is enabled.
+- **Vertical Pitch** shared toggle for Action Camera dynamic pitch.
+- **Autofocus Locked Target** (General → Target Lock): pulls the camera toward your locked target via the Target Focus Enemy CVar while focus exists.
+
+### Changed
+
+- Action Camera options rebuilt around shared controls (Preset, Disable with Mouse Look, Max Zoom, Vertical Pitch, Vignette) plus a Base / Combat / Mounted segment panel instead of a single flat slider set.
+- Default Max Zoom raised to **20**; situation defaults: Base FOV 75 / zoom 7 / shoulder 1.2, Combat FOV 80 / zoom 10 / shoulder 1.2, Mounted FOV 85 / zoom 15 / shoulder 0.
+- Vignette fade-with-Mouse-Look is now driven by Action Camera’s **Disable with Mouse Look** (no separate vignette fade toggle).
+- Flat Action Camera DB keys (`actionCameraFov`, `actionCameraZoomSpeed`, `actionCameraHeadTracking`, `char.shoulderOffset`, `char.stickyCrosshair`) migrate into `actionCameraProfiles` on load.
+
+### Removed
+
+- Flat Action Camera FOV / Zoom Scroll Speed / Head Tracking Strength sliders (replaced by per-situation controls; zoom speed and transition duration are fixed).
+
+## [4.5.6] - 2026-09-03
+
+### Fixed
+
+- Mouse Look Turn Speed no longer resets after login or reload when Action Camera is on (the slider kept your value, but Action Camera was overwriting the camera CVars).
+
+## [4.5.5] - 2026-08-31
+
+### Changed
+
+- Target Lock toggle off now clears your hard target as well as focus (locking still focuses and targets the unit).
+
+## [4.5.4] - 2026-08-30
+
+### Added
+
+- **Cycle Lock - Next** and **Cycle Lock - Previous** as dedicated Combat Mode keybinds (General → Target Lock). You're no longer locked to using `SHIFT + MOUSEWHEEL*` to cycle Target Lock.
+
+### Changed
+
+- Cycle Lock no longer uses mouselook-only overrides, so it cannot silently eat mouse wheel (or other keys) without taking over the binding. Assigning a key to Cycle Lock replaces that key's previous action; clear the bind to disable cycling on that key.
+
+## [4.5.3] - 2026-08-29
+
+### Changed
+
+- **Cycle Lock with Mouse Wheel** now uses **Shift + mouse wheel** instead of overriding bare scroll. Plain mouse wheel keeps your normal binds (zoom by default, or whatever you remapped).
+
+### Fixed
+
+- Skyriding abilities have been hard-coded to no longer run reticle targeting prelines, so they do not soft-target or auto-lock enemies while flying.
+
+## [4.5.2] - 2026-08-28
+
+### Fixed
+
+- Party Radial click-cast on slices only worked for **action bar 1** (`ACTIONBUTTON1–12`); bindings on bars 2–8 (`MULTIACTIONBAR*`) now resolve to the correct action slots and cast on the party member.
+
+## [4.5.1] - 2026-08-28
+
+### Changed
+
+- Crosshair reaction **scale** pop now plays only when acquiring or losing a target (base ↔ active). Switching between active reactions (e.g. hostile → friendly NPC) keeps the settled scale and no longer restarts the animation on every flick.
+- Crosshair reaction **colors** smoothly transition when swapping between active target types while aimed on target.
+
+### Fixed
+
+- Default **Situational Condition** called `isStealthed()` (undefined) instead of `IsStealthed()`, spamming errors every update tick while Debug Mode was on and causing stutter. User-Lua condition errors are now throttled in debug output.
+
+### Removed
+
+- Crosshair **Opacity** slider on the Crosshair tab; adjust transparency per reaction in **Reaction Colors** instead.
+
+## [4.5.0] - 2026-08-28
+
+### Added
+
+- Crosshair **Reaction Colors** editor (Crosshair tab → Edit): customize reticle tint and alpha per reaction — Hostile, Friendly NPC, Friendly Player, Object, and Base (idle).
+- Crosshair **Situational Condition** (Crosshair tab): optional custom Lua checked during Mouse Look. Return `true` to swap the reticle to the **X** texture while keeping your reaction colors. Default covers player dead/ghost and stealth; clear the field to disable.
+
+### Changed
+
+- Reticle reaction tints, Target Lock nameplate marker (arrive + settled pulse), and cast-break / cast-feedback hostile flashes now use your customized colors (Target Lock and cast feedback use **Hostile**).
+
+## [4.4.2] - 2026-08-28
+
+### Fixed
+
+- Auto Target Lock no longer leaves focus stuck on a dead corpse: auto-lock prelines add `,nodead` on focus targeting branches (`,harm` / `,exists` alone still match corpses) and resync focus each cast (`/focus [nodead]` or `/focus [nodead,harm]`) instead of sticky `[@focus,noexists]`.
+- Enemies Only + Auto Target Lock: `/focus [nodead,harm]` no longer auto-focuses friendly targets when you hard-target them, so hostile casts do not require manually clearing focus or cycling Target Lock.
+- Opening options no longer errors on characters whose spellbook exposes pet spells when `C_SpellBook.GetSpellBookItemInfo` is unavailable.
+
+### Changed
+
+- Default auto-lock prelines updated again; reset Macro Prelines to defaults and `/reload` if you customized them under 4.4.0–4.4.1.
+
+## [4.4.1] - 2026-08-27
+
+### Fixed
+
+- Auto Target Lock no longer re-locks a dead hostile hard target after the lock dies (clears dead hostile targets before retarget/re-lock), which was causing invalid-target casts until you aimed at a new unit.
+
+### Changed
+
+- Default targeting prelines tightened for the 255-character macro limit. If you've modified the Macro Prelines, it's advised to reset them to defaults to pick up the new revised versions.
+
+## [4.4.0] - 2026-08-27
+
+### Added
+
+- Auto Target Lock option under Reticle Targeting: Target Lock engages automatically when attacking units (clears when the unit dies and re-locks onto a new crosshair target).
+- Support for new Click Casting bindings for MultiBar 5 to 7.
+- More bindable actions in the Click Casting action dropdown: pings, arena target/focus (1–5), vehicle exit/seats, party pets (1–4), sit/sheath/run, pitch up/down, and Toggle Ping Listener.
+
+### Changed
+
+- Targeting Macro Prelines editor always shows all four preline fields; inactive combinations show a watermark (Auto Target Lock × Enemies Only). Labels include the active Enemies Only / Auto Target Lock state.
+- Default reticle targeting prelines adjusted for Auto Target Lock behavior and the 255-character SecureActionButton `macrotext` limit (auto-lock variants keep death-unlock + re-lock; soft-target conditions are trimmed where needed to leave room for the longest `/click` cast line).
+- Targeting Macro Prelines editor enforces a max length (`CM.TargetingMacroPrelineMaxLen`, 129) so custom prelines cannot truncate the trailing `/click` on the worst-case primary-bar path; oversized saved overrides are ignored at runtime.
+
+### Fixed
+
+- Target Lock nameplate marker now appears reliably with nameplate addons (e.g. Platynator): marker parents to the nameplate root with ignore-parent-alpha so health-bar fades no longer hide it; animations (scale/alpha + color pulse) phases no longer fight each other; plate recycle resumes settled without a second flash.
+
+## [4.3.3] - 2026-08-20
+
+### Fixed
+
+- Fixed issue where upgrading items would cause a Lua error due to `StaticPopup_Show` hook + dismiss loop.
+
+## [4.3.2] - 2026-08-20
+
+### Fixed
+
+- Experimental camera features popup now reliably suppressed on every login/reload. Replaced `UIParent:UnregisterEvent` with a `StaticPopup_Show` hook so the popup is intercepted before it can appear — works regardless of addon load timing.
+- Camera no longer jumps or zooms erratically when "Disable with Mouse Look" toggles mouse look on and off. Added `ConfigActionCameraMouselookDisable` which only toggles behavioral Action Camera CVars (shoulder offset, head tracking, pitch, motion sickness); preference CVars (zoom, FOV, zoom speed, turn speed) are left unchanged so zoom/fov survive mouse look toggles.
+
+### Changed
+
+- Sticky Targeting moved from the Action Camera tab to Reticle Targeting.
+- Mouse Look Turn Speed moved from the Action Camera tab to General > Mouse Look.
+
+## [4.3.1] - 2026-08-20
+
+### Added
+
+- Four new adjustable Action Camera CVars in the Action Camera options tab: Field of View (50–90°), Max Zoom Distance (15–39 yards), Zoom Scroll Speed (1–50 inc/s), and Head Tracking Strength (0–2). Each slider applies immediately and only shows when the Action Camera preset is on (disabled when DynamicCam is loaded).
+- Frame name to Vignette effect: `CombatModeVignetteFrame`.
+- Added Alliance's version of Traveler's Tundra Mammoth to the Unlock Mount list.
+
+### Changed
+
+- Camera presets now apply adjustable CVars (FOV, max zoom, scroll speed, head tracking) on top of the base Action Camera preset values at enable time.
+
+## [4.3.0] - 2026-08-19
+
+### Added
+
+- Vignette Effect option under Action Camera > Additional Features: Darkens the edges of the screen to reduce visual distractions. On by default.
+- Vignette Fade with Mouse Look toggle: Vignette fades out when Mouse Look is off and fades in when engaged. On by default.
+- `CM.IsMouselooking()` public API: tracks Combat Mode's own intentional mouselook, distinct from Blizzard's `IsMouselooking`. Combines an internal flag with the Blizzard API so external addons starting or stopping mouselook are also handled safely.
+
+### Changed
+
+- Crosshair while mounted now shows an inactive dot texture instead of being hidden; the "Hide While Mounted" option was removed.
+- Target Lock now always prefers your current target, falling back to the unit under the crosshair when no target exists. The "Lock Selected Target" option was removed; both the Target Lock keybind and the click-cast Toggle Focus bindings share this behavior.
+- Target Lock sound cues are now always on; the sound cue toggle was removed from the options.
+- Toggle Focus Any / Toggle Focus Enemy bindable actions now use the same target-first macros as the Target Lock keybind, and CM macros are refreshed on every load so existing installs pick up the updated behavior.
+- Reticle Targeting in Enemies Only mode now ignores a friendly Target Lock for hostile casts, so locking a party member as focus no longer redirects your attacks; the friendly focus is still honored when Enemies Only is off.
+- Default click-cast binds for Alt+Left / Alt+Right mouse now use Toggle Focus (Enemy / Any) instead of Focus Target / Clear Focus.
+- Vendor Mount auto-unlock renamed to Unlock Mounts. It is now a customizable multi-select field, pre-populated with the current vendor mount list so users can add their own mounts that force a cursor unlock.
+- Vignette, crosshair, animations, assisted highlight, and party radial now use `CM.IsMouselooking()` instead of the raw Blizzard API, so they only respond to Combat Mode's intentional mouselook — not right-click-drag camera turn or other addon mouselook.
+
+### Removed
+
+- "Hide While Mounted" crosshair option (new mounted crosshair state).
+- "Target Lock Sound Cues" option (always on now).
+- "Lock Selected Target" option (target-first behavior is now the default).
+
+### Fixed
+
+- Friendly Target Lock no longer hijacks abilities when Enemies Only is on: offensive spells skip the friendly focus and target hostile units instead.
+- Experimental camera features popup no longer appears when applying Action Camera CVars — the `EXPERIMENTAL_CVAR_CONFIRMATION_NEEDED` unregister now runs before the CVar writes.
+
+## [4.2.1] - 2026-08-12
+
+### Added
+
+- Target Lock marker now flashes red when the locked unit is casting, making it easier to track interrupt windows at a glance.
+
+### Fixed
+
+- Party Radial no longer produces "Unknown Unit" red errors when changing zones while in a party, even when the radial is not open. The fix disarms slice secure buttons on every zone transition so they cannot intercept stray clicks or binding-resolution events with stale/out-of-zone unit tokens.
+- Settings CVar snapshot is no longer overwritten on every login, ensuring the Uninstall button correctly restores the user's pre-Combat Mode camera and targeting CVars.
+
+## [4.2.0] - 2026-08-08
+
+### Added
+
+- In-game function-level profiler (`Core/Dev/FunctionProfiler.lua`): lightweight wrapper around `C_AddOnProfiler.MeasureCall` with per-key cumulative CPU and memory stats. Access via the Debug Mode toggle in the options panel — toggle ON to start profiling, toggle OFF to print a sorted report + CPU stats to chat.
+- `CM.StartProfiling()` and `CM.StopAndReportProfiling()` public APIs for automated performance testing.
+
+### Changed
+
+- Debug Mode toggle now also drives profiling: on → start, off → report + reset.
+- Optimised several hot paths:
+  - `ShouldFreeLookBeOff` early-exit short circuit (-14% avg, -42% alloc per call).
+  - `C_AssistedCombat.GetNextCastSpell` cached for 1 second (-31% alloc per assist tick).
+  - Consolidated duplicate `IsMouselooking()` calls in the root OnUpdate (-19% root tick time).
+  - Party Radial `TrackMousePosition` slice refresh throttled to 0.15s (-11% avg, -10% alloc per call).
+  - Binding fingerprint uses a numeric hash instead of string allocation.
+  - `UpdateFocusCycleWheelBindings` and `UpdateAllHealthBarGlowPulses` use local caching and batch operations.
+
+## [4.1.6] - 2026-08-06
+
+### Added
+
+- Reset Mouse Look keybind to recover a macOS stuck-cursor freeze after switching windows (macOS only, PR #179, thanks Roman Kitaev).
+- GitHub Sponsors button in the config panel header.
+
+## [4.1.5] - 2026-08-05
+
+### Added
+
+- Scale sliders for Interaction HUD, Combat Assist, and Party Radial (0.5–1.5); each scales the full companion / radial chrome.
+- Added Discord & GitHub repository links to the config panel.
+
+### Changed
+
+- Crosshair Size is now Scale (0.5–1.5, default 1.0); existing pixel sizes migrate to the equivalent scale.
+- Added new Combat Mode theme to celebrate the release of version 4.
+
+### Fixed
+
+- While Target Lock is held (and the marker option is on), the center reticle stays on the locked dot even if the focus nameplate is not visible.
+- Cycling Target Lock with the mouse wheel no longer briefly flashes the reactive crosshair; the locked dot stays up across focus swaps.
+
+## [4.1.4] - 2026-08-03
+
+### Added
+
+- Target Lock Marker option (on by default): turn off to keep the normal reactive crosshair while locked, with no nameplate hit marker.
+
+### Changed
+
+- Party Radial runtime is split into focused submodules under `Core/PartyRadial/` (`PartyData` → `SecureBindings` → `HealthBars` → `RoleIcons` → `Visual` → `Lifecycle` → façade; behavior unchanged).
+- Shared crosshair cast-break VFX tuning and companion side offset live in `Constants/Assets.lua` (`CrosshairCastBreak`, `CrosshairCompanionOffsetX`); cast-break flash red reuses hostile reaction color.
+- Party Radial Show Health Bars is on by default for new installs.
+- Target Lock (keybind, mouse-wheel cycle, marker, and sound cues) is fully disabled when Reticle Targeting is off, matching the options panel.
+
+### Fixed
+
+- Crosshair cast feedback and Combat Assist cast swipe/break no longer error in instances when cast GUIDs are secret under taint.
+- Hardened several patterns across the code base against possibly secret or tainted value comparisons.
+- Target Lock no longer leaves the center reticle stuck on a static Dot when the focus nameplate never appears; the plate marker still shows if the plate arrives later.
+- Party Radial no longer blanket-enables slice mouse when the feature is disabled; inactive slices also collapse hit rects out of combat to reduce free-cursor click-steal.
+
+## [4.1.3] - 2026-08-02
+
+### Added
+
+- Cycle Target Lock with Mouse Wheel (on by default): while Mouse Look is on and a Target Lock is set, mouse wheel cycles nearby enemies and moves the lock. Without a lock (or with Mouse Look off), the wheel zooms the camera as usual.
+- Target Lock Sound Cues (on by default): play distinct cues when a Target Lock is set, cleared, or cycled to another enemy.
+- Target Lock nameplate marker: while locked, the center reticle becomes a static Dot and a hit marker (the Active texture for your selected crosshair Appearance) appears on the locked unit's nameplate health bar.
+
+### Changed
+
+- Combat Assist animations & appearance reworked to be more subtle/less annoying.
+- Sheath Weapons with Mouse Look now waits briefly before sheathing after unlock, so rapid Mouse Look toggles (e.g. while single-pulling) no longer flash sheath/unsheath. Unsheath on lock is still immediate.
+- Combat Assist and Interaction HUD runtime code are split into focused submodules under `Core/Crosshair/AssistedHighlight/` and `Core/Crosshair/InteractionHUD/` (behavior unchanged).
+- Party Radial slices have been expanded to provide more information.
+
+### Fixed
+
+- Binding another action to an Interact key that already includes Alt (for example Alt+Mouse Button 3) no longer leaves Interact as Alt+Alt+key.
+- Rapid Single-Button Assistant presses no longer spam Combat Assist cast-success press/pulse animations (repeats are coalesced while feedback is already playing).
+- Click-cast binding refresh no longer loops when Blizzard's Single-Button Assistant rewrites its action slot.
+
+## [4.1.2] - 2026-08-01
+
+### Added
+
+- Combat Mode is now also published on [Wago Addons](https://addons.wago.io/addons/combat-mode); GitHub releases upload to both CurseForge and Wago.
+
+## [4.1.1] - 2026-08-01
+
+### Fixed
+
+- Combat Assist no longer plays its cast-success animation twice when using the Single-Button Assistant action (the assisted-action event and `UNIT_SPELLCAST_SUCCEEDED` are coalesced into one).
+
+## [4.1.0] - 2026-07-30
+
+### Added
+
+- Crosshair Cast Feedback: the crosshair grows while channeling, explodes on a successful cast, and shakes on cancel or interrupt.
+- Sheath Weapons with Mouse Look (on by default): unsheath when Mouse Look turns on; sheath when it turns off or Auto Cursor Unlock opens a panel. Temporary unlocks (hold, Party Radial, ground spells, OPie) keep weapons drawn.
+- Redesigned Combat Assist HUD with improved animations and custom keyboard/mouse icons for Click Casting bindings.
+- Redesigned Interaction HUD with Left/Right placement, fixed icon size, and opacity independent of the crosshair opacity slider.
+- Redesigned Party Radial with rebuilt health bars, smooth fade in/out, and greyed role icons for dead members.
+
+### Changed
+
+- Combat Assist, Interaction HUD, and Party Radial options streamlined for a fixed, more controllable layout.
+- Clicking a Party Radial slice now also hard-targets that party member.
+- Clicking the Party Radial center close (X) clears the current target.
+
+### Fixed
+
+- Rebinding Mouse Look, Party Radial, or Target Lock now clears leftover Interact Alt+key chords and refreshes Target Lock overrides immediately (no reload required when stealing a key).
+
+## [4.0.3] - 2026-07-28
+
+### Added
+
+- Character-specific options now show a blue © mark beside the title; hover it for a tooltip explaining they are saved per character.
+- Interact Unit option (Crosshair Unit or Soft Targeted Unit) under the Interact keybind; switching units rebinds the key and keeps ALT+key on the other command to avoid Blizzard's interact warning.
+- Excluded Spells and Cast at Crosshair input fields under Reticle Targeting now use a pill multi-selector: type a name or ID for suggestions from your spellbook, then pick to add it to the list.
+
+### Changed
+
+- Cast-at-crosshair and excluded-spell lists are stored as spell IDs. Legacy name tokens migrate when the options UI loads.
+
+
+## [4.0.2] - 2026-07-27
+
+### Added
+
+- Uninstall button in the options sidebar: restores your pre-Combat Mode camera and targeting CVars, resets Left/Right Click to the default camera binds, disables the addon, and reloads.
+- Combat Mode now snapshots your CVars before changing them, so Uninstall can restore *your* settings instead of only hard-coded Blizzard defaults.
+- Changelog window now has a left-hand version list; click a version to scroll to that section.
+
+### Changed
+
+- Welcome popup now clarifies the difference between deleting the addon folder and and fully uninstalling.
+
+### Removed
+
+- `/undocm` slash command — use the Uninstall button in options instead.
+
+
+## [4.0.1] - 2026-07-27
+
+### Added
+
+- Excluded Spells and Cast at Crosshair now accept spell IDs as well as names (including mixed lists such as `Heroic Leap, #6544`).
+
+### Fixed
+
+- Keybind options can no longer bind Left or Right Mouse Button, which previously could clear Camera Or Select Or Move from `BUTTON1`.
+
+### Changed
+
+- Clarified helper text on several options.
+
+## [4.0.0] - 2026-07-25
+
+### Changed
+
+- **Breaking:** rebuilt the settings UI as a standalone, movable Combat Mode window with a sidebar layout. Open it with `/cm` or `/combatmode`, or from Escape > Options > AddOns > Combat Mode.
+- **Breaking:** Crosshair can no longer be edited through Edit Mode; its settings live under the Crosshair tab in the new options window.
+- Healing Radial renamed to Party Radial, with a live preview while adjusting visual settings.
+- Action Camera options moved into a dedicated Action Camera section.
+
+### Removed
+
+- Ace3 / LibStub dependency stack in favor of native Combat Mode modules. SavedVariables (`CombatModeDB`) and slash commands are unchanged.
+
+### Fixed
+
+- Rapidly toggling OPie rings could leave the cursor stuck and visible while Mouse Look was active.
+- Reloading could leave the cursor visible while still in the Mouse Look state after the loading screen.
+
+[Unreleased]: https://github.com/ThericGames/combatmode/compare/5.5.0...HEAD
+[5.5.0]: https://github.com/ThericGames/combatmode/compare/5.4.7...5.5.0
+[5.4.7]: https://github.com/ThericGames/combatmode/compare/5.4.6...5.4.7
+[5.4.6]: https://github.com/ThericGames/combatmode/compare/5.4.5...5.4.6
+[5.4.5]: https://github.com/ThericGames/combatmode/compare/5.4.4...5.4.5
+[5.4.4]: https://github.com/ThericGames/combatmode/compare/5.4.3...5.4.4
+[5.4.3]: https://github.com/ThericGames/combatmode/compare/5.4.2...5.4.3
+[5.4.2]: https://github.com/ThericGames/combatmode/compare/5.4.1...5.4.2
+[5.4.1]: https://github.com/ThericGames/combatmode/compare/5.4.0...5.4.1
+[5.4.0]: https://github.com/ThericGames/combatmode/compare/5.3.3...5.4.0
+[5.3.3]: https://github.com/ThericGames/combatmode/compare/5.3.2...5.3.3
+[5.3.2]: https://github.com/ThericGames/combatmode/compare/5.3.1...5.3.2
+[5.3.1]: https://github.com/ThericGames/combatmode/compare/5.3.0...5.3.1
+[5.3.0]: https://github.com/ThericGames/combatmode/compare/5.2.5...5.3.0
+[5.0.5]: https://github.com/ThericGames/combatmode/compare/5.0.4...5.0.5
+[5.0.4]: https://github.com/ThericGames/combatmode/compare/5.0.3...5.0.4
+[5.0.3]: https://github.com/ThericGames/combatmode/compare/5.0.2...5.0.3
+[5.0.2]: https://github.com/ThericGames/combatmode/compare/5.0.1...5.0.2
+[5.0.1]: https://github.com/ThericGames/combatmode/compare/5.0.0...5.0.1
+[5.0.0]: https://github.com/ThericGames/combatmode/compare/4.8.2...5.0.0
+[4.8.2]: https://github.com/ThericGames/combatmode/compare/4.8.1...4.8.2
+[4.8.1]: https://github.com/ThericGames/combatmode/compare/4.8.0...4.8.1
+[4.8.0]: https://github.com/ThericGames/combatmode/compare/4.7.6...4.8.0
+[4.7.6]: https://github.com/ThericGames/combatmode/compare/4.7.5...4.7.6
+[4.7.5]: https://github.com/ThericGames/combatmode/compare/4.7.4...4.7.5
+[4.7.4]: https://github.com/ThericGames/combatmode/compare/4.7.3...4.7.4
+[4.7.3]: https://github.com/ThericGames/combatmode/compare/4.7.2...4.7.3
+[4.7.2]: https://github.com/ThericGames/combatmode/compare/4.7.1...4.7.2
+[4.7.1]: https://github.com/ThericGames/combatmode/compare/4.7.0...4.7.1
+[4.7.0]: https://github.com/ThericGames/combatmode/compare/4.6.8...4.7.0
+[4.6.8]: https://github.com/ThericGames/combatmode/compare/4.6.7...4.6.8
+[4.6.7]: https://github.com/ThericGames/combatmode/compare/4.6.6...4.6.7
+[4.6.6]: https://github.com/ThericGames/combatmode/compare/4.6.5...4.6.6
+[4.6.5]: https://github.com/ThericGames/combatmode/compare/4.6.4...4.6.5
+[4.6.4]: https://github.com/ThericGames/combatmode/compare/4.6.3...4.6.4
+[4.6.3]: https://github.com/ThericGames/combatmode/compare/4.6.2...4.6.3
+[4.6.2]: https://github.com/ThericGames/combatmode/compare/4.6.1...4.6.2
+[4.6.1]: https://github.com/ThericGames/combatmode/compare/4.6.0...4.6.1
+[4.6.0]: https://github.com/ThericGames/combatmode/compare/4.5.6...4.6.0
+[4.5.6]: https://github.com/ThericGames/combatmode/compare/4.5.5...4.5.6
+[4.5.5]: https://github.com/ThericGames/combatmode/compare/4.5.4...4.5.5
+[4.5.4]: https://github.com/ThericGames/combatmode/compare/4.5.3...4.5.4
+[4.5.3]: https://github.com/ThericGames/combatmode/compare/4.5.2...4.5.3
+[4.5.2]: https://github.com/ThericGames/combatmode/compare/4.5.1...4.5.2
+[4.5.1]: https://github.com/ThericGames/combatmode/compare/4.5.0...4.5.1
+[4.5.0]: https://github.com/ThericGames/combatmode/compare/4.4.2...4.5.0
+[4.4.2]: https://github.com/ThericGames/combatmode/compare/4.4.1...4.4.2
+[4.4.1]: https://github.com/ThericGames/combatmode/compare/4.4.0...4.4.1
+[4.4.0]: https://github.com/ThericGames/combatmode/compare/4.3.3...4.4.0
+[4.3.3]: https://github.com/ThericGames/combatmode/compare/4.3.2...4.3.3
+[4.3.2]: https://github.com/ThericGames/combatmode/compare/4.3.1...4.3.2
+[4.3.1]: https://github.com/ThericGames/combatmode/compare/4.3.0...4.3.1
+[4.3.0]: https://github.com/ThericGames/combatmode/compare/4.2.1...4.3.0
+[4.2.1]: https://github.com/ThericGames/combatmode/compare/4.2.0...4.2.1
+[4.2.0]: https://github.com/ThericGames/combatmode/compare/4.1.6...4.2.0
+[4.1.6]: https://github.com/ThericGames/combatmode/compare/4.1.5...4.1.6
+[4.1.5]: https://github.com/ThericGames/combatmode/compare/4.1.4...4.1.5
+[4.1.4]: https://github.com/ThericGames/combatmode/compare/4.1.3...4.1.4
+[4.1.3]: https://github.com/ThericGames/combatmode/compare/4.1.2...4.1.3
+[4.1.2]: https://github.com/ThericGames/combatmode/compare/4.1.1...4.1.2
+[4.1.1]: https://github.com/ThericGames/combatmode/compare/4.1.0...4.1.1
+[4.1.0]: https://github.com/ThericGames/combatmode/compare/4.0.3...4.1.0
+[4.0.3]: https://github.com/ThericGames/combatmode/compare/4.0.2...4.0.3
+[4.0.2]: https://github.com/ThericGames/combatmode/compare/4.0.1...4.0.2
+[4.0.1]: https://github.com/ThericGames/combatmode/compare/4.0.0...4.0.1
+[4.0.0]: https://github.com/ThericGames/combatmode/compare/3.3.1...4.0.0
+]]

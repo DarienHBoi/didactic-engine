@@ -1,0 +1,99 @@
+local ADDON_NAME, ns = ...
+
+--------------------------------------------------
+-- MEDIA
+-- FlareUI's fonts, bar textures and borders, registered with LibSharedMedia.
+--------------------------------------------------
+
+--------------------------------------------------
+-- 1. LIBRARY
+--------------------------------------------------
+local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
+if not LSM then return end   -- LoadCheck.lua tells the player
+
+-- forward slashes so the paths work on every platform
+local MEDIA_PATH = "Interface/AddOns/" .. ADDON_NAME .. "/Media/"
+
+--------------------------------------------------
+-- 2. CUSTOM ASSETS
+--------------------------------------------------
+local ASSETS = {
+    -- Forever: Blizzard's Forever health bar art, greyed so the bar colours tint it. Forever (Light):
+    -- the same art 1.25x brighter, as bright as Flat on average.
+    statusbar = {
+        ["FlareUI Flat"]    = "Bars/FlareUI-Flat.tga",
+        ["FlareUI Striped"] = "Bars/FlareUI-Striped.tga",
+        ["FlareUI Forever"] = "Bars/FlareUI-Forever.tga",
+        ["FlareUI Forever (Light)"] = "Bars/FlareUI-Forever-Bright.tga",
+    },
+    -- grey frame borders, tinted by each frame's border colour; 16 px edge
+    border = {
+        ["FlareUI Thick"]  = "Borders/FlareUI-Thick.tga",
+        ["FlareUI Frames"] = "Borders/FlareUI-Frames.tga",
+        -- Frames cut to 16 px pieces, drawn at an 8 px edge (ns.BorderEdgeSize)
+        ["FlareUI Thin"]   = "Borders/FlareUI-Thin.tga",
+    },
+    font = {
+        ["Asap Condensed"]   = "Fonts/AsapCondensed-Regular.ttf",
+        ["Fira Condensed"]   = "Fonts/FiraSansExtraCondensed-Regular.ttf",
+        ["Cabin Condensed"]  = "Fonts/CabinCondensed-Regular.ttf",
+        ["Barlow Condensed"] = "Fonts/BarlowCondensed-Regular.ttf",
+        ["Roboto Condensed"] = "Fonts/RobotoCondensed-Regular.ttf",
+        ["Roboto Condensed Bold"] = "Fonts/RobotoCondensed-Bold.ttf",
+        -- the settings window's titles (11-10 panel rework); Latin only
+        ["Marcellus"]        = "Fonts/Marcellus-Regular.ttf",
+    },
+}
+
+-- Fonts need the alphabets they cover, or LibSharedMedia drops them on every non-Western client
+local LATIN_CYRILLIC = LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_ruRU
+local FONT_ALPHABETS = {
+    ["Asap Condensed"]   = LSM.LOCALE_BIT_western,
+    ["Fira Condensed"]   = LATIN_CYRILLIC,
+    ["Cabin Condensed"]  = LSM.LOCALE_BIT_western,
+    ["Barlow Condensed"] = LSM.LOCALE_BIT_western,
+    ["Roboto Condensed"] = LATIN_CYRILLIC,
+    ["Roboto Condensed Bold"] = LATIN_CYRILLIC,
+    ["Marcellus"]        = LSM.LOCALE_BIT_western,
+}
+
+for mediaType, entries in pairs(ASSETS) do
+    for name, relativePath in pairs(entries) do
+        -- FlareUI's own fonts with Russian letters: their families keep them (Core.lua, ns.FontFamily)
+        if mediaType == "font" and FONT_ALPHABETS[name] == LATIN_CYRILLIC and ns.FontFamily then
+            ns.FontFamily.cyrillic[(MEDIA_PATH .. relativePath):lower():gsub("/", "\\")] = true
+        end
+        local langMask = mediaType == "font" and FONT_ALPHABETS[name] or nil
+        local ok, err = pcall(LSM.Register, LSM, mediaType, name, MEDIA_PATH .. relativePath, langMask)
+        if not ok then
+            print(("|cffff0000FlareUI Media:|r could not register %s '%s': %s"):format(mediaType, name, tostring(err)))
+        end
+    end
+end
+
+--------------------------------------------------
+-- 3. DROPDOWN LISTS
+--------------------------------------------------
+-- LibSharedMedia's own entries (added by every addon's copy, never removable): FlareUI's dropdowns
+-- leave them out; a frame already set to one keeps it. The chat, damage meter and quest tracker keep
+-- None as their own first choice.
+local HIDDEN = {
+    border = {
+        ["None"] = true, ["Blizzard Achievement Wood"] = true, ["Blizzard Chat Bubble"] = true, ["Blizzard Dialog"] = true,
+        ["Blizzard Dialog Gold"] = true, ["Blizzard Party"] = true, ["Blizzard Tooltip"] = true,
+    },
+    statusbar = {
+        ["Blizzard"] = true, ["Blizzard Character Skills Bar"] = true, ["Blizzard Raid Bar"] = true, ["Solid"] = true,
+    },
+}
+
+-- The names a media dropdown lists after FlareUI's own and a divider: other addons' bars or borders, A-Z
+function ns.AddonMedia(mediaType)
+    local hidden = HIDDEN[mediaType] or {}
+    local list = {}
+    for _, name in ipairs(LSM:List(mediaType) or {}) do
+        if not hidden[name] and not name:find("^FlareUI ") then list[#list + 1] = name end
+    end
+    table.sort(list, function(a, b) return a:lower() < b:lower() end)
+    return list
+end

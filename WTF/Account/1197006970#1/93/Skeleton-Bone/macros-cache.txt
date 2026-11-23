@@ -1,5 +1,5 @@
 VER 3 0100000000000003 "FF Apply Lure" "134400"
-/use 0 15
+/use 0 12
 /use 16
 END
 VER 3 0100000000000002 "FF Fishing Cast" "134400"

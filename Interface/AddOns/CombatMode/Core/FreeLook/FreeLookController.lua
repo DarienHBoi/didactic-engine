@@ -1,0 +1,817 @@
+---------------------------------------------------------------------------------------
+--  Core/FreeLook/FreeLookController.lua — FREELOOK — mouselook state machine
+---------------------------------------------------------------------------------------
+--  What it does: Owns Mouse Look lock/unlock, cursor-mode keybind behavior,
+--  ShouldFreeLookBeOff aggregation, cursor centering without the 10.2 jolt (centering 1 +
+--  speed dip → Start → Stop → centering 0 → Start), tooltip hide while locked
+--  (Show Tooltips With key peeks it beside the crosshair), optional sheath-with-mouselook (intentional toggle only), and the OPie rematch
+--  latch (NotifyOpieUnlockFrameVisible / RematchFreeLookAfterOpieIfNeeded).
+--  Architecture / how it works:
+--    • LockFreeLook / UnlockFreeLook drive MouselookStart/Stop + crosshair display +
+--      centering helpers via CVarManager.
+--    • StartFreeLookFresh (crosshair enabled) bounces in one frame: centering 1 + a
+--      cameraYaw/PitchMoveSpeed dip to 0.1 (the engine applies its warp-to-centre as a turn
+--      scaled by those speeds) → MouselookStart → MouselookStop → centering 0 →
+--      MouselookStart; speeds restored next frame. The dip writes and saved values are
+--      CVarManager's (CM.BeginCameraSpeedDip / CM.EndCameraSpeedDip); this file only
+--      schedules the restore with one shared callback. The cursor then reappears at the
+--      crosshair on unlock. See the comment above StartFreeLookFresh / issue 189.
+--    • ShouldFreeLookBeOff consults AutoCursorUnlock predicates, SpellIsTargeting (+ the
+--      pet Move To noted by a CastPetAction hook until the next click or Esc, since it is not a spell cast),
+--      cinematics, FreeLookOverride, default LMB/RMB held. customLockCondition
+--      (IsCustomLockConditionTrue) beats tap/hold unlock and the Auto Unlock
+--      custom condition only; feign, pet battle, ground targeting, cinematics,
+--      frames, and vendor mounts still unlock. customLockConditionOnce latches
+--      that force to the rising edge: a manual unlock stays unlocked until the
+--      snippet goes false. customConditionOnce does the same for force-unlock:
+--      a manual lock stays locked until that snippet goes false. Without Once, the
+--      Mouse Look keybind is ignored while force lock is true; a stale FreeLookOverride
+--      is dropped when force lock wins, and the tap poll never clears chrome or sheathes
+--      while Mouse Look is actually on.
+--    • Sheathing with Mouse Look and the OPie rematch: see .claude/rules/domain-freelook-camera.md (FreeLookController.lua notes).
+--    • Mouse Look camera chrome (shoulder + vignette): active while locked and through
+--      temp unlock; cleared only on permanent unlock via IsMouseLookCameraChromeActive.
+--      Shoulder tweens with Vignette over MouseLookCameraFadeDuration. Dynamic Pitch is
+--      sticky (SetDynamicPitch).
+--  Does not: Own frame-watch lists/predicates (AutoCursorUnlock) or CVar preset tables.
+--  Related: Core/FreeLook/AutoCursorUnlock.lua, Core/Runtime/CVarManager.lua,
+--  Core/Runtime/Runtime.lua, Core/Crosshair/Animations.lua, Core/Crosshair/Crosshair.lua,
+--  Core/Vignette.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+local _G = _G
+
+-- WoW API
+local C_Timer = _G.C_Timer
+local GameTooltip = _G.GameTooltip
+local GetBindingKey = _G.GetBindingKey
+local GetSheathState = _G.GetSheathState
+local GetTime = _G.GetTime
+local GameTooltip_SetDefaultAnchor = _G.GameTooltip_SetDefaultAnchor
+local InCinematic = _G.InCinematic
+local InCombatLockdown = _G.InCombatLockdown
+local IsAltKeyDown = _G.IsAltKeyDown
+local IsControlKeyDown = _G.IsControlKeyDown
+local IsInCinematicScene = _G.IsInCinematicScene
+local IsKeyDown = _G.IsKeyDown
+local IsMouseButtonDown = _G.IsMouseButtonDown
+local IsMouselooking = _G.IsMouselooking
+local IsShiftKeyDown = _G.IsShiftKeyDown
+local MouselookStart = _G.MouselookStart
+local MouselookStop = _G.MouselookStop
+local PlaySound = _G.PlaySound
+local SOUNDKIT = _G.SOUNDKIT
+local SpellIsTargeting = _G.SpellIsTargeting
+local GetPetActionInfo = _G.GetPetActionInfo
+local ToggleSheath = _G.ToggleSheath
+local UIParent = _G.UIParent
+local UnitExists = _G.UnitExists
+
+-- Lua stdlib
+local math = _G.math
+local string = _G.string
+
+-- INITIAL STATE VARIABLES
+local cmMouselookActive = false -- Tracks Combat Mode's own intentional mouselook. Used in conjunction with _G.IsMouselooking() to handle external mouselook properly.
+-- Shoulder + vignette stay up through temp (hold) unlock; cleared only on permanent unlock.
+local mouseLookCameraChromeActive = false
+local FreeLookOverride = false -- Changes when Free Look state is modified through user input ("Toggle / Hold" keybind and "/acm" cmd)
+-- customLockConditionOnce: after a manual unlock, ignore force-lock until the snippet is false.
+local customLockOnceConsumed = false
+-- customConditionOnce: after a manual lock, ignore force-unlock until the snippet is false.
+local customUnlockOnceConsumed = false
+local CursorModeShowTime = 0 -- GetTime() when cursor was unlocked via keybind (for spurious key-up filter)
+local opieUnlockSeen = false -- Latched while an OPie ring was reported visible
+local pendingTapSheath = false -- True until tap sheath is applied or hold is confirmed
+local pendingSheathToken = 0 -- Bumped to cancel a scheduled sheath debounce
+local SHEATH_STATE_SHEATHED = 1
+local MOUSE_LOOK_BINDING = "Combat Mode - Mouse Look"
+local CURSOR_MODE_HOLD_THRESHOLD = 0.3
+local CURSOR_MODE_SPURIOUS_KEY_UP = 0.05
+local CURSOR_MODE_SHEATH_POLL = 0.05
+-- Delay sheath-on so quick Mouse Look re-entry (e.g. pull → click → lock) does not flash.
+local SHEATH_DEBOUNCE_SEC = 1.5
+local MOUSE_BINDING_BUTTON = {
+  BUTTON1 = "LeftButton",
+  BUTTON2 = "RightButton",
+  BUTTON3 = "MiddleButton",
+  BUTTON4 = "Button4",
+  BUTTON5 = "Button5",
+}
+
+local function CancelPendingSheath()
+  pendingSheathToken = pendingSheathToken + 1
+end
+
+-- Immediate idempotent ToggleSheath when the option is on (no debounce).
+local function ApplyWeaponsSheathedNow(wantSheathed)
+  if not (CM.DB and CM.DB.global and CM.DB.global.sheathWeaponsWithMouselook) then
+    return
+  end
+  if not (GetSheathState and ToggleSheath) then
+    return
+  end
+  local state = GetSheathState()
+  if not state then
+    return
+  end
+  local isSheathed = state == SHEATH_STATE_SHEATHED
+  if wantSheathed == isSheathed then
+    return
+  end
+  ToggleSheath()
+end
+
+-- Unsheath immediately; sheath after SHEATH_DEBOUNCE_SEC (cancelledable by unsheath/re-lock).
+local function ApplyWeaponsSheathed(wantSheathed)
+  if not wantSheathed then
+    CancelPendingSheath()
+    ApplyWeaponsSheathedNow(false)
+    return
+  end
+  if not (CM.DB and CM.DB.global and CM.DB.global.sheathWeaponsWithMouselook) then
+    return
+  end
+  CancelPendingSheath()
+  local token = pendingSheathToken
+  if not (C_Timer and C_Timer.After) then
+    ApplyWeaponsSheathedNow(true)
+    return
+  end
+  C_Timer.After(SHEATH_DEBOUNCE_SEC, function()
+    -- Mouse Look came back during the delay (e.g. force lock): never sheath while looking.
+    if token ~= pendingSheathToken or IsMouselooking() then
+      return
+    end
+    ApplyWeaponsSheathedNow(true)
+  end)
+end
+
+-- Pet "Move To" shows a ground marker but is not a spell cast: SpellIsTargeting() stays
+-- false, the cursor holds nothing and the pet bar never flags the slot active (verified in
+-- game), so nothing can be polled. Instead the CastPetAction hook below notes when Move To
+-- was triggered and unlocks at once (ReconcileFreeLook would wait: it bails while a mouse
+-- button is held, and Move To is often bound to one). A per-frame poller, shown only while it
+-- is pending, ends it on a fresh click (placing or cancelling), Escape, or a timeout: a quick
+-- Esc or right-click press is gone before the 0.15 s tick or GLOBAL_MOUSE_DOWN would see it.
+local PET_MOVE_TO_TOKEN = "PET_ACTION_MOVE_TO"
+local PET_MOVE_TO_CLICK_GRACE = 0.25 -- the press that triggered it must not end it
+local PET_MOVE_TO_TIMEOUT = 10
+local petMoveToAt = nil
+local petMoveToArmed = false -- all mouse buttons seen up since it was triggered
+local petMoveToPoller = nil
+
+local function IsPetGroundTargeting()
+  return petMoveToAt ~= nil
+end
+
+local function EndPetMoveTo()
+  petMoveToAt = nil
+  if petMoveToPoller then
+    petMoveToPoller:Hide()
+  end
+  -- Bails while a button is still down; the tick re-locks right after release.
+  if CM.ReconcileFreeLook then
+    CM.ReconcileFreeLook()
+  end
+end
+
+local function PetMoveToPoll()
+  if not petMoveToAt then
+    petMoveToPoller:Hide()
+    return
+  end
+  local now = GetTime()
+  if now - petMoveToAt > PET_MOVE_TO_TIMEOUT or IsKeyDown("ESCAPE") then
+    EndPetMoveTo()
+    return
+  end
+  local anyDown = IsMouseButtonDown("LeftButton")
+    or IsMouseButtonDown("RightButton")
+    or IsMouseButtonDown("MiddleButton")
+  if not anyDown then
+    petMoveToArmed = true
+  elseif petMoveToArmed and now - petMoveToAt > PET_MOVE_TO_CLICK_GRACE then
+    EndPetMoveTo()
+  end
+end
+
+if _G.hooksecurefunc and _G.CastPetAction and GetPetActionInfo and _G.CreateFrame then
+  petMoveToPoller = _G.CreateFrame("Frame")
+  petMoveToPoller:Hide()
+  petMoveToPoller:SetScript("OnUpdate", PetMoveToPoll)
+  _G.hooksecurefunc("CastPetAction", function(index)
+    local name, _, isToken = GetPetActionInfo(index)
+    if isToken and name == PET_MOVE_TO_TOKEN then
+      petMoveToAt = GetTime()
+      petMoveToArmed = false
+      petMoveToPoller:Show()
+      -- Direct: the held click that triggered it would stall a reconcile.
+      CM.UnlockFreeLook()
+    end
+  end)
+end
+
+local function IsGroundTargeting()
+  return SpellIsTargeting() or IsPetGroundTargeting()
+end
+
+-- Temporary gameplay unlocks keep weapons drawn; Auto Cursor Unlock / etc. may sheath.
+local function ShouldKeepWeaponsDrawnOnTempUnlock()
+  if FreeLookOverride then
+    return true
+  end
+  if IsGroundTargeting() then
+    return true
+  end
+  if CM.IsRadialMenuOpen and CM.IsRadialMenuOpen() then
+    return true
+  end
+  -- Set by AutoCursorUnlock while an OPie ring is visible (before UnlockFreeLook).
+  if opieUnlockSeen then
+    return true
+  end
+  return false
+end
+
+local function IsMouseLookBindingKeyDown()
+  if not GetBindingKey then
+    return false
+  end
+  local key1, key2 = GetBindingKey(MOUSE_LOOK_BINDING)
+  for i = 1, 2 do
+    local key = (i == 1) and key1 or key2
+    if key then
+      if IsKeyDown and IsKeyDown(key) then
+        return true
+      end
+      local mouseButton = MOUSE_BINDING_BUTTON[key]
+      if mouseButton and IsMouseButtonDown(mouseButton) then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+local function CancelPendingTapSheath()
+  pendingTapSheath = false
+  CancelPendingSheath()
+end
+
+--- Drop shoulder/vignette chrome (permanent unlock / tap confirmed). Safe if already off.
+local function ClearMouseLookCameraChrome()
+  if not mouseLookCameraChromeActive then
+    return
+  end
+  -- Capture DC shoulder intent before chrome clears (fade goal / settled, not mid-tween).
+  if CM.SnapshotShoulderBeforeChromeClear then
+    CM.SnapshotShoulderBeforeChromeClear()
+  end
+  mouseLookCameraChromeActive = false
+  if CM.ClearMouseLookCamera then
+    CM.ClearMouseLookCamera()
+  end
+end
+
+-- Never sheath on unlock press (hold would flash). Poll until the binding is up
+-- (tap → sheath + clear camera chrome) or the hold threshold elapses while still
+-- down (hold → no sheath, chrome stays).
+local function ScheduleTapSheathPoll()
+  pendingTapSheath = true
+  if not (C_Timer and C_Timer.After) then
+    pendingTapSheath = false
+    return
+  end
+
+  local function poll()
+    if not pendingTapSheath then
+      return
+    end
+    if not FreeLookOverride then
+      pendingTapSheath = false
+      return
+    end
+
+    local elapsed = GetTime() - CursorModeShowTime
+    if IsMouseLookBindingKeyDown() then
+      if elapsed >= CURSOR_MODE_HOLD_THRESHOLD then
+        -- Hold confirmed: keep weapons drawn; chrome stays (temp unlock).
+        pendingTapSheath = false
+        return
+      end
+      C_Timer.After(CURSOR_MODE_SHEATH_POLL, poll)
+      return
+    end
+
+    -- Key/button released. Ignore the near-instant MouselookStop spurious window.
+    if elapsed < CURSOR_MODE_SPURIOUS_KEY_UP then
+      C_Timer.After(CURSOR_MODE_SHEATH_POLL, poll)
+      return
+    end
+
+    -- Tap confirmed: stay unlocked and drop shoulder/vignette chrome.
+    pendingTapSheath = false
+    if IsMouselooking() then
+      -- Force lock relocked before the tap resolved: this was not a permanent unlock.
+      return
+    end
+    ApplyWeaponsSheathed(true)
+    ClearMouseLookCameraChrome()
+  end
+
+  C_Timer.After(CURSOR_MODE_SPURIOUS_KEY_UP, poll)
+end
+
+-- This prevents the auto running bug.
+function CM.IsDefaultMouseActionBeingUsed()
+  return IsMouseButtonDown("LeftButton") or IsMouseButtonDown("RightButton")
+end
+
+-- Tooltips while Mouse Look is on (Hide Tooltips): suppressed unless the Show Tooltips With key
+-- is held. Held, the player's own GameTooltip is built for the mouseover unit and pinned beside
+-- the crosshair. The game moves a tooltip it shows for a new unit to the cursor (which sits on
+-- the crosshair) every frame, so after a swap ours is hidden, rebuilt through the default
+-- anchor path (which hands it back to us) and faded in, never seen at the wrong spot.
+local TOOLTIP_OFFSET_X = 40 -- gap between the crosshair centre and the tooltip's left edge
+local TOOLTIP_FADE_IN = 0.12 -- seconds from invisible to fully shown
+local TOOLTIP_PIN_RETRIES = 10 -- frames to fight the game for the position before giving up
+
+local tooltipHidden = false
+local isTooltipHooked = false
+local tooltipPinMisses = 0
+local tooltipRebuildPending = false
+
+--- True while the key chosen in Show Tooltips With (default Alt) is held, out of combat only.
+function CM.IsTooltipModifierDown()
+  if InCombatLockdown() then
+    return false
+  end
+  local modifier = CM.DB.global.tooltipModifier
+  if modifier == "CTRL" then
+    return IsControlKeyDown()
+  elseif modifier == "SHIFT" then
+    return IsShiftKeyDown()
+  end
+  return IsAltKeyDown()
+end
+
+--- True while the tooltip is on screen because the key is held (the Assist HUD hides so they
+--- do not overlap).
+function CM.IsTooltipHeldOverCrosshair()
+  return tooltipHidden and CM.IsTooltipModifierDown() and GameTooltip:IsShown()
+end
+
+local function IsTooltipPinned(tooltip)
+  -- Offsets come back scaled by the tooltip's scale, so compare with a tolerance.
+  local point, relativeTo, relativePoint, x, y = tooltip:GetPoint(1)
+  return point == "LEFT"
+    and relativeTo == _G.CombatModeCrosshairFrame
+    and relativePoint == "CENTER"
+    and math.abs((x or 0) - TOOLTIP_OFFSET_X) < 1
+    and math.abs(y or 0) < 1
+end
+
+--- Builds GameTooltip for the mouseover unit beside the crosshair, invisible until the OnUpdate
+--- hook sees it pinned and fades it in.
+local function ShowMouseoverTooltip()
+  local crosshair = _G.CombatModeCrosshairFrame
+  if not crosshair or not UnitExists("mouseover") then
+    GameTooltip:Hide()
+    return
+  end
+  pcall(function()
+    GameTooltip:Hide()
+    -- Full alpha while the content is built: skinning addons read it as the tooltip's own alpha
+    -- (they hide GameTooltip at alpha 0 and draw a panel of their own) and restore it later.
+    GameTooltip:SetAlpha(1)
+    GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+    GameTooltip:SetUnit("mouseover")
+    GameTooltip:ClearAllPoints()
+    GameTooltip:SetPoint("LEFT", crosshair, "CENTER", TOOLTIP_OFFSET_X, 0)
+    GameTooltip:SetAlpha(0)
+  end)
+end
+
+--- MODIFIER_STATE_CHANGED / UPDATE_MOUSEOVER_UNIT: while tooltips are suppressed, holding the
+--- key shows the mouseover tooltip beside the crosshair, following the unit; releasing hides it.
+function CM.OnTooltipModifierChanged(event)
+  if not tooltipHidden then
+    return
+  end
+
+  if not CM.IsTooltipModifierDown() then
+    GameTooltip:SetAlpha(1)
+    GameTooltip:Hide()
+  elseif event == "UPDATE_MOUSEOVER_UNIT" then
+    -- Hide the game's tooltip for the new unit right away and rebuild ours from the OnUpdate
+    -- hook, before the frame is drawn. The timer covers the game showing no tooltip at all.
+    GameTooltip:SetAlpha(0)
+    tooltipRebuildPending = true
+    C_Timer.After(0, function()
+      if tooltipRebuildPending and tooltipHidden and CM.IsTooltipModifierDown() then
+        tooltipRebuildPending = false
+        ShowMouseoverTooltip()
+      end
+    end)
+  else
+    ShowMouseoverTooltip()
+  end
+
+  -- Hide / restore the Assist HUD right away instead of on the next tick.
+  if CM.UpdateCrosshairAssistedHighlight then
+    CM.UpdateCrosshairAssistedHighlight()
+  end
+end
+
+local function OnTooltipUpdate(tooltip, elapsed)
+  if not (tooltipHidden and CM.IsTooltipModifierDown()) then
+    return
+  end
+
+  if tooltipRebuildPending then
+    tooltipRebuildPending = false
+    ShowMouseoverTooltip()
+  elseif IsTooltipPinned(tooltip) then
+    tooltipPinMisses = 0
+    local alpha = tooltip:GetAlpha()
+    if alpha < 1 then
+      -- A tooltip addon that skins GameTooltip owns its alpha (it forces 0 and draws its own
+      -- panel). Probe once: if full alpha does not stick, leave it to the addon, with the full
+      -- value recorded as the one it restores.
+      tooltip:SetAlpha(1)
+      if tooltip:GetAlpha() < 1 then
+        return
+      end
+      tooltip:SetAlpha(alpha + elapsed / TOOLTIP_FADE_IN)
+    end
+  elseif tooltipPinMisses < TOOLTIP_PIN_RETRIES then
+    tooltipPinMisses = tooltipPinMisses + 1
+    tooltip:SetAlpha(0)
+    ShowMouseoverTooltip()
+  else
+    tooltip:SetAlpha(1) -- the game keeps it: show it where it is rather than never
+  end
+end
+
+local function HideTooltip(shouldHide)
+  tooltipHidden = shouldHide
+
+  if not isTooltipHooked then
+    GameTooltip:HookScript("OnShow", function(self)
+      if tooltipHidden and not CM.IsTooltipModifierDown() then
+        self:Hide()
+      end
+    end)
+    GameTooltip:HookScript("OnHide", function(self)
+      if not (tooltipHidden and CM.IsTooltipModifierDown()) then
+        self:SetAlpha(1)
+        tooltipPinMisses = 0
+      end
+    end)
+    GameTooltip:HookScript("OnUpdate", OnTooltipUpdate)
+    isTooltipHooked = true
+  end
+
+  if tooltipHidden then
+    -- Hide it immediately in case there's a tooltip still fading while mouse locking
+    if GameTooltip:IsShown() then
+      GameTooltip:Hide()
+    end
+  else
+    GameTooltip:SetAlpha(1)
+  end
+end
+
+function CM.ShouldFreeLookBeOff()
+  return CM.Profile("FreeLook:ShouldBeOff", function()
+    -- Force lock beats tap/hold unlock and the Auto Unlock custom condition only.
+    -- Feign, pet battle, ground targeting, cinematics, frames, and mounts still unlock.
+    -- Cheap bools stay ahead of SpellIsTargeting / frame walks when force lock is off.
+    -- Once-mode spends that force after a manual unlock until the snippet is false again.
+    local condition = CM.IsCustomLockConditionTrue()
+    local once = CM.DbBool(CM.DB.global.customLockConditionOnce, false)
+    if not condition or not once then
+      customLockOnceConsumed = false
+    end
+    local forceLock = condition and not customLockOnceConsumed
+    local unlockCondition = CM.IsCustomConditionTrue()
+    local unlockOnce = CM.DbBool(CM.DB.global.customConditionOnce, false)
+    if not unlockCondition or not unlockOnce then
+      customUnlockOnceConsumed = false
+    end
+    local forceUnlock = unlockCondition and not customUnlockOnceConsumed
+    if forceLock and FreeLookOverride then
+      -- Force lock consumed the manual unlock: drop the stale override and its tap poll so
+      -- chrome / sheath state cannot be changed by a tap that force lock already undid.
+      FreeLookOverride = false
+      CancelPendingTapSheath()
+    end
+    if not forceLock and FreeLookOverride then
+      return true
+    end
+    if CM.IsFeignDeathActive() then
+      return true
+    end
+    if CM.IsInPetBattle() then
+      return true
+    end
+    -- Radial Menu held open: the cursor must be free to flick toward a slice.
+    if CM.IsRadialMenuOpen and CM.IsRadialMenuOpen() then
+      return true
+    end
+    if
+      IsGroundTargeting()
+      or InCinematic()
+      or IsInCinematicScene()
+      or CM.IsUnlockFrameVisible()
+      or CM.IsVendorMountOut()
+    then
+      return true
+    end
+    if not forceLock and forceUnlock then
+      return true
+    end
+    return false
+  end)
+end
+
+-- Helper function to handle UI state changes when toggling free look
+local function HandleFreeLookUIState(isLocking)
+  if CM.IsCrosshairEnabled() then
+    CM.DisplayCrosshair(isLocking)
+  end
+
+  if CM.DB.global.hideTooltip then
+    HideTooltip(isLocking)
+  end
+
+  -- Shoulder + vignette chrome turns on with lock. Clearing is explicit via
+  -- ClearMouseLookCameraChrome (tap confirmed), not on every unlock.
+  if isLocking then
+    mouseLookCameraChromeActive = true
+    if CM.ApplyMouseLookCamera then
+      CM.ApplyMouseLookCamera()
+    end
+  end
+end
+
+function CM.SetCursorFreelookCentering(shouldCenter)
+  -- When enabled, freelook centers the cursor on the crosshair (CursorFreelookCentering +
+  -- CursorCenteredYPos applied in Crosshair).
+  local useCrosshairCursor = shouldCenter and CM.IsCrosshairEnabled()
+  if useCrosshairCursor then
+    CM.SetCursorFreelookCenteringCVar(true)
+    CM.DebugPrint("Locking cursor to crosshair position.")
+  else
+    CM.SetCursorFreelookCenteringCVar(false)
+    CM.DebugPrint("Freeing cursor from crosshair position.")
+  end
+end
+
+local function RunLockFreeLookDeferredUI()
+  if C_Timer and C_Timer.After then
+    C_Timer.After(0, function()
+      CM.SetCursorFreelookCentering(true)
+      HandleFreeLookUIState(true)
+    end)
+  else
+    CM.SetCursorFreelookCentering(true)
+    HandleFreeLookUIState(true)
+  end
+end
+
+local function RunUnlockFreeLookDeferredUI()
+  if C_Timer and C_Timer.After then
+    C_Timer.After(0, function()
+      CM.SetCursorFreelookCentering(false)
+      HandleFreeLookUIState(false)
+    end)
+  else
+    CM.SetCursorFreelookCentering(false)
+    HandleFreeLookUIState(false)
+  end
+end
+
+-- Cursor centering (issue 189). With CursorFreelookCentering 1 the engine warps the cursor
+-- to the crosshair inside MouselookStart and feeds that warp through Mouse Look as a turn
+-- (the 10.2+ "jolt", WoWUIBugs 504). Measured on 12.x: the turn is linear in
+-- cameraYaw/PitchMoveSpeed, and 0 is rejected (the write is ignored, which is why zeroing
+-- never seemed to help) while 0.1 is accepted. So: drop both speeds to the floor for the one
+-- frame MouselookStart runs in, then put them back. A 975 px offset then turns the character
+-- by ~0.03 degrees instead of ~85, and the cursor reappears at the crosshair on MouselookStop.
+-- Writing the CVar to 1 mid-look does nothing (the warp only happens at start), and a start
+-- made with it already 1 leaves the cursor drawn for the whole look. So the lock is a bounce,
+-- all in one frame: centering 1 + dip → MouselookStart (warps, ~no turn) → MouselookStop
+-- (sticky: cursor stays at the crosshair) → centering 0 → MouselookStart (a normal start that
+-- hides the cursor and remembers the crosshair as the unlock position).
+-- The speed writes and the saved values live in CVarManager (CM.BeginCameraSpeedDip /
+-- CM.EndCameraSpeedDip); this file only schedules the restore. If the client rejects the dip
+-- value (Classic clamps are unmeasured), Begin returns false and the lock is the plain start.
+local CENTERING_DIP_SPEED = 0.1
+local cameraSpeedRestoreScheduled = false
+
+-- One shared restore callback: locks are frequent, so no closure per lock.
+local function RestoreCameraSpeedAfterDip()
+  cameraSpeedRestoreScheduled = false
+  CM.EndCameraSpeedDip()
+end
+
+local function StartFreeLookFresh()
+  if CM.IsCrosshairEnabled() and CM.BeginCameraSpeedDip(CENTERING_DIP_SPEED) then
+    if not cameraSpeedRestoreScheduled then
+      cameraSpeedRestoreScheduled = true
+      C_Timer.After(0, RestoreCameraSpeedAfterDip)
+    end
+    CM.SetCursorFreelookCenteringCVar(true)
+    MouselookStart()
+    MouselookStop()
+  end
+  CM.SetCursorFreelookCenteringCVar(false)
+  MouselookStart()
+  cmMouselookActive = true
+  RunLockFreeLookDeferredUI()
+  CM.ShowCrosshairLockIn()
+  CM.DebugPrint("Free Look Enabled")
+end
+
+-- One soft click (checkbox-on) when Mouse Look turns on / off (quick re-locks stay silent).
+local FREELOOK_SOUND = (SOUNDKIT and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) or 856
+local SOUND_GAP = 0.15
+local lastSoundTime = 0
+
+local function PlayFreeLookSound()
+  local now = GetTime()
+  if PlaySound and now - lastSoundTime >= SOUND_GAP and CM.IsSoundEnabled("soundMouseLook") then
+    lastSoundTime = now
+    PlaySound(FREELOOK_SOUND, "Master", true)
+  end
+end
+
+function CM.LockFreeLook()
+  if IsMouselooking() then
+    return
+  end
+  StartFreeLookFresh()
+  PlayFreeLookSound()
+  CancelPendingSheath()
+  -- Returning to intentional Mouse Look (e.g. after Auto Cursor Unlock).
+  if not FreeLookOverride then
+    ApplyWeaponsSheathed(false)
+  end
+end
+
+function CM.UnlockFreeLook()
+  if not IsMouselooking() then
+    return
+  end
+  cmMouselookActive = false
+  RunUnlockFreeLookDeferredUI()
+  MouselookStop()
+  PlayFreeLookSound()
+
+  if CM.DB.global.pulseCursor then
+    CM.ShowCursorPulse()
+  end
+
+  -- Auto Cursor Unlock / mount / pet battle / etc. sheath; hold/ground/OPie do not.
+  if not ShouldKeepWeaponsDrawnOnTempUnlock() then
+    ApplyWeaponsSheathed(true)
+  end
+
+  CM.DebugPrint("Free Look Disabled")
+end
+
+-- Called from AutoCursorUnlock while an OPie ring frame is visible.
+function CM.NotifyOpieUnlockFrameVisible()
+  opieUnlockSeen = true
+end
+
+-- After freelook should be on again: if an OPie ring had forced centering off (and may
+-- have rematched mouselook itself), bounce so StartFreeLookFresh can apply centering.
+function CM.RematchFreeLookAfterOpieIfNeeded()
+  if not opieUnlockSeen then
+    return false
+  end
+  opieUnlockSeen = false
+
+  CM.DebugPrint("OPie ring closed — bouncing free-look rematch.")
+  if IsMouselooking() then
+    MouselookStop()
+  end
+  StartFreeLookFresh()
+  return true
+end
+
+-- Unified cursor mode keybind: tap to toggle, hold to temporarily unlock.
+-- Uses the same spurious key-up filter as other hold/tap keybinds.
+-- MouselookStop() fires spurious key-up events for held keys, so we ignore
+-- key-ups within 0.3s of unlocking. A quick tap leaves the cursor free (toggle)
+-- and clears shoulder/vignette chrome once the tap is confirmed; holding longer
+-- than 0.3s re-locks on release (hold) and keeps chrome.
+-- Sheath polls the binding: tap sheaths after release; hold never sheaths.
+function _G.CombatMode_CursorModeKey(keystate)
+  if CM.IsDefaultMouseActionBeingUsed() then
+    CM.DebugPrint("Cannot toggle Free Look while holding down your left or right click.")
+    return
+  end
+
+  if keystate == "down" then
+    if not IsMouselooking() then
+      local unlockOnceActive = CM.DbBool(CM.DB.global.customConditionOnce, false)
+        and CM.IsCustomConditionTrue()
+      if unlockOnceActive then
+        customUnlockOnceConsumed = true
+      end
+      if
+        not unlockOnceActive
+        and CM.DbBool(CM.DB.global.closeWindowsOnMouseLook, false)
+        and CM.IsUnlockFrameVisible()
+        and CM.CloseUnlockWindows()
+      then
+        -- Close Windows: the windows were what kept the cursor free. Reconcile re-locks now
+        -- (and the next tick does if a frame lingers), still honouring force-unlock etc.
+        CancelPendingTapSheath()
+        FreeLookOverride = false
+        CursorModeShowTime = 0
+        CM.ReconcileFreeLook()
+        return
+      end
+      if FreeLookOverride or unlockOnceActive then
+        -- Re-lock. Unlock Once also covers a force-unlock that did not set FreeLookOverride,
+        -- so the key can lock and stay locked while that snippet remains true.
+        CancelPendingTapSheath()
+        CM.LockFreeLook()
+        FreeLookOverride = false
+        CursorModeShowTime = 0 -- No spurious filter needed for lock
+        ApplyWeaponsSheathed(false)
+      end
+    elseif IsMouselooking() then
+      -- Unlock cursor; tap vs hold is decided after the hold threshold.
+      -- Use temp unlock so chrome stays until a tap is confirmed (or re-lock on hold).
+      -- Once-mode: this manual unlock suppresses force-lock until the snippet is false.
+      if CM.IsCustomLockConditionTrue() then
+        if not CM.DbBool(CM.DB.global.customLockConditionOnce, false) then
+          -- Plain force lock always wins: there is nothing to toggle.
+          CM.DebugPrint("Cursor Mode: ignored, force lock condition is active.")
+          return
+        end
+        customLockOnceConsumed = true
+      end
+      CursorModeShowTime = GetTime()
+      FreeLookOverride = true
+      CM.UnlockFreeLook()
+      ScheduleTapSheathPoll()
+    end
+  elseif keystate == "up" then
+    if not FreeLookOverride then
+      -- Already re-locked on key-down (toggle-off case), nothing to do
+      return
+    end
+    -- Ignore spurious key-ups from MouselookStop (within 0.3s)
+    local elapsed = GetTime() - CursorModeShowTime
+    if elapsed < CURSOR_MODE_HOLD_THRESHOLD then
+      CM.DebugPrint(
+        "Cursor Mode: Ignoring spurious key-up (elapsed=" .. string.format("%.3f", elapsed) .. "s)"
+      )
+      return
+    end
+    -- Hold release: re-lock mouselook; do not sheath
+    CancelPendingTapSheath()
+    CM.LockFreeLook()
+    FreeLookOverride = false
+  end
+end
+
+-- Manual recovery for the macOS stuck-cursor freeze (a MouselookStop issued while the
+-- window was backgrounded leaves the OS capture stuck). Re-grab and release through the
+-- free-look state machine so the crosshair/tooltip/CVar side effects stay in sync rather
+-- than trusting IsMouselooking(); OnUpdate re-locks afterward if free look should be active.
+function _G.CombatMode_ResetMouseLook()
+  CM.LockFreeLook()
+  local function settle()
+    if CM.ShouldFreeLookBeOff() then
+      CM.UnlockFreeLook()
+    end
+  end
+  if C_Timer and C_Timer.After then
+    C_Timer.After(0, settle)
+  else
+    settle()
+  end
+end
+
+-- Returns whether Combat Mode's own intentional mouselook is active.
+-- Combines our internal flag with Blizzard's IsMouselooking so that external
+-- addons starting/stopping mouselook safely short-circuit both directions:
+--   • Right-click-drag camera turn: cmMouselookActive=false, IsMouselooking=false → false
+--   • External addon starts mouselook: cmMouselookActive=false, IsMouselooking=true → false
+--   • External addon stops CM's mouselook: cmMouselookActive=true, IsMouselooking=false → false
+function CM.IsMouselooking()
+  return cmMouselookActive and IsMouselooking()
+end
+
+--- Shoulder + vignette stay active through temp (hold) unlock; false after permanent unlock.
+function CM.IsMouseLookCameraChromeActive()
+  return mouseLookCameraChromeActive
+end

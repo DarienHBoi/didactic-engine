@@ -253,6 +253,7 @@ function S.UI.buildCustomers(root, hooks)
         end
 
         local w = wantsFor(c, recipes)
+        local label = S.Group.labeler(recipes)
         cp.none:SetShown(#w == 0)
         for i, b in ipairs(cp.quotes) do
             local m = w[i]
@@ -261,7 +262,7 @@ function S.UI.buildCustomers(root, hooks)
                 local mg = (db.cardMargin and db.cardMargin[m.recipe.key]) or S.DB.global.margin
                 local ask = S.Pricing.suggest(cost, mg)
                 b.recipe = m.recipe
-                b:SetText("Quote: " .. S.Group.shortName(m.recipe.name) .. "  " .. S.Money.format(ask))
+                b:SetText("Quote: " .. label(m.recipe.name) .. "  " .. S.Money.format(ask))
                 b:SetEnabled(ask ~= nil)
                 b:Show()
             else
@@ -295,6 +296,7 @@ end
 
 -- Whisper in (outgoing=false) or out (outgoing=true). Safe to call from any chat event.
 function S.UI.onWhisper(text, name, outgoing)
+    if not S.Mod.on("customers") then return end -- switched off in NectarKit: no log, no alert
     if not S.DB or not S.DB.char then return end
     if issecretvalue and (issecretvalue(text) or issecretvalue(name)) then return end
     local ok, c, isNew = pcall(S.Customers.record, S.DB.char, name, text, outgoing, time and time() or 0, S.UI.currentCustomer and S.UI.currentCustomer() or nil)

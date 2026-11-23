@@ -1,0 +1,3 @@
+
+HUI_FAKE_AURAS = {
+}

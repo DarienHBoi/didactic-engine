@@ -41,7 +41,7 @@ function S.UI.button(parent, text, w, h, primary)
     local function paint(self, enabled)
         local bg, border, tc = BTN.bg, BTN.border, BTN.text
         if not enabled then bg, border, tc = BTN.dbg, BTN.dborder, BTN.dtext
-        elseif primary then bg, border, tc = BTN.pbg, BTN.pborder, BTN.ptext end
+        elseif primary or self.selected then bg, border, tc = BTN.pbg, BTN.pborder, BTN.ptext end
         if hasBackdrop then
             self:SetBackdropColor(bg[1], bg[2], bg[3], bg[4])
             self:SetBackdropBorderColor(border[1], border[2], border[3], border[4])
@@ -51,7 +51,10 @@ function S.UI.button(parent, text, w, h, primary)
         self.label:SetTextColor(tc[1], tc[2], tc[3])
     end
     local baseEnable = b.SetEnabled
-    b.SetEnabled = function(self, v) baseEnable(self, v); paint(self, v and true or false) end
+    b.enabledFlag = true
+    b.SetEnabled = function(self, v) baseEnable(self, v); self.enabledFlag = v and true or false; paint(self, self.enabledFlag) end
+    -- "Selected" look for a button that stays clickable (a tab, the chosen range): gold border and fill, text kept.
+    b.SetSelected = function(self, on) self.selected = on and true or false; paint(self, self.enabledFlag) end
     b.SetText = function(self, t) self.label:SetText(t or "") end
     b:SetScript("OnMouseDown", function(self) self.label:SetPoint("CENTER", 1, -1) end)
     b:SetScript("OnMouseUp", function(self) self.label:SetPoint("CENTER", 0, 0) end)

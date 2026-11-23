@@ -41,6 +41,11 @@ function S.UI.buildDetail(pane, hooks)
     d.icon = c:CreateTexture(nil, "ARTWORK")
     d.icon:SetSize(40, 40)
     d.icon:SetPoint("TOPLEFT", 12, -10)
+    -- Hovering the big icon shows the same card as the grid: item tooltip, mats cost and what it sells for.
+    d.iconBtn = CreateFrame("Button", nil, c)
+    d.iconBtn:SetAllPoints(d.icon)
+    d.iconBtn:SetScript("OnEnter", function(self) if d.recipe and hooks.tip then hooks.tip(self, d.recipe) end end)
+    d.iconBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
     d.name = c:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     d.name:SetPoint("TOPLEFT", 60, -12)
     d.name:SetWidth(290)
@@ -48,6 +53,10 @@ function S.UI.buildDetail(pane, hooks)
     d.name:SetWordWrap(false)
     d.cat = c:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     d.cat:SetPoint("TOPLEFT", 60, -32)
+    -- What this item has really earned: sales count and gold, from the ledger.
+    d.sold = c:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    d.sold:SetPoint("TOPRIGHT", -14, -34)
+    d.sold:SetJustifyH("RIGHT")
     d.star = CreateFrame("Button", nil, c)
     d.star:SetSize(24, 24)
     d.star:SetPoint("TOPRIGHT", -10, -10)
@@ -173,6 +182,9 @@ function S.UI.buildDetail(pane, hooks)
         d.icon:SetTexture(recipe.icon or S.UI.QUESTION)
         d.name:SetText(recipe.name)
         d.cat:SetText(recipe.category or "")
+        local soldN, soldCopper = 0, 0
+        if hooks.earned then soldN, soldCopper = hooks.earned(recipe) end
+        d.sold:SetText((soldN or 0) > 0 and ("Sold " .. soldN .. " for |cffffd100" .. S.Money.format(soldCopper) .. "|r") or "")
         if S.DB.char.favourites[recipe.key] then d.star.label:SetTextColor(1, 0.82, 0) else d.star.label:SetTextColor(0.4, 0.4, 0.4) end
 
         local b = S.Breakdown.compute(recipe, S.Prices.lookup, STACK)

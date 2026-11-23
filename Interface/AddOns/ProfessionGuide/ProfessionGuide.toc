@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Profession Guide |cffaaaaaa(moved into ZugDAQ)|r
+## Notes: Profession Guide is now part of the ZugDAQ addon (/pg still opens it). This stub only hands your saved settings and recipe scans over to ZugDAQ; you can delete this folder after that.
+## Author: Troyzerk
+## Version: 2.0.0
+## SavedVariables: ProfessionGuideDB
+## SavedVariablesPerCharacter: ProfessionGuideCharDB
+## IconTexture: Interface\Icons\INV_Misc_Note_06
+
+Stub.lua

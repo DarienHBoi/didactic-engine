@@ -1,0 +1,379 @@
+---------------------------------------------------------------------------------------
+--  UI/Options/SpellMultiSelect.lua — OPTIONS — spell ID pill multi-select
+---------------------------------------------------------------------------------------
+--  What it does: UI.MakeSpellMultiSelect — type-ahead suggestions from the spellbook,
+--  pill chips for selected spells, storage as CSV spell IDs for Reticle Targeting exclude
+--  and cast-at-crosshair lists (and the Party Wheel list, which passes opts.spellFilter).
+--  Architecture / how it works:
+--    • Suggestion popup capped (MAX_MATCHES / visible rows); migrates legacy name tokens
+--      when resolving. Spellbook index build skips when C_SpellBook.GetSpellBookItemInfo
+--      is unavailable (pet-spell scan is guarded — warlock pet books could otherwise
+--      crash options open).
+--    • Spells are told apart by ID, so every rank of a spell can be listed (Forever / Classic).
+--      Entries carry `rank` (client spell subtext, shown in the pill) and `detail` (the same
+--      text, drawn dim on the right of a suggestion row).
+--    • Runtime membership tests live in TargetingMacroBuilder, not here.
+--  Does not: Build click-cast macros or write CVars.
+--  Related: UI/Options/Widgets.lua, UI/Options/Tabs/TabReticleTargeting.lua,
+--  Core/ClickCasting/TargetingMacroBuilder.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+local L = CM.L
+local _G = _G
+
+-- WoW API
+local CreateFrame = _G.CreateFrame
+local C_Spell = _G.C_Spell
+local C_SpellBook = _G.C_SpellBook
+local Enum = _G.Enum
+local issecretvalue = _G.issecretvalue
+
+-- Lua stdlib
+local ipairs = _G.ipairs
+local pcall = _G.pcall
+local type = _G.type
+local strfind = _G.string.find
+local strlower = _G.string.lower
+local strtrim = _G.string.trim
+local tonumber = _G.tonumber
+local tostring = _G.tostring
+local wipe = _G.wipe
+
+local UI = CM.UI
+
+local MAX_MATCHES = 50
+
+---------------------------------------------------------------------------------------
+--                              SPELLBOOK INDEX                                      --
+---------------------------------------------------------------------------------------
+local spellList = {} -- { spellId, name, nameLower, icon }
+local spellById = {}
+local spellByName = {}
+local indexDirty = true
+local indexFrame
+
+--- Rank text of a spell ("Rank 3") on clients that have ranks (Forever, Classic), else nil.
+local function SpellRank(spellId)
+  if not spellId then
+    return nil
+  end
+  local getSubtext = C_Spell and C_Spell.GetSpellSubtext or _G.GetSpellSubtext
+  if not getSubtext then
+    return nil
+  end
+  local ok, text = pcall(getSubtext, spellId)
+  if
+    ok
+    and type(text) == "string"
+    and text ~= ""
+    and not (issecretvalue and issecretvalue(text))
+  then
+    return text
+  end
+  return nil
+end
+
+local function AddSpellToIndex(spellId, name, icon)
+  if not spellId or spellId <= 0 or not name or name == "" then
+    return
+  end
+  if spellById[spellId] then
+    return
+  end
+  local rank = SpellRank(spellId)
+  local entry = {
+    spellId = spellId,
+    name = name,
+    nameLower = strlower(name),
+    icon = icon,
+    rank = rank,
+    detail = rank,
+  }
+  spellList[#spellList + 1] = entry
+  spellById[spellId] = entry
+  if not spellByName[entry.nameLower] then
+    spellByName[entry.nameLower] = entry
+  end
+end
+
+local function IsPassiveSpell(spellId, slot, bank)
+  if slot and bank and C_SpellBook.IsSpellBookItemPassive then
+    if C_SpellBook.IsSpellBookItemPassive(slot, bank) then
+      return true
+    end
+  end
+  if spellId and C_Spell and C_Spell.IsSpellPassive then
+    return C_Spell.IsSpellPassive(spellId) and true or false
+  end
+  return false
+end
+
+local function RebuildSpellIndex()
+  wipe(spellList)
+  wipe(spellById)
+  wipe(spellByName)
+  if not (C_SpellBook and Enum and Enum.SpellBookSpellBank) then
+    indexDirty = false
+    return
+  end
+
+  local GetSpellBookItemInfo = C_SpellBook.GetSpellBookItemInfo
+  if not GetSpellBookItemInfo then
+    indexDirty = false
+    return
+  end
+
+  local playerBank = Enum.SpellBookSpellBank.Player
+  local petBank = Enum.SpellBookSpellBank.Pet
+  local spellType = Enum.SpellBookItemType and Enum.SpellBookItemType.Spell
+
+  local numLines = C_SpellBook.GetNumSpellBookSkillLines and C_SpellBook.GetNumSpellBookSkillLines()
+    or 0
+  for i = 1, numLines do
+    local line = C_SpellBook.GetSpellBookSkillLineInfo and C_SpellBook.GetSpellBookSkillLineInfo(i)
+    if line and not line.offSpecID and line.numSpellBookItems and line.itemIndexOffset then
+      for slot = line.itemIndexOffset + 1, line.itemIndexOffset + line.numSpellBookItems do
+        local info = GetSpellBookItemInfo(slot, playerBank)
+        if info and (not spellType or info.itemType == spellType) then
+          local spellId = info.spellID or info.actionID
+          if not IsPassiveSpell(spellId, slot, playerBank) then
+            local name = info.name
+            local icon = info.iconID
+            if (not name or name == "") and spellId and C_Spell and C_Spell.GetSpellInfo then
+              local si = C_Spell.GetSpellInfo(spellId)
+              if si then
+                name = si.name
+                icon = icon or si.iconID
+              end
+            end
+            AddSpellToIndex(spellId, name, icon)
+          end
+        end
+      end
+    end
+  end
+
+  local numPet = C_SpellBook.HasPetSpells and C_SpellBook.HasPetSpells()
+  if numPet and numPet > 0 and petBank then
+    for slot = 1, numPet do
+      local info = GetSpellBookItemInfo(slot, petBank)
+      if info then
+        local spellId = info.spellID or info.actionID
+        if not IsPassiveSpell(spellId, slot, petBank) then
+          local name = info.name
+          local icon = info.iconID
+          if (not name or name == "") and spellId and C_Spell and C_Spell.GetSpellInfo then
+            local si = C_Spell.GetSpellInfo(spellId)
+            if si then
+              name = si.name
+              icon = icon or si.iconID
+            end
+          end
+          AddSpellToIndex(spellId, name, icon)
+        end
+      end
+    end
+  end
+
+  indexDirty = false
+end
+
+local function EnsureSpellIndex()
+  if indexDirty then
+    RebuildSpellIndex()
+  end
+  if not indexFrame then
+    indexFrame = CreateFrame("Frame")
+    indexFrame:RegisterEvent("SPELLS_CHANGED")
+    indexFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    indexFrame:SetScript("OnEvent", function()
+      indexDirty = true
+    end)
+  end
+end
+
+--- Adds the rank text (`rank` for the pill, `detail` for the dim label on the right of a suggestion).
+local function WithRank(entry)
+  local rank = SpellRank(entry.spellId)
+  entry.rank = rank
+  entry.detail = rank
+  return entry
+end
+
+local function ResolveSpellToken(token)
+  token = strtrim(token or "")
+  if token == "" then
+    return nil
+  end
+  EnsureSpellIndex()
+
+  local idText = token:gsub("^#", "")
+  local id = tonumber(idText)
+  if id and id > 0 then
+    local fromBook = spellById[id]
+    if fromBook then
+      return WithRank({
+        token = tostring(id),
+        spellId = fromBook.spellId,
+        name = fromBook.name,
+        icon = fromBook.icon,
+      })
+    end
+    if C_Spell and C_Spell.GetSpellInfo then
+      local si = C_Spell.GetSpellInfo(id)
+      if si and si.name then
+        return WithRank({
+          token = tostring(id),
+          spellId = id,
+          name = si.name,
+          icon = si.iconID,
+        })
+      end
+    end
+    -- Keep unknown IDs so whitelist/blacklist by id still works.
+    return { token = tostring(id), spellId = id, name = tostring(id), icon = nil }
+  end
+
+  local fromBook = spellByName[strlower(token)]
+  if fromBook then
+    return WithRank({
+      token = tostring(fromBook.spellId),
+      spellId = fromBook.spellId,
+      name = fromBook.name,
+      icon = fromBook.icon,
+    })
+  end
+  if C_Spell and C_Spell.GetSpellInfo then
+    local si = C_Spell.GetSpellInfo(token)
+    local spellId = si and (si.spellID or si.spellId)
+    if si and si.name and spellId then
+      return WithRank({
+        token = tostring(spellId),
+        spellId = spellId,
+        name = si.name,
+        icon = si.iconID,
+      })
+    end
+  end
+  -- Unresolved legacy name: show as text-only until the user removes it.
+  return { token = token, spellId = nil, name = token, icon = nil }
+end
+
+local function FilterSuggestions(query, selectedIds, selectedNames)
+  EnsureSpellIndex()
+  query = strtrim(query or "")
+  local out = {}
+  if query == "" then
+    return out
+  end
+
+  local idText = query:gsub("^#", "")
+  local asId = tonumber(idText)
+  if asId and asId > 0 and not IsPassiveSpell(asId) then
+    local entry = ResolveSpellToken(tostring(asId))
+    if
+      entry
+      and entry.spellId
+      and not selectedIds[entry.spellId]
+      and not IsPassiveSpell(entry.spellId)
+    then
+      out[#out + 1] = entry
+    end
+  end
+
+  local q = strlower(query)
+  for _, sp in ipairs(spellList) do
+    if #out >= MAX_MATCHES then
+      break
+    end
+    if not selectedIds[sp.spellId] and not selectedNames[sp.nameLower] then
+      if strfind(sp.nameLower, q, 1, true) then
+        -- Skip if already added via ID resolve
+        local dup = false
+        for _, existing in ipairs(out) do
+          if existing.spellId == sp.spellId then
+            dup = true
+            break
+          end
+        end
+        if not dup then
+          out[#out + 1] = {
+            token = tostring(sp.spellId),
+            spellId = sp.spellId,
+            name = sp.name,
+            icon = sp.icon,
+            rank = sp.rank,
+            detail = sp.rank,
+          }
+        end
+      end
+    end
+  end
+  return out
+end
+
+--- Spellbook names containing `query` (names starting with it first), as { spellId, name, icon }.
+--- Used by the macro editor's autocomplete; passive spells are already left out of the index.
+function UI.SearchSpellNames(query, limit)
+  EnsureSpellIndex()
+  local q = strlower(strtrim(query or ""))
+  local out = {}
+  if q == "" then
+    return out
+  end
+  local starts, contains = {}, {}
+  for _, sp in ipairs(spellList) do
+    local pos = strfind(sp.nameLower, q, 1, true)
+    if pos == 1 then
+      starts[#starts + 1] = sp
+    elseif pos then
+      contains[#contains + 1] = sp
+    end
+  end
+  local function ByName(a, b)
+    return a.nameLower < b.nameLower
+  end
+  table.sort(starts, ByName)
+  table.sort(contains, ByName)
+  for _, list in ipairs({ starts, contains }) do
+    for _, sp in ipairs(list) do
+      if #out >= (limit or MAX_MATCHES) then
+        return out
+      end
+      out[#out + 1] = { spellId = sp.spellId, name = sp.name, icon = sp.icon }
+    end
+  end
+  return out
+end
+
+---------------------------------------------------------------------------------------
+--                              MAKE SPELL MULTI-SELECT                              --
+---------------------------------------------------------------------------------------
+--- `opts.spellFilter(spellId)` (optional): spells it rejects are neither suggested nor added.
+function UI.MakeSpellMultiSelect(parent, opts)
+  local accept = opts and opts.spellFilter
+  local resolve, filter = ResolveSpellToken, FilterSuggestions
+  if accept then
+    resolve = function(token)
+      local entry = ResolveSpellToken(token)
+      if entry and entry.spellId and not accept(entry.spellId) then
+        return nil
+      end
+      return entry
+    end
+    filter = function(...)
+      local out = {}
+      for _, entry in ipairs(FilterSuggestions(...)) do
+        if not entry.spellId or accept(entry.spellId) then
+          out[#out + 1] = entry
+        end
+      end
+      return out
+    end
+  end
+  return UI.MakePillMultiSelect(parent, opts, {
+    resolveToken = resolve,
+    filterSuggestions = filter,
+    placeholder = L["Type spell name or ID…"],
+  })
+end

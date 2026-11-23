@@ -1,7 +1,7 @@
 
 GraphicsPipDB = {
 ["reapply"] = true,
-["angle"] = -148.1875102049604,
+["angle"] = 124.6375167299321,
 ["values"] = {
 ["weatherDensity"] = 3,
 ["groundEffectFade"] = 500,
@@ -10,7 +10,7 @@ GraphicsPipDB = {
 ["lodObjectFadeScale"] = 300,
 ["cameraDistanceMaxZoomFactor"] = 4,
 ["lodObjectCullSize"] = 50,
-["HDRFactor"] = 3,
+["HDRFactor"] = 1.2,
 ["HDROutput"] = 1,
 ["terrainLodDist"] = 2000,
 ["ResampleAlwaysSharpen"] = 1,

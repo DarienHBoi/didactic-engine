@@ -1,0 +1,17 @@
+## Interface: 16001
+## Title: Ring the Bell
+## Version: 0.3
+## Category: Nectar
+## IconTexture: Interface\AddOns\RingTheBell\Media\Bell
+## Author: Nectar
+## SavedVariables: RingTheBellDB
+## OptionalDeps: NectarKit
+
+Logic.lua
+Wire.lua
+Capture.lua
+Probe.lua
+Banner.lua
+Board.lua
+Pip.lua
+Main.lua

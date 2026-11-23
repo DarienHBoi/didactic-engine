@@ -1,0 +1,2 @@
+
+ProfessionGuideCharDB = nil

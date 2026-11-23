@@ -1,0 +1,26 @@
+Place the AllTheQuests folder in _forever_/Interface/AddOns and restart WoW.
+Open options with /atq or the button at the bottom-right of the world map.
+
+A quest database is included. A separate QuestieDB installation is optional.
+If an equal or newer compatible Forever version is loaded, AllTheQuests uses it
+instead. The bundled fallback does not download updates or install QuestieDB.
+The options window shows which database is in use.
+
+Hide ineligible quests checks professions, supported profession tiers,
+specializations, active parent quests, prerequisites, and reputation requirements.
+Quests stay visible when a requirement cannot be checked reliably.
+
+Ctrl + right-click a map icon to hide a quest on this character. Shared icons
+let you choose which quest to hide. Use Undo last hide or Restore all hidden
+in /atq or the map settings to bring quests back. Other filters still apply.
+
+Hover a marker for a quest with multiple recorded start locations to preview
+those locations as blue exclamation marks. The original markers for
+those quests are hidden during the preview and return when you move away. Normal
+quest markers remain limited to two locations. Preview locations come from
+the database and do not guarantee that the quest giver is currently there.
+
+Loot icons mark possible sources of items that start quests, including recorded
+creature drops, containers, and vendors. Hover for the starter item's name.
+These markers do not guarantee a drop or vendor stock. Item-started quests
+without a recorded source location cannot be placed on the map.

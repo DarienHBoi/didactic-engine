@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: |cff33ccffAddon|r Presets
+## Category: Nectar
+## Notes: Save which addons are on as named presets and switch between them. Type /presets.
+## SavedVariables: AddonPresetsDB
+## SavedVariablesPerCharacter: AddonPresetsCharDB
+Logic.lua
+Main.lua

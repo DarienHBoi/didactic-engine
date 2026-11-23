@@ -1,5 +1,6 @@
 ## Interface: 16001
 ## Title: Taxi
+## Category: Nectar
 ## Notes: Find players by class and place, tick them, whisper them all.
 ## SavedVariables: TaxiDB
 Core.lua

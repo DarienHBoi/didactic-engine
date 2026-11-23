@@ -1,0 +1,859 @@
+---------------------------------------------------------------------------------------
+--  Core/RadialMenu/Actions.lua — RADIALMENU — UI actions a slice can run (map, bags, panels)
+---------------------------------------------------------------------------------------
+--  What it does: Registry of curated UI actions (CM.RadialActions) plus one plain Button per
+--  action. A slice of kind "action" runs the secure macro "/click CombatModeRadialAct_<id>"; the
+--  Button's OnClick calls the matching Blizzard toggle, so panels open from the wheel in combat
+--  as far as Blizzard allows.
+--  Architecture / how it works:
+--    • CM.RadialActions.list (ordered, for the editor picker) and .byId[id] = { id, label, icon,
+--      button, run, group? }. `run` resolves the Blizzard function at click time (names differ by patch);
+--      a missing function simply does nothing.
+--    • Proxy buttons are created once at load (CM.InitializeRadialActions is not needed): a button
+--      created out of combat is clickable by secure macros forever.
+--  `group = "emote"` (DoEmote tokens), `"command"` and `"marker"` entries are listed under their own
+--  sections in the editor. Entries with `macro = "/cmd"` (commands, raid / world markers) skip the proxy
+--  Button: the slice runs that text as its own secure macro.
+--  Icons: Blizzard radial menu icon art (radial_art_*.tga; UI panels draw it alone via the `art` field,
+--  commands show it inside the circle slot),
+--  Assist HUD cursor art (atlas/cursor/crosshair_*_64.tga): drawn alone for the UI panels Pet Journal,
+--  Housing, Currency and Great Vault, inside the circle slot for the Duel command, the emote name written inside the circle for emotes,
+--  the addon logo for Action Combat Mode options, and "portrait" (the player's 2D portrait, drawn by
+--  CM.RadialSetIcon) for Character Info.
+--  Client availability: `click = {buttons}` (micro buttons; the first one that exists is clicked, as a
+--  secure /click so Blizzard's own handler runs) or `requires = "Global"`; Housing, Achievements and
+--  Great Vault also need their Blizzard addon loadable (`loads`) and a global (`needs`), because Forever
+--  has their micro buttons without the panels; CM.RadialActions.IsAvailable
+--  hides what the client lacks from the editor and the default wheels, and a saved slice for a missing
+--  action is skipped by the wheel. CM.RadialActions.IsLocked (an action's `locked()` or a disabled micro
+--  button: level / progression gates) makes the wheel draw the slice greyed and ignore its release.
+--  Does not: Own the wheel, draw anything, or touch bindings.
+--  Related: Core/RadialMenu/Data.lua (CM.RadialEntrySecure), UI/Options/Tabs/TabRadialMenu.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+local L = CM.L
+local _G = _G
+
+-- WoW API
+local CreateFrame = _G.CreateFrame
+
+-- Lua stdlib
+local format = _G.string.format
+local type = _G.type
+local unpack = _G.unpack
+
+local function Call(name, ...)
+  local fn = _G[name]
+  if type(fn) == "function" then
+    fn(...)
+    return true
+  end
+  return false
+end
+
+local function Icon(path)
+  return "Interface\\Icons\\" .. path
+end
+
+-- Emotes have no art: their slice shows the emote name inside the circle (sentinel icon "text").
+local TEXT_ICON = "text"
+
+local DEFINITIONS = {
+  {
+    id = "character",
+    label = L["Character Info"],
+    icon = "portrait",
+    click = { "CharacterMicroButton" },
+  },
+  {
+    id = "spellbook",
+    label = L["Spellbook & Talents"],
+    click = { "PlayerSpellsMicroButton", "SpellbookMicroButton" },
+  },
+  {
+    id = "talents",
+    label = L["Talents"],
+    click = { "PlayerSpellsMicroButton", "TalentMicroButton" },
+    -- Blizzard's micro button knows the level talents unlock at (Forever lowers it with Legacy ranks).
+    locked = function()
+      local button = _G.PlayerSpellsMicroButton
+      if button and button.GetTalentUnlockLevel then
+        return _G.UnitLevel("player") < button:GetTalentUnlockLevel()
+      end
+      return false
+    end,
+  },
+  {
+    -- Opens only the spellbook (Forever and Retail's PlayerSpellsFrame); needs the util global.
+    id = "spellbookonly",
+    label = L["Spellbook"],
+    noCombat = true,
+    requires = "PlayerSpellsUtil",
+    run = function()
+      local util = _G.PlayerSpellsUtil
+      if util and util.ToggleSpellBookFrame then
+        util.ToggleSpellBookFrame()
+      end
+    end,
+  },
+  {
+    -- Forever's Legacy system panel (opens only once the Legacy reward track has renown).
+    id = "legacy",
+    label = L["Legacy"],
+    noCombat = true,
+    requires = "ToggleLegacySystemUI",
+    -- ToggleLegacySystemUI silently does nothing until the Legacy reward track has renown.
+    locked = function()
+      local factions = _G.C_MajorFactions
+      local legacy = _G.Constants and _G.Constants.LegacyConsts
+      if not (factions and factions.GetCurrentRenownLevel and legacy) then
+        return false
+      end
+      return (factions.GetCurrentRenownLevel(legacy.LEGACY_REWARD_TRACK_FACTION_ID) or 0) <= 0
+    end,
+    run = function()
+      Call("ToggleLegacySystemUI")
+    end,
+  },
+  {
+    id = "map",
+    label = L["World Map"],
+    icon = Icon("INV_Misc_Map_01"),
+    noCombat = true, -- Blizzard blocks addon code from opening the map in combat
+    requires = "ToggleWorldMap",
+    run = function()
+      Call("ToggleWorldMap")
+    end,
+  },
+  {
+    id = "bags",
+    label = L["All Bags"],
+    icon = Icon("INV_Misc_Bag_08"),
+    requires = "ToggleAllBags",
+    run = function()
+      Call("ToggleAllBags")
+    end,
+  },
+  {
+    id = "professions",
+    label = L["Professions"],
+    click = { "ProfessionMicroButton" },
+  },
+  {
+    id = "achievements",
+    label = L["Achievements"],
+    click = { "AchievementMicroButton" },
+  },
+  {
+    id = "questlog",
+    label = L["Quest Log"],
+    click = { "QuestLogMicroButton" },
+  },
+  {
+    id = "guild",
+    label = L["Guild & Communities"],
+    click = { "GuildMicroButton" },
+  },
+  {
+    id = "groupfinder",
+    label = L["Group Finder"],
+    click = { "LFDMicroButton", "LFGMicroButton" },
+  },
+  {
+    id = "collections",
+    label = L["Warband Collection"],
+    click = { "CollectionsMicroButton" },
+  },
+  {
+    id = "housing",
+    label = L["Housing Dashboard"],
+    click = { "HousingMicroButton" },
+  },
+  {
+    id = "adventureguide",
+    label = L["Adventure Guide"],
+    click = { "EJMicroButton" },
+  },
+  {
+    id = "calendar",
+    label = L["Calendar"],
+    icon = Icon("INV_Misc_Note_06"),
+    click = { "GameTimeFrame" },
+  },
+  {
+    id = "social",
+    label = L["Friends & Social"],
+    icon = Icon("INV_Letter_15"),
+    noCombat = true,
+    requires = "ToggleFriendsFrame",
+    run = function()
+      Call("ToggleFriendsFrame")
+    end,
+  },
+  {
+    id = "gamemenu",
+    label = L["Game Menu"],
+    -- MainMenuMicroButton ignores clicks unless the mouse is over it (the wheel is). ToggleGameMenu
+    -- is the Esc handler: it also calls SpellStopCasting / SpellStopTargeting / ClearTarget, which are
+    -- forbidden to addon code (taint errors), so show the menu frame directly instead.
+    noCombat = true,
+    requires = "GameMenuFrame",
+    run = function()
+      local menu = _G.GameMenuFrame
+      if menu:IsShown() then
+        _G.HideUIPanel(menu)
+      else
+        _G.ShowUIPanel(menu)
+      end
+    end,
+  },
+  {
+    id = "acmoptions",
+    label = L["ACM Options"],
+    icon = CM.Constants.Logo,
+    run = function()
+      if CM.OpenOptions then
+        CM.OpenOptions()
+      end
+    end,
+  },
+  {
+    id = "emote_wave",
+    label = L["Wave"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "WAVE")
+    end,
+  },
+  {
+    id = "emote_dance",
+    label = L["Dance"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "DANCE")
+    end,
+  },
+  {
+    id = "emote_cheer",
+    label = L["Cheer"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "CHEER")
+    end,
+  },
+  {
+    id = "emote_bow",
+    label = L["Bow"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "BOW")
+    end,
+  },
+  {
+    id = "emote_salute",
+    label = L["Salute"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "SALUTE")
+    end,
+  },
+  {
+    id = "emote_laugh",
+    label = L["Laugh"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "LAUGH")
+    end,
+  },
+  {
+    id = "emote_flex",
+    label = L["Flex"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "FLEX")
+    end,
+  },
+  {
+    id = "emote_roar",
+    label = L["Roar"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "ROAR")
+    end,
+  },
+  {
+    id = "emote_thank",
+    label = L["Thank"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "THANK")
+    end,
+  },
+  {
+    id = "emote_clap",
+    label = L["Clap"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "CLAP")
+    end,
+  },
+  {
+    id = "emote_point",
+    label = L["Point"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "POINT")
+    end,
+  },
+  {
+    id = "emote_cry",
+    label = L["Cry"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "CRY")
+    end,
+  },
+  {
+    id = "emote_sit",
+    label = L["Sit"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "SIT")
+    end,
+  },
+  {
+    id = "emote_kneel",
+    label = L["Kneel"],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", "KNEEL")
+    end,
+  },
+}
+
+-- More UI panels (plain Blizzard toggles; names verified like the rest, a missing one does nothing).
+local function Panel(id, label, icon, run, noCombat)
+  DEFINITIONS[#DEFINITIONS + 1] =
+    { id = id, label = label, icon = icon, run = run, noCombat = noCombat }
+end
+
+Panel("reputation", L["Reputation"], Icon("Achievement_Reputation_01"), function()
+  Call("ToggleCharacter", "ReputationFrame")
+end)
+Panel("currency", L["Currency"], Icon("INV_Misc_Coin_01"), function()
+  Call("ToggleCharacter", "TokenFrame")
+end)
+Panel("greatvault", L["Great Vault"], Icon("INV_Box_01"), function()
+  local loadAddOn = _G.C_AddOns and _G.C_AddOns.LoadAddOn or _G.LoadAddOn
+  if not _G.WeeklyRewardsFrame and loadAddOn then
+    loadAddOn("Blizzard_WeeklyRewards")
+  end
+  if _G.WeeklyRewardsFrame then
+    Call("ToggleFrame", _G.WeeklyRewardsFrame)
+  end
+end, true)
+Panel("mounts", L["Mount Journal"], Icon("Ability_Mount_RidingHorse"), function()
+  Call("ToggleCollectionsJournal", 1)
+end)
+Panel("petjournal", L["Pet Journal"], Icon("INV_Pet_BattlePetTraining"), function()
+  Call("ToggleCollectionsJournal", 2)
+end)
+Panel("toybox", L["Toy Box"], Icon("INV_Misc_Toy_10"), function()
+  Call("ToggleCollectionsJournal", 3)
+end)
+Panel("macros", L["Macros"], Icon("INV_Scroll_03"), function()
+  Call("ShowMacroFrame")
+end, true)
+
+-- More emotes (DoEmote is not protected).
+for _, emote in ipairs({
+  { "hello", L["Hello"], "HELLO" },
+  { "bye", L["Bye"], "BYE" },
+  { "applaud", L["Applaud"], "APPLAUD" },
+  { "shrug", L["Shrug"], "SHRUG" },
+  { "yes", L["Yes"], "YES" },
+  { "no", L["No"], "NO" },
+  { "kiss", L["Kiss"], "KISS" },
+  { "flirt", L["Flirt"], "FLIRT" },
+  { "rude", L["Rude"], "RUDE" },
+  { "ready", L["Ready"], "READY" },
+  { "victory", L["Victory"], "VICTORY" },
+}) do
+  DEFINITIONS[#DEFINITIONS + 1] = {
+    id = "emote_" .. emote[1],
+    label = emote[2],
+    group = "emote",
+    icon = TEXT_ICON,
+    run = function()
+      Call("DoEmote", emote[3])
+    end,
+  }
+end
+
+-- Slash commands run as the slice's own secure macro text (`macro`), so they work in combat as far as
+-- the command allows. No proxy button is made for these.
+local function Command(id, label, group, icon, macro, noCombat, needsGroup)
+  DEFINITIONS[#DEFINITIONS + 1] = {
+    id = id,
+    label = label,
+    group = group,
+    icon = icon,
+    macro = macro,
+    noCombat = noCombat,
+    needsGroup = needsGroup, -- shown as unusable on the wheel while not in a group
+  }
+end
+
+Command(
+  "readycheck",
+  L["Ready Check"],
+  "command",
+  Icon("Achievement_Dungeon_ClassicDungeonMaster"),
+  "/readycheck"
+)
+Command("roll", L["Roll (1-100)"], "command", Icon("INV_Misc_Dice_02"), "/roll")
+Command("reloadui", L["Reload UI"], "command", Icon("INV_Misc_Gear_01"), "/reload")
+-- Not protected, so the proxy button can run them (also in combat, where the game allows it).
+DEFINITIONS[#DEFINITIONS + 1] = {
+  id = "leaveparty",
+  label = L["Leave Party"],
+  group = "command",
+  icon = Icon("Spell_Shadow_Teleport"),
+  needsGroup = true,
+  run = function()
+    local partyInfo = _G.C_PartyInfo
+    if partyInfo and partyInfo.LeaveParty then
+      partyInfo.LeaveParty()
+    else
+      Call("LeaveParty")
+    end
+  end,
+}
+-- Unprotected API calls through the proxy button. `fns` lists { table-or-nil, name } candidates;
+-- the first that exists is called with `...` (new C_ namespace first, old global as fallback).
+local function CallApi(candidates, ...)
+  for _, candidate in ipairs(candidates) do
+    local owner = candidate[1] and _G[candidate[1]] or _G
+    local fn = type(owner) == "table" and owner[candidate[2]]
+    if type(fn) == "function" then
+      fn(...)
+      return true
+    end
+  end
+  return false
+end
+
+local function ApiCommand(id, label, icon, candidates, args, needsGroup)
+  DEFINITIONS[#DEFINITIONS + 1] = {
+    id = id,
+    label = label,
+    group = "command",
+    icon = icon,
+    needsGroup = needsGroup,
+    run = function()
+      CallApi(candidates, unpack(args or {}))
+    end,
+  }
+end
+
+ApiCommand(
+  "resetinstances",
+  L["Reset Instances"],
+  Icon("INV_Misc_PocketWatch_01"),
+  { { nil, "ResetInstances" } }
+)
+ApiCommand(
+  "countdown",
+  L["Pull Countdown (10s)"],
+  Icon("INV_Misc_PocketWatch_02"),
+  { { "C_PartyInfo", "DoCountdown" } },
+  { 10 },
+  true
+)
+ApiCommand(
+  "rolepoll",
+  L["Role Check"],
+  Icon("Ability_Warrior_Challange"),
+  { { nil, "InitiateRolePoll" } },
+  nil,
+  true
+)
+ApiCommand(
+  "converttoraid",
+  L["Convert to Raid"],
+  Icon("Achievement_Dungeon_GloryoftheRaider"),
+  { { "C_PartyInfo", "ConvertToRaid" }, { nil, "ConvertToRaid" } },
+  nil,
+  true
+)
+ApiCommand(
+  "mount",
+  L["Summon Random Mount"],
+  Icon("Ability_Mount_RidingHorse"),
+  { { "C_MountJournal", "SummonByID" } },
+  { 0 }
+)
+ApiCommand(
+  "screenshot",
+  L["Take Screenshot"],
+  Icon("INV_Misc_Spyglass_02"),
+  { { nil, "Screenshot" } }
+)
+ApiCommand(
+  "togglesheath",
+  L["Sheathe / Unsheathe Weapons"],
+  Icon("INV_Sword_04"),
+  { { nil, "ToggleSheath" } }
+)
+ApiCommand(
+  "lootspec",
+  L["Loot Spec: Current Spec"],
+  Icon("INV_Misc_Bag_10"),
+  { { nil, "SetLootSpecialization" } },
+  { 0 }
+)
+
+-- Invite the player you target (the name goes straight to the API, never compared: it can be secret).
+DEFINITIONS[#DEFINITIONS + 1] = {
+  id = "invitetarget",
+  label = L["Invite Target"],
+  group = "command",
+  icon = Icon("Spell_Holy_PrayerOfHealing"),
+  run = function()
+    if _G.UnitIsPlayer("target") then
+      CallApi(
+        { { "C_PartyInfo", "InviteUnit" }, { nil, "InviteUnit" } },
+        _G.GetUnitName("target", true)
+      )
+    end
+  end,
+}
+
+-- Secure slash commands, so they also work in combat as far as the command allows.
+Command("focus", L["Focus Target"], "command", Icon("Ability_TrueShot"), "/focus")
+Command("clearfocus", L["Clear Focus"], "command", Icon("Ability_Rogue_Disguise"), "/clearfocus")
+Command("cancelform", L["Cancel Form"], "command", Icon("Ability_Druid_CatForm"), "/cancelform")
+Command("follow", L["Follow Target"], "command", Icon("Ability_Tracking"), "/follow")
+Command("duel", L["Duel Target"], "command", Icon("Ability_Dualwield"), "/duel")
+Command("inspect", L["Inspect Target"], "command", Icon("INV_Misc_Spyglass_03"), "/inspect")
+Command("afk", L["Toggle AFK"], "command", Icon("Spell_Nature_Sleep"), "/afk")
+Command("dnd", L["Toggle Do Not Disturb"], "command", Icon("Spell_Holy_SealOfProtection"), "/dnd")
+Command("camp", L["Camp (Log Out)"], "command", Icon("INV_Misc_Bedroll_01"), "/camp", true)
+Command("dismount", L["Dismount"], "command", Icon("Ability_Mount_Dreadsteed"), "/dismount")
+Command(
+  "leavevehicle",
+  L["Leave Vehicle"],
+  "command",
+  Icon("Ability_Vehicle_LoadSelfCatapult"),
+  "/leavevehicle"
+)
+
+local MARKERS = {
+  _G.RAID_TARGET_1 or "Star",
+  _G.RAID_TARGET_2 or "Circle",
+  _G.RAID_TARGET_3 or "Diamond",
+  _G.RAID_TARGET_4 or "Triangle",
+  _G.RAID_TARGET_5 or "Moon",
+  _G.RAID_TARGET_6 or "Square",
+  _G.RAID_TARGET_7 or "Cross",
+  _G.RAID_TARGET_8 or "Skull",
+}
+local function MarkerIcon(index)
+  return "Interface\\TargetingFrame\\UI-RaidTargetingIcon_" .. index
+end
+for index, name in ipairs(MARKERS) do
+  Command(
+    "tm" .. index,
+    format(L["Mark Target: %s"], name),
+    "marker",
+    MarkerIcon(index),
+    "/tm " .. index
+  )
+end
+Command("tm0", L["Clear Target Mark"], "marker", Icon("Ability_Rogue_Disguise"), "/tm 0")
+for index, name in ipairs(MARKERS) do
+  Command(
+    "wm" .. index,
+    format(L["World Marker: %s"], name),
+    "marker",
+    MarkerIcon(index),
+    "/wm " .. index,
+    nil,
+    true
+  )
+end
+Command(
+  "cwm",
+  L["Clear World Markers"],
+  "marker",
+  Icon("Ability_Rogue_Disguise"),
+  "/cwm all",
+  nil,
+  true
+)
+
+local build = _G.GetBuildInfo and select(4, _G.GetBuildInfo()) or 0
+local IS_FOREVER = type(build) == "number" and build >= 16000 and build < 20000
+
+-- Classic-family clients (Era, TBC, Wrath, Cata, Mists, and some Forever builds that no longer report as
+-- Mainline). Some of their micro buttons work from OnMouseDown/Up behind an IsMouseOver() check
+-- (Character, Group Finder), so a "/click" does nothing; the others can be replaced by an addon
+-- (GW2 UI hooks the Spellbook), so clicking the Blizzard button opens both windows. These actions call
+-- the global toggle instead (so replacements win) through the insecure proxy, not in combat.
+if _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_MAINLINE then
+  local CLASSIC_TOGGLES = {
+    character = { "ToggleCharacter", "PaperDollFrame" },
+    spellbook = { "ToggleSpellBook", "spell" },
+    talents = { "ToggleTalentFrame" },
+    groupfinder = { "PVEFrame_ToggleFrame" },
+  }
+  for _, def in ipairs(DEFINITIONS) do
+    local toggle = CLASSIC_TOGGLES[def.id]
+    -- Forever has the Retail-style micro buttons, and the addon-run toggle taints its panels (secret
+    -- health / mana compares error), so it keeps the secure /click when the button exists.
+    local hasButton = false
+    if IS_FOREVER then
+      for _, name in ipairs(def.click or {}) do
+        if _G[name] then
+          hasButton = true
+          break
+        end
+      end
+    end
+    if toggle and not hasButton then
+      def.click = nil
+      def.requires = toggle[1]
+      def.noCombat = true
+      def.run = function()
+        Call(unpack(toggle))
+      end
+    end
+  end
+end
+
+-- Client availability: panels and commands that the running client doesn't have (Classic / Forever
+-- lack many Retail windows) are hidden from the editor and skipped by the wheel. `click` lists micro
+-- buttons (first one that exists is clicked); `requires` names a global the action needs.
+local PANEL_REQUIRES = {
+  reputation = "ToggleCharacter",
+  currency = "ToggleCharacter",
+  greatvault = "C_WeeklyRewards",
+  mounts = "ToggleCollectionsJournal",
+  petjournal = "ToggleCollectionsJournal",
+  toybox = "ToggleCollectionsJournal",
+  macros = "ShowMacroFrame",
+  cwm = "PlaceRaidMarker",
+}
+for index = 1, 8 do
+  PANEL_REQUIRES["wm" .. index] = "PlaceRaidMarker"
+end
+for _, def in ipairs(DEFINITIONS) do
+  def.requires = def.requires or PANEL_REQUIRES[def.id]
+end
+
+-- Panels whose micro button exists on a client that can't open them (Forever ships the Retail micro
+-- buttons, but not the Housing Dashboard, and its Achievements / Great Vault builds can differ): a click
+-- would error inside Blizzard's handler. `loads` = the load-on-demand Blizzard addon the panel needs
+-- (must be loadable), `needs` = a global it uses that must exist. Both are checked on top of `click` /
+-- `requires`.
+local PANEL_CLIENT_CHECKS = {
+  housing = { loads = "Blizzard_HousingDashboard", needs = "HousingFramesUtil" },
+  achievements = { loads = "Blizzard_AchievementUI", needs = "ToggleAchievementFrame" },
+  greatvault = { loads = "Blizzard_WeeklyRewards" },
+}
+for _, def in ipairs(DEFINITIONS) do
+  local check = PANEL_CLIENT_CHECKS[def.id]
+  if check then
+    def.loads = check.loads
+    def.needs = check.needs
+  end
+end
+
+--- True when a load-on-demand Blizzard addon is loaded or can be loaded on this client.
+local function AddOnUsable(name)
+  local addons = _G.C_AddOns
+  if not (addons and addons.IsAddOnLoadable) then
+    return true -- cannot tell: assume it works
+  end
+  if addons.IsAddOnLoaded and addons.IsAddOnLoaded(name) then
+    return true
+  end
+  local ok, loadable = pcall(addons.IsAddOnLoadable, name)
+  return not ok or loadable == true
+end
+
+local registry = { list = {}, byId = {} }
+CM.RadialActions = registry
+
+--- First existing button of a `click` list (nil when the client has none).
+local function ClickButton(def)
+  for _, name in ipairs(def.click) do
+    if _G[name] then
+      return name
+    end
+  end
+  return nil
+end
+
+--- True when the running client offers this action.
+function registry.IsAvailable(def)
+  if type(def) == "string" then
+    def = registry.byId[def]
+  end
+  if not def then
+    return false
+  end
+  if def.loads and not AddOnUsable(def.loads) then
+    return false
+  end
+  if def.needs and _G[def.needs] == nil then
+    return false
+  end
+  if def.click then
+    return ClickButton(def) ~= nil
+  end
+  return def.requires == nil or _G[def.requires] ~= nil
+end
+
+--- True when the client has the action but this character can't use it yet (a level or progression
+--- lock): the action's own `locked()` check, or a disabled Blizzard micro button.
+function registry.IsLocked(def)
+  if type(def) == "string" then
+    def = registry.byId[def]
+  end
+  if not def then
+    return false
+  end
+  if def.locked then
+    local ok, locked = pcall(def.locked)
+    if ok and locked == true then
+      return true
+    end
+  end
+  if def.click then
+    local button = _G[ClickButton(def) or ""]
+    if button and button.IsEnabled and button:IsEnabled() == false then
+      return true
+    end
+  end
+  return false
+end
+
+--- Secure macro text a slice runs for this action, or nil when the client lacks it.
+function registry.MacroText(def)
+  if def.click then
+    local name = ClickButton(def)
+    return name and ("/click " .. name) or nil
+  end
+  return def.macro or ("/click " .. def.button)
+end
+
+-- Blizzard's radial menu icon art (Assets/radial/radial_art_<name>[_disabled].tga): UI panels draw it on
+-- its own in place of the circle slot; commands (`group`) show it inside the circle as their icon. The
+-- picker lists the same art as the entry icon.
+local ART = {
+  character = "character",
+  spellbook = "spellbook",
+  spellbookonly = "spellbook",
+  legacy = "legacy",
+  talents = "talents",
+  map = "fullmap",
+  bags = "bags",
+  professions = "professions",
+  achievements = "legacy",
+  questlog = "quests",
+  guild = "guild",
+  groupfinder = "groupfinder",
+  collections = "collections",
+  adventureguide = "adventureguide",
+  calendar = "calendar",
+  social = "chat",
+  gamemenu = "gamemenu2",
+  reputation = "viewbuffs",
+  mounts = "collections",
+  toybox = "editradials",
+  clearfocus = "targeting_disabled", -- always the grey art
+  macros = "macros",
+  readycheck = "gamemenu",
+  reloadui = "editcrossbars",
+  inspect = "inspecthud",
+  invitetarget = "group",
+  leaveparty = "cancel",
+  cancelform = "cancel",
+  countdown = "stopwatch",
+  resetinstances = "clock",
+  focus = "targeting",
+}
+for _, def in ipairs(DEFINITIONS) do
+  local art = ART[def.id]
+  if art then
+    -- Only UI panels (no group) draw the art alone; commands put it inside the circle slot as their icon.
+    if not def.group then
+      def.art = art
+    end
+    def.icon = "Interface\\AddOns\\CombatMode\\Assets\\radial\\radial_art_" .. art .. ".tga"
+  end
+end
+-- Assist HUD cursor art (Assets/atlas/cursor), drawn alone like the other plain icons.
+local CURSOR_ICON = {
+  duel = "missions",
+  petjournal = "petting",
+  housing = "broom",
+  currency = "lootall",
+  greatvault = "lock",
+}
+for _, def in ipairs(DEFINITIONS) do
+  local cursor = CURSOR_ICON[def.id]
+  if cursor then
+    def.icon = "Interface\\AddOns\\CombatMode\\Assets\\atlas\\cursor\\crosshair_"
+      .. cursor
+      .. "_64.tga"
+  end
+end
+-- Icon files drawn alone (no circle slot, no padded art pair).
+local PLAIN_ICON = {
+  acmoptions = true,
+  petjournal = true,
+  housing = true,
+  currency = true,
+  greatvault = true,
+}
+for _, def in ipairs(DEFINITIONS) do
+  if PLAIN_ICON[def.id] then
+    def.art = def.icon
+  end
+end
+
+for _, def in ipairs(DEFINITIONS) do
+  if def.icon == TEXT_ICON then
+    def.iconText = def.label
+  end
+  if not def.macro and not def.click then
+    def.button = "CombatModeRadialAct_" .. def.id
+    local proxy = CreateFrame("Button", def.button, _G.UIParent)
+    proxy:RegisterForClicks("AnyUp", "AnyDown")
+    proxy:SetScript("OnClick", function(_, _, down)
+      -- "/click" sends an up and a down: run once per click.
+      -- noCombat panels would taint protected Blizzard frames, so never run them in combat.
+      if (down == false or down == nil) and not (def.noCombat and _G.InCombatLockdown()) then
+        def.run()
+      end
+    end)
+  end
+  registry.list[#registry.list + 1] = def
+  registry.byId[def.id] = def
+end

@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: Gold Ledger |cffaaaaaa(moved into ZugDAQ)|r
+## Notes: Gold Ledger is now part of the ZugDAQ addon. This stub only hands your saved history over to ZugDAQ the first time it loads; you can delete this folder after that.
+## Author: Troyzerk
+## Version: 2.0.0
+## SavedVariables: GoldLedgerDB
+## IconTexture: Interface\Icons\INV_Misc_Coin_02
+
+Stub.lua

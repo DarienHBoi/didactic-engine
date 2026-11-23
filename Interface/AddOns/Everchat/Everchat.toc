@@ -1,0 +1,48 @@
+## Interface: 16001
+## Title: Everchat
+## Notes: Chat quality of life for WoW Forever, styled to fit the game's own UI.
+## Notes-esES: Mejoras para el chat de WoW Forever, con el aspecto de la propia interfaz del juego.
+## Notes-esMX: Mejoras para el chat de WoW Forever, con el aspecto de la propia interfaz del juego.
+## Author: Lokzsxf
+## Version: 0.56.1
+## Category: Chat
+## IconTexture: Interface\AddOns\Everchat\Media\Logo
+## X-License: MIT
+## X-Curse-Project-ID: 1732589
+## SavedVariables: EverchatDB
+## AddonCompartmentFunc: Everchat_OpenOptions
+
+Core.lua
+Locales\enUS.lua
+Locales\esES.lua
+Locales\frFR.lua
+Locales\deDE.lua
+Locales\ptBR.lua
+Locales\itIT.lua
+Locales\ruRU.lua
+Locales.lua
+Theme.lua
+Shapes.lua
+Fonts.lua
+Players.lua
+Skin.lua
+Tabs.lua
+NewTab.lua
+Header.lua
+Buttons.lua
+EditBox.lua
+Resize.lua
+Padlock.lua
+Timestamps.lua
+Channels.lua
+Names.lua
+Filters.lua
+Lines.lua
+Alerts.lua
+Scroll.lua
+History.lua
+Conflicts.lua
+Links.lua
+Search.lua
+TabCopy.lua
+Options.lua

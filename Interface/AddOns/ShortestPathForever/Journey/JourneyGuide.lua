@@ -172,7 +172,12 @@ local function NameWaypointTooltip(tooltip)
 	end
 	local titleLine = GameTooltipTextLeft1
 	local clientTitle = titleLine and titleLine.GetText and titleLine:GetText()
-	if not (clientTitle and (clientTitle == MAP_PIN or clientTitle == MAP_PIN_SHARING)) then
+	-- Local patch (owner's PC): the title can be a secret string that tainted code may not compare; skip it then.
+	-- Original backed up on the Desktop.
+	local ok, isPin = pcall(function()
+		return clientTitle and (clientTitle == MAP_PIN or clientTitle == MAP_PIN_SHARING)
+	end)
+	if not (ok and isPin) then
 		return
 	end
 	local title, goalTitle = WaypointNames()

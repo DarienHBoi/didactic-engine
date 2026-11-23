@@ -1,0 +1,211 @@
+-- Close calls' words (JRN-25): a close call in the level's prose
+-- (Text.RegisterLines, UI/Journey/Text/Prose.lua), the plates' caption words
+-- (Text.RegisterCaption), the cross's tooltip (Mark.lua) and the card's:
+-- its heading, its tag, its deed and its tooltip (Card.lua's SetFoe). A
+-- creature's name in a sentence ("a Plainstrider", "Hogger") is the
+-- core's Text.KillerName, the health left held together ("6% health")
+-- its Text.Health. Copy changes go through the copywriter skill, as every
+-- player-read word does.
+
+local addonName, ns = ...
+
+local CloseCalls = ns.CloseCalls
+local Text = ns.UI.JourneyText
+local Capital, Health, NUMBER, When = Text.Capital, Text.Health, Text.NUMBER, Text.When
+local L, Fmt = ns.L, ns.Fmt
+
+-- A close call's creature in a sentence: "a Plainstrider", "Hogger", "a
+-- Plainstrider and two others" (it was one of `foes` targeted); nil when
+-- no creature was.
+local function Foes(call)
+    local name = Text.KillerName(call)
+    if not name then return nil end
+    local more = (call.foes or 1) - 1
+    if more < 1 then return name end
+    return Fmt(L["%1$s and %2$s"], name, ns.Plural(more, L["another|%s others##plural"], NUMBER[more] or tostring(more)))
+end
+
+-- A close call in a sentence: "Got away from a Plainstrider with 6%
+-- health.", or, no creature targeted, "Got out of a fight with 6%
+-- health."
+function CloseCalls.Sentence(call)
+    local foes = Foes(call)
+    if foes then return Fmt(L["Got away from %1$s with %2$s."], foes, Health(call)) end
+    return Fmt(L["Got out of a fight with %s."], Health(call))
+end
+
+-- A close call's creature's level and rank, as its card's tag says them
+-- (Card.lua's SetFoe): "Lv 45 (Elite)", "Lv ?? (Boss)" (a skull, -1),
+-- "Lv 12" for a common creature, the rank alone where no level was kept
+-- ("Elite"); nil with neither. The fight's length is never told: it said
+-- nothing (11 Oct).
+local TAG = { elite = L["Elite"], rare = L["Rare"], rareelite = L["Rare Elite"], worldboss = L["Boss"] }
+
+function CloseCalls.Tag(call)
+    local level = call and call.foeLevel
+    local lv = level == -1 and L["Lv ??"] or (type(level) == "number" and level > 0 and Fmt(L["Lv %d"], level)) or nil
+    local rank = call and TAG[call.rank]
+    if lv and rank then return Fmt(L["%1$s (%2$s)"], lv, rank) end
+    return lv or rank
+end
+
+-- What a close call is called on the page: its card's heading in the
+-- diary's hand (Card.lua's SetFoe), and its cross's tooltip's title, so
+-- the card and the mark it points to read as one thing.
+function CloseCalls.Heading()
+    return L["A close call"]
+end
+
+-- A close call's cross on a plate, for its tooltip: every close call on
+-- the spot together (Mark.lua's `tips`; 9 Nov 2026, as a fight's stain
+-- tells its stops: two on one spot each said "A close call" and its own
+-- time again). One: "A close call", its health and what with, the
+-- creature's level and rank, then when and at what level (Deaths.Foot,
+-- the ending the death-side marks share). Several: "Three close calls",
+-- the lowest health of them, the creatures each once with how often
+-- ("Against a Plainstrider twice and Hogger once"; FOES of them, then "and
+-- others"), the creature's tag where they were all the one, then from
+-- when to when. Four lines at most.
+local FOES = 2
+
+local function Against(calls)
+    local by, names = {}, {}
+    for _, call in ipairs(calls) do
+        local name = Text.KillerName(call)
+        if name then
+            if not by[name] then
+                by[name] = { name = name, n = 0, call = call }
+                names[#names + 1] = by[name]
+            end
+            by[name].n = by[name].n + 1
+        end
+    end
+    if #names == 0 then return nil end
+    if #names == 1 then
+        local one = names[1]
+        if one.n == #calls then
+            return (#calls == 2 and Fmt(L["Against %s both times"], one.name) or Fmt(L["Against %s each time"], one.name)), one.call
+        end
+        return Fmt(L["Against %1$s %2$s##times"], one.name, ns.UI.Format.Times(one.n)), one.call
+    end
+    local many = false
+    for _, f in ipairs(names) do many = many or f.n > 1 end
+    local parts = {}
+    for i = 1, math.min(#names, FOES) do
+        parts[i] = many and Fmt(L["%1$s %2$s##times"], names[i].name, ns.UI.Format.Times(names[i].n)) or names[i].name
+    end
+    if #names > FOES then
+        local head = parts[1]
+        for i = 2, #parts do head = Fmt(L["%1$s, %2$s##list"], head, parts[i]) end
+        return Fmt(L["Against %s and others"], head)
+    end
+    return Fmt(L["Against %s"], Text.List(parts))
+end
+
+function CloseCalls.Tips(calls, now)
+    local n = #calls
+    if n == 1 then
+        local call = calls[1]
+        local foes = Foes(call)
+        local pct = tostring(call.pct or 0)
+        local lines = { foes and Fmt(L["%1$s%% health left, against %2$s"], pct, foes) or Fmt(L["%s%% health left"], pct) }
+        if foes then lines[#lines + 1] = CloseCalls.Tag(call) end
+        lines[#lines + 1] = ns.Deaths.Foot(calls, now)
+        return CloseCalls.Heading(), lines
+    end
+    local low
+    for _, call in ipairs(calls) do
+        if not low or (call.pct or 0) < low then low = call.pct or 0 end
+    end
+    local lines = { Fmt(L["Down to %s%% health at worst"], tostring(low)) }
+    local against, one = Against(calls)
+    if against then lines[#lines + 1] = against end
+    if one then lines[#lines + 1] = CloseCalls.Tag(one) end
+    lines[#lines + 1] = ns.Deaths.Foot(calls, now)
+    return Capital(ns.Plural(n, L["%s close call|%s close calls##plural"], NUMBER[n] or tostring(n))), lines
+end
+
+-- One close call's tooltip, as its mark tells it alone.
+function CloseCalls.Tip(call, now)
+    return CloseCalls.Tips({ call }, now)
+end
+
+-- The card of the creature that nearly got you (Card.lua's SetFoe):
+-- under its chart, how many it was against, "fought against three"; ""
+-- against one ("fought" alone says nothing). And its tooltip.
+function CloseCalls.Deed(call)
+    local foes = call.foes or 1
+    if foes <= 1 then return "" end
+    return Fmt(L["fought against %s"], NUMBER[foes] or tostring(foes))
+end
+
+function CloseCalls.FoeTip(call, now)
+    local lines = { CloseCalls.Tag(call) }
+    lines[#lines + 1] = Fmt(L["Left you with %s%% health"], tostring(call.pct or 0))
+    local more = (call.foes or 1) - 1
+    if more > 0 then
+        lines[#lines + 1] = ns.Plural(more, L["One more was in the fight|%s more were in the fight##plural"],
+            Capital(NUMBER[more] or tostring(more)))
+    end
+    lines[#lines + 1] = When(call.t, call.level, now)
+    return call.name, lines
+end
+
+--------------------------------------------------------------------------
+-- In the level's prose (Text.RegisterLines)
+--------------------------------------------------------------------------
+
+-- The level's close calls in its prose: each close call, at most `most`,
+-- the rest counted. Nil with none. They open the fights' paragraph
+-- ("combat", the `run` it shares with the luck with a quest's drops,
+-- which runs on after it: Features/Hunts/Text.lua's "hunts", 75).
+local PROSE = { most = 2 }
+
+function CloseCalls.Lines(e)
+    local parts = {}
+    local calls = e.closeCalls or {}
+    for i = 1, math.min(#calls, PROSE.most) do parts[#parts + 1] = CloseCalls.Sentence(calls[i]) end
+    local more = #calls - PROSE.most
+    if more > 0 then
+        parts[#parts + 1] = Fmt(L["And %s.##more"], ns.Plural(more,
+            L["one more close call|%s more close calls##plural"], NUMBER[more] or tostring(more)))
+    end
+    if #parts == 0 then return nil end
+    return table.concat(parts, " ")
+end
+
+-- After the professions' caps (60), first of the fights' paragraph.
+Text.RegisterLines("close", { at = 70, run = "combat", lines = function(e) return CloseCalls.Lines(e) end })
+
+--------------------------------------------------------------------------
+-- On a plate (Text.RegisterCaption)
+--------------------------------------------------------------------------
+
+-- A close call: after the deaths, ", and a close call", or leading where
+-- nothing above does. `said.close` (true): the card of the creature that
+-- nearly got you is beside the plate (Card.lua's SetFoe), or a witness's
+-- card names it, its health and fight charted there, so a close call
+-- leading the words only names it ("A close call."); without, the
+-- creature is named after the deaths too (", and a close call with a
+-- Plainstrider"), as the killer is, and a lone close call leads whole
+-- ("Got away from a Plainstrider with 6% health"). More are counted, "two
+-- close calls". A killer's card and a close call's are two fights, so both
+-- may be beside the plate, or either left off. It leads at 60 (after the
+-- deaths, 50) and is told at 50 in the tail (after the deaths, 40).
+local function Calls(calls, c)
+    if #calls == 1 then
+        local name = not c.said.close and Text.KillerName(calls[1])
+        return name and Fmt(L["a close call with %s"], name) or L["a close call"]
+    end
+    return ns.Plural(#calls, L["%s close call|%s close calls##plural"], NUMBER[#calls] or tostring(#calls))
+end
+
+Text.RegisterCaption("close", {
+    moment = "close",
+    take = function(m) return m.call end,
+    lead = { at = 60, say = function(calls, c)
+        if #calls == 1 then return c.said.close and L["A close call"] or CloseCalls.Sentence(calls[1]):sub(1, -2) end
+        return Capital(Calls(calls, c))
+    end },
+    tail = { at = 50, say = Calls },
+})

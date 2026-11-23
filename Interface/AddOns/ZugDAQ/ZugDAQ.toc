@@ -1,0 +1,71 @@
+## Interface: 16001
+## Title: ZugDAQ
+## Notes: The in-game half of the ZugDAQ app: tracks your gold, auctions, farming, bags and recipes for the app, shows the app's prices, plans and deals in game, and finds the cheapest way to level your professions.
+## Author: Troyzerk
+## Version: 2.6.2
+## AddonCompartmentFunc: ZugDAQ_OnAddonCompartmentClick
+## SavedVariables: ZugDAQDB, ZugDAQ_ProfDB
+## SavedVariablesPerCharacter: ZugDAQ_ProfCharDB
+## OptionalDeps: Auctionator, GoldLedger, ProfessionGuide
+## IconTexture: Interface\Icons\INV_Misc_Coin_02
+
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0\lib.xml
+
+# written by the ZugDAQ app (market prices, plans, deals); the game reads it at login and /reload
+Data\FromApp.lua
+
+Core.lua
+Debug.lua
+Bridge.lua
+Prices.lua
+LivePrices.lua
+Ledger.lua
+Auctions.lua
+Farming.lua
+Activity.lua
+Market.lua
+Inventory.lua
+Crafting.lua
+Planner.lua
+Share.lua
+ItemInfo.lua
+Advisor.lua
+Insights.lua
+UI\Widgets.lua
+UI\Main.lua
+UI\Overview.lua
+UI\Advisor.lua
+UI\Income.lua
+UI\Farming.lua
+UI\Auctions.lua
+UI\Sellers.lua
+UI\Market.lua
+UI\Crafting.lua
+UI\Explore.lua
+UI\LiveFrame.lua
+UI\Minimap.lua
+UI\App.lua
+UI\Planner.lua
+
+# professions: the cheapest way to the next skill point, and recipes to go and get (was Profession Guide)
+Professions\Core.lua
+Data\Factions.lua
+Data\Recipes\FirstAid.lua
+Data\Recipes\Mining.lua
+Data\Recipes\Cooking.lua
+Data\Recipes\Skinning.lua
+Data\Recipes\Herbalism.lua
+Data\Recipes\Blacksmithing.lua
+Data\Recipes\Fishing.lua
+Data\Recipes\Alchemy.lua
+Data\Recipes\Leatherworking.lua
+Data\Recipes\Tailoring.lua
+Data\Recipes\Enchanting.lua
+Data\Recipes\Engineering.lua
+Professions\Pricing.lua
+Professions\Scanner.lua
+Professions\Sources.lua
+Professions\UI.lua

@@ -1,0 +1,9 @@
+Bundled database: QuestieDB 1.0.12, Forever, by the QuestieDB / Questie contributors.
+Source: https://github.com/Questie/QuestieDB/tree/4d31c10394b11bd133069ecf1662062cdf4d8691
+Release: https://github.com/Questie/QuestieDB/releases/tag/v1.0.12
+Archive SHA-256: bc1e6894b64fc347e29758fa73e4ca9e4921844a16852c0c428f45f14ca2f8cf
+
+Adapted for AllTheQuests by Reversal on 2026-11-07. Global reads/writes in the Lua runtime are scoped to a private environment. The original metadata and provider logic are retained. This bundled copy is not a separate QuestieDB installation and does not use its logo.
+
+QuestieDB imports historic Questie content: https://github.com/Questie/Questie
+See LICENSE.md and gpl-3.0.md for the upstream licensing terms and historical-contributor notice.

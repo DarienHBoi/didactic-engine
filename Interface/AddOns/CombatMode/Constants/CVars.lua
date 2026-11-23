@@ -1,0 +1,253 @@
+---------------------------------------------------------------------------------------
+--  Constants/CVars.lua — CONSTANTS — CVar presets / editor exclusions
+---------------------------------------------------------------------------------------
+--  What it does: Declares every named CVar preset Combat Mode may apply: reticle targeting,
+--  Interaction HUD SoftTarget subset, Mouse Look camera (shoulder / dynamic pitch /
+--  motion sickness), Target Focus, and matching Blizzard reset tables. Builds
+--  ManagedCVarNames as the union used for prior snapshots. Also lists
+--  ReticleTargetingCVarEditorExcluded keys the editor must not show.
+--  Architecture / how it works:
+--    • ReticleTargetingCVarValues — SoftTarget*, deselectOnClick, CursorStickyCentering, the
+--      outline CVars (Outline + selection / mouseover fades; ReticleOutlineCVarNames), etc.
+--    • InteractionHUDSoftTargetCVarValues — SoftTargetInteract subset when HUD is on
+--      without full reticle targeting, plus the Friend / Interact / GameObject icons off.
+--      InteractionHUDIconCVarNames lists those three: hidden only while the Interactable
+--      Indicator is on (CVarManager drops them from the effective preset otherwise).
+--      SoftTargetIconEnemy stays in the full reticle preset only.
+--    • MouseLookCameraLockedValues — MS off while locked. Shoulder unlock is tweened
+--      (SetShoulderOffset), not a snap table.
+--    • TargetFocusCVarValues (+ Blizzard* counterparts).
+--    • ManagedCVarNames also includes cameraYaw/PitchMoveSpeed and CursorCenteredYPos.
+--  Does not: Call SetCVar or merge DB overrides (CVarManager owns writes + effective values).
+--  Related: Core/Runtime/CVarManager.lua, UI/Editors/ReticleCVarEditorData.lua,
+--  UI/Editors/ReticleCVarEditorPanel.lua, Constants/DatabaseDefaults.lua,
+--  Core/Crosshair/AssistedHighlight/Assist.lua, UI/Options/Tabs/TabReticleTargeting.lua,
+--  UI/Options/Tabs/TabGeneral.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+
+local ipairs = _G.ipairs
+local pairs = _G.pairs
+local table = _G.table
+local type = _G.type
+
+-- CVARS FOR RETICLE TARGETING
+CM.Constants.ReticleTargetingCVarValues = {
+  ["interactKeyWarningTutorial"] = 1, -- Hides the interact key tutorial if using the INTERACTMOUSEOVER binding
+  ["deselectOnClick"] = 1, -- Disables Sticky Targeting. We never want this w/ soft targeting, as it interferes w/ SoftTargetForce
+  ["enableMouseoverCast"] = 0, -- Disabling to avoid issues with targeting macro preline priority
+  -- SoftTarget General
+  ["SoftTargetForce"] = 0, -- Auto-set target to match soft target. 1 = for enemies, 2 = for friends | 0 = soft targets are not auto-promoted to hard target
+  ["SoftTargetMatchLocked"] = 1, -- Match appropriate soft target to locked target. 1 = hard locked only, 2 = targets you attack | 1 = soft target follows your hard target while you have one (aiming at another enemy does not move it)
+  ["SoftTargetWithLocked"] = 2, -- Allows soft target selection while player has a locked target | 2 = soft selection is not suppressed while locked target is present
+  -- SoftTarget Enemy
+  ["SoftTargetEnemy"] = 3, -- Sets when enemy soft targeting should be enabled. 0=off, 1=gamepad, 2=KBM, 3=always
+  ["SoftTargetEnemyArc"] = 0, -- 0 = No yaw arc allowed, must be directly in front (More precise. Harder to target far away enemies but better for prioritizing stacked targets). 1 = Must be in front of arc (Less precise. Makes targeting far away enemies easier but prioritizing gets messy with stacked mobs).
+  ["SoftTargetEnemyRange"] = 60,
+  -- SoftTarget Interact
+  ["SoftTargetInteract"] = 3,
+  ["SoftTargetInteractArc"] = 1, -- Setting it to 1 since we don't need too much precision when interacting with NPCs and having to aim precisely at them when this is set to 0 gets annoying.
+  ["SoftTargetInteractRange"] = 15,
+  -- SoftTarget Friend
+  ["SoftTargetFriend"] = 0,
+  ["SoftTargetFriendArc"] = 0,
+  ["SoftTargetFriendRange"] = 60,
+  -- SoftTarget Nameplate
+  ["SoftTargetNameplateEnemy"] = 0, -- Always show nameplates  for soft target enemy.
+  -- SoftTarget Icon. Enemy is always hidden (the reticle replaces it). Friend / Interact / GameObject
+  -- are hidden only while the Interactable Indicator is on (the Interaction HUD already shows them);
+  -- otherwise GetEffectiveReticleTargetingCVarValues leaves them alone (InteractionHUDIconCVarNames).
+  ["SoftTargetIconEnemy"] = 0,
+  ["SoftTargetIconFriend"] = 0,
+  ["SoftTargetIconInteract"] = 0,
+  ["SoftTargetIconGameObject"] = 0,
+  -- Outline (the glow on quest objectives / mouseover / target). Switched by Target Outline
+  -- (global.reticleOutline): off forces Outline 0 and Blizzard's fade defaults. A fade is how long
+  -- the outline stays bright before settling dim. Both the target and the mouseover fade are long so
+  -- the outline is strong on the target and on the unit under the crosshair (a short mouseover fade
+  -- starts it dim and wins over the target outline, e.g. when the hovered unit becomes the target).
+  -- The soft-interact fade is left at Blizzard's.
+  ["Outline"] = 3, -- 0 = off, 1 = quest objectives, 2 = + mouseover, 3 = + target
+  ["outlineMouseOverFadeDuration"] = 3600, -- Blizzard 0.9
+  ["outlineSelectionFadeDuration"] = 3600, -- Blizzard 0.32
+  -- Selection circle under a unit and the floating name Blizzard shows on the soft target. The
+  -- soft target follows the player, not the (shifted) crosshair, so its circle can sit on a
+  -- different unit than the one under the crosshair. The preset value is the hidden state; Selection
+  -- Circle (global.selectionCircleMode) turns the circle on for your hard target (or only your
+  -- Target Lock) while SoftTargetMatchLocked pins the soft target to it, or hands Blizzard's circle
+  -- and name back ("soft"). UnitNameFocused is blocked in combat, so it only follows the mode.
+  ["ObjectSelectionCircle"] = 0, -- Blizzard 1
+  ["UnitNameFocused"] = 0, -- Blizzard 1
+  -- cursor centering. Preset 0; FreeLookController flips CursorFreelookCentering to 1 for the
+  -- first start of its lock bounce (crosshair on). Since 10.2 the engine applies the
+  -- warp-to-centre as a Mouse Look turn (https://github.com/Stanzilla/WoWUIBugs/issues/504);
+  -- the bounce dips cameraYaw/PitchMoveSpeed to 0.1 for that frame, which makes the turn
+  -- negligible (issue 189).
+  ["CursorFreelookCentering"] = 0,
+  ["CursorStickyCentering"] = 1,
+}
+
+-- Not shown in the Reticle CVar editor; saved overrides for these keys are ignored and pruned.
+CM.Constants.ReticleTargetingCVarEditorExcluded = {
+  ["CursorStickyCentering"] = true,
+  ["CursorFreelookCentering"] = true,
+  ["enableMouseoverCast"] = true,
+  ["deselectOnClick"] = true,
+  ["interactKeyWarningTutorial"] = true,
+  -- Owned by the Target Outline / Selection Circle options; an editor row would conflict with
+  -- them.
+  ["Outline"] = true,
+  ["outlineMouseOverFadeDuration"] = true,
+  ["outlineSelectionFadeDuration"] = true,
+  ["ObjectSelectionCircle"] = true,
+  ["UnitNameFocused"] = true,
+}
+
+-- Minimal SoftTarget CVars so the Interaction HUD (softinteract) works when Reticle Targeting
+-- is off; full stack remains CM.ConfigReticleTargeting("combatmode").
+-- Includes the Friend / Interact / GameObject icons off (the HUD replaces them).
+CM.Constants.InteractionHUDSoftTargetCVarValues = {
+  ["interactKeyWarningTutorial"] = 1,
+  ["SoftTargetInteract"] = 3,
+  ["SoftTargetInteractArc"] = 1,
+  ["SoftTargetInteractRange"] = 15,
+  ["SoftTargetIconFriend"] = 0,
+  ["SoftTargetIconInteract"] = 0,
+  ["SoftTargetIconGameObject"] = 0,
+}
+
+-- Blizzard soft-target icons the Interaction HUD replaces. Written (hidden) only while the
+-- Interactable Indicator is on, restored from the prior snapshot when it turns off.
+CM.Constants.InteractionHUDIconCVarNames = {
+  "SoftTargetIconFriend",
+  "SoftTargetIconInteract",
+  "SoftTargetIconGameObject",
+}
+
+-- CVARS FOR MOUSE LOOK CAMERA (shoulder, dynamic pitch pads, motion sickness)
+-- Dynamic pitch is sticky with the option (SetDynamicPitch) — not cleared on unlock
+-- (flying snaps if the master CVar flips mid-air). MS ActionCam gates follow pitch /
+-- autofocus / owned shoulder — not freelook alone (that also snaps skyriding).
+-- No FOV/zoom ownership.
+-- https://warcraft.wiki.gg/wiki/CVar_ActionCam
+CM.Constants.MouseLookCameraPitchBase = 0.4
+CM.Constants.MouseLookCameraPitchFlying = 0.75
+-- Pitch Strength when the player never set one (Base/Flying above only give the flying ratio).
+CM.Constants.MouseLookCameraPitchDefault = 0
+-- Slider range for the ground pad. Flying stays at Flying/Base times the chosen strength.
+CM.Constants.MouseLookCameraPitchStrengthMin = 0
+CM.Constants.MouseLookCameraPitchStrengthMax = 1
+CM.Constants.MouseLookCameraPitchDownScale = 0.25
+CM.Constants.MouseLookCameraPitchSmartPivotCutoff = 39
+-- Shared with Vignette fade so shoulder ease matches edge darkening.
+CM.Constants.MouseLookCameraFadeDuration = 0.35
+
+-- Motion-sickness off while ActionCam features need it (shoulder / pitch / autofocus).
+-- See ApplyActionCamMotionSicknessGate — not toggled by freelook alone.
+CM.Constants.MouseLookCameraLockedValues = {
+  ["CameraKeepCharacterCentered"] = 0,
+  ["CameraReduceUnexpectedMovement"] = 0,
+}
+
+-- Unlock no longer snaps shoulder here — SetShoulderOffset tweens to 0 with the fade duration.
+
+-- CVARS FOR TARGET FOCUS (Autofocus Locked Target)
+CM.Constants.TargetFocusCVarValues = {
+  ["test_cameraTargetFocusEnemyEnable"] = 1,
+  ["test_cameraTargetFocusEnemyStrengthYaw"] = 0.7, -- horizontal strength
+  ["test_cameraTargetFocusEnemyStrengthPitch"] = 0.2, -- vertical strength
+}
+
+-- DEFAULT BLIZZARD VALUES
+-- !! DO NOT CHANGE !!
+CM.Constants.BlizzardReticleTargetingCVarValues = {
+  ["SoftTargetEnemy"] = 1,
+  ["SoftTargetEnemyArc"] = 2,
+  ["SoftTargetEnemyRange"] = 45,
+  ["SoftTargetInteract"] = 1,
+  ["SoftTargetInteractArc"] = 0,
+  ["SoftTargetInteractRange"] = 10,
+  ["SoftTargetIconEnemy"] = 0,
+  ["SoftTargetIconFriend"] = 0,
+  ["SoftTargetIconInteract"] = 0,
+  ["SoftTargetIconGameObject"] = 0,
+  ["CursorStickyCentering"] = 0,
+  ["Outline"] = 2,
+  ["outlineMouseOverFadeDuration"] = 0.9,
+  ["outlineSelectionFadeDuration"] = 0.32,
+  ["ObjectSelectionCircle"] = 1,
+  ["UnitNameFocused"] = 1,
+}
+
+-- The CVars the Target Outline option (global.reticleOutline) owns.
+CM.Constants.ReticleOutlineCVarNames = {
+  "Outline",
+  "outlineMouseOverFadeDuration",
+  "outlineSelectionFadeDuration",
+}
+
+-- The CVars the Selection Circle option (global.selectionCircleMode) owns.
+CM.Constants.ReticleSelectionCircleCVarNames = {
+  "ObjectSelectionCircle",
+  "UnitNameFocused",
+}
+
+-- Full Blizzard reset for Mouse Look camera-related CVars (uninstall fallback).
+-- Only CVars CM still owns: shoulder, dynamic pitch (+ pads), motion sickness.
+CM.Constants.BlizzardMouseLookCameraCVarValues = {
+  ["test_cameraDynamicPitch"] = 0,
+  ["test_cameraDynamicPitchBaseFovPad"] = 0.4,
+  ["test_cameraDynamicPitchBaseFovPadFlying"] = 0.75,
+  ["test_cameraDynamicPitchBaseFovPadDownScale"] = 0.25,
+  ["test_cameraDynamicPitchSmartPivotCutoffDist"] = 10,
+  ["test_cameraOverShoulder"] = 0,
+  ["CameraKeepCharacterCentered"] = 1,
+  ["CameraReduceUnexpectedMovement"] = 1,
+}
+
+CM.Constants.BlizzardTargetFocusCVarValues = {
+  ["test_cameraTargetFocusEnemyEnable"] = 0,
+  ["test_cameraTargetFocusEnemyStrengthYaw"] = 0.4,
+  ["test_cameraTargetFocusEnemyStrengthPitch"] = 0.5,
+}
+
+-- Every CVar Combat Mode may write. Used to snapshot the player's pre-CM values once
+-- so Uninstall can restore them instead of hard-coded Blizzard tables.
+do
+  local seen = {}
+  local names = {}
+  local function addTable(t)
+    if type(t) ~= "table" then
+      return
+    end
+    for name in pairs(t) do
+      if not seen[name] then
+        seen[name] = true
+        names[#names + 1] = name
+      end
+    end
+  end
+  addTable(CM.Constants.ReticleTargetingCVarValues)
+  addTable(CM.Constants.InteractionHUDSoftTargetCVarValues)
+  addTable(CM.Constants.MouseLookCameraLockedValues)
+  addTable(CM.Constants.TargetFocusCVarValues)
+  addTable(CM.Constants.BlizzardReticleTargetingCVarValues)
+  addTable(CM.Constants.BlizzardMouseLookCameraCVarValues)
+  addTable(CM.Constants.BlizzardTargetFocusCVarValues)
+  for _, name in ipairs({
+    "cameraYawMoveSpeed",
+    "cameraPitchMoveSpeed",
+    "CursorCenteredYPos",
+    "test_cameraDynamicPitchBaseFovPad",
+    "test_cameraDynamicPitchBaseFovPadFlying",
+    "test_cameraDynamicPitchBaseFovPadDownScale",
+    "test_cameraDynamicPitchSmartPivotCutoffDist",
+  }) do
+    if not seen[name] then
+      seen[name] = true
+      names[#names + 1] = name
+    end
+  end
+  table.sort(names)
+  CM.Constants.ManagedCVarNames = names
+end

@@ -1,0 +1,4 @@
+
+DisenchantryCharacterDB = {
+["hideDisenchantMaterials"] = false,
+}

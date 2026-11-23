@@ -1,12 +1,28 @@
 local _, S = ...
 S.Message = { MAX = 255 }
 
--- Advert for the profession itself: only {link} is required.
-function S.Message.buildSkill(template, link)
+local CRAFTER = {
+    Enchanting = "ENCHANTER", Leatherworking = "LEATHERWORKER", Tailoring = "TAILOR", Blacksmithing = "BLACKSMITH",
+    Alchemy = "ALCHEMIST", Engineering = "ENGINEER", Cooking = "COOK", Jewelcrafting = "JEWELCRAFTER",
+    Inscription = "SCRIBE", ["First Aid"] = "FIRST AID",
+}
+
+-- The advert word for someone with this profession ("Leatherworking" -> "LEATHERWORKER").
+function S.Message.crafter(profession)
+    if type(profession) ~= "string" or profession == "" then return "CRAFTER" end
+    return CRAFTER[profession] or profession:upper()
+end
+
+-- Advert for the profession itself: only {link} is required; {crafter} names the profession's crafter.
+function S.Message.buildSkill(template, link, profession)
     if not template:find("{link}", 1, true) then return nil, "template needs {link}" end
-    if link == nil or link == "" then return nil, "skill link missing (open your Enchanting window once)" end
+    if link == nil or link == "" then return nil, "skill link missing (open your profession window once)" end
     local escaped = template:gsub("|", "||")
-    local text = escaped:gsub("{link}", function() return link end)
+    local word = S.Message.crafter(profession)
+    local text = escaped:gsub("{(%a+)}", function(k)
+        if k == "link" then return link end
+        if k == "crafter" then return word end
+    end)
     if #text > S.Message.MAX then return nil, "message longer than 255 characters" end
     return text
 end

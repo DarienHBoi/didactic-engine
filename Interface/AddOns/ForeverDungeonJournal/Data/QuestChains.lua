@@ -102,8 +102,10 @@ FDJ.QUEST_PREREQ_CHAINS = {
         { id = 2947, name = "Return of the Ring" },
     },
     [2950] = {
-        { id = 2945, name = "Grime-Encrusted Ring" },
-        { id = 2949, name = "Return of the Ring" },
+        -- gnomerhorde (2.0.9): for the route: the ring drops inside, and it
+        -- is cleaned at the Sparklematic inside, so both come after the run
+        { id = 2945, name = "Grime-Encrusted Ring", startsInDungeon = true },
+        { id = 2949, name = "Return of the Ring", needsDungeon = true },
     },
 
     -- Gnomeregan. Optional breadcrumb quests are intentionally excluded.
@@ -114,10 +116,9 @@ FDJ.QUEST_PREREQ_CHAINS = {
     [2962] = {
         { id = 2926, name = "Gnogaine" },
     },
-    -- Rig Wars only needs to be accepted/in progress to make Chief Engineer
-    -- Scooty available; it does not need to be completed first.
+    -- rigwarsfix (2.0.9, M 16 Nov 2026): fixed in Forever, Rig Wars no longer
+    -- has to be in the log for Chief Engineer Scooty; it is its own quest only.
     [2843] = {
-        { id = 2841, name = "Rig Wars" },
         { id = 2842, name = "Chief Engineer Scooty" },
     },
 
@@ -138,6 +139,8 @@ FDJ.QUEST_PREREQ_CHAINS = {
     -- Gnomeregan: Data Rescue needs the Prismatic Punch Card, built up card
     -- by card through four Matrix Punchograph terminals. These are item
     -- steps (placeholder IDs), shown so players know the whole route.
+    -- NOT a prerequisite: Data Rescue is picked up straight away. These
+    -- are shown as a How to complete guide (QUEST_GUIDE_CHAINS below).
     [2930] = {
         { id = 2930001, name = "White Punch Card", itemStep = true },
         { id = 2930002, name = "Yellow Punch Card (Punchograph 3005-A)", itemStep = true },
@@ -151,10 +154,11 @@ FDJ.QUEST_PREREQ_CHAINS = {
     },
 
     -- Excavation Site: Wetlands (Alliance): Horrors in the Highland only
-    -- becomes available after completing Rethiel the Greenwarden's full
-    -- Wetlands chain, beginning with First Mate Fitzsimmons in Menethil Harbor.
+    -- becomes available after completing Rethiel the Greenwarden's Wetlands
+    -- chain. 2.0.38: The Greenwarden (463, First Mate Fitzsimmons in Menethil
+    -- Harbor) is only a breadcrumb to Rethiel and no longer a required step:
+    -- the chain starts with Tramping Paws at Rethiel himself.
     [95646] = {
-        { id = 463, name = "The Greenwarden" },
         { id = 276, name = "Tramping Paws" },
         { id = 277, name = "Fire Taboo" },
         { id = 275, name = "Blisters on The Land" },
@@ -181,6 +185,19 @@ FDJ.QUEST_PREREQ_CHAINS = {
 
     -- Dungeons added in 1.6.5.
 
+    -- brotherinneed (2.0.8): Scarlet Monastery: Cathedral, Alliance Paladins.
+    [79946] = {
+        { id = 78088, name = "A Strange Artifact" },
+        { id = 78089, name = "Advice From Stormwind" },
+        { id = 78090, name = "A Second Opinion" },
+        { id = 78091, name = "Earning Your Salt" },
+        { id = 78092, name = "It Must Be Destroyed" },
+        { id = 78093, name = "Return to Delgren" },
+        { id = 96438, name = "Battle at the Mannoroc Coven" },
+        { id = 79939, name = "The Broken Hammer" },
+        { id = 79940, name = "A Lost Brother" },
+        { id = 79945, name = "Orders from the Grand Crusader" },
+    },
     [1053] = {
         { id = 261, name = "Down the Scarlet Path" },
         { id = 1052, name = "Down the Scarlet Path" },
@@ -329,6 +346,13 @@ FDJ.QUEST_PREREQ_CHAINS = {
     },
     [7046] = {
         { id = 7044, name = "Legends of Maraudon" },
+    },
+    -- Forever Maraudon: Word of the Woods (93594) is the direct prerequisite
+    -- for Rot and Regret (93404), as listed in the Forever quest series.
+    -- Hub-unlock prerequisites are not yet independently verified; use the
+    -- temporary map placeholder on the Word of the Woods chain step.
+    [93404] = {
+        { id = 93594, name = "Word of the Woods", level = 43, requires = 35 },
     },
     [4263] = {
         { id = 4262, name = "Overmaster Pyron" },
@@ -573,6 +597,61 @@ FDJ.QUEST_PREREQ_CHAINS = {
 }
 
 FDJ.QUEST_PREREQ_DETAILS = {
+    -- Maraudon (Forever): temporary, offline-safe first-step page while
+    -- the Shen'dralas quest-hub unlock requirements are being researched.
+    [93594] = {
+        level = 43,
+        requires = 35,
+        -- Temporary instruction page until the complete hub-unlock chain is verified.
+        hubPlaceholder = true,
+        objective = "Need to unlock |cffffd36bShen'dralas|r quest hub.\nUpdating soon with full details",
+        -- Evenshade's Overlook: documented location of Mordent Evenshade.
+        -- This marks a known Shen'dralas questing landmark, not a verified
+        -- exact pickup NPC for Word of the Woods.
+        hubMap = {
+            mapID = 2652, x = 0.350, y = 0.466,
+            label = "Shen'dralas quest hub - Evenshade's Overlook",
+            detail = "Evenshade's Overlook, Shen'dralas (35.0, 46.6); temporary hub marker",
+        },
+    },
+
+    -- brotherinneed (2.0.8): M's audit, 15 Nov 2026. Places as players give them.
+    [78088] = { objective = "Loot the Strange Orb on top of the Tower of Althalaxx in Darkshore and bring it to Delgren the Purifier in Ashenvale.",
+        pickup = "Strange Orb, top of the Tower of Althalaxx, Darkshore", turnin = "Delgren the Purifier, Maestra's Post, Ashenvale",
+        startObject = {"Strange Orb", "Interface\\Icons\\INV_Misc_Orb_05", "On top of the Tower of Althalaxx, Darkshore (about 56.2, 26.4)"},
+        map = { mapID = 1439, x = 0.562, y = 0.264, label = "Strange Orb — Tower of Althalaxx, Darkshore", detail = "On top of the tower" },
+        turninMap = { mapID = 1440, x = 0.262, y = 0.387, label = "Delgren the Purifier — Ashenvale", targetName = "Delgren the Purifier" } },
+    [78089] = { objective = "Speak with Katherine the Pure in the Cathedral of Light in Stormwind.",
+        pickup = "Delgren the Purifier, Ashenvale", turnin = "Katherine the Pure, Cathedral of Light, Stormwind",
+        map = { mapID = 1440, x = 0.262, y = 0.387, label = "Delgren the Purifier — Ashenvale", targetName = "Delgren the Purifier" },
+        turninMap = { mapID = 1453, x = 0.485, y = 0.491, label = "Katherine the Pure — Cathedral of Light, Stormwind", targetName = "Katherine the Pure" } },
+    [78090] = { objective = "Speak with Ursula Deline in the Mage Quarter of Stormwind.",
+        pickup = "Katherine the Pure, Cathedral of Light, Stormwind", turnin = "Ursula Deline, Mage Quarter, Stormwind",
+        map = { mapID = 1453, x = 0.485, y = 0.491, label = "Katherine the Pure — Cathedral of Light, Stormwind", targetName = "Katherine the Pure" } },
+    [78091] = { objective = "Collect 14 Summoner's Salt from the Blackrock orcs in Redridge Mountains and return to Ursula Deline.",
+        pickup = "Ursula Deline, Mage Quarter, Stormwind", turnin = "Ursula Deline, Mage Quarter, Stormwind" },
+    [78092] = { objective = "Collect 12 Motes of Mannoroth from the demons in Demon Fall Canyon, Ashenvale, then use the Spear of Mannoroth there to destroy the orb.",
+        pickup = "Ursula Deline, Mage Quarter, Stormwind", turnin = "Spear of Mannoroth, Demon Fall Canyon, Ashenvale",
+        objectiveMap = { mapID = 1440, x = 0.890, y = 0.770, label = "Spear of Mannoroth — Demon Fall Canyon, Ashenvale" } },
+    [78093] = { objective = "Bring the Orb Fragments to Delgren the Purifier in Ashenvale. Reward: Cloak of the Divine Storm.",
+        pickup = "Shattered Orb, Demon Fall Canyon, Ashenvale", turnin = "Delgren the Purifier, Ashenvale",
+        map = { mapID = 1440, x = 0.890, y = 0.770, label = "Shattered Orb — Demon Fall Canyon, Ashenvale" },
+        turninMap = { mapID = 1440, x = 0.262, y = 0.387, label = "Delgren the Purifier — Ashenvale", targetName = "Delgren the Purifier" } },
+    [96438] = { requires = 35, objective = "Investigate the Broken Warhammer at the Mannoroc Coven in Desolace.",
+        pickup = "Katherine the Pure, Cathedral of Light, Stormwind", turnin = "Broken Warhammer, Mannoroc Coven, Desolace",
+        map = { mapID = 1453, x = 0.485, y = 0.491, label = "Katherine the Pure — Cathedral of Light, Stormwind", targetName = "Katherine the Pure" },
+        turninMap = { mapID = 1443, x = 0.527, y = 0.848, label = "Broken Warhammer — Mannoroc Coven, Desolace" } },
+    [79939] = { requires = 35, objective = "Find the Torn Letter (a player reports it from a Burning Blade Summoner) and return to Katherine the Pure.",
+        pickup = "Broken Warhammer, Mannoroc Coven, Desolace", turnin = "Katherine the Pure, Cathedral of Light, Stormwind",
+        map = { mapID = 1443, x = 0.527, y = 0.848, label = "Broken Warhammer — Mannoroc Coven, Desolace" },
+        turninMap = { mapID = 1453, x = 0.485, y = 0.491, label = "Katherine the Pure — Cathedral of Light, Stormwind", targetName = "Katherine the Pure" } },
+    [79940] = { requires = 35, objective = "Listen to Katherine the Pure about the hammer and Aeonas.",
+        pickup = "Katherine the Pure, Cathedral of Light, Stormwind", turnin = "Katherine the Pure, Cathedral of Light, Stormwind",
+        map = { mapID = 1453, x = 0.485, y = 0.491, label = "Katherine the Pure — Cathedral of Light, Stormwind", targetName = "Katherine the Pure" } },
+    [79945] = { requires = 35, objective = "Players report: speak to the fishing trainer by the docks of Menethil Harbor, take the small boat south of the docks to Aeonas's hut on the coast, inspect the fallen Scarlet Crusader, defeat the level 40 elite assassin and loot the orders. Use them and return to Katherine the Pure.",
+        pickup = "Orders, looted from the assassin at Aeonas's hut, Wetlands coast", turnin = "Katherine the Pure, Cathedral of Light, Stormwind",
+        turninMap = { mapID = 1453, x = 0.485, y = 0.491, label = "Katherine the Pure — Cathedral of Light, Stormwind", targetName = "Katherine the Pure" } },
+
     -- Pre-quests for the dungeons added in 1.6.5.
 
     [261] = {
@@ -581,6 +660,8 @@ FDJ.QUEST_PREREQ_DETAILS = {
         pickup = "Brother Anton, Desolace",
         turnin = "Brother Anton, Desolace",
         map = { mapID = 1443, x = 0.664, y = 0.078, label = "Brother Anton — Desolace", targetName = "Brother Anton" },
+        -- stepgoal (2.0.8): where it is done, until it is done
+        objectiveMap = { mapID = 1443, x = 0.640, y = 0.820, label = "Undead Ravagers — Valley of Bones, Desolace", detail = "Through the arch with the red banners, south of the centaur village with the ponds" },
     },
     [1052] = {
         level = 40, requires = 34,
@@ -817,14 +898,14 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Brohann Caskbelly in Stormwind wants you to search for the Temple of Atal'Hakkar.",
         pickup = "Brohann Caskbelly, Stormwind",
         turnin = "Brohann Caskbelly, Stormwind",
-        map = { mapID = 1453, x = 0.668, y = 0.434, label = "Brohann Caskbelly — Stormwind", targetName = "Brohann Caskbelly" },
+        map = { mapID = 1453, x = 0.695, y = 0.404, label = "Brohann Caskbelly — Stormwind", targetName = "Brohann Caskbelly" },
     },
     [1449] = {
         level = 43, requires = 38,
         objective = "Speak with High Thane Falstad Wildhammer at Aerie Peak in the Hinterlands.",
         pickup = "Brohann Caskbelly, Stormwind",
         turnin = "Falstad Wildhammer, The Hinterlands",
-        map = { mapID = 1453, x = 0.668, y = 0.434, label = "Brohann Caskbelly — Stormwind", targetName = "Brohann Caskbelly" },
+        map = { mapID = 1453, x = 0.695, y = 0.404, label = "Brohann Caskbelly — Stormwind", targetName = "Brohann Caskbelly" },
     },
     [1450] = {
         level = 43, requires = 38,
@@ -1136,14 +1217,14 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Speak with Highlord Bolvar Fordragon after speaking with Lady Katrana Prestor.",
         pickup = "Highlord Bolvar Fordragon, Stormwind",
         turnin = "Highlord Bolvar Fordragon, Stormwind",
-        map = { mapID = 1453, x = 0.774, y = 0.188, label = "Highlord Bolvar Fordragon — Stormwind", targetName = "Highlord Bolvar Fordragon" },
+        map = { mapID = 1453, x = 0.802, y = 0.383, label = "Highlord Bolvar Fordragon — Stormwind", targetName = "Highlord Bolvar Fordragon" },
     },
     [4186] = {
         level = 54, requires = 48,
         objective = "Take Bolvar's Decree to Magistrate Solomon in Lakeshire.",
         pickup = "Highlord Bolvar Fordragon, Stormwind",
         turnin = "Magistrate Solomon, Redridge Mountains",
-        map = { mapID = 1453, x = 0.774, y = 0.188, label = "Highlord Bolvar Fordragon — Stormwind", targetName = "Highlord Bolvar Fordragon" },
+        map = { mapID = 1453, x = 0.802, y = 0.383, label = "Highlord Bolvar Fordragon — Stormwind", targetName = "Highlord Bolvar Fordragon" },
     },
     [4223] = {
         level = 54, requires = 48,
@@ -1361,7 +1442,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Speak with Eitrigg in Orgrimmar. When you have discussed matters with Eitrigg, seek council from Thrall. You recall having seen Eitrigg in Thrall's chamber.",
         pickup = "Warlord Goretooth, Badlands",
         turnin = "Thrall, Orgrimmar",
-        map = { mapID = 1418, x = 0.030, y = 0.476, label = "Warlord Goretooth — Badlands", targetName = "Warlord Goretooth" },
+        map = { mapID = 1418, x = 0.058, y = 0.474, label = "Warlord Goretooth — Badlands", targetName = "Warlord Goretooth" },
     },
     [4974] = {
         level = 60, requires = 55,
@@ -1417,7 +1498,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "You must search the world for a being capable of restoring the power to the Fragment of the Dragon's Eye. The only information you possess about such a being is that they exist.",
         pickup = "Highlord Bolvar Fordragon, Stormwind",
         turnin = "Haleh, Winterspring",
-        map = { mapID = 1453, x = 0.774, y = 0.188, label = "Highlord Bolvar Fordragon — Stormwind", targetName = "Highlord Bolvar Fordragon" },
+        map = { mapID = 1453, x = 0.802, y = 0.383, label = "Highlord Bolvar Fordragon — Stormwind", targetName = "Highlord Bolvar Fordragon" },
     },
     [6569] = {
         level = 60, requires = 55,
@@ -1508,42 +1589,42 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Travel to Ironforge and get High Priest Rohan's Exorcism Censer. You will need to make a donation of 150 gold in order to secure it.",
         pickup = "Lord Grayson Shadowbreaker, Stormwind",
         turnin = "High Priest Rohan, Ironforge",
-        map = { mapID = 1453, x = 0.494, y = 0.476, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
+        map = { mapID = 1453, x = 0.484, y = 0.502, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
     },
     [7639] = {
         level = 60, requires = 60,
         objective = "Return the Exorcism Censer to Lord Grayson Shadowbreaker in the Cathedral District of Stormwind.",
         pickup = "High Priest Rohan, Ironforge",
         turnin = "Lord Grayson Shadowbreaker, Stormwind",
-        map = { mapID = 1455, x = 0.234, y = 0.064, label = "High Priest Rohan — Ironforge", targetName = "High Priest Rohan" },
+        map = { mapID = 1455, x = 0.247, y = 0.082, label = "High Priest Rohan — Ironforge", targetName = "High Priest Rohan" },
     },
     [7640] = {
         level = 60, requires = 60,
         objective = "Use the Exorcism Censer to drive out the spirits that torment Terrordale. When you have slain 25 Terrordale Spirits, return to Lord Grayson Shadowbreaker in the Cathedral District of Stormwind.",
         pickup = "Lord Grayson Shadowbreaker, Stormwind",
         turnin = "Lord Grayson Shadowbreaker, Stormwind",
-        map = { mapID = 1453, x = 0.494, y = 0.476, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
+        map = { mapID = 1453, x = 0.484, y = 0.502, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
     },
     [7641] = {
         level = 60, requires = 60,
         objective = "Speak with Grimand Elmore in Stormwind's Dwarven District.",
         pickup = "Lord Grayson Shadowbreaker, Stormwind",
         turnin = "Grimand Elmore, Stormwind",
-        map = { mapID = 1453, x = 0.494, y = 0.476, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
+        map = { mapID = 1453, x = 0.484, y = 0.502, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
     },
     [7642] = {
         level = 60, requires = 60,
         objective = "Bring 40 Runecloth, 6 Arcanite Bars, 10 Arthas' Tears, 5 Stratholme Holy Water vials, and 150 gold to Grimand Elmore in the Dwarven District of Stormwind.",
         pickup = "Grimand Elmore, Stormwind",
         turnin = "Grimand Elmore, Stormwind",
-        map = { mapID = 1453, x = 0.516, y = 0.122, label = "Grimand Elmore — Stormwind", targetName = "Grimand Elmore" },
+        map = { mapID = 1453, x = 0.597, y = 0.338, label = "Grimand Elmore — Stormwind", targetName = "Grimand Elmore" },
     },
     [7648] = {
         level = 60, requires = 60,
         objective = "Take the Arcanite Barding to Lord Grayson Shadowbreaker in Stormwind's Cathedral District for his inspection.",
         pickup = "Grimand Elmore, Stormwind",
         turnin = "Lord Grayson Shadowbreaker, Stormwind",
-        map = { mapID = 1453, x = 0.516, y = 0.122, label = "Grimand Elmore — Stormwind", targetName = "Grimand Elmore" },
+        map = { mapID = 1453, x = 0.597, y = 0.338, label = "Grimand Elmore — Stormwind", targetName = "Grimand Elmore" },
     },
     [7645] = {
         level = 60, requires = 60,
@@ -1700,7 +1781,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Acquire special horse feed used for feeding a spirit horse. Merideth Carlson in Southshore apparently is the source for such food. Travel to the Dire Maul dungeon in Feralas and slay Tendris Warpwood. Doing so will free the Ancient Equine Spirit. Feed it the special horse feed, thereby soothing the spirit. Finally, give it the Arcanite Barding so it may bless it.",
         pickup = "Lord Grayson Shadowbreaker, Cathedral of Light, Stormwind",
         turnin = "Ancient Equine Spirit, Dire Maul",
-        map = { mapID = 1453, x = 0.494, y = 0.476, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
+        map = { mapID = 1453, x = 0.484, y = 0.502, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
     },
     [7644] = {
         startsInDungeon = true,
@@ -1714,7 +1795,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Bring an Azerothian Diamond and a Pristine Black Diamond to Lord Grayson Shadowbreaker in the Cathedral District of Stormwind.",
         pickup = "Lord Grayson Shadowbreaker, Stormwind",
         turnin = "Lord Grayson Shadowbreaker, Stormwind",
-        map = { mapID = 1453, x = 0.494, y = 0.476, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
+        map = { mapID = 1453, x = 0.484, y = 0.502, label = "Lord Grayson Shadowbreaker — Stormwind", targetName = "Lord Grayson Shadowbreaker" },
     },
     [7667] = {
         level = 60, requires = 58,
@@ -1839,7 +1920,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Find Rethiel the Greenwarden in the Wetlands.",
         pickup = "First Mate Fitzsimmons, Menethil Harbor, Wetlands",
         turnin = "Rethiel the Greenwarden, The Green Belt, Wetlands",
-        description = "First required step before Horrors in the Highland.",
+        description = "Optional breadcrumb to Rethiel; not required for Horrors in the Highland.",
         map = { mapID = 1437, x = 0.108, y = 0.596, label = "First Mate Fitzsimmons — Menethil Harbor", detail = "Start The Greenwarden here" },
     },
     [276] = {
@@ -1847,7 +1928,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Kill 15 Mosshide Gnolls and 10 Mosshide Mongrels, then return to Rethiel the Greenwarden.",
         pickup = "Rethiel the Greenwarden, The Green Belt, Wetlands",
         turnin = "Rethiel the Greenwarden, The Green Belt, Wetlands",
-        description = "Second required step before Horrors in the Highland.",
+        description = "First required step before Horrors in the Highland.",
         map = { mapID = 1437, x = 0.562, y = 0.406, label = "Rethiel the Greenwarden — Wetlands", detail = "Continue with Tramping Paws here" },
     },
     [277] = {
@@ -1855,7 +1936,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         objective = "Bring Rethiel the Greenwarden 9 Crude Flints.",
         pickup = "Rethiel the Greenwarden, The Green Belt, Wetlands",
         turnin = "Rethiel the Greenwarden, The Green Belt, Wetlands",
-        description = "Third required step before Horrors in the Highland.",
+        description = "Second required step before Horrors in the Highland.",
         map = { mapID = 1437, x = 0.562, y = 0.406, label = "Rethiel the Greenwarden — Wetlands", detail = "Continue with Fire Taboo here" },
     },
     [275] = {
@@ -1877,7 +1958,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
         map = { mapID = 1437, x = 0.080, y = 0.550, label = "James Halloran — Menethil Harbor", detail = "Start Young Crocolisk Skins here" },
     },
 
-    [95663] = { level = 31, requires = 24, objective = "Travel to the Wetlands and meet the Deathstalker Agent in the hills above the Dragonmaw camp.", pickup = "Zaruk, Hammerfall, Arathi Highlands", turnin = "Deathstalker Agent, hills above the Dragonmaw camp, Wetlands", description = "Required before Open the Maw.", map = { mapID = 1417, x = 0.740, y = 0.360, label = "Zaruk — Hammerfall", detail = "Start Dragonmaw Rumors here" } },
+    [95663] = { level = 31, requires = 24, objective = "Travel to the Wetlands and meet the Deathstalker Agent in the hills above the Dragonmaw camp.", pickup = "Zaruk, Hammerfall, Arathi Highlands", turnin = "Deathstalker Agent, hills above the Dragonmaw camp, Wetlands", description = "Required before Open the Maw.", map = { mapID = 1417, x = 0.7454, y = 0.3563, label = "Zaruk — Hammerfall", detail = "Start Dragonmaw Rumors here" } },
     [95647] = { level = 31, requires = 24, objective = "Find Ardin Grassman in the Excavation Sites. Learn what happened to Ardin Grassman.", pickup = "Caitlin Grassman, Menethil Harbor, Wetlands", turnin = "Ardin Grassman, inside Excavation Site: Wetlands", description = "Required before Heartwoven.", map = { mapID = 1437, x = 0.119, y = 0.588, label = "Caitlin Grassman — Menethil Harbor", detail = "Start Lost in the Thicket Things here" } },
 
 
@@ -1908,12 +1989,19 @@ FDJ.QUEST_PREREQ_DETAILS = {
     },
 
     -- Gnomeregan prerequisite steps.
-    [2926] = { level = 27, requires = 20, objective = "Use the Empty Leaden Collection Phial on a living Irradiated Invader or Irradiated Pillager, then return the full phial to Ozzie Togglevolt.", pickup = "Ozzie Togglevolt, Kharanos, Dun Morogh", turnin = "Ozzie Togglevolt, Kharanos, Dun Morogh", description = "Required before The Only Cure is More Green Glow.", map = { mapID = 1426, x = 0.450, y = 0.490, label = "Ozzie Togglevolt — Kharanos", detail = "Start Gnogaine here" } },
-    [2841] = { level = 35, requires = 25, objective = "Accept Rig Wars from Nogg. You do not need to complete it before continuing to Chief Engineer Scooty.", pickup = "Nogg, Valley of Honor, Orgrimmar", turnin = "Nogg, Orgrimmar", description = "Rig Wars must be in progress to unlock the transporter chain in Forever.", note = "Accept Rig Wars first; completion is not required for Chief Engineer Scooty.", warning = "Accept Rig Wars before Chief Engineer Scooty. If Rig Wars disappears, abandon Chief Engineer Scooty and it will reappear.", map = { mapID = 1454, x = 0.760, y = 0.250, label = "Nogg — Valley of Honor, Orgrimmar", detail = "Accept Rig Wars here" } },
+    [2926] = { level = 27, requires = 20, objective = "Use the Empty Leaden Collection Phial on a living Irradiated Invader or Irradiated Pillager, then return the full phial to Ozzie Togglevolt.", pickup = "Ozzie Togglevolt, Kharanos, Dun Morogh", turnin = "Ozzie Togglevolt, Kharanos, Dun Morogh", description = "Required before The Only Cure is More Green Glow.", map = { mapID = 1426, x = 0.450, y = 0.490, label = "Ozzie Togglevolt — Kharanos", detail = "Start Gnogaine here" }, requiredItems = { {9284, "Full Leaden Collection Phial", 1, "Use the Vial on an Irradiated Invader just outside the instance", map = { mapID = 1426, x = 0.243, y = 0.398, label = "Irradiated Invaders — outside Gnomeregan", detail = "Use the Vial on an Irradiated Invader just outside the instance" }} } },
+    [2841] = { level = 35, requires = 25, objective = "Retrieve the Rig Blueprints and Thermaplugg's Safe Combination and bring them to Nogg in Orgrimmar.", pickup = "Nogg, Valley of Honor, Orgrimmar", turnin = "Nogg, Orgrimmar", map = { mapID = 1454, x = 0.760, y = 0.250, label = "Nogg — Valley of Honor, Orgrimmar", detail = "Accept Rig Wars here" } },
     [2842] = { level = 35, requires = 20, objective = "Speak with Scooty in Booty Bay.", pickup = "Sovik, Valley of Honor, Orgrimmar", turnin = "Scooty, Booty Bay, Stranglethorn Vale", description = "Required before Gnomer-gooooone!", map = { mapID = 1454, x = 0.756, y = 0.252, label = "Sovik — Valley of Honor, Orgrimmar", detail = "Start Chief Engineer Scooty here" } },
 
     -- Razorfen Kraul / Scarlet Monastery prerequisite steps.
-    [1100] = { level = 27, requires = 23, objective = "Read Henrig Lonebrow's Journal and take it to Falfindel Waywarder in Thalanaar.", pickup = "Henrig Lonebrow's Journal beside his corpse at the bottom of the Great Lift", turnin = "Falfindel Waywarder, Thalanaar, Feralas", description = "Required before The Crone of the Kraul.", map = { mapID = 1441, x = 0.300, y = 0.240, label = "Henrig Lonebrow — bottom of the Great Lift", detail = "Loot Lonebrow's Journal here" } },
+    [1100] = { level = 27, requires = 23, objective = "Read Henrig Lonebrow's Journal and take it to Falfindel Waywarder in Thalanaar.", pickup = "Henrig Lonebrow's Journal beside his corpse at the bottom of the Great Lift", turnin = "Falfindel Waywarder, Thalanaar, Feralas", description = "Required before The Crone of the Kraul.", map = { mapID = 1441, x = 0.307, y = 0.244, label = "Henrig Lonebrow — bottom of the Great Lift", detail = "Loot Lonebrow's Journal here",
+        -- spawns (2.0.36): the journal has two spots (Wowhead Forever comments,
+        -- Nov 2026): by his body at the lift's foot, and by a second body about
+        -- 110 yards down the road (31.3, 28.1). The arrow tries the nearest first.
+        spawns = { { x = 0.307, y = 0.244 }, { x = 0.313, y = 0.281 } } },
+        -- The book gives Henrig Lonebrow's Journal (item 5791), which starts the
+        -- quest: in the bags, the route goes on (and says to use it).
+        lootItem = { 5791, "Henrig Lonebrow's Journal" } },
     [1109] = { level = 33, requires = 30, objective = "Bring 1 pile of Kraul Guano to Master Apothecary Faranell in the Undercity.", pickup = "Master Apothecary Faranell, Apothecarium, Undercity", turnin = "Master Apothecary Faranell, Apothecarium, Undercity", description = "Required before Hearts of Zeal.", map = { mapID = 1458, x = 0.480, y = 0.690, label = "Master Apothecary Faranell — Apothecarium", detail = "Start Going, Going, Guano! here" } },
     [96391] = { level = 15, requires = 9, objective = "Deliver the Dark Iron Map to Earthseer Farsen in Dun Morogh.", pickup = "Dark Iron Map, dropped by Dark Iron Spies at Ironband's Compound, Dun Morogh", turnin = "Earthseer Farsen, Dun Morogh", description = "The Dark Iron Map starts this quest and leads directly into Old Ironforge Incursion.", map = { mapID = 1426, x = 0.770, y = 0.600, label = "Dark Iron Spies — Ironband's Compound", detail = "Farm Dark Iron Spies here for the Dark Iron Map" } },
 
@@ -1956,7 +2044,7 @@ FDJ.QUEST_PREREQ_DETAILS = {
     [5727] = { level = 12, requires = 9, objective = "Speak with Neeru Fireblade in the Cleft of Shadow, then return to Thrall.", pickup = "Thrall, Valley of Wisdom, Orgrimmar", turnin = "Thrall, Valley of Wisdom, Orgrimmar", description = "Neeru is in the Cleft of Shadow near the Ragefire Chasm entrance." },
 
     [3765] = { level = 24, requires = 18, objective = "Travel to Gershala Nightwhisper in Auberdine, Darkshore.", pickup = "Argos Nightwhisper, The Park, Stormwind", turnin = "Gershala Nightwhisper, Auberdine, Darkshore", description = "Optional Alliance breadcrumb leading to Researching the Corruption.", map = { mapID = 1453, x = 0.363, y = 0.674, label = "Argos Nightwhisper — The Park", detail = "Argos Nightwhisper is in The Park, beside the moonwell area." } },
-    [1198] = { level = 24, requires = 18, objective = "Seek out Argent Guard Thaelrid inside Blackfathom Deeps.", pickup = "Dawnwatcher Shaedlass, Darnassus", turnin = "Argent Guard Thaelrid, inside Blackfathom Deeps", description = "Required before the Alliance version of Blackfathom Villainy.", map = { mapID = 1457, x = 0.550, y = 0.240, label = "Dawnwatcher Shaedlass — Darnassus", detail = "Start In Search of Thaelrid here" } },
+    [1198] = { level = 24, requires = 18, objective = "Seek out Argent Guard Thaelrid inside Blackfathom Deeps.", pickup = "Dawnwatcher Shaedlass, Darnassus", turnin = "Argent Guard Thaelrid, inside Blackfathom Deeps", description = "Optional lead-in to the Alliance version of Blackfathom Villainy: hand it in before accepting Blackfathom Villainy, or it can no longer be completed.", map = { mapID = 1457, x = 0.550, y = 0.240, label = "Dawnwatcher Shaedlass — Darnassus", detail = "Start In Search of Thaelrid here" } },
     [6564] = { level = 22, requires = 17, objective = "Bring the Damp Note to Je'neu Sancrea in Ashenvale.", pickup = "Damp Note", startItem = {16790, "Damp Note", 1, "Drops from Blackfathom Tide Priestess in the entrance tunnels leading to Blackfathom Deeps."}, turnin = "Je'neu Sancrea, Zoram'gar Outpost, Ashenvale" },
     -- Data Rescue punch card steps (item steps, not quests).
     [2930001] = { level = 30, requires = 25, objective = "Kill mobs in the outer Gnomeregan area until a White Punch Card drops.", pickup = "Caverndeep Pillagers, Caverndeep Invaders, Irradiated Invaders and Addled Lepers, outside the instance", turnin = "Keep the card for Matrix Punchograph 3005-A", description = "Random drop; you usually get it during your first clear of the outer area.", startItem = {9279, "White Punch Card", 1, "Random drop from mobs outside the Gnomeregan instance"}, map = { mapID = 1426, x = 0.243, y = 0.393, label = "Gnomeregan — outer area", detail = "White Punch Cards drop from the mobs here" } },
@@ -1966,6 +2054,13 @@ FDJ.QUEST_PREREQ_DETAILS = {
     [2930005] = { level = 30, requires = 25, objective = "Use Matrix Punchograph 3005-D with the Red Punch Card to get the Prismatic Punch Card, then bring it to Master Mechanic Castpipe in Ironforge.", pickup = "Matrix Punchograph 3005-D, west side of the lower level of the Engineering Labs", turnin = "Master Mechanic Castpipe, Tinker Town, Ironforge", description = "Take the elevator down; the terminal is in the first passage on the right.", startItem = {9316, "Prismatic Punch Card", 1, "From Matrix Punchograph 3005-D"} },
 
 }
+
+-- questguide: chains that are HOW to complete the quest, not quests needed
+-- before it. The journal shows them behind a red Guide button (quest list)
+-- and a How to complete button (quest page) instead of the chain icon and
+-- "Requires a quest chain first.".
+FDJ.QUEST_GUIDE_CHAINS = FDJ.QUEST_GUIDE_CHAINS or {}
+FDJ.QUEST_GUIDE_CHAINS[2930] = true -- Data Rescue: the punch cards
 
 -- Pre-quests that also start a dungeon quest elsewhere in the journal reuse
 -- that quest's giver location for their Show on Map button.
@@ -1985,7 +2080,8 @@ for _, dungeon in pairs(FDJ.DB or {}) do
             local chain = quest.id and FDJ.QUEST_PREREQ_CHAINS[quest.id]
             if chain then
                 for _, step in ipairs(chain) do
-                    if step.id and step.id ~= quest.id then steps[step.id] = true end
+                    -- standalone: a step also listed on its own (Rig Wars)
+                    if step.id and step.id ~= quest.id and not step.standalone then steps[step.id] = true end
                 end
             end
         end

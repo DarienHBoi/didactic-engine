@@ -1,0 +1,22 @@
+
+AscendXPSettings = {
+["barY"] = 428.872314453125,
+["showTracker"] = true,
+["scale"] = 0.75,
+["uiMode"] = "bar",
+["showGold"] = true,
+["locked"] = false,
+["rateWindow"] = 5,
+["minimapAngle"] = -13.60339364358251,
+["questOverlay"] = true,
+["compact"] = false,
+["barX"] = -71.96368408203125,
+["hideBlizzardBar"] = true,
+["barScale"] = 1.1,
+["y"] = 150,
+["x"] = 0,
+["barAnchor"] = "CENTER",
+["nativeBarFix123"] = true,
+["showMinimap"] = true,
+["restedOverlay"] = true,
+}

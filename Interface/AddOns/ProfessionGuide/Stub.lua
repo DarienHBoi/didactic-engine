@@ -1,0 +1,2 @@
+-- Profession Guide is now part of ZugDAQ. This stub exists only so the game loads ProfessionGuideDB and
+-- ProfessionGuideCharDB before ZugDAQ, which takes them over. Delete the folder once each character has logged in.

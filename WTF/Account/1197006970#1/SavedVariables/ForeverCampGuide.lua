@@ -1,0 +1,5 @@
+
+ForeverCampGuideDB = {
+["coords"] = {
+},
+}

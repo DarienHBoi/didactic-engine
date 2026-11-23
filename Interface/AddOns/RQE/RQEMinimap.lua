@@ -1,0 +1,690 @@
+--[[ 
+
+RQEMinimap.lua
+LibDataBroker launcher, minimap button, frame toggles, and dropdown menus
+
+]]
+
+
+--------------------------------------------------
+-- #1. 🌐 Namespace & Minimap State
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #1a. Addon Namespace & Hover Timers
+	-------------------------------------------------------
+
+	RQE = RQE or {}  -- Initialize the RQE table if it's not already initialized
+	RQE.Frame = RQE.Frame or {}
+	RQE.hoverTimers = {}
+
+	-------------------------------------------------------
+	-- #1b. Minimap Button Type
+	-------------------------------------------------------
+
+	---@class RQEMinimapButton : Frame
+	---@field hoverTimer any
+	local RQEMinimapButton = {}
+
+--------------------------------------------------
+-- #2. 🛠️ Bootstrap Diagnostics
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #2a. Debug Logger Availability
+	-------------------------------------------------------
+
+	if RQE and RQE.debugLog then
+		RQE.debugLog("Message here")
+	else
+		RQE.debugLog("RQE or RQE.debugLog is not initialized.")
+	end
+
+--------------------------------------------------
+-- #3. 🧰 Shared Launcher Actions & Pointer Helpers
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #3a. Debug Log & Settings Actions
+	-------------------------------------------------------
+
+	-- Toggle Debug Log window function
+	function RQE:ToggleDebugLog()
+		local debugLogFrame = RQE.DebugLogFrameRef
+		if debugLogFrame and debugLogFrame:IsShown() then
+			debugLogFrame:Hide()
+		elseif RQE.DebugLogFrame then
+			RQE.DebugLogFrame()
+		end
+	end
+
+	-- Open AddOn Settings function
+	function RQE:OpenSettings()
+		if RQE.ConfigUI and RQE.ConfigUI.OpenRegisteredPanel then
+			RQE.ConfigUI:OpenRegisteredPanel("general")
+		end
+	end
+
+	-------------------------------------------------------
+	-- #3b. Pointer Detection & Menu Dismissal
+	-------------------------------------------------------
+
+	-- Reports whether the pointer is over a shown frame using the mouse API available on this client.
+	local function isPointerOver(frame)
+		if not frame or not frame.IsShown or not frame:IsShown() then return false end
+		if type(frame.IsMouseOver) == "function" then
+			return frame:IsMouseOver()
+		end
+		-- Previous Blizzard call changed 2026.09.25: return MouseIsOver and MouseIsOver(frame) or false
+		local mouseIsOver = RQE.API.ResolveClientAPI("MouseIsOver")
+		return mouseIsOver and mouseIsOver(frame) or false
+	end
+
+	-- Function to close the main launcher menu and any open More Options submenu
+	function RQE:HideLDBDropdownMenus()
+		if self.CustomMenu then
+			self.CustomMenu.RQEOutsideTime = 0
+			self.CustomMenu:Hide()
+		end
+		if self.MoreOptionsMenu then self.MoreOptionsMenu:Hide() end
+	end
+
+
+--------------------------------------------------
+-- #4. 📡 LibDataBroker Launcher
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #4a. Broker Object & Mouse Interaction
+	-------------------------------------------------------
+
+	local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
+
+	-- Updated LDB Button OnClick Function
+	local RQEdataBroker = ldb:NewDataObject("RQE", {
+		type = "launcher",
+		icon = "Interface\\Addons\\RQE\\Textures\\rhodan.tga",
+		-- Handles launcher clicks for frame visibility, logging, settings, and menus
+		OnClick = function(display, button)
+			-- A pending hover-open timer must not toggle a manually opened menu closed later.
+			if RQE.hoverTimers[display] then
+				RQE:CancelTimer(RQE.hoverTimers[display])
+				RQE.hoverTimers[display] = nil
+			end
+
+			-- Previous Blizzard call changed 2026.09.25: if IsShiftKeyDown() and button == "LeftButton" then
+			if RQE.API.Client.IsShiftKeyDown() and button == "LeftButton" then
+				RQE:ToggleDebugLog()
+
+			elseif button == "LeftButton" then
+				RQE.ToggleBothFramesfromLDB()
+
+			-- Previous Blizzard call changed 2026.09.25: elseif button == "RightButton" and IsShiftKeyDown() then
+			elseif button == "RightButton" and RQE.API.Client.IsShiftKeyDown() then
+				RQE:OpenSettings()
+
+			elseif button == "RightButton" then
+				RQE.lastClickedFrame = display  -- Use the actual LDB display that was clicked.
+				RQE:ShowLDBDropdownMenu()
+			end
+		end,
+
+		-- Starts the hover-open timer and displays the launcher control tooltip
+		OnEnter = function(display)
+			RQE.lastClickedFrame = display
+			if RQE.hoverTimers[display] then
+				RQE:CancelTimer(RQE.hoverTimers[display])
+			end
+			-- Opens a closed launcher menu after hovering without toggling an already open menu.
+			RQE.hoverTimers[display] = RQE:ScheduleTimer(function()
+				RQE.hoverTimers[display] = nil
+				if not RQE.CustomMenu or not RQE.CustomMenu:IsShown() then
+					RQE:ShowLDBDropdownMenu()
+				end
+			end, 3)
+
+			GameTooltip:SetOwner(display, "ANCHOR_NONE")
+			GameTooltip:SetPoint("BOTTOMLEFT", display, "TOPRIGHT")
+
+			-- Directly define the tooltip here
+			GameTooltip:AddLine("Rhodan's Quest Explorer")
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine("Left-click to toggle frame.", 0.8, 0.8, 0.8, true)
+			GameTooltip:AddLine("Right-click to open dropdown menu.", 0.8, 0.8, 0.8, true)
+			GameTooltip:AddLine("Shift+Left-click to toggle Debug Log.", 0.8, 0.8, 0.8, true)
+			GameTooltip:AddLine("Shift+Right-click to open Settings.", 0.8, 0.8, 0.8, true)
+
+			GameTooltip:Show()
+		end,
+
+		-- Cancels pending hover work and hides the launcher tooltip
+		OnLeave = function(display)
+			if RQE.hoverTimers[display] then
+				RQE:CancelTimer(RQE.hoverTimers[display])
+				RQE.hoverTimers[display] = nil
+			end
+			GameTooltip:Hide()
+		end,
+	})
+
+
+	-------------------------------------------------------
+	-- #4b. Combined Frame Toggle
+	-------------------------------------------------------
+
+	-- Function that toggles RQEFrame and RQEQuestFrame
+	function RQE.ToggleBothFramesfromLDB()
+		if RQEFrame:IsShown() then
+			RQE:SaveSuperTrackedQuestToCharacter()
+			-- Previous Blizzard call changed 2026.09.25: if not InCombatLockdown() then
+			if not RQE.API.Client.InCombatLockdown() then
+				if RQEFrame then
+					RQEFrame:Hide()
+				end
+			end
+			RQE.db.profile.enableFrame = false
+
+			-- Previous Blizzard call changed 2026.09.25: C_Map.ClearUserWaypoint()
+			RQE.API.Client.C_Map.ClearUserWaypoint()
+
+			-- Check if TomTom is loaded and compatibility is enabled
+			-- Previous Blizzard call changed 2026.09.25: local _, isTomTomLoaded = C_AddOns.IsAddOnLoaded("TomTom")
+			local _, isTomTomLoaded = RQE.API.Client.C_AddOns.IsAddOnLoaded("TomTom")
+			if isTomTomLoaded and RQE.db.profile.enableTomTomCompatibility then
+				RQE:ClearRQETomTomWaypoints()
+				-- Previous code (commented out 2026.10.30): reset TomTom's whole waypoint profile, deleting the player's own and other addons' waypoints
+				-- TomTom.waydb:ResetProfile()
+				RQE._currentTomTomUID = nil
+			end
+
+			-- Previous Blizzard call changed 2026.09.25: if not InCombatLockdown() then
+			if not RQE.API.Client.InCombatLockdown() then
+				if RQE.MagicButton then
+					RQE.MagicButton:Hide()
+				end
+			end
+
+			RQE.RQEQuestFrame:Hide()
+			RQE.db.profile.enableQuestFrame = false
+			RQE.isRQEFrameManuallyClosed = true
+			RQE.isRQEQuestFrameManuallyClosed = true
+
+			-- Previous Blizzard call changed 2026.09.25: C_Timer.After(0.5, function()
+			-- Toggles the objective tracker.
+			RQE.API.Client.C_Timer.After(0.5, function()
+				if RQE.db.profile.toggleBlizzObjectiveTracker then
+					RQE:ToggleObjectiveTracker()
+				end
+			end)
+		else
+			RQE:ClearFrameData()
+			RQE:ClearWaypointButtonData()
+
+			-- Previous Blizzard call changed 2026.09.25: if not InCombatLockdown() then
+			if not RQE.API.Client.InCombatLockdown() then
+				if RQEFrame then
+					RQEFrame:Show()
+				end
+			end
+			RQE.db.profile.enableFrame = true
+
+			-- Previous Blizzard call changed 2026.09.25: if not InCombatLockdown() then
+			if not RQE.API.Client.InCombatLockdown() then
+				if RQE.MagicButton then
+					RQE.MagicButton:Show()
+				end
+			end
+
+			RQE.RQEQuestFrame:Show()
+			RQE.db.profile.enableQuestFrame = true
+			RQE.isRQEFrameManuallyClosed = false
+			RQE.isRQEQuestFrameManuallyClosed = false
+			RQE.Buttons.UpdateMagicButtonVisibility()
+		end
+
+		RQE.updateScenarioUI() -- Necessary to check/update if scenario information was present in the RQEQuestFrame, closed and then re-opened outside of a scenario
+
+		-- Previous Blizzard call changed 2026.09.25: C_Timer.After(0.1, function()
+		-- Restores the super tracked quest for character.
+		RQE.API.Client.C_Timer.After(0.1, function()
+			if RQE.db.profile.enableFrame then
+				RQE:RestoreSuperTrackedQuestForCharacter()
+			else
+				local isSuperTracking = RQE.API.IsSuperTrackingQuest()
+
+				if not RQE.isSuperTracking or not isSuperTracking then
+					RQE.Buttons.ClearButtonPressed()
+				end
+			end
+		end)
+	end
+
+
+--------------------------------------------------
+-- #5. 🧭 Minimap Button Construction & Position
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #5a. Frame, Texture & Hover Appearance
+	-------------------------------------------------------
+
+	-- Creates the Minimap Button
+	RQE.MinimapButton = CreateFrame("Frame", "RQEMinimapButton", Minimap)
+	RQE.MinimapButton:SetSize(25, 25)
+
+	local tex = RQE.MinimapButton:CreateTexture(nil, "ARTWORK")
+	tex:SetAllPoints()
+	tex:SetTexture("Interface\\Addons\\RQE\\Textures\\rhodan-minimap.tga")
+	RQE.MinimapButton.texture = tex
+
+	-- Optional highlight on mouseover
+	RQE.MinimapButton:EnableMouse(true)
+	-- Sets the vertex color.
+	RQE.MinimapButton:SetScript("OnEnter", function(self)
+		tex:SetVertexColor(1, 1, 1, 1) -- normal
+	end)
+	-- Sets the vertex color.
+	RQE.MinimapButton:SetScript("OnLeave", function(self)
+		tex:SetVertexColor(0.8, 0.8, 0.8, 1) -- dimmed highlight
+	end)
+
+	RQE.MinimapButton:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", 0, 0)
+	RQE.MinimapButton:SetFrameStrata("MEDIUM")
+	RQE.MinimapButton:SetFrameLevel(8)
+
+
+	-------------------------------------------------------
+	-- #5b. Drag Registration & Perimeter Positioning
+	-------------------------------------------------------
+
+	-- Allow the button to be dragged
+	RQE.MinimapButton:RegisterForDrag("LeftButton")
+	RQE.MinimapButton:SetMovable(true)
+	RQE.MinimapButton:EnableMouse(true)
+
+
+	-- Function to keep the button within the minimap's perimeter
+	function RQE:UpdateMinimapButtonPosition()
+		-- Previous Blizzard call changed 2026.09.25: local x, y = GetCursorPosition()
+		local x, y = RQE.API.Client.GetCursorPosition()
+		local scale = Minimap:GetEffectiveScale()
+		x = x / scale
+		y = y / scale
+
+		local angle = math.rad(RQE.db.profile.minimapButtonAngle)
+		local mx, my = Minimap:GetCenter()
+		local radius = (Minimap:GetWidth() / 2) + 5
+		local dx = math.cos(angle) * radius
+		local dy = math.sin(angle) * radius
+		local dist = math.sqrt(dx * dx + dy * dy)
+
+		local minimapRadius = (Minimap:GetWidth() / 2) + 5
+
+		-- Clamp the button position to the minimap's perimeter
+		if dist > minimapRadius then
+			angle = math.atan2(dy, dx)
+			dx = math.cos(angle) * minimapRadius
+			dy = math.sin(angle) * minimapRadius
+		end
+
+		-- Ensure dx and dy are valid numbers
+		if not dx or not dy then
+			dx = math.cos(angle) * minimapRadius
+			dy = math.sin(angle) * minimapRadius
+		end
+
+		RQE.MinimapButton:ClearAllPoints()
+		RQE.MinimapButton:SetPoint("CENTER", Minimap, "CENTER", dx, dy)
+
+		return dx, dy
+	end
+
+
+--------------------------------------------------
+-- #6. 🖱️ Minimap Button Interaction Scripts
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #6a. Click Actions
+	-------------------------------------------------------
+
+	-- Register Minimap Button OnClick Function
+	RQE.MinimapButton:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			-- Previous Blizzard call changed 2026.09.25: if IsShiftKeyDown() then
+			if RQE.API.Client.IsShiftKeyDown() then
+				RQE:ToggleDebugLog()  -- Shift + Left Click
+			else
+				RQE.ToggleBothFramesfromLDB()
+			end
+		elseif button == "RightButton" then
+			-- Previous Blizzard call changed 2026.09.25: if IsShiftKeyDown() then
+			if RQE.API.Client.IsShiftKeyDown() then
+				RQE:OpenSettings()  -- Shift + Right Click
+			else
+				RQE.lastClickedFrame = self  -- Set the minimap button as the last clicked frame
+				RQE:ShowLDBDropdownMenu()  -- Right Click
+			end
+		end
+	end)
+
+
+	-------------------------------------------------------
+	-- #6b. Tooltip Hover Behavior
+	-------------------------------------------------------
+
+	-- Function that handles the OnEnter for the MinimapButton
+	RQE.MinimapButton:SetScript("OnEnter", function(self)
+		RQE.lastClickedFrame = self
+		GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+		GameTooltip:SetPoint("BOTTOMLEFT", self, "TOPRIGHT")
+
+		-- Directly define the tooltip here
+		GameTooltip:AddLine("Rhodan's Quest Explorer")
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine("Left-click to toggle frame.", 0.8, 0.8, 0.8, true)
+		GameTooltip:AddLine("Right-click to open dropdown menu.", 0.8, 0.8, 0.8, true)
+		GameTooltip:AddLine("Shift+Left-click to toggle Debug Log.", 0.8, 0.8, 0.8, true)
+		GameTooltip:AddLine("Shift+Right-click to open Settings.", 0.8, 0.8, 0.8, true)
+
+		GameTooltip:Show()
+	end)
+
+
+	-- Function that handles the OnLeave for the MinimapButton
+	RQE.MinimapButton:SetScript("OnLeave", function(self)
+		GameTooltip:Hide()
+	end)
+
+
+	-------------------------------------------------------
+	-- #6c. Dragging & Position Persistence
+	-------------------------------------------------------
+
+	-- Function that handles the OnDragStart for the MinimapButton
+	RQE.MinimapButton:SetScript("OnDragStart", function(self)
+		self:StartMoving()
+	end)
+
+
+	-- Function that handles the OnDragStop for the MinimapButton
+	RQE.MinimapButton:SetScript("OnDragStop", function(self)
+		self:StopMovingOrSizing()
+
+		-- Calculate the new position after dragging
+		local mx, my = Minimap:GetCenter()
+		local bx, by = self:GetCenter()
+		local dx = bx - mx
+		local dy = by - my
+
+		-- Calculate the angle based on the new position
+		local angle = math.deg(math.atan2(dy, dx))
+		RQE.db.profile.minimapButtonAngle = angle
+
+		-- Update the button's position based on the new angle
+		RQE:UpdateMinimapButtonPosition()
+	end)
+
+
+--------------------------------------------------
+-- #7. 📋 Dropdown Menu Mixins & Construction
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #7a. Button & Menu Mixin Setup
+	-------------------------------------------------------
+
+	-- Custom Mixin for Buttons & Menus
+	RQE_ButtonMixin = {}
+
+	-- Function to apply the shared normal, highlighted, and pressed button styling
+	function RQE_ButtonMixin:OnLoad()
+		self:SetNormalFontObject("GameFontHighlightSmall")
+		self:SetHighlightFontObject("GameFontHighlightSmall")
+
+		local normalTexture = self:CreateTexture(nil, "BACKGROUND")
+		normalTexture:SetColorTexture(0.1, 0.1, 0.1, 0.9)
+		normalTexture:SetAllPoints(self)
+		self:SetNormalTexture(normalTexture)
+
+		local highlightTexture = self:CreateTexture(nil, "BACKGROUND")
+		highlightTexture:SetColorTexture(0.2, 0.2, 0.2, 1)
+		highlightTexture:SetAllPoints(self)
+		self:SetHighlightTexture(highlightTexture)
+
+		local pushedTexture = self:CreateTexture(nil, "BACKGROUND")
+		pushedTexture:SetColorTexture(0.05, 0.05, 0.05, 0.8)
+		pushedTexture:SetAllPoints(self)
+		self:SetPushedTexture(pushedTexture)
+	end
+
+
+	-- Placeholder function available for menu buttons without a specialized click handler
+	function RQE_ButtonMixin:OnClick()
+		-- Placeholder for button click handling
+	end
+
+
+	-- Custom Mixin for Menus
+	RQE_MenuMixin = {}
+
+
+	-- Function to initialize a menu frame's button list and backdrop styling
+	function RQE_MenuMixin:OnLoad()
+		self.buttons = {}
+		self:SetBackdrop({
+			bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
+			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+			tile = true,
+			tileSize = 32,
+			edgeSize = 16,
+			insets = { left = 4, right = 4, top = 4, bottom = 4 },
+		})
+		self:SetBackdropColor(0, 0, 0, 0.8)
+	end
+
+
+	-------------------------------------------------------
+	-- #7b. Menu Button & Visibility Lifecycle
+	-------------------------------------------------------
+
+	-- Function to add one uniquely labeled action or submenu button to the menu
+	function RQE_MenuMixin:AddButton(text, onClick, isSubmenu)
+		-- Prevent adding the same button multiple times
+		for _, button in ipairs(self.buttons) do
+			if button:GetText() == text .. (isSubmenu and " >" or "") then
+				return
+			end
+		end
+
+		local button = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
+		Mixin(button, RQE_ButtonMixin)
+		button:OnLoad()
+		button:SetText(text .. (isSubmenu and " >" or ""))
+		button:SetSize(self:GetWidth() - 20, 20)
+		button:SetScript("OnClick", onClick)
+
+		if #self.buttons == 0 then
+			button:SetPoint("TOP", self, "TOP", 0, -10)
+		else
+			button:SetPoint("TOP", self.buttons[#self.buttons], "BOTTOM", 0, -5)
+		end
+
+		table.insert(self.buttons, button)
+		self:SetHeight((#self.buttons * (20 + 5)) + 20)
+	end
+
+
+	-- Show and Position the Menu
+	function RQE_MenuMixin:ShowMenu(anchorFrame, isSubmenu)
+		self:ClearAllPoints()
+
+		-- Previous Blizzard call changed 2026.09.25: local screenWidth = GetScreenWidth()
+		local screenWidth = RQE.API.Client.GetScreenWidth()
+		local anchorX = anchorFrame:GetCenter()
+
+		local isLeftHalf = anchorX < (screenWidth / 2)
+
+		-- LDB displays have different frame names across broker bars. Anchor the
+		-- main menu to the actual clicked display, just as for the minimap button.
+		if not isSubmenu then
+			if isLeftHalf then
+				self:SetPoint("TOPLEFT", anchorFrame, "BOTTOMLEFT", 0, -5)
+			else
+				self:SetPoint("TOPRIGHT", anchorFrame, "BOTTOMRIGHT", 0, -5)
+			end
+		elseif isSubmenu then
+			-- Adjust the positioning to anchor the submenu to the specific button (anchorFrame)
+			if isLeftHalf then
+				self:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 10, -60)
+			else
+				self:SetPoint("TOPRIGHT", anchorFrame, "TOPRIGHT", -10, -60)
+			end
+		end
+
+		self:Show()
+	end
+
+
+	-- Function to hide the current menu frame
+	function RQE_MenuMixin:HideMenu()
+		self:Hide()
+	end
+
+
+	-- Function to toggle the menu relative to the supplied launcher anchor
+	function RQE_MenuMixin:ToggleMenu(anchorFrame)
+		if self:IsShown() then
+			self:HideMenu()
+		else
+			self:ShowMenu(anchorFrame)
+		end
+	end
+
+
+	-------------------------------------------------------
+	-- #7c. Main Launcher Dropdown
+	-------------------------------------------------------
+
+	-- Create the Dropdown Menu Function
+	function RQE:ShowLDBDropdownMenu()
+		GameTooltip:Hide()
+
+		if not self.CustomMenu then
+			self.CustomMenu = CreateFrame("Frame", "RQECustomMenu", UIParent, "BackdropTemplate")
+			Mixin(self.CustomMenu, RQE_MenuMixin)
+			self.CustomMenu:OnLoad()
+			self.CustomMenu:SetSize(150, 100)
+			self.CustomMenu:SetFrameStrata("DIALOG")
+			self.CustomMenu:Hide()
+
+			-- Keep menu visible when mouse is over it
+			self.CustomMenu:SetScript("OnEnter", function(self)
+				self:Show()
+			end)
+
+			-- Schedules menu dismissal after allowing the pointer to enter its submenu.
+			self.CustomMenu:SetScript("OnLeave", function(self)
+				-- Previous Blizzard call changed 2026.09.25: C_Timer.After(0.1, function()
+				-- Hides the minimap menu only after the pointer leaves it and its submenu.
+				RQE.API.Client.C_Timer.After(0.1, function()
+					if isPointerOver(self) or isPointerOver(RQE.MoreOptionsMenu)
+						or isPointerOver(RQE.lastClickedFrame) then
+						-- Do nothing, the mouse is still over the menu or its related submenus
+						return
+					end
+
+					-- Hide the menus if the mouse is not over them
+					RQE:HideLDBDropdownMenus()
+				end)
+			end)
+
+			-- Parent-frame OnLeave is not reliable after the pointer crosses a child
+			-- button.  Track the complete menu and its anchor while visible so the
+			-- menu always dismisses shortly after the pointer leaves both regions.
+			self.CustomMenu:SetScript("OnUpdate", function(menu, elapsed)
+				if isPointerOver(menu) or isPointerOver(RQE.lastClickedFrame) or isPointerOver(RQE.MoreOptionsMenu) then
+					menu.RQEOutsideTime = 0
+					return
+				end
+				menu.RQEOutsideTime = (menu.RQEOutsideTime or 0) + elapsed
+				if menu.RQEOutsideTime >= 0.2 then
+					RQE:HideLDBDropdownMenus()
+				end
+			end)
+		end
+
+		-- Ensure buttons are only added once
+		if #self.CustomMenu.buttons == 0 then
+			-- Closes the minimap menu and toggles the RQE frames.
+			self.CustomMenu:AddButton("Toggle Frame(s)", function() RQE:HideLDBDropdownMenus(); RQE.ToggleBothFramesfromLDB() end)
+			-- Closes the minimap menu and opens addon settings.
+			self.CustomMenu:AddButton("AddOn Settings", function() RQE:HideLDBDropdownMenus(); RQE:OpenSettings() end)
+			-- Closes the minimap menu and opens the standalone configuration window.
+			self.CustomMenu:AddButton("Config Window", function() RQE:HideLDBDropdownMenus(); RQE:ToggleConfigFrame() end)
+			-- Closes the minimap menu and toggles the debug log.
+			self.CustomMenu:AddButton("Debug Log", function() RQE:HideLDBDropdownMenus(); RQE:ToggleDebugLog() end)
+		end
+
+		-- Determine the actual frame object
+		local anchorFrame = RQE.lastClickedFrame
+
+		if anchorFrame then
+			self.CustomMenu.RQEOutsideTime = 0
+			-- Toggle menu visibility using the dynamically determined anchor
+			self.CustomMenu:ToggleMenu(anchorFrame)
+		end
+	end
+
+
+	-------------------------------------------------------
+	-- #7d. More Options Submenu
+	-------------------------------------------------------
+
+	-- More Options Menu Creation
+	function RQE:ShowMoreOptionsMenu(parentMenu)
+		if not self.MoreOptionsMenu then
+			self.MoreOptionsMenu = CreateFrame("Frame", "RQEMoreOptionsMenu", UIParent, "BackdropTemplate")
+			Mixin(self.MoreOptionsMenu, RQE_MenuMixin)
+			self.MoreOptionsMenu:OnLoad()
+			self.MoreOptionsMenu:SetSize(150, 100)
+			self.MoreOptionsMenu:SetFrameStrata("DIALOG")
+			self.MoreOptionsMenu:Hide()
+
+			-- Keep submenu visible when mouse is over it
+			self.MoreOptionsMenu:SetScript("OnEnter", function(self)
+				self:Show()
+				parentMenu:Show()
+			end)
+			-- Schedules submenu dismissal after the pointer leaves its visible region.
+			self.MoreOptionsMenu:SetScript("OnLeave", function(self)
+				-- Previous Blizzard call changed 2026.09.25: C_Timer.After(0.1, function()
+				-- Hides the submenu only when the pointer also leaves the parent menu.
+				RQE.API.Client.C_Timer.After(0.1, function()
+					if not isPointerOver(self) and not isPointerOver(parentMenu)
+						and not isPointerOver(RQE.lastClickedFrame) then
+						RQE:HideLDBDropdownMenus()
+					end
+				end)
+			end)
+		end
+
+		-- Ensure buttons are only added once
+		if #self.MoreOptionsMenu.buttons == 0 then
+			-- Closes the minimap menus and opens frame settings.
+			self.MoreOptionsMenu:AddButton("Frame Settings", function() RQE:HideLDBDropdownMenus(); RQE:OpenFrameSettings() end)
+			-- Closes the minimap menus and opens font settings.
+			self.MoreOptionsMenu:AddButton("Font Settings", function() RQE:HideLDBDropdownMenus(); RQE:OpenFontSettings() end)
+			-- Closes the minimap menus and opens debugging options.
+			self.MoreOptionsMenu:AddButton("Debug Options", function() RQE:HideLDBDropdownMenus(); RQE:OpenDebugOptions() end)
+			-- Closes the minimap menus and opens profile settings.
+			self.MoreOptionsMenu:AddButton("Profiles", function() RQE:HideLDBDropdownMenus(); RQE:OpenProfiles() end)
+			-- Closes the minimap menu and opens the standalone configuration window.
+			self.MoreOptionsMenu:AddButton("Config Window", function() RQE:HideLDBDropdownMenus(); RQE:ToggleConfigFrame() end)
+		end
+
+		-- Toggle More Options menu visibility
+		self.MoreOptionsMenu:ClearAllPoints()
+		self.MoreOptionsMenu:SetPoint("TOPLEFT", parentMenu, "TOPRIGHT", 0, 0) -- Adjust this to desired position
+		self.MoreOptionsMenu:ToggleMenu(parentMenu, true)
+	end

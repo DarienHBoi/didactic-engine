@@ -1,0 +1,6 @@
+## Interface: 16001
+## Title: LinkBisect
+## Category: Nectar
+## Notes: Finds which addon breaks chat link clicks. /lb start
+## SavedVariables: LinkBisectDB
+LinkBisect.lua

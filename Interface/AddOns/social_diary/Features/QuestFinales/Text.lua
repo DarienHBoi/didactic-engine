@@ -1,0 +1,162 @@
+-- Quest chain finales' words (JRN-28): a sentence each in the level's
+-- prose (Text.RegisterLines, UI/Journey/Text/Prose.lua), the plates' caption
+-- words (Text.RegisterCaption) and the tailpiece's tooltip (Mark.lua).
+-- Copy changes go through the copywriter skill, as every player-read word
+-- does.
+
+local addonName, ns = ...
+
+local QuestFinales = ns.QuestFinales
+local Text = ns.UI.JourneyText
+local Capital, MapName, Spoken = Text.Capital, Text.MapName, Text.Spoken
+local NUMBER, WORDS = Text.NUMBER, Text.WORDS
+local L, Fmt = ns.L, ns.Fmt
+
+-- A quest's title as the diary quotes it: “Crown of the Earth”.
+local function Quoted(title)
+    return Fmt(L["“%s”"], title or L["a quest"])
+end
+
+-- A number of quests in words: "nine", "29".
+local function Many(n)
+    return WORDS[n] or tostring(n)
+end
+
+-- How long a chain took, as the prose says it: "three hours", "five
+-- days", "three weeks", "two months".
+local function Span(seconds)
+    local days = seconds / ns.DAY
+    if days < 1 then return Spoken(seconds) end
+    local function Of(n, forms)
+        n = math.max(1, math.floor(n + 0.5))
+        return ns.Plural(n, forms, Many(n))
+    end
+    if days < 13.5 then return Of(days, L["a day|%s days##plural"]) end
+    if days < 60 then return Of(days / 7, L["a week|%s weeks##plural"]) end
+    return Of(days / 30, L["a month|%s months##plural"])
+end
+
+-- A finale in a few words, for a plate's caption: "the end of “Crown of
+-- the Earth”".
+function QuestFinales.Words(f)
+    return Fmt(L["the end of %s"], Quoted(f.title))
+end
+
+-- A finale in a sentence: "The end of “Crown of the Earth”, a chain of
+-- nine begun in Shadowglen five days before." Where it began is said only
+-- where the diary saw it begin.
+function QuestFinales.Sentence(f)
+    local title = Quoted(f.title)
+    local n = f.n or 0
+    if n <= 1 then return Fmt(L["The end of %s."], title) end
+    local start = f.started
+    if start and start.t and f.t then
+        local zone = MapName(start.mapID)
+        local span = Span(f.t - start.t)
+        if zone then
+            return Fmt(L["The end of %1$s, a chain of %2$s begun %3$s %4$s before.##zone"], title, Many(n),
+                ns.ZoneIn(start.mapID, zone), span)
+        end
+        return Fmt(L["The end of %1$s, a chain of %2$s begun %3$s before."], title, Many(n), span)
+    end
+    return Fmt(L["The end of %1$s, a chain of %2$s."], title, Many(n))
+end
+
+-- The level's finales in its prose, one sentence each.
+function QuestFinales.Lines(e)
+    local parts = {}
+    for _, f in ipairs(e.finales or {}) do parts[#parts + 1] = QuestFinales.Sentence(f) end
+    if #parts == 0 then return nil end
+    return table.concat(parts, " ")
+end
+
+-- Its mark's tooltip: "The end of “Crown of the Earth”", then how long the
+-- chain was, where and when it began, when it ended.
+function QuestFinales.Tip(f, now)
+    local lines = {}
+    if (f.n or 0) > 1 then lines[#lines + 1] = Fmt(L["A chain of %s"], ns.Plural(f.n, L["%d quest|%d quests##plural"])) end
+    local start = f.started
+    if start and start.t then
+        local zone = MapName(start.mapID)
+        local at = ns.UI.Format.At(start.t, now)
+        lines[#lines + 1] = zone and Fmt(L["Begun %1$s, %2$s##zone"], ns.ZoneIn(start.mapID, zone), at)
+            or Fmt(L["Begun %s"], at)
+    end
+    lines[#lines + 1] = Text.Foot({ from = f.t, levelFrom = f.level }, now)
+    return Capital(QuestFinales.Words(f)), lines
+end
+
+-- A tooltip's last line for everything under one mark, as the core says
+-- it for every mark (Text.Foot, UI/Journey/Text/Tips.lua): when, from the
+-- first to the last ("Today at 12:47", "Today from 12:47 to 13:20"), then
+-- the level or levels ("Level 20", "Levels 19 to 20"). `list` is records
+-- with `t` and `level`.
+local function Foot(list, now)
+    local a = {}
+    for _, r in ipairs(list) do
+        if r.t then a.from, a.to = math.min(a.from or r.t, r.t), math.max(a.to or r.t, r.t) end
+        if r.level then
+            a.levelFrom, a.levelTo = math.min(a.levelFrom or r.level, r.level), math.max(a.levelTo or r.level, r.level)
+        end
+    end
+    return Text.Foot(a, now)
+end
+
+-- The tooltip of a tailpiece (Mark.lua's `tips`): every chain that ended
+-- on the spot told once together (9 Nov 2026; before, each finale's
+-- QuestFinales.Tip was stacked under the last, its time again each time).
+-- One: "The end of “Crown of the Earth”", how long the chain was, where
+-- and when it began, when it ended and at what level. Several: "Two chains
+-- finished", each chain once with its length ("“The Demon Seed”, a chain
+-- of 7 quests"; more than three, their titles on one line), then from
+-- when to when.
+function QuestFinales.Tips(finales, now)
+    local lines = {}
+    if #finales == 1 then
+        local f = finales[1]
+        if (f.n or 0) > 1 then lines[#lines + 1] = Fmt(L["A chain of %s"], ns.Plural(f.n, L["%d quest|%d quests##plural"])) end
+        local start = f.started
+        if start and start.t then
+            local zone = MapName(start.mapID)
+            local at = ns.UI.Format.At(start.t, now)
+            lines[#lines + 1] = zone and Fmt(L["Begun %1$s, %2$s##zone"], ns.ZoneIn(start.mapID, zone), at)
+                or Fmt(L["Begun %s"], at)
+        end
+        lines[#lines + 1] = Foot(finales, now)
+        return Capital(QuestFinales.Words(f)), lines
+    end
+    if #finales <= 3 then
+        for _, f in ipairs(finales) do
+            lines[#lines + 1] = (f.n or 0) > 1
+                and ns.Plural(f.n, L["%1$s, a chain of %2$d quest|%1$s, a chain of %2$d quests##plural"], Quoted(f.title), f.n)
+                or Quoted(f.title)
+        end
+    else
+        local titles = {}
+        for i, f in ipairs(finales) do titles[i] = Quoted(f.title) end
+        lines[1] = Text.List(titles)
+    end
+    lines[#lines + 1] = Foot(finales, now)
+    return Capital(ns.Plural(#finales, L["%s chain finished|%s chains finished##plural"],
+        NUMBER[#finales] or tostring(#finales))), lines
+end
+
+-- Its paragraph in the level's prose: the chains finished, a sentence
+-- each, after the firsts found (40), before the profession caps (60).
+Text.RegisterLines("finale", { at = 50, lines = function(e) return QuestFinales.Lines(e) end })
+
+-- The caption's words: after the finds, or leading where nothing above it
+-- does ("The end of “Crown of the Earth”."); "two chains finished". Its
+-- lead (`at` 30) comes after a first found (20), before a profession's
+-- cap (40); its tail (`at` 20) after the finds (10), before the caps (30).
+local function Ended(finales)
+    return #finales == 1 and QuestFinales.Words(finales[1])
+        or ns.Plural(#finales, L["%s chain finished|%s chains finished##plural"], NUMBER[#finales] or tostring(#finales))
+end
+
+Text.RegisterCaption("finale", {
+    moment = "finale",
+    take = function(m) return m.finale end,
+    lead = { at = 30, say = function(finales) return Capital(Ended(finales)) end },
+    tail = { at = 20, say = Ended },
+})

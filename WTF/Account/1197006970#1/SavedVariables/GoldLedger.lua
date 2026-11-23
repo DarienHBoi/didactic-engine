@@ -1,0 +1,2 @@
+
+GoldLedgerDB = nil

@@ -6,15 +6,21 @@ FDJ = FDJ or _G.ForeverDungeonJournal_NS
 FDJ.Locales = FDJ.Locales or {}
 
 FDJ.Locales.enUS = {
-    RANDOM_ENCHANT = "+Random Enchant",
+    RANDOM_ENCHANT = "<Random enchantment>",
     ALSO_RECEIVE = "You will also receive:",
     MAP_JUMP_LEVEL = "Jump down to Level %d",
-    MAP_RFK_WALLJUMP = "Wall jump the gate to reach Roogug",
     MAP_RFK_VINE = "Jump on this vine to reach Roogug",
     MAP_OBJ_BFD_CHEST = "Loot the Lorgalis Manuscript from the Pitted Iron Chest, underwater in this alcove of the pool.",
     MAP_OBJ_BFD_FATHOM = "Click the Fathom Stone underwater, below the walkway, to get the Fathom Core. Baron Aquanis spawns when you do.",
+    MAP_OBJ_LOOT = "Loot here: %s",
+    MAP_OBJ_USE = "Use it here",
+    MAP_OBJ_EXPLORE = "Explore this place",
     NOTICE_LV30_DATA = "New loot and quests for dungeons up to lv 30 are still being discovered. I will update as new data comes out. gl hf",
     NOTICE_RESIZE = "Commands changed from |cffff3030/fj|r to |cff33ff33/dj|r.",
+    MAP_SHARK_EXIT = "Shark exit",
+    MAP_SAFE_EXIT = "Safe exit",
+    MAP_SWIM_HERE = "Swim underwater here for level %d",
+    MAP_ALT_SPAWN = "Can also spawn here",
     MAP_SWIM_LEVEL = "Swim underwater for level %d",
     MAP_ENTRANCE = "Entrance",
     LOOT_COMPACT = "Compact view",
@@ -42,10 +48,12 @@ FDJ.Locales.enUS = {
     ITEMS = "items",
     RARE = "RARE",
     YOU_HAVE_IT = "YOU HAVE IT",
+    TURN_IN_LABEL = "Turn in",
     AVAILABLE_FROM_LEVEL = "Available from Level %s",
     REQUIRED_PREREQUISITE = "Required prerequisite",
     OBJECTIVE = "Objective",
     STARTS_AT = "Starts at",
+    OBTAIN = "Obtain",
     TURN_IN = "Turn in",
     NOTES = "Notes",
     SHARE = "Share",
@@ -58,6 +66,7 @@ FDJ.Locales.enUS = {
     CHOOSE_ONE_REWARD = "Choose one reward",
     SHOW_ON_MAP = "Show on Map",
     SHOW_TURN_IN = "Show Turn In",
+    TURN_IN_DUNGEON = "Turn in: Dungeon",
     ROUTE_FP_TARREN_MILL_TEXT = "The route detours here so you can pick up the flight path. Afterwards, head back down the road and continue east toward Arathi.",
     ROUTE_FP_TARREN_MILL = "Tarren Mill Flight Path",
     ROUTE_REMOVE_HINT = "Right click to remove route",
@@ -78,6 +87,12 @@ FDJ.Locales.enUS = {
     IN_DUNGEON = "In Dungeon",
     NO_QUESTS = "No quests",
     NO_FACTION_QUESTS = "No %s quests recorded for this dungeon.",
+    NO_FACTION_QUESTS_TBD = "No %s quests known for this dungeon yet. It is new and its quests are still being found.",
+    STEP_ACCEPT_ONLY = "(accept only)",
+    CHAIN_PICK_ONE = "You just need 1 of the following quests:",
+    LOOT_NOTE_TWO_ITEMS = "Can drop 2 items",
+    LOOT_NOTE_HELNURATH = "Summoned by the Warlock epic mount quest",
+    LOOT_NOTE_BURNING_FELGUARD = "Scarshield Warlocks can summon it through their portals",
     UNIQUE_TRASH = "Unique dungeon trash drops",
     DROPS_FROM = "Drops from: %s",
     CLICK_DUNGEON = "Click to open dungeon details",
@@ -90,16 +105,26 @@ FDJ.Locales.enUS = {
     WM_DUNGEON_MAP = "Dungeon Map",
     MINIMAP_HIDE_CONFIRM = "Hide the Dungeon Journal minimap button?\n\nYou can bring it back by typing /dj minimap.",
     LF_SHOW_RECIPES = "Always show pattern/recipe drops",
-    RESIZE_TIP_TITLE = "Resize",
-    RESIZE_TIP = "Drag to resize the window. Right-click to reset.",
+    RESIZE_TIP_TITLE = "Rescale",
+    RESIZE_TIP = "Drag to rescale the window. Right-click to reset.",
+    OPT_RESIZE = "Resize",
+    OPT_RESIZE_TIP = "Opens the journal so you can drag its corners to make it bigger.",
+    RESIZE_HINT = "Drag the corners to resize",
+    RESIZE_CORNER_TIP = "Drag to resize. Right-click to reset the size.",
+    OPT_RESET_SIZE = "Reset Size",
+    OPT_RESET_SIZE_TIP = "Puts the journal back to its normal size and scale.",
     LF_ENABLE = "Enable",
     LF_DISABLE = "Disable",
     LF_MIN_LEVEL = "Minimum required level",
+    LF_LEVEL_RANGE = "Level range", -- levelrange (2.1.2)
     OPT_UI = "General",
     OPT_DISCORD_TEXT = "Join the Dungeon Journal Discord to report bugs, share new discoveries and get the latest news.",
     OPT_DUNGEON_LIST = "Dungeon list",
     OPT_HIDE_ITEM_LINE = "Hide journal line on item tooltips",
     OPT_HIDE_ITEM_LINE_TIP = "Removes the line that shows which boss or quest an item comes from.",
+    OPT_AUTO_COMPARE = "Auto Item Comparison",
+    OPT_AUTO_COMPARE_TIP = "Item tooltips in the journal compare with your equipped item right away, without holding Shift.",
+    MALLET_HOW = "How to get the Mallet",
     OPT_HIDE_MINIMAP = "Hide minimap button",
     OPT_HIDE_MINIMAP_TIP = "Type /dj minimap to bring the button back.",
     OPT_BIND = "Open Journal Bind",
@@ -108,6 +133,15 @@ FDJ.Locales.enUS = {
     OPT_PRESS_KEY = "Press a key...",
     OPT_KEY_TAKEN = "%s is already bound. Choose an unused key.",
     OPT_NO_COMBAT = "Keybinds cannot be changed during combat.",
+    LEVEL_TOO_LOW_DUNGEONS = "You are too low level for dungeons.\nThe first ones start at level %d.",
+    NO_DUNGEONS_MY_LEVEL = "No dungeons for your level.",
+    SHOW_ALL_DUNGEONS_ANYWAY = "Show all dungeons anyway",
+    SUMMON_QUEST_NOTE = "%s has to be summoned: use the %s at the gong by his pool.",
+    REP_REQUIRES = "Requires %s with %s",
+    HOW_TO_SUMMON = "How to summon %s",
+    MAP_WREX_KEYRING = "Open with Wrex's Keyring for level %d",
+    OPT_MY_LEVEL_RANGE = "Show only my level range",
+    OPT_MY_LEVEL_RANGE_TIP = "Shows only the dungeons whose level range includes your level (the ranges of the Looking For Group panel).",
     OPT_HIDE_OUTLEVELED = "Auto-hide outleveled dungeons",
     OPT_HIDE_OUTLEVELED_TIP = "Hides a dungeon from the list once your level is above its level range.",
     OPT_HIDE_QUESTS_DONE = "Auto-hide dungeons with all quests done",
@@ -118,6 +152,8 @@ FDJ.Locales.enUS = {
     OPT_SHOW_ALL_CLASS_TIP = "Also lists class quests for other classes (for example Warlock or Paladin quests). Off: you only see your own class's quests.",
     OPT_HIDE_LFG = "Hide LFG Panel",
     OPT_HIDE_LFG_TIP = "Hides the eye button next to Show Location on dungeon pages, which opens Looking For Group on that dungeon. You can also right-click the eye and pick Disable.",
+    OPT_HIDE_SLEEPING_BAG = "Hide Sleeping Bag quest",
+    OPT_HIDE_SLEEPING_BAG_TIP = "Hides the Sleeping Bag icon on the journal's home page (next to the WoW Forever and Raids icons). You can also right-click the icon and pick Hide. A tracked Sleeping Bag chain keeps its arrow.",
     OPT_HIDE_DUNGEON_MAP = "Hide Dungeon Map inside the dungeon",
     OPT_HIDE_DUNGEON_MAP_TIP = "When ticked, pressing M inside a dungeon shows the game's normal map instead of the journal's dungeon map.",
     DESCRIPTION = "Description",
@@ -130,6 +166,10 @@ FDJ.Locales.enUS = {
     LF_ARMOR_TIP = "Hides armor pieces of other types. Weapons, shields, rings, necks, trinkets and cloaks always stay.",
     CHAIN_REQUIRED = "Requires a quest chain first.",
     CHAIN_STEP = "You are on step %d of %d.",
+    GUIDE = "Guide",
+    HOW_TO_COMPLETE = "How to complete",
+    GUIDE_TIP = "Click to show the steps to complete this quest",
+    GUIDE_STEP = "Guide: step %d of %d",
     SHOW_NEXT_STEP_MAP = "Show next step on Map",
     LF_SHOW = "Show results",
     LF_SHOW_TIP = "Opens a page listing every boss, in every dungeon, that drops loot matching the filters above.",
@@ -140,6 +180,8 @@ FDJ.Locales.enUS = {
     LF_STATS_HEADER = "Only items with these stats",
     LF_STATS_HINT = "Tick the stats you are looking for. Nothing ticked shows everything.",
     LF_MATCH_ALL = "Item must have all ticked stats",
+    LF_QUEST_REWARDS = "Show quest rewards too",
+    LF_SEARCHING = "Searching the loot... %d%%",
     LF_CLEAR = "Clear",
     OPT_DISCORD_COPY = "Press Ctrl+C to copy the invite link.",
     OPT_CLOSE = "Close",
@@ -154,6 +196,21 @@ FDJ.Locales.enUS = {
     RPG_UNLOCKED_MSG = "%s is now unlocked in your journal!",
     RPG_TOAST_TITLE = "Journal Page Unlocked",
     RPG_TOAST_HINT = "Click to open it in the journal",
+    RPG_QUEST_TOAST_TITLE = "Dungeon Quest Unlocked",
+    RPG_QUEST_UNLOCKED_MSG = "%s quest unlocked! %d/%d",
+    RPG_QUEST_TOAST_HINT = "Click to open it in the journal",
+    RPG_BOSS_HIDDEN = "Defeat this boss to reveal it.",
+    RPG_TRASH_HIDDEN = "Clear about 20% of the dungeon's trash to reveal it.",
+    RPG_QUEST_HIDDEN = "Pick up this quest to unlock it.",
+    RPG_MAP_LOCKED_TITLE = "Map Locked",
+    RPG_MAP_LOCKED_TIP = "Clear about 20%% of the dungeon's trash to unlock it: %d/%d.",
+    RPG_MAP_LOCKED_MSG = "The dungeon map unlocks after clearing about 20%% of its trash (%d/%d).",
+    RPG_MAP_TOAST_TITLE = "Dungeon Map Unlocked",
+    RPG_MAP_UNLOCKED_MSG = "%s map unlocked!",
+    RPG_MAP_TOAST_HINT = "Click to open the map in the journal",
+    RPG_MAP_TOAST_HINT_M = "Press M in the dungeon to see it",
+    RPG_BOSS_REVEALED_MSG = "%s revealed in your journal!",
+    RPG_LOCKED_TIP_QUEST = "Picking up one of its quests opens part of it.",
     RPG_PROGRESS = "Journey %d%%",
     RPG_PROGRESS_TITLE = "Dungeon Journey",
     RPG_PROGRESS_TIP = "%d of %d dungeon quests completed for your faction and class.",
@@ -170,7 +227,7 @@ FDJ.Locales.enUS = {
     RPG_CONFIRM_TEXT = "In this mode dungeons will be locked until you kill the final boss. You can always change mode in the options panel.",
     RPG_CONFIRM_OK = "Ok",
     RPG_CONFIRM_BACK = "Choose again",
-    RPG_INTRO_TEXT = "Dungeons stay locked until you kill their final boss.",
+    RPG_INTRO_TEXT = "Dungeons stay locked until you kill their final boss.\nYou can still choose to show quests in the Options panel.", -- introline (2.0.17, text 2.0.18)
     RPG_INTRO_KEEP = "Keep RPG Mode",
     RPG_INTRO_OPTIONS = "Disable in Options",
     MODE_RPG_ENABLE = "Enable in Options",
@@ -182,6 +239,8 @@ FDJ.Locales.enUS = {
     REPEAT_HIDE = "Hide Repeatable Quests (%d)",
     OPT_SHOW_ALL_PROF = "Show All Profession Quests",
     OPT_SHOW_ALL_PROF_TIP = "Also list profession quests (Blacksmithing, Mining...) for professions this character doesn't have.",
+    OPT_FOREVER_ONLY = "Forever Dungeons Only",
+    OPT_FOREVER_ONLY_TIP = "Show only the dungeons that are new in WoW Forever. Untick it to see every dungeon again.",
     PROF_BLACKSMITHING = "Blacksmithing",
     PROF_MINING = "Mining",
     RAIDS_TITLE = "Raids",
@@ -204,6 +263,7 @@ FDJ.Locales.enUS = {
     RECIPES_SECTION = "Recipes & Patterns (%d)",
     SHARED_SHOW = "Show Shared Loot (%d)",
     SHARED_HIDE = "Hide Shared Loot (%d)",
+    PROBABLE_LOOT = "Not confirmed, but probable drop (%d)",
     SHARED_NOTE = "low drop chance, many bosses",
     SHARED_LOOT = "Shared Loot",
     SEVERAL_DUNGEONS = "several dungeons",
@@ -219,6 +279,10 @@ FDJ.Locales.enUS = {
     LF_STAT_HP5 = "HP5",
     LF_STAT_HP5_TIP = "Health per 5 seconds",
     LF_ARMOR_BTN = "Armor",
+    LF_RING = "Ring",
+    LF_NECK = "Neck",
+    LF_TRINKET = "Trinket",
+    LF_CLOAK = "Cloak",
     LF_WEAPON_BTN = "Weapon",
     LF_RESIST = "Resistance Filter",
     LF_RESISTANCES = "Resistances",
@@ -239,6 +303,8 @@ FDJ.Locales.enUS = {
     HIDDEN = "Hidden",
     CLICK_HIDE_DUNGEON = "Click to hide this dungeon.",
     CLICK_RESTORE_DUNGEON = "Click to restore this dungeon.",
+    AUTO_HIDDEN_BY = "Hidden by: %s",
+    CLICK_SHOW_ANYWAY = "Click to show it anyway.",
     ALL_DUNGEONS_HIDDEN = "All dungeons are hidden. Click Hide Dungeons to restore them.",
     FACTION_QUESTS = "%s quests",
     QUEST_IN_LOG = "This earlier quest is in your quest log.",
@@ -255,27 +321,47 @@ FDJ.Locales.enUS = {
     LANGUAGE_HELP = "Language test: /dj lang de, fr, es, ru, it, pt, ko, zh, zhtw, en, /dj lang auto",
     UPDATE_AVAILABLE = "Version %s is available (you have %s). Update on CurseForge.",
     PREVIOUS_QUEST = "Previous quest",
+    REQUIRES_QUEST = "Requires: %s",
     NEXT_QUEST = "Next quest",
     LEADS_TO = "Leads to: %s",
     MAP_MARKER_REMOVED = "map marker removed.",
     MAP_LEFT_TARGET = "Left Click to target and mark quest giver if nearby",
     MAP_RIGHT_REMOVE = "Right Click to remove marker",
+    MAP_PATROL = "Walks around: the line shows the path",
+    MAP_QUEST_TARGET = "Quest target",
     MAP_MARKED = "marked %s on the map.",
     MAP_OPEN_FAILED = "could not open the recorded map location.",
+    MAP_COMBAT = "the map can't open during combat. Press %s to see the marked spot.",
     QUEST_GIVER = "Quest giver",
     QUEST_STARTS_HERE = "Quest starts here",
+    TRACK = "Track",
+    TRACKING = "Tracking",
+    TRACK_TIP = "Shows this dungeon's quests on your screen with your progress. Drag it anywhere.",
+    TRACK_STOP = "Stop tracking",
+    TRACK_READY = "Ready to turn in",
+    TRACK_DONE = "Completed",
+    TRACK_IN_LOG = "In your quest log",
+    TRACK_CLICK = "Click to open it in the journal",
+    TURN_IN_HERE = "Turn in here",
+    TRACK_ACCEPT = "Click to accept the quest",
 }
 
 FDJ.Locales.deDE = {
-    RANDOM_ENCHANT = "+Zufällige Verzauberung",
+    RANDOM_ENCHANT = "<Zufällige Verzauberung>",
     ALSO_RECEIVE = "Ihr bekommt außerdem:",
     MAP_JUMP_LEVEL = "Auf Ebene %d hinunterspringen",
-    MAP_RFK_WALLJUMP = "Spring an der Wand über das Tor, um Roogug zu erreichen",
     MAP_RFK_VINE = "Spring auf diese Ranke, um Roogug zu erreichen",
     MAP_OBJ_BFD_CHEST = "Plündere das Lorgalis-Manuskript aus der Narbigen Eisentruhe, unter Wasser in dieser Nische des Beckens.",
     MAP_OBJ_BFD_FATHOM = "Klicke unter Wasser unter dem Steg auf den Tiefenstein, um den Tiefenkern zu erhalten. Dabei erscheint Baron Aquanis.",
+    MAP_OBJ_LOOT = "Hier plündern: %s",
+    MAP_OBJ_USE = "Hier benutzen",
+    MAP_OBJ_EXPLORE = "Diesen Ort erkunden",
     NOTICE_LV30_DATA = "Neue Beute und Quests für Dungeons bis Stufe 30 werden noch entdeckt. Ich aktualisiere, sobald neue Daten erscheinen. gl hf",
     NOTICE_RESIZE = "Die Befehle wurden von |cffff3030/fj|r zu |cff33ff33/dj|r geändert.",
+    MAP_SHARK_EXIT = "Hai-Ausgang",
+    MAP_SAFE_EXIT = "Sicherer Ausgang",
+    MAP_SWIM_HERE = "Hier unter Wasser tauchen für Ebene %d",
+    MAP_ALT_SPAWN = "Kann auch hier erscheinen",
     MAP_SWIM_LEVEL = "Unter Wasser tauchen für Ebene %d",
     MAP_ENTRANCE = "Eingang",
     LOOT_COMPACT = "Kompaktansicht",
@@ -303,10 +389,12 @@ FDJ.Locales.deDE = {
     ITEMS = "Gegenstände",
     RARE = "RARE",
     YOU_HAVE_IT = "ANGENOMMEN",
+    TURN_IN_LABEL = "Abgeben",
     AVAILABLE_FROM_LEVEL = "Verfügbar ab Stufe %s",
     REQUIRED_PREREQUISITE = "Benötigte Vorquest",
     OBJECTIVE = "Ziel",
     STARTS_AT = "Startet bei",
+    OBTAIN = "Erhalten",
     TURN_IN = "Abgeben bei",
     NOTES = "Hinweise",
     SHARE = "Teilen",
@@ -319,6 +407,7 @@ FDJ.Locales.deDE = {
     CHOOSE_ONE_REWARD = "Wähle eine Belohnung",
     SHOW_ON_MAP = "Auf Karte zeigen",
     SHOW_TURN_IN = "Abgabe anzeigen",
+    TURN_IN_DUNGEON = "Abgabe: Dungeon",
     SHOW_LOCATION = "Ort anzeigen",
     DUNGEON_ENTRANCE = "Dungeoneingang",
     HOW_TO_GET_THERE = "Anreise",
@@ -336,6 +425,12 @@ FDJ.Locales.deDE = {
     IN_DUNGEON = "Im Dungeon",
     NO_QUESTS = "Keine Quests",
     NO_FACTION_QUESTS = "Keine %s-Quests für diesen Dungeon erfasst.",
+    NO_FACTION_QUESTS_TBD = "Noch keine %s-Quests für diesen Dungeon bekannt. Er ist neu und seine Quests werden noch gesammelt.",
+    STEP_ACCEPT_ONLY = "(nur annehmen)",
+    CHAIN_PICK_ONE = "Du brauchst nur 1 der folgenden Quests:",
+    LOOT_NOTE_TWO_ITEMS = "Kann 2 Gegenstände droppen",
+    LOOT_NOTE_HELNURATH = "Beschworen durch die epische Reittier-Quest der Hexenmeister",
+    LOOT_NOTE_BURNING_FELGUARD = "Scarschild-Hexenmeister können ihn durch ihre Portale beschwören",
     UNIQUE_TRASH = "Einzigartige Beute von Trashmobs",
     DROPS_FROM = "Beute von: %s",
     CLICK_DUNGEON = "Klicken, um Dungeon-Details zu öffnen",
@@ -348,16 +443,26 @@ FDJ.Locales.deDE = {
     WM_DUNGEON_MAP = "Dungeonkarte",
     MINIMAP_HIDE_CONFIRM = "Minimap-Schaltfläche des Dungeon-Journals ausblenden?\n\nMit /dj minimap wird sie wieder angezeigt.",
     LF_SHOW_RECIPES = "Muster-/Rezept-Drops immer anzeigen",
-    RESIZE_TIP_TITLE = "Größe ändern",
-    RESIZE_TIP = "Ziehen, um die Fenstergröße zu ändern. Rechtsklick zum Zurücksetzen.",
+    RESIZE_TIP_TITLE = "Skalieren",
+    RESIZE_TIP = "Ziehen, um das Fenster zu skalieren. Rechtsklick zum Zurücksetzen.",
+    OPT_RESIZE = "Größe ändern",
+    OPT_RESIZE_TIP = "Öffnet das Journal, damit du es an den Ecken größer ziehen kannst.",
+    RESIZE_HINT = "Ziehe an den Ecken, um die Größe zu ändern",
+    RESIZE_CORNER_TIP = "Ziehen, um die Größe zu ändern. Rechtsklick setzt die Größe zurück.",
+    OPT_RESET_SIZE = "Größe zurücksetzen",
+    OPT_RESET_SIZE_TIP = "Setzt das Journal auf seine normale Größe und Skalierung zurück.",
     LF_ENABLE = "Aktivieren",
     LF_DISABLE = "Deaktivieren",
     LF_MIN_LEVEL = "Mindeststufe (benötigt)",
+    LF_LEVEL_RANGE = "Stufenbereich",
     OPT_UI = "Allgemein",
     OPT_DISCORD_TEXT = "Tritt dem Dungeon Journal Discord bei, um Fehler zu melden, neue Entdeckungen zu teilen und die neuesten News zu erhalten.",
     OPT_DUNGEON_LIST = "Dungeonliste",
     OPT_HIDE_ITEM_LINE = "Journalzeile in Gegenstandstooltips ausblenden",
     OPT_HIDE_ITEM_LINE_TIP = "Entfernt die Zeile, die zeigt, von welchem Boss oder aus welcher Quest ein Gegenstand stammt.",
+    OPT_AUTO_COMPARE = "Automatischer Gegenstandsvergleich",
+    OPT_AUTO_COMPARE_TIP = "Gegenstandstooltips im Journal vergleichen sofort mit deinem angelegten Gegenstand, ohne dass du Shift gedrückt hältst.",
+    MALLET_HOW = "So bekommst du den Hammer",
     OPT_HIDE_MINIMAP = "Minikartenknopf ausblenden",
     OPT_HIDE_MINIMAP_TIP = "Mit /dj minimap holst du den Knopf zurück.",
     OPT_BIND = "Taste: Journal öffnen",
@@ -366,6 +471,15 @@ FDJ.Locales.deDE = {
     OPT_PRESS_KEY = "Taste drücken...",
     OPT_KEY_TAKEN = "%s ist bereits belegt. Wähle eine freie Taste.",
     OPT_NO_COMBAT = "Tastenbelegungen können im Kampf nicht geändert werden.",
+    LEVEL_TOO_LOW_DUNGEONS = "Deine Stufe ist zu niedrig für Dungeons.\nDie ersten beginnen ab Stufe %d.",
+    NO_DUNGEONS_MY_LEVEL = "Keine Dungeons für deine Stufe.",
+    SHOW_ALL_DUNGEONS_ANYWAY = "Trotzdem alle Dungeons zeigen",
+    SUMMON_QUEST_NOTE = "%s muss beschworen werden: Benutze %s am Gong bei seinem Becken.",
+    REP_REQUIRES = "Benötigt %s bei %s",
+    HOW_TO_SUMMON = "So beschwörst du %s",
+    MAP_WREX_KEYRING = "Mit Wrex' Schlüsselring öffnen für Ebene %d",
+    OPT_MY_LEVEL_RANGE = "Nur meinen Stufenbereich zeigen",
+    OPT_MY_LEVEL_RANGE_TIP = "Zeigt nur die Dungeons, deren Stufenbereich deine Stufe enthält (die Bereiche der Gruppensuche).",
     OPT_HIDE_OUTLEVELED = "Zu niedrige Dungeons automatisch ausblenden",
     OPT_HIDE_OUTLEVELED_TIP = "Blendet einen Dungeon aus der Liste aus, sobald deine Stufe über seinem Stufenbereich liegt.",
     OPT_HIDE_QUESTS_DONE = "Dungeons mit allen Quests erledigt ausblenden",
@@ -376,6 +490,8 @@ FDJ.Locales.deDE = {
     OPT_SHOW_ALL_CLASS_TIP = "Zeigt auch Klassenquests anderer Klassen (zum Beispiel Hexenmeister- oder Paladinquests). Aus: Du siehst nur die Quests deiner eigenen Klasse.",
     OPT_HIDE_LFG = "LFG-Button ausblenden",
     OPT_HIDE_LFG_TIP = "Blendet den Augen-Button neben „Ort anzeigen“ auf Dungeonseiten aus, der die Gruppensuche für diesen Dungeon öffnet. Geht auch per Rechtsklick auf das Auge → Deaktivieren.",
+    OPT_HIDE_SLEEPING_BAG = "Schlafsack-Quest ausblenden",
+    OPT_HIDE_SLEEPING_BAG_TIP = "Blendet das Schlafsack-Symbol auf der Startseite des Journals aus (neben den Symbolen für WoW Forever und Schlachtzüge). Geht auch per Rechtsklick auf das Symbol → Ausblenden. Eine verfolgte Schlafsack-Questreihe behält ihren Pfeil.",
     OPT_HIDE_DUNGEON_MAP = "Dungeonkarte im Dungeon ausblenden",
     OPT_HIDE_DUNGEON_MAP_TIP = "Wenn aktiviert, zeigt M im Dungeon die normale Karte des Spiels statt der Dungeonkarte des Journals.",
     DESCRIPTION = "Beschreibung",
@@ -388,6 +504,10 @@ FDJ.Locales.deDE = {
     LF_ARMOR_TIP = "Blendet Rüstungsteile anderer Typen aus. Waffen, Schilde, Ringe, Halsketten, Schmuckstücke und Umhänge bleiben immer sichtbar.",
     CHAIN_REQUIRED = "Erfordert zuerst eine Questreihe.",
     CHAIN_STEP = "Du bist bei Schritt %d von %d.",
+    GUIDE = "Anleitung",
+    HOW_TO_COMPLETE = "So schließt du sie ab",
+    GUIDE_TIP = "Klicken, um die Schritte zum Abschließen dieser Quest anzuzeigen",
+    GUIDE_STEP = "Anleitung: Schritt %d von %d",
     SHOW_NEXT_STEP_MAP = "Nächsten Schritt auf Karte zeigen",
     LF_SHOW = "Ergebnisse",
     LF_SHOW_TIP = "Öffnet eine Seite mit allen Bossen aus allen Dungeons, die zur Auswahl passende Beute fallen lassen.",
@@ -403,6 +523,8 @@ FDJ.Locales.deDE = {
     LF_STATS_HEADER = "Nur Gegenstände mit diesen Werten",
     LF_STATS_HINT = "Gesuchte Werte auswählen. Ohne Auswahl wird alles angezeigt.",
     LF_MATCH_ALL = "Gegenstand muss alle gewählten Werte haben",
+    LF_QUEST_REWARDS = "Auch Questbelohnungen zeigen",
+    LF_SEARCHING = "Beute wird durchsucht... %d%%",
     LF_CLEAR = "Leeren",
     OPT_DISCORD_COPY = "Drücke Strg+C, um den Einladungslink zu kopieren.",
     OPT_CLOSE = "Schließen",
@@ -417,6 +539,21 @@ FDJ.Locales.deDE = {
     RPG_UNLOCKED_MSG = "%s ist jetzt in deinem Journal freigeschaltet!",
     RPG_TOAST_TITLE = "Journalseite freigeschaltet",
     RPG_TOAST_HINT = "Klicken, um sie im Journal zu öffnen",
+    RPG_QUEST_TOAST_TITLE = "Dungeonquest freigeschaltet",
+    RPG_QUEST_UNLOCKED_MSG = "%s: Quest freigeschaltet! %d/%d",
+    RPG_QUEST_TOAST_HINT = "Klicken, um sie im Journal zu öffnen",
+    RPG_BOSS_HIDDEN = "Besiege diesen Boss, um ihn aufzudecken.",
+    RPG_TRASH_HIDDEN = "Besiege etwa 20 % der Gegner im Dungeon, um es aufzudecken.",
+    RPG_QUEST_HIDDEN = "Nimm diese Quest an, um sie freizuschalten.",
+    RPG_MAP_LOCKED_TITLE = "Karte gesperrt",
+    RPG_MAP_LOCKED_TIP = "Besiege etwa 20 %% der Gegner im Dungeon, um sie freizuschalten: %d/%d.",
+    RPG_MAP_LOCKED_MSG = "Die Dungeonkarte wird freigeschaltet, wenn etwa 20 %% der Gegner besiegt sind (%d/%d).",
+    RPG_MAP_TOAST_TITLE = "Dungeonkarte freigeschaltet",
+    RPG_MAP_UNLOCKED_MSG = "%s: Karte freigeschaltet!",
+    RPG_MAP_TOAST_HINT = "Klicken, um die Karte im Journal zu öffnen",
+    RPG_MAP_TOAST_HINT_M = "Drücke M im Dungeon, um sie zu sehen",
+    RPG_BOSS_REVEALED_MSG = "%s im Journal aufgedeckt!",
+    RPG_LOCKED_TIP_QUEST = "Nimmst du eine seiner Quests an, öffnet sich ein Teil davon.",
     RPG_PROGRESS = "Reise %d%%",
     RPG_PROGRESS_TITLE = "Dungeon-Reise",
     RPG_PROGRESS_TIP = "%d von %d Dungeon-Quests für deine Fraktion und Klasse abgeschlossen.",
@@ -433,7 +570,7 @@ FDJ.Locales.deDE = {
     RPG_CONFIRM_TEXT = "In diesem Modus bleiben Dungeons gesperrt, bis du den Endboss besiegst. Du kannst den Modus jederzeit in den Optionen ändern.",
     RPG_CONFIRM_OK = "Ok",
     RPG_CONFIRM_BACK = "Erneut wählen",
-    RPG_INTRO_TEXT = "Dungeons bleiben gesperrt, bis du ihren Endboss besiegst.",
+    RPG_INTRO_TEXT = "Dungeons bleiben gesperrt, bis du ihren Endboss besiegst.\nDu kannst die Quests trotzdem in den Optionen anzeigen lassen.", -- introline (2.0.17, text 2.0.18)
     RPG_INTRO_KEEP = "RPG-Modus behalten",
     RPG_INTRO_OPTIONS = "In den Optionen deaktivieren",
     MODE_RPG_ENABLE = "In den Optionen aktivieren",
@@ -445,6 +582,8 @@ FDJ.Locales.deDE = {
     REPEAT_HIDE = "Wiederholbare Quests ausblenden (%d)",
     OPT_SHOW_ALL_PROF = "Alle Berufsquests anzeigen",
     OPT_SHOW_ALL_PROF_TIP = "Zeigt auch Berufsquests (Schmiedekunst, Bergbau...) für Berufe, die dieser Charakter nicht hat.",
+    OPT_FOREVER_ONLY = "Nur Forever-Dungeons",
+    OPT_FOREVER_ONLY_TIP = "Zeigt nur die Dungeons, die neu in WoW Forever sind. Haken entfernen, um wieder alle Dungeons zu sehen.",
     PROF_BLACKSMITHING = "Schmiedekunst",
     PROF_MINING = "Bergbau",
     RAIDS_TITLE = "Schlachtzüge",
@@ -467,6 +606,7 @@ FDJ.Locales.deDE = {
     RECIPES_SECTION = "Rezepte & Muster (%d)",
     SHARED_SHOW = "Geteilte Beute anzeigen (%d)",
     SHARED_HIDE = "Geteilte Beute ausblenden (%d)",
+    PROBABLE_LOOT = "Nicht bestätigt, aber wahrscheinlicher Drop (%d)",
     SHARED_NOTE = "geringe Dropchance, viele Bosse",
     SHARED_LOOT = "Geteilte Beute",
     SEVERAL_DUNGEONS = "mehrere Dungeons",
@@ -482,6 +622,10 @@ FDJ.Locales.deDE = {
     LF_STAT_HP5 = "HP5",
     LF_STAT_HP5_TIP = "Gesundheit alle 5 Sekunden",
     LF_ARMOR_BTN = "Rüstung",
+    LF_RING = "Ring",
+    LF_NECK = "Hals",
+    LF_TRINKET = "Schmuck",
+    LF_CLOAK = "Umhang",
     LF_WEAPON_BTN = "Waffe",
     LF_RESIST = "Widerstandsfilter",
     LF_RESISTANCES = "Widerstände",
@@ -497,6 +641,8 @@ FDJ.Locales.deDE = {
     HIDDEN = "Ausgeblendet",
     CLICK_HIDE_DUNGEON = "Klicken, um diesen Dungeon auszublenden.",
     CLICK_RESTORE_DUNGEON = "Klicken, um diesen Dungeon wieder einzublenden.",
+    AUTO_HIDDEN_BY = "Ausgeblendet durch: %s",
+    CLICK_SHOW_ANYWAY = "Klicken, um ihn trotzdem anzuzeigen.",
     ALL_DUNGEONS_HIDDEN = "Alle Dungeons sind ausgeblendet. Klicke auf Dungeons ausblenden, um sie wieder einzublenden.",
     FACTION_QUESTS = "%s-Quests",
     QUEST_IN_LOG = "Diese frühere Quest befindet sich in deinem Questlog.",
@@ -513,15 +659,29 @@ FDJ.Locales.deDE = {
     LANGUAGE_HELP = "Sprachtest: /dj lang de, fr, es, ru, it, pt, en oder auto",
     UPDATE_AVAILABLE = "Version %s ist verfügbar (du hast %s). Aktualisiere über CurseForge.",
     PREVIOUS_QUEST = "Vorherige Quest",
+    REQUIRES_QUEST = "Erfordert: %s",
     NEXT_QUEST = "Nächste Quest",
     LEADS_TO = "Führt zu: %s",
     MAP_MARKER_REMOVED = "Kartenmarkierung entfernt.",
     MAP_LEFT_TARGET = "Linksklick, um den Questgeber in der Nähe anzuvisieren und zu markieren",
     MAP_RIGHT_REMOVE = "Rechtsklick zum Entfernen der Markierung",
+    MAP_PATROL = "Läuft umher: die Linie zeigt den Weg",
+    MAP_QUEST_TARGET = "Questziel",
     MAP_MARKED = "%s auf der Karte markiert.",
     MAP_OPEN_FAILED = "Der gespeicherte Kartenort konnte nicht geöffnet werden.",
+    MAP_COMBAT = "Die Karte lässt sich im Kampf nicht öffnen. Drücke %s, um die markierte Stelle zu sehen.",
     QUEST_GIVER = "Questgeber",
     QUEST_STARTS_HERE = "Quest startet hier",
+    TRACK = "Verfolgen",
+    TRACKING = "Verfolgt",
+    TRACK_TIP = "Zeigt die Quests dieses Dungeons mit deinem Fortschritt auf dem Bildschirm. Lässt sich überallhin ziehen.",
+    TRACK_STOP = "Nicht mehr verfolgen",
+    TRACK_READY = "Bereit zur Abgabe",
+    TRACK_DONE = "Abgeschlossen",
+    TRACK_IN_LOG = "In deinem Questlog",
+    TRACK_CLICK = "Klicken, um sie im Journal zu öffnen",
+    TURN_IN_HERE = "Hier abgeben",
+    TRACK_ACCEPT = "Klicken, um die Quest anzunehmen",
 }
 
 local function NormalizeLanguage(value)
@@ -670,6 +830,7 @@ end
 -- instead of requiring a translation entry for every possible amount.
 local REPUTATION_NAMES = {
     deDE = {
+        ["Alliance"] = "Allianz", -- repfix (2.0.8)
         ["Gadgetzan"] = "Gadgetzan",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "Gnomeregangnome",
@@ -684,6 +845,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "Unterstadt",
     },
     frFR = {
+        ["Alliance"] = "Alliance", -- repfix (2.0.8)
         ["Gadgetzan"] = "Gadgetzan",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "Exilés de Gnomeregan",
@@ -698,6 +860,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "Fossoyeuse",
     },
     esES = {
+        ["Alliance"] = "Alianza", -- repfix (2.0.8)
         ["Gadgetzan"] = "Gadgetzan",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "Exiliados de Gnomeregan",
@@ -712,6 +875,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "Entrañas",
     },
     itIT = {
+        ["Alliance"] = "Alleanza", -- repfix (2.0.8)
         ["Gadgetzan"] = "Gadgetzan",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "Esuli di Gnomeregan",
@@ -726,6 +890,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "Sepulcra",
     },
     ptBR = {
+        ["Alliance"] = "Aliança", -- repfix (2.0.8)
         ["Gadgetzan"] = "Geringontzan",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "Exilados de Gnomeregan",
@@ -740,6 +905,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "Cidade Baixa",
     },
     ruRU = {
+        ["Alliance"] = "Альянс", -- repfix (2.0.8)
         ["Gadgetzan"] = "Прибамбасск",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "Изгнанники Гномрегана",
@@ -754,6 +920,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "Подгород",
     },
     koKR = {
+        ["Alliance"] = "얼라이언스", -- repfix (2.0.8)
         ["Gadgetzan"] = "가젯잔",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "놈리건 추방자",
@@ -768,6 +935,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "언더시티",
     },
     zhCN = {
+        ["Alliance"] = "联盟", -- repfix (2.0.8)
         ["Gadgetzan"] = "加基森",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "诺莫瑞根流亡者",
@@ -782,6 +950,7 @@ local REPUTATION_NAMES = {
         ["Undercity"] = "幽暗城",
     },
     zhTW = {
+        ["Alliance"] = "聯盟", -- repfix (2.0.8)
         ["Gadgetzan"] = "加基森",
         ["Kirin Tor"] = "Kirin Tor",
         ["Gnomeregan Exiles"] = "諾姆瑞根流亡者",
@@ -821,6 +990,21 @@ function FDJ.LocalizeDungeonField(internalName, field, fallback)
 end
 
 function FDJ.LocalizeQuestField(questID, field, fallback)
+    -- Quest lists, trackers and prerequisite pages must use the same title as
+    -- the player's client. Only query it for the matching journal language;
+    -- another language still uses the verified static translations below.
+    if field == "name" and FDJ.GetLanguage() ~= "itIT"
+        and FDJ.CanUseClientLocalizedText() and type(questID) == "number"
+        and questID > 0 and questID < 1000000 and C_QuestLog then
+        local getter = C_QuestLog.GetTitleForQuestID or C_QuestLog.GetQuestInfo
+        if type(getter) == "function" then
+            local ok, title = pcall(getter, questID)
+            if ok and not (type(issecretvalue) == "function" and issecretvalue(title))
+                and type(title) == "string" and title ~= "" then
+                return title
+            end
+        end
+    end
     local content = ContentTable()
     local entry = content and content.quests and content.quests[questID]
     local value = entry and entry[field]
@@ -837,6 +1021,28 @@ function FDJ.LocalizeBossName(name)
     local content = ContentTable()
     local value = content and content.bosses and content.bosses[name]
     return value or FDJ.LocalizeFreeText(name)
+end
+
+-- sourcetipl10n (2.0.9, M 16 Nov 2026: the trash portrait tooltip "like
+-- all trees, all satyrs ... doesn't get translated to other languages"):
+-- the family a trash item's portraits stand for (sourceTip, Data/Dungeons.lua).
+-- Eldreth spirits and Verek: the game's own names (Wowhead tooltips of npc
+-- 11472 and 9042, per language); zhTW written from zhCN.
+local SOURCE_TIPS = {
+    deDE = { ["All trees"] = "Alle Bäume", ["All satyrs"] = "Alle Satyrn", ["All Eldreth spirits"] = "Alle Geister der Eldreth", ["Verek"] = "Verek" },
+    frFR = { ["All trees"] = "Tous les arbres", ["All satyrs"] = "Tous les satyres", ["All Eldreth spirits"] = "Tous les esprits Eldreth", ["Verek"] = "Verek" },
+    esES = { ["All trees"] = "Todos los árboles", ["All satyrs"] = "Todos los sátiros", ["All Eldreth spirits"] = "Todos los espíritus Eldreth", ["Verek"] = "Verek" },
+    itIT = { ["All trees"] = "Tutti gli alberi", ["All satyrs"] = "Tutti i satiri", ["All Eldreth spirits"] = "Tutti gli spiriti Eldreth", ["Verek"] = "Verek" },
+    ptBR = { ["All trees"] = "Todas as árvores", ["All satyrs"] = "Todos os sátiros", ["All Eldreth spirits"] = "Todos os espíritos eldretianos", ["Verek"] = "Verek" },
+    ruRU = { ["All trees"] = "Все деревья", ["All satyrs"] = "Все сатиры", ["All Eldreth spirits"] = "Все элдретарские духи", ["Verek"] = "Верек" },
+    koKR = { ["All trees"] = "모든 나무정령", ["All satyrs"] = "모든 사티로스", ["All Eldreth spirits"] = "모든 엘드레스 영혼", ["Verek"] = "베레크" },
+    zhCN = { ["All trees"] = "所有树人", ["All satyrs"] = "所有萨特", ["All Eldreth spirits"] = "所有艾德雷斯鬼巫", ["Verek"] = "维雷克" },
+    zhTW = { ["All trees"] = "所有樹人", ["All satyrs"] = "所有薩特", ["All Eldreth spirits"] = "所有艾德雷斯鬼巫", ["Verek"] = "維雷克" },
+}
+function FDJ.LocalizeSourceTip(text)
+    if type(text) ~= "string" or text == "" then return text end
+    local own = SOURCE_TIPS[FDJ.GetLanguage()]
+    return (own and own[text]) or FDJ.LocalizeFreeText(text)
 end
 
 function FDJ.LocalizeItemSlot(slotText)
@@ -873,5 +1079,7 @@ function FDJ.LocalizeMapLocation(loc)
         y = loc.y,
         label = FDJ.LocalizeFreeText(loc.label),
         detail = FDJ.LocalizeFreeText(loc.detail),
+        noteKey = loc.noteKey, noteArg = loc.noteArg, -- (loreaspects: the arrow's note line, translated by its key)
+        pickUp = loc.pickUp, exact = loc.exact, -- (bookexact: a thing to pick up at one place, in every language)
     }
 end

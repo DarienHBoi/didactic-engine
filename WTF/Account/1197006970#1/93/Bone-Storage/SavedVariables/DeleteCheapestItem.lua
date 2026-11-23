@@ -1,0 +1,31 @@
+
+DCI_DB = {
+["Auto_Loot"] = true,
+["UseAuctionPrices"] = true,
+["IgnoredItems"] = {
+},
+["SubtractAuctionCut"] = true,
+["Auto_Trade"] = true,
+["HideWindowTitle"] = false,
+["AuctionGreyUnderVendor"] = true,
+["CompareByPrice"] = 3,
+["HideSoulbound"] = true,
+["Minimap"] = {
+["hide"] = false,
+},
+["Auto_QuestComplete"] = true,
+["FollowLootWindow"] = false,
+["AllowInCombat"] = true,
+["HideBronzeTheme"] = false,
+["MaxQuality"] = 2,
+["ShowFullStackValues"] = false,
+["Auto_Inventory"] = false,
+["Auto_Roll"] = true,
+["Auto_LowSlots"] = false,
+["AuctionPriceHidePoorQuality"] = true,
+["LowSlotsThreshold"] = 0,
+["ShowBothPrices"] = false,
+["Auto_Mail"] = true,
+["Auto_Vendor"] = true,
+["Auto_QuestAccept"] = true,
+}

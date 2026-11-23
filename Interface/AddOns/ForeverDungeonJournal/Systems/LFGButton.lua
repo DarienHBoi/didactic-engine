@@ -81,6 +81,20 @@ local function FindActivity(dungeonName)
                     return aid, i
                 end
             end
+            -- Names that differ a little ("The Stockade" / "Stormwind
+            -- Stockades"): one contains the other, plural "s" ignored.
+            local stem = wanted:gsub("s$", "")
+            if #stem >= 5 then
+                for _, aid in ipairs(ids) do
+                    local ok2, i = pcall(C_LFGList.GetActivityInfoTable, aid)
+                    if ok2 and type(i) == "table" then
+                        for _, n in ipairs({ Norm(i.fullName), Norm(i.shortName) }) do
+                            local ns = n:gsub("s$", "")
+                            if ns ~= "" and (ns:find(stem, 1, true) or stem:find(ns, 1, true)) then return aid, i end
+                        end
+                    end
+                end
+            end
         end
     end
     return id, info
@@ -195,7 +209,7 @@ function FDJ.ShowBrowseHint()
         h.arrow:SetVertexColor(1, 0.12, 0.08)
         h.arrow:SetSize(24, 24)
         h.arrow:SetPoint("LEFT", 6, 0)
-        h.text = h:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+        h.text = h:CreateFontString(nil, "OVERLAY", "ForeverDJ_GameFontHighlightLarge")
         h.text:SetPoint("LEFT", h.arrow, "RIGHT", 6, 0)
         h.text:SetTextColor(1, 1, 1)
         h.text:SetShadowColor(0, 0, 0, 1)
@@ -540,7 +554,7 @@ function FDJ.ShowLFGMenu(anchor)
             item:SetPoint("RIGHT", -5, 0)
             item:SetHeight(20)
             item:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
-            item.text = item:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            item.text = item:CreateFontString(nil, "OVERLAY", "ForeverDJ_GameFontHighlight")
             item.text:SetPoint("LEFT", 6, 0)
             item:SetScript("OnClick", function()
                 m:Hide()
@@ -550,7 +564,11 @@ function FDJ.ShowLFGMenu(anchor)
         end
         -- (A "List me for this dungeon" entry was tried: the game does not
         -- let addons create listings, so it was removed.)
-        m.disable = Item(1, function() FDJ.SetLFGButtonHidden(true) end)
+        -- 2.0.4: Disable opens Options at its line (highlighted); the player
+        -- ticks it there, so they know where to undo it.
+        m.disable = Item(1, function()
+            if FDJ.OpenSettingsAt then FDJ.OpenSettingsAt("OPT_HIDE_LFG") else FDJ.SetLFGButtonHidden(true) end
+        end)
         -- Closes on its own once the mouse has been away for a moment.
         m:SetScript("OnUpdate", function(self, elapsed)
             if self:IsMouseOver() or (self.fdjAnchor and self.fdjAnchor:IsMouseOver()) then
@@ -663,6 +681,7 @@ function FDJ.UpdateLFGButton(frame, dungeonName, dungeon)
     local b = frame and frame.lfgButton
     if not b then return end
     local valid = dungeon and not dungeon.recipeSearch and not dungeon.fdjItemCount and not dungeon.previewOnly
+        and not dungeon.questChainPage
     b.fdjDungeon = valid and dungeonName or nil
     local show = valid and not FDJ.IsLFGButtonHidden()
     b:SetShown(show and true or false)
@@ -809,7 +828,7 @@ function FDJ.ShowCopyBox(text)
         })
         box:SetBackdropColor(0.06, 0.05, 0.04, 0.97)
         box:SetBackdropBorderColor(0.62, 0.50, 0.30, 1)
-        local title = box:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        local title = box:CreateFontString(nil, "OVERLAY", "ForeverDJ_GameFontNormal")
         title:SetPoint("TOPLEFT", 14, -12)
         title:SetText("Dungeon Journal debug: press Ctrl+C to copy, then paste it to the author")
         local close = CreateFrame("Button", nil, box, "UIPanelCloseButton")

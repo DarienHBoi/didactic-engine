@@ -1,0 +1,140 @@
+local _, ns = ...
+ns.guides = ns.guides or {}
+
+local HAMMER_VENDORS = {
+    { "H", "Orgrimmar", "Sumi", "Justo al lado del instructor." },
+    { "H", "Undercity", "Samuel Van Brunt", "Justo al lado del instructor." },
+    { "H", "Thunder Bluff", "Taur Stonehoof", "Justo al lado del instructor." },
+    { "H", "Durotar", "Flakk", "En Cerrotajo (Razor Hill)." },
+    { "H", "Tirisfal Glades", "Walter Mason", "En el Camposanto (Deathknell)." },
+    { "H", "Tirisfal Glades", "Abigail Shiel", "En Rémol (Brill)." },
+    { "A", "Stormwind City", "Kaita Deepforge", "Justo al lado del instructor." },
+    { "A", "Ironforge", "Thurgrum Deepforge", "Justo al lado del instructor." },
+    { "A", "Elwynn Forest", "Tharynn Bouden", "En Villadorada (Goldshire)." },
+    { "A", "Dun Morogh", "Thrawn Boltar", "Justo al lado del instructor." },
+    { "A", "Darkshore", "Elisa Steelhand", "En Auberdine, junto al instructor." },
+    { "N", "Zephras Isle", "Halavuul Cragwind", "Instructor de Minería en Valanaar." },
+    { "N", "Zephras Isle", "Aedi Thriceforged", "En el poblado Shen'dar." },
+}
+
+ns.guides.blacksmithing = {
+    intro = "Ruta más rápida y barata de 1 a 300. Herrería gasta muchísimo mineral, así que conviene subirla junto con Minería; comprarlo todo en la subasta sale caro.",
+    apprenticeNote = "Herrería de aprendiz no tiene requisito de nivel en Forever. Todas las capitales tienen instructor salvo Darnassus.",
+
+    shopping = {
+        { title = "1-150", rows = {
+            { "2835x90" }, { "2840x114" }, { "2836x72" }, { "2841x380" }, { "2838x60" }, { "2319x58" },
+            { "2880x96", vendor = true }, { "3466x10", vendor = true },
+        } },
+        { title = "150-225", rows = {
+            { "2841x152" }, { "3466x19", vendor = true }, { "2319x19" }, { "3575x90" }, { "2605x15", vendor = true },
+            { "3859x50", alt = "3575x50 3857x50", note = "Con Minería 165 puedes fundir tú el Acero (el Carbón se compra al proveedor de suministros de herrería)." },
+            { "3860x432", alt = "3859x478 2838x135 7912x68", note = "La alternativa es la ruta de Coraza y Yelmo de acero en 185-215." },
+            { "3860x160" },
+        } },
+        { title = "225-300", note = "Aún no es definitiva: esta parte no se ha podido probar.", rows = {
+            { "12365x5" }, { "3860x224" }, { "4304x64" }, { "12359x1910" }, { "8170x30" }, { "7910x67" }, { "7909x25" },
+        } },
+    },
+
+    capitals = {
+        { "H", "Orgrimmar", "Ug'thok" }, { "H", "Undercity", "Basil Frye" }, { "H", "Thunder Bluff", "Thrag Stonehoof" },
+        { "A", "Stormwind City", "Dane Lindgren" }, { "A", "Ironforge", "Groum Stonebeard" },
+    },
+    starting = {
+        { race = "Orco, Trol", zone = "Durotar", npcs = { { "H", "Durotar", "Dwukk", "En la forja de Cerrotajo (Razor Hill)." } } },
+        { race = "Tauren", zone = "Mulgore", npcs = { { "H", "Thunder Bluff", "Thrag Stonehoof", "No hay instructor en Mulgore: está en la meseta inferior de Cima del Trueno." } } },
+        { race = "No-muerto", zone = "Tirisfal Glades", npcs = { { "H", "Tirisfal Glades", "Angus Hammerhand",
+            "En el Bastión de Bandarion (Bandarion Keep). Nadie cerca vende el Martillo de herrero: cómpralo antes a Walter Mason (Camposanto) o Abigail Shiel (Rémol)." } } },
+        { race = "Humano", zone = "Elwynn Forest", npcs = { { "A", "Elwynn Forest", "Smith Argus", "En Villadorada (Goldshire), frente a la posada." } } },
+        { race = "Enano, Gnomo", zone = "Dun Morogh", npcs = { { "A", "Dun Morogh", "Tognus Flintfire", "En Kharanos, frente a la destilería Cebatruenos." } } },
+        { race = "Elfo de la noche", zone = "Teldrassil", npcs = { { "A", "Darkshore", "Delfrum Flintbeard", "No hay en Teldrassil ni Darnassus: el más cercano está en Auberdine, Costa Oscura." } } },
+        { race = "Skyborne", zone = "Zephras Isle", npcs = {
+            { "N", "Zephras Isle", "Daeann Steelwind", "En Valanaar." },
+            { "N", "Zephras Isle", "Aedi Thriceforged", "En el poblado Shen'dar." } } },
+    },
+
+    extras = {
+        { title = "Martillo de herrero", item = 5956,
+          text = "Cómpralo al aprender la profesión: casi todas las recetas lo piden y así puedes fabricarte equipo mientras subes. Cuesta unas pocas monedas de cobre.",
+          npcs = HAMMER_VENDORS },
+    },
+
+    ranks = {
+        { title = "Aprendiz", range = "1-75", steps = {
+            { r = "1-25", n = 30, spell = 2660, name = "Rough Sharpening Stone", icon = "inv_stone_sharpeningstone_01", mats = "2835x30" },
+            { r = "25-50", n = 30, spell = 3320, name = "Rough Grinding Stone", icon = "inv_stone_grindingstone_01", mats = "2835x60",
+              note = "Guarda 26: 16 para los guanteletes y 10 para las Varillas de plata en 75 si las haces." },
+            { r = "50-67", n = 36, spell = 3326, name = "Coarse Grinding Stone", icon = "inv_stone_grindingstone_02", mats = "2836x72",
+              note = "Haz las 36: las necesitarás para los brazales en 95 y 112." },
+            { r = "67-75", n = 8, spell = 3323, name = "Runed Copper Gauntlets", icon = "inv_gauntlets_04", mats = "2840x64 3470x16",
+              note = "A partir de aquí necesitas el Martillo de herrero." },
+        } },
+        { title = "Oficial", range = "75-150", req = "Herrería 50 y nivel 10.",
+          trainers = {
+            { "H", "Orgrimmar", "Snarl" }, { "H", "Undercity", "James Van Brunt" }, { "H", "Thunder Bluff", "Karn Stonehoof" },
+            { "H", "Tirisfal Glades", "Angus Hammerhand", "En el Bastión de Bandarion." },
+            { "A", "Stormwind City", "Therum Deepforge" }, { "A", "Ironforge", "Rotgath Stonebeard" } },
+          steps = {
+            { r = "75-80", n = 5, spell = 2666, name = "Runed Copper Belt", icon = "inv_belt_03", mats = "2840x50",
+              alt = { { n = 5, spell = 7818, name = "Silver Rod", icon = "inv_staff_01", mats = "2842x5 3470x10",
+                        note = "Si tienes Barras de plata o una cuesta menos que 10 Barras de cobre." } } },
+            { r = "80-95", n = 15, spell = 2668, name = "Rough Bronze Leggings", icon = "inv_pants_03", mats = "2841x90" },
+            { r = "95-100", n = 5, spell = 2672, name = "Patterned Bronze Bracers", icon = "inv_bracer_07", mats = "2841x25 3478x10",
+              note = "Usa las Piedras de afilar toscas que hiciste en 50." },
+            { r = "100-112", n = 20, spell = 3337, name = "Heavy Grinding Stone", icon = "inv_stone_grindingstone_03", mats = "2838x60",
+              note = "Guarda las 20: las necesitas para los Brazales de escamas doradas en 175." },
+            { r = "112-125", n = 13, spell = 2672, name = "Patterned Bronze Bracers", icon = "inv_bracer_07", mats = "2841x65 3478x26" },
+            { r = "125-140", n = 24, spell = 2742, name = "Bronze Shortsword", icon = "inv_sword_24", mats = "2841x120 2880x96 2319x48",
+              note = "El Fundente débil lo vende el proveedor de suministros de herrería junto al instructor de cada capital." },
+            { r = "140-150", n = 10, spell = 9985, name = "Bronze Warhammer", icon = "inv_hammer_18", mats = "2841x80 3466x10 2319x10",
+              note = "El Fundente fuerte lo vende el proveedor de suministros de herrería junto al instructor de cada capital." },
+        } },
+        { title = "Experto", range = "150-215", req = "Herrería 125, nivel 20 y 50 de plata.",
+          trainers = { { "H", "Orgrimmar", "Saru Steelfury" }, { "A", "Ironforge", "Bengus Deepforge" } },
+          steps = {
+            { r = "150-165", n = 19, spell = 9985, name = "Bronze Warhammer", icon = "inv_hammer_18", mats = "2841x152 3466x19 2319x19",
+              note = "Aprende antes Herrería de experto." },
+            { r = "165-175", n = 15, spell = 3501, name = "Green Iron Bracers", icon = "inv_bracer_06", mats = "3575x90 2605x15",
+              note = "El Tinte verde lo venden los proveedores de suministros de sastrería y peletería de las capitales.",
+              vendors = { { "H", "Orgrimmar", "Tamar", "En el Arrastradero." }, { "H", "Undercity", "Millie Gregorian", "En el Barrio de la Magia." },
+                          { "H", "Thunder Bluff", "Mahu" }, { "A", "Stormwind City", "Jillian Tanner", "En el Casco Antiguo." },
+                          { "A", "Ironforge", "Bombus Finespindle", "En la Gran Fundición." } } },
+            { r = "175-185", n = 10, spell = 7223, name = "Golden Scale Bracers", icon = "inv_bracer_10", mats = "3859x50 3486x20",
+              note = "Usa las 20 Piedras de afilar pesadas que hiciste en 100. El Carbón lo vende el proveedor de suministros de herrería; necesitas Minería 165 para fundir el Acero tú mismo." },
+            { r = "185-215", n = 36, spell = 9931, name = "Mithril Scale Pants", icon = "inv_pants_04", mats = "3860x432",
+              alt = { { n = 15, spell = 9916, name = "Steel Breastplate", icon = "inv_chest_plate06", mats = "3859x240 3486x45",
+                        note = "Si el Acero sale más barato que el Mitril: 15 Corazas de acero de 185 a 200 y luego 17 Yelmos de placas de acero de 200 a 215. La Piedra de afilar sólida se hace con 4 Piedras sólidas.",
+                        also = { { n = 17, spell = 9935, name = "Steel Plate Helm", icon = "inv_helmet_03", mats = "3859x238 7966x17" } } } } },
+        } },
+        { title = "Artesano", range = "215-300", req = "Herrería 200 y nivel 35. Ambas facciones aprenden con el mismo instructor.", untested = true,
+          text = "Desde 225 aún no se ha podido probar por el límite de nivel de la beta. Muchos rangos cambiaron respecto a Classic Era (la mayoría de recetas se vuelven grises 25 puntos antes), así que no sigas la guía de Classic para este tramo.",
+          trainers = { { "N", "Stranglethorn Vale", "Brikk Keencraft", "En Bahía del Botín (Booty Bay)." } },
+          steps = {
+            { r = "215-225", n = 10, spell = 9959, name = "Heavy Mithril Breastplate", icon = "inv_chest_plate07", mats = "3860x160",
+              alt = { { n = 10, spell = 9964, name = "Mithril Spurs", icon = "ability_rogue_sprint", mats = "3860x40 7966x30", recipe = 7989,
+                        note = "Los planos son botín del mundo: búscalos en la subasta." } } },
+            { r = "225-230", n = 5, spell = 16641, name = "Dense Sharpening Stone", icon = "inv_stone_sharpeningstone_05", mats = "12365x5" },
+            { r = "230-240", n = 16, spell = 9968, name = "Heavy Mithril Boots", icon = "inv_boots_plate_06", mats = "3860x224 4304x64" },
+            { r = "240-245", n = 5, spell = 16647, name = "Imperial Plate Belt", icon = "inv_belt_11", mats = "12359x110 8170x30 7909x5", quest = 7653,
+              note = "Los planos se ganan con la misión Imperial Plate Belt (nivel 50, entrega 20 Barras de torio). Las cuatro misiones Imperial piden en total 140 Barras de torio (20, 20, 40 y 60): llévalas además de las de fabricar. En Classic piden Herrería 265; Forever bajó las recetas a 240, pero aún no se ha probado.",
+              vendors = { { "N", "Tanaris", "Derotain Mudsipper", "En Gadgetzan. Da las cuatro misiones de placas imperiales." } },
+              alt = {
+                { n = 15, spell = 10013, name = "Ebon Shiv", icon = "inv_weapon_shortblade_15", mats = "3860x180 6037x90 7910x30 7966x15 4304x30",
+                  note = "Solo si las misiones siguen pidiendo Herrería 265: Daga de ébano de 240 a 255 y luego Hacha de mano de torio ornamentada de 255 a 270.",
+                  vendors = { { "N", "Winterspring", "Magnus Frostwake", "Vende los planos de la Hacha de mano de torio ornamentada." } },
+                  also = { { n = 15, spell = 16969, name = "Ornate Thorium Handaxe", icon = "inv_axe_09", mats = "12359x300 12799x30 12644x30 8170x60" } } },
+                { n = 15, spell = 16645, name = "Radiant Belt", icon = "inv_belt_11", mats = "12359x150 7077x30",
+                  note = "Planos de botín del mundo (240-255)." },
+                { n = 17, spell = 16644, name = "Thorium Bracers", icon = "inv_bracer_13", mats = "12359x204 11184x68",
+                  note = "Planos de botín del mundo (240-255)." },
+              } },
+            { r = "245-270", n = 27, spell = 16649, name = "Imperial Plate Bracers", icon = "inv_bracer_14", mats = "12359x540 7910x27", quest = 7655,
+              note = "Planos de la misión Imperial Plate Bracer (20 Barras de torio)." },
+            { r = "270-290", n = 20, spell = 16657, name = "Imperial Plate Boots", icon = "inv_boots_plate_03", mats = "12359x680 7910x20 7909x20", quest = 7654,
+              note = "Planos de la misión Imperial Plate Boots (40 Barras de torio)." },
+            { r = "290-300", n = 10, spell = 16730, name = "Imperial Plate Leggings", icon = "inv_pants_04", mats = "12359x440 7910x20", quest = 7658,
+              note = "Planos de la misión Imperial Plate Leggings (60 Barras de torio)." },
+          } },
+    },
+}

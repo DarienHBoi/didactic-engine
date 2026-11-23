@@ -1,0 +1,6 @@
+## Interface: 16001
+## Title: !ErrorLog
+## Category: Nectar
+## Notes: Saves every Lua error (and blocked-action taint warnings) to SavedVariables so they can be read outside the game. /errlog clear empties it.
+## SavedVariables: ErrorLogDB
+ErrorLog.lua

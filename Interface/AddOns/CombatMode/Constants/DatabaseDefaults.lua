@@ -1,0 +1,225 @@
+---------------------------------------------------------------------------------------
+--  Constants/DatabaseDefaults.lua — CONSTANTS — CombatModeDB defaults
+---------------------------------------------------------------------------------------
+--  What it does: Defines `CM.Constants.DatabaseDefaults` (global + char) merged by
+--  `CM.InitDatabase` into AceDB-shaped CombatModeDB. Single source of truth for
+--  new-install defaults across free-look, crosshair companions, click-cast, reticle,
+--  and Ally Cycle.
+--  Architecture / how it works:
+--    • global: free-look / crosshair / Interaction HUD / Assisted Combat / reticle /
+--      click-cast bindings / auto-unlock / Mouse Look camera (mouseLookSpeed,
+--      minCameraZoom, dynamicPitch, dynamicPitchStrength, vignette, shoulderFollowsMouseLook, respectMotionSickness,
+--      autofocusLockedTarget) / allyCycle / debug.
+--      Crosshair also stores crosshairSituationalCondition + crosshairSituationalAppearance.
+--    • char: reticle targeting, click-cast bindings, useGlobalBindings, shoulderOffset,
+--      supportMode* (Support Mode page / nameplates / Vignette tint).
+--    • InitDatabase merges missing keys, then coerces Forever-style 1/0 flags to real
+--      booleans wherever these defaults declare a boolean (CM.DbBool / NormalizeBools).
+--    • MigrateMouseLookCameraDB (CVarManager) seeds shoulder/dynamicPitch from legacy
+--      Action Camera profile keys once after merge.
+--    • global.composedMacros maps macro name -> the body the Macro Composer wrote after the
+--      preline (ComposedMacros.lua auto-rebuilds those macros when the preline changes).
+--    • DefaultBindings seeds button1/2 + shift/ctrl/alt mouse slots and Mouse Look toggle.
+--  Does not: Migrate saved data or apply CVars/bindings at runtime (CVarManager does).
+--  Related: Core/Runtime/Runtime.lua, Core/Runtime/CVarManager.lua,
+--  Core/ClickCasting/TargetingMacroBuilder.lua, UI/Options/Tabs/TabCrosshair.lua,
+--  UI/Editors/TargetingMacroPrelinesEditor.lua, Core/AllyCycle/AllyCycle.lua,
+--  UI/Options/Tabs/TabClickCasting.lua, UI/Options/Tabs/TabGeneral.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+
+local DefaultBindings = {
+  button1 = {
+    enabled = true,
+    key = "BUTTON1",
+    value = "ACTIONBUTTON1",
+    macroName = "",
+  },
+  button2 = {
+    enabled = true,
+    key = "BUTTON2",
+    value = "ACTIONBUTTON2",
+    macroName = "",
+  },
+  shiftbutton1 = {
+    enabled = true,
+    key = "SHIFT-BUTTON1",
+    value = "ACTIONBUTTON3",
+    macroName = "",
+  },
+  shiftbutton2 = {
+    enabled = true,
+    key = "SHIFT-BUTTON2",
+    value = "ACTIONBUTTON4",
+    macroName = "",
+  },
+  ctrlbutton1 = {
+    enabled = true,
+    key = "CTRL-BUTTON1",
+    value = "ACTIONBUTTON5",
+    macroName = "",
+  },
+  ctrlbutton2 = {
+    enabled = true,
+    key = "CTRL-BUTTON2",
+    value = "ACTIONBUTTON6",
+    macroName = "",
+  },
+  altbutton1 = {
+    enabled = true,
+    key = "ALT-BUTTON1",
+    value = "TARGETMOUSEOVER",
+    macroName = "",
+  },
+  altbutton2 = {
+    enabled = true,
+    key = "ALT-BUTTON2",
+    value = "CLEARTARGET",
+    macroName = "",
+  },
+  toggle = { key = "Combat Mode - Mouse Look", value = "BUTTON3" },
+}
+
+CM.Constants.DatabaseDefaults = {
+  global = {
+    -- general
+    pulseCursor = true,
+    hideTooltip = true,
+    tooltipModifier = "ALT", -- key that shows tooltips while Hide Tooltips is on: ALT | CTRL | SHIFT
+    sheathWeaponsWithMouselook = false,
+    closeWindowsOnMouseLook = false, -- Mouse Look key closes open windows instead of waiting for you to
+    interactUnit = "target",
+    showTargetLockMarker = true,
+    -- Sounds (Advanced tab): one switch per feature that plays cues.
+    soundMouseLook = true,
+    soundTargetLock = true,
+    soundRadialMenu = true,
+    soundAllyCycle = true,
+    -- Reticle Targeting: outline preset (Outline 3, no fades). false = Outline 0 + Blizzard fades.
+    reticleOutline = true,
+    -- Reticle Targeting: which target gets Blizzard's selection circle (ObjectSelectionCircle).
+    -- "target" = your hard target; "locked" = only your Target Lock (focus); "soft" = Blizzard's
+    -- circle and name on the soft target; "hidden" = none.
+    selectionCircleMode = "target",
+    autofocusLockedTarget = false, -- Target Focus Enemy while focus exists
+    -- crosshair
+    crosshair = true,
+    crosshairCastFeedback = true,
+    crosshairAppearance = CM.Constants.CrosshairTextureObj.Default,
+    crosshairMountedId = CM.Constants.CrosshairIdleDefaultId, -- texture while mounted
+    crosshairTargetLockId = CM.Constants.CrosshairIdleDefaultId, -- texture while Target Lock holds
+    crosshairSupportId = CM.Constants.CrosshairSupportDefaultId, -- texture in Support Mode
+    crosshairScale = 1.0,
+    crosshairY = 100,
+    -- crosshair HUD: interaction mode toggle (layout is shared with combat assist)
+    interactionHUD = true,
+    -- Interactable Indicator also prompts for other players (portrait + name) after a short aim
+    interactionHUDPlayers = true,
+    -- On = the Interact key never opens a player's context menu, so it stays native everywhere
+    -- (e.g. multi-passenger mounts). Off (default) = long press on a player opens their menu.
+    disablePlayerInteract = false,
+    -- combat assist
+    -- "always" | "combat" | "hidden"
+    assistedHighlightMode = "always",
+    assistedHighlightSide = "RIGHT",
+    assistedHighlightScale = 1.0,
+    assistedHighlightPadding = 24,
+    -- reticle targeting
+    reticleTargetingCVarOverrides = {},
+    priorCVarSnapshot = nil,
+    targetingMacroPrelineEnemyOverride = nil,
+    targetingMacroPrelineAutoLockEnemyOverride = nil,
+    composedMacros = {},
+    crosshairReactionColors = {},
+    crosshairSituationalCondition = [[
+local deadOrGhost = UnitIsDeadOrGhost and UnitIsDeadOrGhost("player")
+if deadOrGhost then
+  return true end
+return false
+]],
+    crosshairSituationalAppearance = CM.Constants.CrosshairSituationalHidden,
+    -- click casting
+    bindings = DefaultBindings,
+    -- auto unlock
+    frameWatching = true,
+    -- Icons of the Extra Frames chips, remembered because their frames may not exist yet after a reload.
+    frameIcons = {},
+    -- Prefilled with the known vendor mounts on Mainline only; every other client starts empty.
+    mountsToUnlock = CM.IsRetailClient and "61447, 122708, 264058, 465235, 457485, 61425" or "",
+    -- Extra frame names the player adds themselves (Auto Unlock tab); empty on a fresh install.
+    watchlist = {},
+    customCondition = "",
+    -- When true, force-unlock applies once per time the snippet becomes true.
+    customConditionOnce = false,
+    -- Return true to force Mouse Look on (beats tap-unlock + customCondition only).
+    customLockCondition = "",
+    -- When true, that force applies once per time the snippet becomes true.
+    customLockConditionOnce = false,
+    -- mouse look camera
+    mouseLookSpeed = 100,
+    -- Closest the camera may zoom in (yards); 0 = off.
+    minCameraZoom = 3,
+    dynamicPitch = true,
+    -- Vignette shows when these are true: CSV of mouselook | combat | interaction ("" = off).
+    -- A string, not a table: MergeDefaults would graft default keys onto a saved table.
+    vignetteConditions = "mouselook",
+    -- "any" = one selected condition is enough, "all" = every selected condition must hold.
+    vignetteMatch = "any",
+    -- Ease shoulder with Mouse Look chrome when on (default off = keep configured offset).
+    shoulderFollowsMouseLook = false,
+    -- When true, never force Motion Sickness ActionCam gates off (Accessibility honored).
+    respectMotionSickness = false,
+    -- Ally Cycle HUD (enable = Up/Down keybinds bound; no master toggle)
+    allyCycle = {
+      showHud = true,
+      hudSide = "BOTTOM",
+      scale = 1.0,
+      padding = 24,
+      skipPlayer = true,
+      -- Extra units cycled after the group: CSV of playerPet | partyPets ("" = group only)
+      extraUnits = "playerPet",
+      -- false + Set=false → follow healer spec until the user toggles.
+      restoreAllyAfterHarm = false,
+      restoreAllyAfterHarmSet = false,
+    },
+    -- first run, account-wide: welcome modal dismissed; setup wizard finished or skipped
+    -- (accounts that predate the wizard get it once at login)
+    seenWarning = false,
+    seenWizard = false,
+    -- Radial Menu look: "forever" (original art) | "minimal" (Blizzard radial vignette)
+    radialStyle = "minimal",
+    -- dev
+    silenceAlerts = true,
+    debugMode = false,
+  },
+  char = {
+    -- Radial Menu wheels: { name, count, slots = { [1..8] = { kind, id } } } (see Core/RadialMenu/Data.lua)
+    radialMenu = {
+      wheels = {},
+    },
+    -- Party Wheel: helpful spells (spell-ID CSV) that open the group wheel while held
+    partyWheelSpells = "",
+    -- mouse look camera
+    shoulderOffset = 1.2,
+    -- reticle targeting
+    reticleTargeting = true,
+    autoTargetLockOnAttack = false,
+    -- Target Lock key: "toggle" = lock / tap again to unlock; "switch" = lock the unit under the
+    -- crosshair (replacing any lock), tap with nothing under the crosshair to unlock.
+    targetLockBehavior = "toggle",
+    macroInjectionClickCastOnly = false,
+    excludeFromTargetingSpells = "",
+    castAtCursorSpells = "",
+    -- click casting
+    useGlobalBindings = true,
+    bindings = DefaultBindings,
+    -- Support Mode (enable = keybind bound; Core/ClickCasting/SupportMode.lua)
+    supportModePage = 2, -- bar page shown while the mode is on (2-6); 0 = no page swap
+    -- Nameplates while the mode is on: "keep" (untouched) | "friendly" | "all" | "none"
+    supportModeNameplateMode = "friendly",
+    -- The unit under the crosshair beats a hard target / Ally Cycle pick (false: the target first)
+    supportModeCrosshairFirst = false,
+    supportModeTintVignette = true, -- the Vignette takes the Support crosshair color while on
+    supportModeActive = false, -- session flag: a reload while on returns to page 1
+  },
+}

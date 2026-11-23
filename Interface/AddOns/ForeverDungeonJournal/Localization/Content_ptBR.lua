@@ -491,6 +491,10 @@ FDJ.ContentLocales.ptBR.bosses = {
 }
 
 FDJ.ContentLocales.ptBR.slotParts = {
+    -- isalien (2.1.1): relics (Wowhead Forever, the drop tables in this language)
+    ["Relic"] = "Relíquia",
+    ["Libram"] = "Livreto",
+    ["Totem"] = "Totem",
     ["Chest"] = "Torso",
     ["Leather"] = "Couro",
     ["Wrist"] = "Pulsos",
@@ -505,6 +509,8 @@ FDJ.ContentLocales.ptBR.slotParts = {
     ["Finger"] = "Dedo",
     ["Trinket"] = "Berloque",
     ["Bag"] = "Bolsa",
+    ["Quiver"] = "Aljava",
+    ["Ammo Pouch"] = "Bolsa de munição",
     ["One-Hand"] = "Uma mão",
     ["Main Hand"] = "Mão principal",
     ["Off Hand"] = "Mão secundária",

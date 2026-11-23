@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: |cff43d9d4AscendXP|r Tweaks
+## Category: Nectar
+## Notes: Drag, align, resize and recolour AscendXP's text. Type /axpt.
+## Dependencies: AscendXP
+## SavedVariables: AscendXPTweaksDB
+Logic.lua
+Main.lua

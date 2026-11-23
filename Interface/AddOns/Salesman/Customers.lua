@@ -99,6 +99,23 @@ function S.Customers.setQuote(db, name, key, price)
     return true
 end
 
+-- You whispered someone you sought out (Whisper target): they are a quoted customer straight away. The whisper itself
+-- is recorded by CHAT_MSG_WHISPER_INFORM, which needs the customer to exist first.
+function S.Customers.pitch(db, name, key, price, now, protect)
+    if type(name) ~= "string" or name == "" or type(key) ~= "string" or type(price) ~= "number" then return nil end
+    db.customers = db.customers or {}
+    local c = db.customers[name]
+    if not c then
+        c = { name = name, status = "quoted", note = "", first = now, last = now, unread = false, msgs = {} }
+        db.customers[name] = c
+        prune(db.customers, name, protect)
+    end
+    c.quote = { key = key, price = price }
+    c.status = "quoted"
+    c.last = now
+    return c
+end
+
 -- Marks done. The first time, a quoted price is added to that enchant sales history.
 function S.Customers.complete(db, name, now)
     local c = db.customers and db.customers[name]

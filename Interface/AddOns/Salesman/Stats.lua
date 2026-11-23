@@ -3,6 +3,7 @@ S.Stats = {}
 
 -- Longest names first so "fire resistance" is taken before "resistance".
 local NAMES = {
+    { "resistance to all schools of magic", "All Res" }, { "additional points of damage", "Dmg" },
     { "all resistances", "All Res" }, { "arcane resistance", "Arcane Res" }, { "fire resistance", "Fire Res" },
     { "frost resistance", "Frost Res" }, { "nature resistance", "Nature Res" }, { "shadow resistance", "Shadow Res" },
     { "attack power", "AP" }, { "spell power", "SP" }, { "spell damage", "Spell dmg" }, { "all stats", "All stats" },
@@ -26,7 +27,10 @@ function S.Stats.parse(desc)
             local free = true
             for i = a, b do if taken[i] then free = false break end end
             if free then
-                local n = low:sub(b + 1):match("^%s+by%s+(%d+)")
+                -- "Stamina by 4", plus Forever's "Stamina of the wearer by 4" and "defense skill of the wearer is increased by 3".
+                local rest = low:sub(b + 1)
+                local n = rest:match("^%s+by%s+(%d+)") or rest:match("^%s+of%s+the%s+wearer%s+by%s+(%d+)")
+                    or rest:match("^%s+skill%s+of%s+the%s+wearer%s+is%s+increased%s+by%s+(%d+)")
                 if not n then
                     local before = low:sub(1, a - 1)
                     n = before:match("%+(%d+)%s*$") or before:match("adds?%s+(%d+)%s+to%s+$") or before:match("adds?%s+(%d+)%s+$") or before:match("(%d+)%s+$")
@@ -70,6 +74,9 @@ function S.Stats.forRecipe(r, getItemStats, overrides)
     local mine = overrides and type(r.name) == "string" and overrides[r.name:lower()]
     if mine then return mine end
     if type(r.stats) == "string" and r.stats ~= "" then return r.stats end
+    -- The game's own text beats the built-in Classic table (Forever changes values and adds enchants).
+    local fromDesc = S.Stats.parse(r.desc)
+    if fromDesc then return fromDesc end
     local known = S.StatsData and type(r.name) == "string" and S.StatsData[r.name:lower()]
     if known then return known end
     if r.resultLink and getItemStats then

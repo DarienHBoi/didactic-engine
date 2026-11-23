@@ -26,6 +26,9 @@ local function replaceAll(s, needle, repl, wholeWord)
     return table.concat(out), n
 end
 
+-- Words from an enchant's name that are fine in any ad.
+local GENERIC = { enchant = true, enchanting = true, of = true, the = true, to = true, ["and"] = true, an = true, on = true, ["in"] = true }
+
 -- Turns hand-edited ad text back into a template: link, price and mats go back to placeholders.
 -- subs = { link=, price= (as shown, e.g. "11s"), mats= }. rebuild(template) must return the text that template
 -- would post; the template is only returned when that equals the edited text exactly. Returns template or nil, reason.
@@ -44,6 +47,22 @@ function S.Wording.derive(text, subs, rebuild)
         local n
         t, n = replaceAll(t, subs.price, "{price}", true)
         if n == 0 then return nil, "Keep the price in the text to save your wording." end
+    end
+    -- A word from this enchant's own name ("2H", "Lesser") would then appear in every other ad: don't learn it.
+    local name = subs.link and subs.link:match("%[(.-)%]")
+    if name then
+        name = name:gsub("^[^:]*:%s*", "")
+        local own = {}
+        for w in name:gmatch("%w+") do
+            local l = w:lower()
+            if not GENERIC[l] and #l >= 2 then own[l] = true end
+        end
+        local bare = t:gsub("{%a+}", " ")
+        for w in bare:gmatch("%w+") do
+            if own[w:lower()] then
+                return nil, "\"" .. w .. "\" is part of this enchant's name, so other ads would say it too. Your message still went out."
+            end
+        end
     end
     local built = rebuild(t)
     if built ~= text then return nil, "This wording could not be saved exactly." end

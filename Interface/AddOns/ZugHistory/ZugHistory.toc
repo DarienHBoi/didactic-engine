@@ -1,0 +1,11 @@
+## Interface: 16001
+## Title: Zug History
+## Category: Nectar
+## Notes: Long server-wide price history from the ZugCompanion desktop app (ZugDAQ snapshots). Read-only API: ZugHistory.stats(itemID, days). /zughistory
+## Author: Nectar
+## Version: 0.1
+## SavedVariables: ZugHistoryDB
+## OptionalDeps: ZugDAQ
+
+Data\History.lua
+ZugHistory.lua

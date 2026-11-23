@@ -4,7 +4,8 @@ S.DB.OLD_DEFAULT_TEMPLATE = "SELLING {link} {price} whisper me"
 S.DB.DEFAULT_TEMPLATE = "SELLING {link} {stats} {price} whisper me"
 S.DB.OLD_DEFAULT_TEMPLATE_BYO = "SELLING {link} {price} (you bring mats: {mats}) whisper me"
 S.DB.DEFAULT_TEMPLATE_BYO = "SELLING {link} {stats} {price} (you bring mats: {mats}) whisper me"
-S.DB.DEFAULT_TEMPLATE_SKILL = "ENCHANTER {link} whisper me for prices"
+S.DB.OLD_DEFAULT_TEMPLATE_SKILL = "ENCHANTER {link} whisper me for prices"
+S.DB.DEFAULT_TEMPLATE_SKILL = "{crafter} {link} whisper me for prices"
 S.DB.DEFAULT_TEMPLATE_REPLY = "Hi! {link} is {price} with mats included. Want it?"
 S.DB.CACHE_VERSION = 2
 
@@ -28,11 +29,13 @@ function S.DB.init(globalSV, charSV)
     if charSV.collapsed == nil then charSV.collapsed = {} end
     if charSV.sales == nil then charSV.sales = {} end
     if charSV.customers == nil then charSV.customers = {} end
+    if charSV.mailLog == nil then charSV.mailLog = {} end
     if globalSV.statsOverride == nil then globalSV.statsOverride = {} end
     globalSV.scale = S.Scale.clamp(globalSV.scale)
     -- Untouched old default wording moves to the one that shows the enchant's stats; custom wording is left alone.
     if globalSV.template == S.DB.OLD_DEFAULT_TEMPLATE then globalSV.template = S.DB.DEFAULT_TEMPLATE end
     if globalSV.templateBYO == S.DB.OLD_DEFAULT_TEMPLATE_BYO then globalSV.templateBYO = S.DB.DEFAULT_TEMPLATE_BYO end
+    if globalSV.templateSkill == S.DB.OLD_DEFAULT_TEMPLATE_SKILL then globalSV.templateSkill = S.DB.DEFAULT_TEMPLATE_SKILL end
     if globalSV.alerts == nil then globalSV.alerts = true end
     if globalSV.templateReply == nil then globalSV.templateReply = S.DB.DEFAULT_TEMPLATE_REPLY end
     S.DB.global, S.DB.char = globalSV, charSV

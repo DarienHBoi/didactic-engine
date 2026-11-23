@@ -87,7 +87,15 @@ local function matsText(recipe)
     return table.concat(parts, ", ")
 end
 
+-- Adverts can be switched off in NectarKit: nothing is posted to a public channel (whispers to customers still go).
+local function advertsOff(entry)
+    if S.Mod.on("adverts") or (entry and entry.chatType == "WHISPER") then return false end
+    setStatus("Adverts are switched off in NectarKit (/nk options).")
+    return true
+end
+
 local function deliver(entry, text, confirmId)
+    if advertsOff(entry) then return end
     local verdict = guard:check(entry.key, text)
     if verdict == "cooldown" then setStatus("Wait a moment before sending again.") return end
     if verdict == "confirm" and state.confirmId ~= confirmId then
@@ -110,6 +118,7 @@ end
 
 -- With "Edit first" on, buttons fill the message box instead of posting; Post sends what the box holds.
 local function route(entry, text, confirmId, source)
+    if advertsOff(entry) then return end
     if S.DB.global.editFirst and state.frame then
         state.source = source
         state.frame.box:SetText(text)
@@ -130,7 +139,7 @@ local function saveWording(text)
     local subs = { link = src.link, price = src.kind ~= "skill" and S.Money.format(src.copper) or nil, mats = src.mats, stats = src.stats }
     local rebuild
     if src.kind == "skill" then
-        rebuild = function(t) return S.Message.buildSkill(t, src.link) end
+        rebuild = function(t) return S.Message.buildSkill(t, src.link, src.prof) end
     elseif src.kind == "byo" then
         rebuild = function(t) return S.Message.build(t, src.link, src.copper, src.mats, src.stats) end
     else
@@ -184,6 +193,43 @@ local function postBox()
     end
 end
 
+-- Whisper target: sends the message box to your current target (a player you sought out). An empty box sends the
+-- customer-reply wording for the selected enchant. The target becomes a quoted customer so Done can log the sale.
+local function whisperTarget()
+    local f = state.frame
+    if not f then return end
+    local name, why = S.Target.name()
+    if not name then setStatus(why) return end
+    local recipe = state.selectedRecipe
+    local raw = f.box:GetText() or ""
+    local text, err, quote
+    if raw:match("^%s*$") then
+        if not recipe then setStatus("Pick an enchant first.") return end
+        local ask = S.Pricing.suggest(cost(recipe), rowMargin(recipe))
+        text, err = S.Message.build(S.DB.global.templateReply, recipe.link, ask, nil, statsOf(recipe))
+        if not text then setStatus("Not sent: " .. err) return end
+        quote = { key = recipe.key, price = ask }
+        state.source = { kind = "reply", link = recipe.link, copper = ask, stats = statsOf(recipe), text = text }
+    else
+        text, err = S.Message.validate(raw)
+        if not text then setStatus("Not sent: " .. err) return end
+        local src = state.source
+        if src and src.kind == "skill" then quote = nil
+        elseif src and src.key and src.copper then quote = { key = src.key, price = src.copper }
+        elseif recipe then quote = { key = recipe.key, price = S.Pricing.suggest(cost(recipe), rowMargin(recipe)) } end
+    end
+    local short = S.Customers.shortName(name, nil)
+    local entry = { key = "whisper:" .. name, label = "whisper to " .. short, chatType = "WHISPER", target = name }
+    local sent = deliver(entry, text, "target|" .. name .. "|" .. text)
+    if sent then
+        -- Only after a real send (cooldown / confirm return without sending). The game's whisper echo arrives later
+        -- and is recorded on this customer.
+        if quote then S.Customers.pitch(S.DB.char, name, quote.key, quote.price, time and time() or 0, state.customer) end
+        local note = saveWording(text)
+        if note then f.status:SetText((f.status:GetText() or "") .. "  " .. note) end
+    end
+end
+
 -- Posts the Enchanting profession link itself (not one recipe).
 local function sendSkill()
     local list = channelList()
@@ -193,9 +239,9 @@ local function sendSkill()
     local entry = findChannel(list, state.channelKey)
     local prof = currentProfession()
     local skillLink = (S.DB.char.skillLinks and prof and S.DB.char.skillLinks[prof]) or S.DB.char.skillLink
-    local text, err = S.Message.buildSkill(S.DB.global.templateSkill, skillLink)
+    local text, err = S.Message.buildSkill(S.DB.global.templateSkill, skillLink, prof)
     if not text then setStatus("Not sent: " .. err) return end
-    route(entry, text, "skill|" .. entry.key .. "|" .. text, { kind = "skill", link = skillLink, text = text })
+    route(entry, text, "skill|" .. entry.key .. "|" .. text, { kind = "skill", link = skillLink, text = text, prof = prof })
 end
 
 -- mode "mats": enchant link, mats included. mode "byo": enchant link, labour only, mat links listed.
@@ -219,11 +265,11 @@ local function buildText(recipe, mode)
             matsStr = matsNames(recipe)
             text, err = S.Message.build(S.DB.global.templateBYO, recipe.link, labour, matsStr, statsOf(recipe))
         end
-        return text, err, { kind = "byo", link = recipe.link, copper = labour, mats = matsStr, stats = statsOf(recipe), text = text }
+        return text, err, { kind = "byo", key = recipe.key, link = recipe.link, copper = labour, mats = matsStr, stats = statsOf(recipe), text = text }
     end
     local ask = S.Pricing.suggest(c, rowMargin(recipe))
     local text, err = S.Message.build(S.DB.global.template, recipe.link, ask, nil, statsOf(recipe))
-    return text, err, { kind = "mats", link = recipe.link, copper = ask, stats = statsOf(recipe), text = text }
+    return text, err, { kind = "mats", key = recipe.key, link = recipe.link, copper = ask, stats = statsOf(recipe), text = text }
 end
 
 local function send(recipe, mode)
@@ -243,7 +289,9 @@ local GOLD_HEX = "|cffffd100"
 local function showTip(owner, r)
     GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
     local ref = r.link and r.link:match("|H(enchant:%d+)")
-    local ok = ref and pcall(GameTooltip.SetHyperlink, GameTooltip, ref)
+    -- A recipe that makes an item shows that item's own tooltip; enchants show the enchant's effect.
+    local ok = r.resultLink and pcall(GameTooltip.SetHyperlink, GameTooltip, r.resultLink)
+    if not ok then ok = ref and pcall(GameTooltip.SetHyperlink, GameTooltip, ref) end
     if not ok then
         GameTooltip:ClearLines()
         GameTooltip:AddLine(r.name, 1, 0.82, 0)
@@ -264,6 +312,23 @@ local function showTip(owner, r)
         if profit < 0 then GameTooltip:AddDoubleLine("Profit", S.UI.signedMoney(profit), 1, 1, 1, 1, 0.25, 0.25)
         else GameTooltip:AddDoubleLine("Profit", S.UI.signedMoney(profit), 1, 1, 1, 0.25, 1, 0.25) end
     end
+    local resultID = S.Prices.itemIDFromLink(r.resultLink)
+    if resultID then
+        local ah = S.Prices.auction(resultID)
+        local res = ah.copper and S.Profit.craft(ah.copper, c.copper)
+        if res then
+            local old = (ah.ageSecs and ah.ageSecs >= 86400) and " (old)" or ""
+            GameTooltip:AddDoubleLine("Sells on AH" .. old, S.Money.format(res.sell), 1, 1, 1, 1, 0.82, 0)
+            GameTooltip:AddDoubleLine("After " .. math.floor(S.Profit.AH_CUT * 100 + 0.5) .. "% AH cut", S.Money.format(res.net), 1, 1, 1, 1, 0.82, 0)
+            if res.profit then
+                local txt = S.UI.signedMoney(res.profit) .. (res.margin and ("  (" .. res.margin .. "%)") or "")
+                if res.profit < 0 then GameTooltip:AddDoubleLine("Resale profit", txt, 1, 1, 1, 1, 0.25, 0.25)
+                else GameTooltip:AddDoubleLine("Resale profit", txt, 1, 1, 1, 0.25, 1, 0.25) end
+            end
+        else
+            GameTooltip:AddLine("AH price: no data (scan the auction house with Auctionator)", 0.6, 0.6, 0.6)
+        end
+    end
     local sales = S.DB.char.sales[r.key]
     if sales and #sales > 0 then
         GameTooltip:AddDoubleLine("Median sold (" .. #sales .. ")", S.Money.format(S.Sales.median(sales)), 1, 1, 1, 1, 0.82, 0)
@@ -282,6 +347,7 @@ end
 local function startQueue()
     local f = state.frame
     if not f then return end
+    if advertsOff() then return end
     local n = pickedCount()
     if n == 0 then setStatus("Tick the enchants you want to post first.") return end
     local list = {}
@@ -332,6 +398,8 @@ end
 local function hooks()
     return {
         cost = cost,
+        tip = showTip,
+        earned = function(r) return S.Ledger.byKey(S.DB.char, r.key) end,
         stock = stockOf,
         margin = rowMargin,
         setMargin = function(r, m)
@@ -390,9 +458,41 @@ local function customerHooks()
             state.frame.box:SetText(text)
             state.frame.box:SetCursorPosition(0)
             state.pendingQuote = { name = name, key = recipe.key, price = ask, text = text }
-            state.source = { kind = "reply", link = recipe.link, copper = ask, stats = statsOf(recipe), text = text }
+            state.source = { kind = "reply", key = recipe.key, link = recipe.link, copper = ask, stats = statsOf(recipe), text = text }
             setStatus("Reply ready. Edit it if you like, then click Post to whisper it.")
         end,
+    }
+end
+
+-- For the board, a mat with no price at all is one you farm: it counts as free (and is tagged).
+local function farmedCost(recipe)
+    return S.Pricing.matsCostFarmed(recipe.reagents, S.Prices.lookup, STALE_SECS)
+end
+
+-- Best crafts tab: rank every crafted item; a click opens that recipe in its profession view.
+local function boardHooks()
+    return {
+        rows = function()
+            return S.Board.rank(S.DB.char.recipes, { cost = farmedCost, auction = S.Prices.auction, history = S.Prices.history, staleSecs = STALE_SECS,
+                sort = S.DB.global.boardSort,
+                outcomes = function(id) return SalesmanAPI.outcomes(id) end,
+                sold = function(r) return S.MailLog.soldFor(S.DB.char.mailLog, r) end })
+        end,
+        select = function(r)
+            local prof = S.Recipes.professionOf(r)
+            if prof and prof ~= currentProfession() then
+                S.DB.global.profession = prof
+                state.picked, state.queue = {}, nil
+            end
+            state.cat = "*all"
+            S.DB.char.selected = r.key
+            if state.frame and state.search ~= "" then
+                state.search = ""
+                state.frame.search:SetText("")
+            end
+            S.UI.setTab("enchants")
+        end,
+        status = setStatus,
     }
 end
 
@@ -405,9 +505,35 @@ function S.UI.updateTabLabel()
     f.tabCustomers:SetText("Customers" .. (unread > 0 and (" (" .. unread .. ")") or ""))
 end
 
+-- The Customers, Best crafts and Mail tabs follow their NectarKit switches; a switched-off tab is hidden and cannot be opened.
+local TABS = { { "tabCustomers", "customers", "customers" }, { "tabBoard", "board", "bestcrafts" }, { "tabMail", "mail", "maillog" } }
+local function tabAllowed(tab)
+    for _, t in ipairs(TABS) do
+        if t[2] == tab then return S.Mod.on(t[3]) end
+    end
+    return true
+end
+
+-- Shows the tabs that are on, in a row, with the search box after the last one.
+local function layoutTabs(f)
+    local prev = f.tabEnchants
+    for _, t in ipairs(TABS) do
+        local b, on = f[t[1]], S.Mod.on(t[3])
+        b:SetShown(on)
+        if on then
+            b:ClearAllPoints()
+            b:SetPoint("LEFT", prev, "RIGHT", 6, 0)
+            prev = b
+        end
+    end
+    f.search:ClearAllPoints()
+    f.search:SetPoint("LEFT", prev, "RIGHT", 12, 0)
+end
+
 function S.UI.setTab(tab)
     local f = state.frame
     if not f then return end
+    if not tabAllowed(tab) then tab = "enchants" end
     if tab ~= state.tab then
         state.pendingQuote = nil
         state.queue = nil
@@ -417,8 +543,12 @@ function S.UI.setTab(tab)
     state.tab = tab
     for _, w in ipairs(f.enchantWidgets) do w:SetShown(tab == "enchants") end
     f.croot:SetShown(tab == "customers")
+    f.broot:SetShown(tab == "board")
+    f.mroot:SetShown(tab == "mail")
     f.tabEnchants:SetAlpha(tab == "enchants" and 1 or 0.55)
     f.tabCustomers:SetAlpha(tab == "customers" and 1 or 0.55)
+    f.tabBoard:SetAlpha(tab == "board" and 1 or 0.55)
+    f.tabMail:SetAlpha(tab == "mail" and 1 or 0.55)
     S.UI.refresh()
 end
 
@@ -426,12 +556,29 @@ function S.UI.refresh()
     local f = state.frame
     if not f then return end
     local n = S.Ledger.count(S.DB.char)
+    if f.whisperTarget then f.whisperTarget:SetText(S.Target.label((S.Target.name()))) end
     f.earned:SetText("Earned: |cffffd100" .. S.Money.format(S.Ledger.total(S.DB.char)) .. "|r" .. (n > 0 and ("  (" .. n .. " sales)") or ""))
+    -- AH and mail income is its own figure beside service earnings (trades and logged sales), plus the combined total.
+    local mail = S.MailLog.income(S.DB.char.mailLog)
+    f.mailEarned:SetText(mail > 0 and ("AH & mail: |cffffd100" .. S.Money.format(mail) .. "|r   Total: |cffffd100"
+        .. S.Money.format(S.Ledger.total(S.DB.char) + mail) .. "|r") or "")
+    local waiting = S.MailLog.waitingCount(S.DB.char.mailLog)
+    f.tabMail:SetText("Mail" .. (waiting > 0 and (" (" .. waiting .. ")") or ""))
     local unread = S.Customers.unreadCount(S.DB.char)
     f.tabCustomers:SetText("Customers" .. (unread > 0 and (" (" .. unread .. ")") or ""))
     if state.tab == "customers" then
         f.customers.update()
         f.channel:SetText(state.customer and ("Whisper: " .. S.Customers.shortName(state.customer, nil)) or "Pick a customer")
+        return
+    end
+    if state.tab == "board" then
+        f.banner:SetShown(not S.Prices.available())
+        f.board.update()
+        return
+    end
+    if state.tab == "mail" then
+        f.banner:SetShown(false)
+        f.mail.update()
         return
     end
     local recipes = S.DB.char.recipes or {}
@@ -498,7 +645,9 @@ function S.UI.refresh()
     local selected
     for _, r in ipairs(items) do if r.key == S.DB.char.selected then selected = r end end
     if not selected then selected = items[1] end
+    state.selectedRecipe = selected
     for _, b in ipairs(state.ench) do b:Hide() end
+    local label = S.Group.labeler(items)
     y = 0
     for i, r in ipairs(items) do
         local b = getEnch(i)
@@ -506,7 +655,7 @@ function S.UI.refresh()
         b:SetPoint("TOPLEFT", 0, -y)
         local c = cost(r)
         b.icon:SetTexture(r.icon or S.UI.QUESTION)
-        b.name:SetText(S.Group.shortName(r.name))
+        b.name:SetText(label(r.name))
         b.sub:SetText("Mats " .. S.Money.format(c.copper) .. (c.state == "stale" and " |cffff8800(old)|r" or "")
             .. "   Ask " .. GOLD_HEX .. S.Money.format(askFn(r)) .. "|r")
         local can = stockOf(r).craftable
@@ -521,7 +670,15 @@ function S.UI.refresh()
             state.queue = nil
             S.UI.refresh()
         end)
-        b:SetScript("OnClick", function() S.DB.char.selected = r.key; S.UI.refresh() end)
+        b:SetScript("OnClick", function()
+            -- An ad built for the previously selected enchant is cleared so it can't be posted for this one.
+            if not state.queue and state.source and state.source.key and state.source.key ~= r.key then
+                state.source = nil
+                state.frame.box:SetText("")
+            end
+            S.DB.char.selected = r.key
+            S.UI.refresh()
+        end)
         b:SetScript("OnEnter", function(self) showTip(self, r) end)
         b:SetScript("OnLeave", function() GameTooltip:Hide() end)
         b:Show()
@@ -598,8 +755,12 @@ local function build()
     f.scaleText:SetWidth(40)
     f.scalePlus = S.UI.button(f, "+", 24, 22)
     f.scalePlus:SetPoint("LEFT", f.scaleText, "RIGHT", 2, 0)
-    f.earned = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    f.earned = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     f.earned:SetPoint("LEFT", f.scalePlus, "RIGHT", 14, 0)
+    f.earned:SetWordWrap(false)
+    f.mailEarned = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    f.mailEarned:SetPoint("LEFT", f.earned, "RIGHT", 12, 0)
+    f.mailEarned:SetWordWrap(false)
     local function setScale(v)
         S.DB.global.scale = S.Scale.clamp(v)
         f:SetScale(S.DB.global.scale)
@@ -626,21 +787,29 @@ local function build()
             S.UI.setTab("enchants")
         end
     end)
-    f.tabCustomers = S.UI.button(f, "Customers", 108, 28, true)
+    f.tabCustomers = S.UI.button(f, "Customers", 104, 28, true)
     f.tabCustomers:SetPoint("LEFT", f.tabEnchants, "RIGHT", 6, 0)
     f.tabCustomers:SetScript("OnClick", function() S.UI.setTab("customers") end)
+    f.tabBoard = S.UI.button(f, "Best crafts", 100, 28, true)
+    f.tabBoard:SetPoint("LEFT", f.tabCustomers, "RIGHT", 6, 0)
+    f.tabBoard:SetScript("OnClick", function() S.UI.setTab("board") end)
+    f.tabMail = S.UI.button(f, "Mail", 76, 28, true)
+    f.tabMail:SetPoint("LEFT", f.tabBoard, "RIGHT", 6, 0)
+    f.tabMail:SetScript("OnClick", function() S.UI.setTab("mail") end)
     local search = CreateFrame("EditBox", nil, f, "SearchBoxTemplate")
-    search:SetSize(150, 20)
-    search:SetPoint("TOPLEFT", 270, -36)
+    search:SetSize(118, 20)
+    search:SetPoint("LEFT", f.tabMail, "RIGHT", 12, 0)
     search:SetAutoFocus(false)
+    f.search = search
+    layoutTabs(f)
     search:SetScript("OnTextChanged", function(self)
         if SearchBoxTemplate_OnTextChanged then SearchBoxTemplate_OnTextChanged(self) end
         state.search = self:GetText() or ""
         S.UI.refresh()
     end)
 
-    local sortBtn = S.UI.button(f, "", 160, 28)
-    sortBtn:SetPoint("LEFT", search, "RIGHT", 12, 0)
+    local sortBtn = S.UI.button(f, "", 140, 28)
+    sortBtn:SetPoint("LEFT", search, "RIGHT", 10, 0)
     sortBtn:SetScript("OnClick", function()
         local cur, idx = sortMode(), 1
         for i, m in ipairs(SORTS) do if m == cur then idx = i end end
@@ -650,11 +819,11 @@ local function build()
     f.sort = sortBtn
 
     local mlabel = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    mlabel:SetPoint("LEFT", sortBtn, "RIGHT", 16, 0)
+    mlabel:SetPoint("LEFT", sortBtn, "RIGHT", 10, 0)
     mlabel:SetText("Default %")
     local margin = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
     margin:SetSize(38, 20)
-    margin:SetPoint("LEFT", mlabel, "RIGHT", 10, 0)
+    margin:SetPoint("LEFT", mlabel, "RIGHT", 8, 0)
     margin:SetAutoFocus(false)
     margin:SetMaxLetters(5)
     margin:SetScript("OnEnterPressed", function(self)
@@ -665,8 +834,9 @@ local function build()
     end)
     f.margin = margin
 
-    local skillBtn = S.UI.button(f, "Link my skill", 140, 28, true)
-    skillBtn:SetPoint("TOPRIGHT", -16, -33)
+    -- Lives in the bottom bar (right of "Edit first") so the top bar has room for three tabs.
+    local skillBtn = S.UI.button(f, "Link my skill", 130, 28, true)
+    skillBtn:SetPoint("BOTTOMRIGHT", -16, 56)
     skillBtn:SetScript("OnClick", sendSkill)
 
     -- Three panes
@@ -703,13 +873,27 @@ local function build()
     f.croot = croot
     f.customers = S.UI.buildCustomers(croot, customerHooks())
     croot:Hide()
+    local broot = CreateFrame("Frame", nil, f)
+    broot:SetPoint("TOPLEFT", 14, -66)
+    broot:SetPoint("BOTTOMRIGHT", -14, 92)
+    f.broot = broot
+    f.board = S.UI.buildBoard(broot, boardHooks())
+    broot:Hide()
+    local mroot = CreateFrame("Frame", nil, f)
+    mroot:SetPoint("TOPLEFT", 14, -66)
+    mroot:SetPoint("BOTTOMRIGHT", -14, 92)
+    f.mroot = mroot
+    f.mail = S.UI.buildMail(mroot)
+    mroot:Hide()
     f.tabEnchants:SetAlpha(1)
     f.tabCustomers:SetAlpha(0.55)
+    f.tabBoard:SetAlpha(0.55)
+    f.tabMail:SetAlpha(0.55)
 
     -- Bottom bar: the message that will post, then the channel and status.
     local box = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
     box:SetPoint("BOTTOMLEFT", 24, 58)
-    box:SetSize(540, 24)
+    box:SetSize(390, 24)
     box:SetAutoFocus(false)
     box:SetMaxLetters(255)
     box:SetScript("OnEnterPressed", function(self) self:ClearFocus(); postBox() end)
@@ -718,9 +902,26 @@ local function build()
     local postBtn = S.UI.button(f, "Post", 80, 28, true)
     postBtn:SetPoint("LEFT", box, "RIGHT", 8, 0)
     postBtn:SetScript("OnClick", postBox)
+    -- Whisper target: the label follows your target so you can see who gets it before clicking.
+    local wt = S.UI.button(f, "Whisper target", 130, 28, true)
+    wt:SetPoint("LEFT", postBtn, "RIGHT", 6, 0)
+    wt:SetScript("OnClick", whisperTarget)
+    wt:SetScript("OnEvent", function(self)
+        self:SetText(S.Target.label((S.Target.name())))
+    end)
+    pcall(wt.RegisterEvent, wt, "PLAYER_TARGET_CHANGED")
+    if wt.SetMotionScriptsWhileDisabled then wt:SetMotionScriptsWhileDisabled(true) end
+    wt:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:AddLine("Whisper your target")
+        GameTooltip:AddLine("Sends the message box to the player you have targeted. If the box is empty, sends the customer-reply wording for the selected enchant at your margin. They are added to Customers as quoted.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    wt:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    f.whisperTarget = wt
     local editFirst = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
     editFirst:SetSize(24, 24)
-    editFirst:SetPoint("LEFT", postBtn, "RIGHT", 6, 0)
+    editFirst:SetPoint("LEFT", wt, "RIGHT", 6, 0)
     editFirst:SetScript("OnClick", function(self) S.DB.global.editFirst = self:GetChecked() and true or false; S.UI.refresh() end)
     local editLabel = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     editLabel:SetPoint("LEFT", editFirst, "RIGHT", 0, 0)
@@ -749,6 +950,8 @@ local function build()
     f.resetWording:SetPoint("BOTTOMLEFT", 24, 8)
     f.resetWording:SetScript("OnClick", function()
         S.DB.resetWording()
+        -- The box may hold an ad built with the old wording: clear it so the next Use button rebuilds it.
+        if not state.queue then state.source = nil; f.box:SetText("") end
         setStatus("Ad wording reset to the defaults.")
         S.UI.refresh()
     end)
@@ -779,6 +982,7 @@ local function targetGold()
     if ok and type(g) == "number" then S.Tracker.setGold(g) end
 end
 function S.UI.onTradeEvent(event, a1, a2)
+    if not S.Mod.on("trades") then return end
     if event == "TRADE_SHOW" then
         tradeToken = tradeToken + 1
         local ok, name = pcall(UnitName, "NPC")
@@ -812,4 +1016,14 @@ end
 function S.UI.toggle()
     local f = state.frame or build()
     f:SetShown(not f:IsShown())
+end
+
+-- NectarKit switches, live: tabs come and go; a switched-off tab that is open gives way to Enchants.
+for _, key in ipairs({ "customers", "bestcrafts", "maillog" }) do
+    S.Mod.listen(key, function()
+        local f = state.frame
+        if not f then return end
+        layoutTabs(f)
+        if not tabAllowed(state.tab) then S.UI.setTab("enchants") elseif f:IsShown() then S.UI.refresh() end
+    end)
 end

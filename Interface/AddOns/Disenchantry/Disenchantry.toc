@@ -1,0 +1,60 @@
+## Interface: 16001, 120100, 50504, 40402, 30405, 20506, 11509
+## Title: Disenchantry
+## Notes: Profession toolkit with item safeguards, material forecasts and statistics.
+## Notes-deDE: Berufswerkzeug mit Gegenstandsschutz, Materialvorschau und Statistik.
+## Author: x_Raven_x
+## Version: 1.2.9
+## IconTexture: 136244
+## Category: Professions
+## SavedVariables: DisenchantryDB
+## SavedVariablesPerCharacter: DisenchantryCharacterDB
+## OptionalDeps: Auctionator
+
+# Third-party service registry used by the minimap integration.
+Libs\LibStub\LibStub.lua
+# Event subscriptions required by the broker libraries.
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+# Broker object registration for the Disenchantry launcher.
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+# Minimap launcher positioning and rendering.
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+
+# Language catalog and independent pricing, forecast and history services.
+Locales\Additional.lua
+Locales.lua
+PriceProviders.lua
+RetailDisenchant.lua
+ForecastPolicy.lua
+DisenchantResults.lua
+Statistics.lua
+Hotkeys.lua
+
+# Runtime model, inventory policies and processing lifecycle.
+Core\Runtime.lua
+Core\Client.lua
+Core\Storage.lua
+Core\ItemRules.lua
+Core\Inventory.lua
+Core\Queue.lua
+Core\Professions.lua
+Core\Processing.lua
+Core\AuctionScan.lua
+Core\AuctionPurchase.lua
+
+# Shared controls followed by their window compositions.
+UI\Widgets.lua
+UI\ItemList.lua
+UI\ActionButton.lua
+UI\Windows.lua
+UI\Blacklist.lua
+UI\Modes.lua
+UI\MainWindow.lua
+UI\Launcher.lua
+UI\Compact.lua
+UI\Settings.lua
+UI\ForecastPreferences.lua
+UI\Diagnostics.lua
+UI\Auction.lua
+
+# Connect client events and commands after all services are defined.
+Disenchantry.lua

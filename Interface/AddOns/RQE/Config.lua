@@ -1,0 +1,4438 @@
+--[[ 
+
+Config.lua
+Retail configuration schemas, custom widgets, settings panels, and profile controls
+
+]]
+
+
+--------------------------------------------------
+-- #1. 📦 Libraries, Namespace & Custom Widgets
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #1a. Ace3 Libraries & Addon Namespace
+	-------------------------------------------------------
+
+	-- Ace3 Libraries
+	local AceDB = LibStub("AceDB-3.0")
+	local AceDBOptions = LibStub("AceDBOptions-3.0")
+	local AceConfig = LibStub("AceConfig-3.0")
+	local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
+	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+	local AceConfigCmd = LibStub("AceConfigCmd-3.0")
+	local AceGUI = LibStub("AceGUI-3.0")
+
+	-- Main Table
+	if not RQE then RQE = {} end
+
+	if RQE and RQE.debugLog then
+		RQE.debugLog("Message here")
+	else
+		RQE.debugLog("RQE or RQE.debugLog is not initialized.")
+	end
+
+	RQE.Frame = RQE.Frame or {}
+
+	RQE.db = RQE.db or {}
+	RQE.db.profile = RQE.db.profile or {}
+
+	-------------------------------------------------------
+	-- #1b. Font Style Registry & Path Lookup
+	-------------------------------------------------------
+
+	-- Font styles available throughout RQE's Font Settings. The first two are
+	-- supplied by WoW; the remaining styles are bundled under Media\Fonts.
+	RQE.FontStyleOptions = {
+		FRIZQT__ = { label = "Friz Quadrata", path = "Fonts\\FRIZQT__.TTF" },
+		SKURRI = { label = "Skurri", path = "Fonts\\SKURRI.TTF" },
+		Abel = { label = "Abel", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Abel\\Abel-Regular.ttf" },
+		AlteHaasGrotesk = { label = "Alte Haas Grotesk", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Alte Haas Grotesk\\AlteHaasGroteskRegular.ttf" },
+		Andika = { label = "Andika", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Andika\\Andika-Regular.ttf" },
+		AtomicAge = { label = "Atomic Age", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\AtomicAge\\AtomicAge-Regular.ttf" },
+		Barlow = { label = "Barlow", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Barlow\\Barlow-Regular.ttf" },
+		BebasNeue = { label = "Bebas Neue", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\BebasNeue\\BebasNeue-Regular.ttf" },
+		BreeSerif = { label = "Bree Serif", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\BreeSerif\\BreeSerif-Regular.ttf" },
+		Comfortaa = { label = "Comfortaa", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Comfortaa\\Comfortaa-VariableFont_wght.ttf" },
+		CrimsonText = { label = "Crimson Text", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\CrimsonText\\CrimsonText-Regular.ttf" },
+		DMSerifDisplay = { label = "DM Serif Display", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\DMSerifDisplay\\DMSerifDisplay-Regular.ttf" },
+		Lobster = { label = "Lobster", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Lobster\\Lobster-Regular.ttf" },
+		PatuaOne = { label = "Patua One", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\PatuaOne\\PatuaOne-Regular.ttf" },
+		Righteous = { label = "Righteous", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Righteous\\Righteous-Regular.ttf" },
+		Roboto = { label = "Roboto", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Roboto\\Roboto-VariableFont_wdth,wght.ttf" },
+		RobotoItalic = { label = "Roboto Italic", path = "Interface\\AddOns\\RQE\\Media\\Fonts\\Roboto\\Roboto-Italic-VariableFont_wdth,wght.ttf" },
+	}
+
+	RQE.FontStyleOrder = {
+		"Abel", "AlteHaasGrotesk", "Andika", "AtomicAge", "Barlow", "BebasNeue",
+		"BreeSerif", "Comfortaa", "CrimsonText", "DMSerifDisplay", "FRIZQT__", "Lobster",
+		"PatuaOne", "Righteous", "Roboto", "RobotoItalic", "SKURRI",
+	}
+	RQE.FontStyleLabels = {}
+	RQE.FontStyleKeyByLabel = {}
+
+	for _, key in ipairs(RQE.FontStyleOrder) do
+		local style = RQE.FontStyleOptions[key]
+		RQE.FontStyleLabels[key] = style.label
+		RQE.FontStyleKeyByLabel[style.label] = key
+	end
+
+	-- Function to resolve a saved font path to its matching dropdown style key
+	function RQE:GetFontStyleKey(fontPath)
+		for _, key in ipairs(self.FontStyleOrder) do
+			if self.FontStyleOptions[key].path == fontPath then
+				return key
+			end
+		end
+
+		-- Preserve a sensible usable selection if a profile refers to a removed font.
+		return "FRIZQT__"
+	end
+
+	-- Function to resolve a dropdown style key to a usable font path
+	function RQE:GetFontStylePath(key)
+		local style = self.FontStyleOptions[key]
+		return style and style.path or self.FontStyleOptions.FRIZQT__.path
+	end
+
+	-------------------------------------------------------
+	-- #1c. Font Color Registry & RGB Lookup
+	-------------------------------------------------------
+
+	-- Named colors available throughout both Font Settings interfaces. The
+	-- original five choices retain their existing RGB values. The menu follows
+	-- a red-to-violet spectrum, then places pale and neutral colors at the end.
+	RQE.FontColorOptions = {
+		Yellow = { label = "Yellow", hex = "ffff00" },
+		Green = { label = "Green", hex = "00ff00" },
+		Cyan = { label = "Cyan", hex = "00ff99" },
+		Canary = { label = "Canary", hex = "ffffd9" },
+		["Cream Can"] = { label = "Cream Can", hex = "edbf59" },
+		["Parchment Ivory"] = { label = "Parchment Ivory", hex = "f4e6c5" },
+		White = { label = "White", hex = "ffffff" },
+		Silver = { label = "Silver", hex = "c0c0c0" },
+		["Dark Orange"] = { label = "Dark Orange", hex = "ff7f00" },
+		["Infernal Orange"] = { label = "Infernal Orange", hex = "ff8c2b" },
+		Crimson = { label = "Crimson", hex = "dc143c" },
+		["Scarlet Red"] = { label = "Scarlet Red", hex = "c42b35" },
+		["Hot Pink"] = { label = "Hot Pink", hex = "ff69b4" },
+		Fuchsia = { label = "Fuchsia", hex = "ff00ff" },
+		Lavender = { label = "Lavender", hex = "c9a0ff" },
+		["Carnation Pink"] = { label = "Carnation Pink", hex = "ff99cc" },
+		["Medium Purple"] = { label = "Medium Purple", hex = "b266ff" },
+		["Maya Blue"] = { label = "Maya Blue", hex = "66ccff" },
+		Cobalt = { label = "Cobalt", hex = "0057b8" },
+		["Astral Ice"] = { label = "Astral Ice", hex = "dee2f7" },
+		["Fel Green"] = { label = "Fel Green", hex = "99e22d" },
+		["Golden Yellow"] = { label = "Golden Yellow", hex = "ffd700" },
+	}
+
+	RQE.FontColorOrder = {
+		"Crimson", "Scarlet Red", "Dark Orange", "Infernal Orange", "Cream Can", "Parchment Ivory", "Golden Yellow", "Yellow", "Canary",
+		"Green", "Fel Green", "Cyan", "Maya Blue", "Cobalt", "Medium Purple", "Lavender",
+		"Fuchsia", "Hot Pink", "Carnation Pink", "Astral Ice", "Silver", "White",
+	}
+	RQE.FontColorLabels = {}
+	RQE.FontColorLabelsByHex = {}
+	RQE.FontColorKeyByHex = {}
+	RQE.FontColorKeyByLabel = {}
+	RQE.FontColorHexOrder = {}
+
+	for index, key in ipairs(RQE.FontColorOrder) do
+		local option = RQE.FontColorOptions[key]
+		RQE.FontColorLabels[key] = option.label
+		RQE.FontColorLabelsByHex[option.hex] = option.label
+		RQE.FontColorKeyByHex[option.hex] = key
+		RQE.FontColorKeyByLabel[option.label] = key
+		RQE.FontColorHexOrder[index] = option.hex
+	end
+
+	-- Function to resolve a saved RGB triplet to its matching named color key
+	function RQE:GetFontColorKey(color)
+		if type(color) ~= "table" then return nil end
+
+		-- Converts a normalized color component to a clamped byte value.
+		local function ToByte(value)
+			return math.max(0, math.min(255, math.floor(((tonumber(value) or 0) * 255) + 0.5)))
+		end
+
+		local hex = string.format("%02x%02x%02x", ToByte(color[1]), ToByte(color[2]), ToByte(color[3]))
+		return self.FontColorKeyByHex[hex]
+	end
+
+	-- Function to resolve a named or hexadecimal color key to normalized RGB
+	function RQE:GetFontColorRGB(value)
+		local option = self.FontColorOptions[value]
+		if not option and type(value) == "string" then
+			option = self.FontColorOptions[self.FontColorKeyByHex[value:lower()]]
+		end
+		if not option then return nil end
+
+		return tonumber(option.hex:sub(1, 2), 16) / 255,
+			tonumber(option.hex:sub(3, 4), 16) / 255,
+			tonumber(option.hex:sub(5, 6), 16) / 255
+	end
+
+	-------------------------------------------------------
+	-- #1d. Font & Color Preview Dropdown Widgets
+	-------------------------------------------------------
+
+	-- Render both configuration surfaces' individual font names in their own
+	-- typeface through AceGUI's custom dropdown item support.
+	do
+		local itemBaseLibrary = LibStub("AceGUI-3.0-DropDown-ItemBase", true)
+		local widgetType = "Dropdown-Item-RQEFontPreview"
+
+		if itemBaseLibrary and not AceGUI:GetWidgetVersion(widgetType) then
+			local ItemBase = itemBaseLibrary.GetItemBase()
+
+			-- Function to synchronize the custom dropdown checkmark with its stored selection
+			local function UpdateCheckedState(self)
+				if self.value then
+					self.check:Show()
+				else
+					self.check:Hide()
+				end
+			end
+
+			-- Function to store a font dropdown item's selected state
+			local function SetValue(self, value)
+				self.value = value
+				UpdateCheckedState(self)
+			end
+
+			-- Function to return a font dropdown item's selected state
+			local function GetValue(self)
+				return self.value
+			end
+
+			-- Function to render a font option's name and sample in its own typeface
+			local function SetText(self, text)
+				ItemBase.SetText(self, text)
+
+				-- Apply the selected typeface to both the font's name and its Aa
+				-- sample. GetText() is used as a fallback because AceGUI can pass a
+				-- formatted label string while building a pullout item.
+				local key = RQE.FontStyleKeyByLabel[text] or RQE.FontStyleKeyByLabel[self.text:GetText()]
+				local style = key and RQE.FontStyleOptions[key]
+				if style then
+					local applied = self.text:SetFont(style.path, 13, "OUTLINE")
+					if not applied then
+						self.text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					end
+
+					applied = self.preview:SetFont(style.path, 13, "OUTLINE")
+					if not applied then
+						self.preview:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					end
+					self.preview:SetTextColor(1, 0.82, 0)
+					self.preview:SetText("Aa")
+				else
+					self.text:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+					self.preview:SetText("")
+				end
+			end
+
+			-- Function to reset a font preview item before AceGUI reuses it
+			local function OnRelease(self)
+				ItemBase.OnRelease(self)
+				self:SetValue(nil)
+			end
+
+			-- Function to toggle the clicked font item and report its new value
+			local function OnClick(frame)
+				local self = frame.obj
+				if self.disabled then return end
+				self:SetValue(not self.value)
+				self:Fire("OnValueChanged", self.value)
+			end
+
+			-- Function to construct and register one reusable font preview dropdown item
+			local function Constructor()
+				local self = ItemBase.Create(widgetType)
+				local preview = self.frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+				preview:SetJustifyH("RIGHT")
+				preview:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", -8, 0)
+				preview:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -8, 0)
+				preview:SetWidth(34)
+				self.preview = preview
+
+				self.text:ClearAllPoints()
+				self.text:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 18, 0)
+				self.text:SetPoint("BOTTOMRIGHT", self.frame, "BOTTOMRIGHT", -48, 0)
+				self.SetValue = SetValue
+				self.GetValue = GetValue
+				self.SetText = SetText
+				self.OnRelease = OnRelease
+				self.frame:SetScript("OnClick", OnClick)
+				AceGUI:RegisterAsWidget(self)
+				return self
+			end
+
+			AceGUI:RegisterWidgetType(widgetType, Constructor, 1 + ItemBase.version)
+		end
+	end
+
+	RQE.ConfigUI:RegisterFontColorWidgets(AceGUI)
+
+--------------------------------------------------
+-- #2. 👤 Profile Options Placeholder
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #2a. Profile Option Initialization Hook
+	-------------------------------------------------------
+
+	-- This section is responsible for initializing and handling the profile logic related to the Add-On Options system.
+	-- Initialize profile options
+	function RQE:InitializeProfileOptions()
+		-- Additional logic related to profile options can go here
+	end
+
+
+--------------------------------------------------
+-- #3. ⚙️ Settings Panel Navigation
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #3a. Registered Panel Openers
+	-------------------------------------------------------
+
+	-- This section controls the default settings if the Profile section for the Add-On configuration doesn't contain that information
+	RQE.Settings = {}
+
+	-- Function to open the Frame Settings panel
+	function RQE:OpenFrameSettings()
+		RQE.ConfigUI:OpenRegisteredPanel("frame")
+	end
+
+	-- Opens the theme settings.
+	function RQE:OpenThemeSettings()
+		RQE.ConfigUI:OpenRegisteredPanel("themes")
+	end
+
+	-- Function to open the Font Settings panel
+	function RQE:OpenFontSettings()
+		RQE.ConfigUI:OpenRegisteredPanel("font")
+	end
+
+	-- Function to open the Debug Options panel
+	function RQE:OpenDebugOptions()
+		RQE.ConfigUI:OpenRegisteredPanel("debug")
+	end
+
+	-- Function to open the Profiles panel
+	function RQE:OpenProfiles()
+		RQE.ConfigUI:OpenRegisteredPanel("profiles")
+	end
+
+
+--------------------------------------------------
+-- #4. 🧾 AceConfig Option Schema
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #4a. Selector Values & Index Helpers
+	-------------------------------------------------------
+
+	-- Valid Anchor Point Options
+	local anchorPointOptions = {"TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT"}
+
+
+	-- Valid Debug Level Options
+	local debugLevelOptions = {"NONE", "INFO", "INFO+", "DEBUG", "WARNING", "CRITICAL"}
+
+	-- Utility function to convert between debug level string and index
+	local function getDebugLevelIndex(str)
+		for i, v in ipairs(debugLevelOptions) do
+			if v == str then
+				return i
+			end
+		end
+		return 1  -- default to 1 (NONE) if not found
+	end
+
+	-- Utility function to convert between string and index
+	local function getAnchorPointIndex(str)
+		for i, v in ipairs(anchorPointOptions) do
+			if v == str then
+				return i
+			end
+		end
+		return 1  -- default to 1 if not found
+	end
+
+	-------------------------------------------------------
+	-- #4b. General Behavior Options
+	-------------------------------------------------------
+
+	-- Main Options Table
+	RQE.options = {
+		name = "Rhodan's Quest Explorer",
+		type = "group",
+		args = {
+			general = {
+				name = "Settings",
+				type = "group",
+				args = {
+					enableFrame = {
+						type = "toggle",
+						name = "Enable Frame",
+						desc = "Enable or disable the frame.",
+						-- Reads the saved quest helper visibility setting.
+						get = function(info) return RQE.db.profile.enableFrame end,
+						-- Saves the enable frame setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.enableFrame = value
+							RQE:ToggleRQEFrame()
+						end,
+						order = 1,
+					},
+					hideRQEFrameWhenEmpty = {
+						type = "toggle",
+						name = "Hide SuperTrack Frame When Empty",
+						desc = "Automatically hide the SuperTrack Frame when there are no quests being super tracked or searched.",
+						-- Reads the saved empty helper visibility setting.
+						get = function(info) return RQE.db.profile.hideRQEFrameWhenEmpty end,
+						-- Saves the hide RQE frame when empty setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.hideRQEFrameWhenEmpty = value
+							RQE:UpdateRQEFrameVisibility()
+						end,
+						width = "full",
+						order = 2, -- Adjust the order as needed
+					},
+					enableQuestFrame = {
+						type = "toggle",
+						name = "Enable Quest Frame",
+						desc = "Enable or disable the Quest Frame.",
+						-- Reads the saved Quest Tracker visibility setting.
+						get = function(info) return RQE.db.profile.enableQuestFrame end,
+						-- Saves the enable quest frame setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.enableQuestFrame = value
+							RQE:UpdateTrackerVisibility()
+						end,
+						order = 3,
+					},
+					hideRQEQuestFrameWhenEmpty = {
+						type = "toggle",
+						name = "Hide Quest Frame When Empty",
+						desc = "Automatically hide the Quest Tracker when no quests or achievements are being watched.",
+						-- Reads the saved empty tracker visibility setting.
+						get = function(info) return RQE.db.profile.hideRQEQuestFrameWhenEmpty end,
+						-- Saves the hide RQE quest frame when empty setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.hideRQEQuestFrameWhenEmpty = value
+							RQE:UpdateRQEQuestFrameVisibility()
+						end,
+						width = "full",
+						order = 4,
+					},
+					minimapToggle = {
+						type = "toggle",
+						name = "Show Minimap Button",
+						desc = "Toggle the minimap button on or off",
+						-- Reads the saved show minimap icon setting.
+						get = function()
+							return RQE.db.profile.showMinimapIcon
+						end,
+						-- Saves the show minimap icon setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.showMinimapIcon = newValue -- Ensure the profile is updated
+							RQE:ToggleMinimapIcon() -- Ensure the minimap icon is toggled according to the new value
+						end,
+						order = 5,
+					},
+					minimapButtonAngle = {
+						type = "range",
+						name = "Minimap Button Position",
+						desc = "Set the position of the Minimap button around the Minimap.",
+						min = 0,
+						max = 360,
+						step = 1,
+						-- Reads the saved minimap button angle setting.
+						get = function()
+							return RQE.db.profile.minimapButtonAngle
+						end,
+						-- Saves the minimap button angle setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.minimapButtonAngle = newValue
+							RQE:UpdateMinimapButtonPosition()
+						end,
+						order = 6,
+					},
+					showMapID = {
+						type = "toggle",
+						name = "Show Current MapID",
+						desc = "Toggles the display of the current MapID on the frame.",
+						order = 7,
+						-- Reads the saved show map ID setting.
+						get = function() return RQE.db.profile.showMapID end,
+						-- Saves the show map ID setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.showMapID = newValue;
+							RQE:UpdateMapIDDisplay();  -- Immediately update the MapID display
+						end,
+					},
+					showCoordinates = {
+						type = "toggle",
+						name = "Show Current X, Y",
+						desc = "Toggles the display of the current coordinates on the frame.",
+						order = 8,
+						-- Reads the saved show coordinates setting.
+						get = function() return RQE.db.profile.showCoordinates end,
+						-- Saves the show coordinates setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.showCoordinates = newValue;
+							RQE:UpdateCoordinates();  -- Immediately update the coordinates display
+							RQE.StepDistanceOverride = true
+							RQE:UpdateStepDistance()
+							RQE.StepDistanceOverride = false
+						end,
+					},
+					autoQuestWatch = {
+						type = "toggle",
+						name = "Auto Quest Watch",
+						desc = "Automatically track quests as soon as you obtain them and after achieving an objective.\n\n" ..
+								"|cFFFF3333If the Auto Quest Watch setting changes 'on its own' check if another quest tracking addon may be interfering with your choice and set it to the same as this setting.|r",
+						order = 9,
+						-- Previous Blizzard call changed 2026.09.25: get = function() return GetCVarBool("autoQuestWatch") end,  -- Get the current CVAR value
+						-- Returns the c var bool.
+						get = function() return RQE.API.Client.GetCVarBool("autoQuestWatch") end,  -- Get the current CVAR value
+						-- Saves the auto quest watch setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.autoQuestWatch = newValue;
+							-- Previous Blizzard call changed 2026.09.25: SetCVar("autoQuestWatch", newValue and "1" or "0")  -- Set the CVAR based on the new value
+							RQE.API.Client.SetCVar("autoQuestWatch", newValue and "1" or "0")  -- Set the CVAR based on the new value
+						end,
+					},
+					autoQuestProgress = {
+						type = "toggle",
+						name = "Auto Quest Progress",
+						desc = "Quests are automatically watched for 5 minutes when you achieve a quest objective.\n\n" ..
+								"|cFFFF3333If the Auto Quest Progress setting changes 'on its own' check if another quest tracking addon may be interfering with your choice and set it to the same as this setting.|r",
+						order = 10,
+						-- Previous Blizzard call changed 2026.09.25: get = function() return GetCVarBool("autoQuestProgress") end,  -- Get the current CVAR value
+						-- Returns the c var bool.
+						get = function() return RQE.API.Client.GetCVarBool("autoQuestProgress") end,  -- Get the current CVAR value
+						-- Saves the auto quest progress setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.autoQuestProgress = newValue;
+							-- Previous Blizzard call changed 2026.09.25: SetCVar("autoQuestProgress", newValue and "1" or "0")  -- Set the CVAR based on the new value
+							RQE.API.Client.SetCVar("autoQuestProgress", newValue and "1" or "0")  -- Set the CVAR based on the new value
+						end,
+					},
+					autoAcceptQuestDetail = {
+						type = "toggle",
+						name = "Auto-Accept Quests",
+						desc = "Automatically accept a quest when its detail window opens. The QUEST_DETAIL event triggers this regardless of its optional item payload.",
+						order = 10.25,
+						-- Reads the saved auto accept quest detail setting.
+						get = function() return RQE.db.profile.autoAcceptQuestDetail end,
+						-- Saves the auto accept quest detail setting and applies the change.
+						set = function(_, value) RQE.db.profile.autoAcceptQuestDetail = value end,
+					},
+					autoCompleteNoRewardChoices = {
+						type = "toggle",
+						name = "Auto-Complete when No Reward Choices",
+						desc = "Allow the Contribution turn-in macro to select the supertracked quest and complete it when there is no reward choice. Multiple reward choices or a required payment remain manual. Reopen the Contribution menu to copy the updated macro.",
+						order = 10.5,
+						-- Reads the saved auto complete no reward choices setting.
+						get = function() return RQE.db.profile.autoCompleteNoRewardChoices end,
+						-- Saves the auto complete no reward choices setting and applies the change.
+						set = function(_, value) RQE.db.profile.autoCompleteNoRewardChoices = value end,
+					},
+					removeWQatLogin = {
+						type = "toggle",
+						name = "Remove WQ after login",
+						desc = "Removes all of the WQ on player login",
+						order = 11,
+						-- Reads the saved world-quest removal at login setting.
+						get = function() return RQE.db.profile.removeWQatLogin end,
+						-- Saves the remove w qat login setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.removeWQatLogin = newValue;
+						end,
+					},
+					autoTrackZoneQuests = {
+						type = "toggle",
+						name = "Auto Track Zone Quests",
+						desc = "Updates watch list on zone change to display quests specific to the player's zone",
+						order = 12,
+						-- Reads the saved auto track zone quests setting.
+						get = function() return RQE.db.profile.autoTrackZoneQuests end,
+						-- Enables or disables automatic tracking of the current zone's quests.
+						set = function(_, newValue)
+							RQE:SetAutoTrackZoneQuestsEnabled(newValue)
+						end,
+					},
+					autoClickWaypointButton = {
+						type = "toggle",
+						name = "Auto Click Waypoint Button",
+						desc = "Automatically click on the Waypoint Button in the Super Tracked frame when you progress through quest objectives",
+						order = 13,
+						-- Reads the saved auto click waypoint button setting.
+						get = function() return RQE.db.profile.autoClickWaypointButton end,
+						-- Saves the auto click waypoint button setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.autoClickWaypointButton = newValue;
+						end,
+						width = "full",
+					},
+					enableQuestAbandonConfirm = {
+						type = "toggle",
+						name = "Auto Abandon Quest",
+						desc = "If enabled will hide confirmation pop up when abandoning quest via right-clicking quest in the addon. If disabled, pop up will appear with confirmation to abandon the selected quest",
+						order = 14,
+						-- Reads the saved enable quest abandon confirm setting.
+						get = function() return RQE.db.profile.enableQuestAbandonConfirm end,
+						-- Saves the enable quest abandon confirm setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableQuestAbandonConfirm = newValue;
+						end,
+					},
+					enableTomTomCompatibility = {
+						type = "toggle",
+						name = "Enable TomTom Compatibility",
+						desc = "If enabled will create waypoints via TomTom addon (if you have this addon also installed)",
+						order = 15,
+						-- Reads the saved TomTom compatibility setting.
+						get = function() return RQE.db.profile.enableTomTomCompatibility end,
+						-- Saves the enable tom tom compatibility setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableTomTomCompatibility = newValue;
+						end,
+						width = "full",
+					},
+					enableCarboniteCompatibility = {
+						type = "toggle",
+						name = "Enable Carbonite Compatibility",
+						desc = "If enabled will create waypoints via Carbonite addon (if you have this addon also installed)",
+						order = 16,
+						-- Reads the saved Carbonite compatibility setting.
+						get = function() return RQE.db.profile.enableCarboniteCompatibility end,
+						-- Saves the enable carbonite compatibility setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableCarboniteCompatibility = newValue;
+						end,
+						width = "full",
+					},
+					enableAutoSuperTrackSwap = {
+						type = "toggle",
+						name = "Enable SuperTrack Nearest on Movement",
+						desc = RQE.IsRetail and "Focus the nearest watched quest while moving, including world quests but excluding tasks and bonus objectives. Takes priority over choosing a newly accepted quest. Campaign preferences apply only to the matching character level and a current-step objective on your exact map. Pauses in combat, instances, and while the world map is open."
+							or "Enable the super tracking to change to the nearest watched non-world quest\n\n" ..
+								"|cFFFF3333EXPERIMENTAL feature designed to auto update nearest supertracked quest based on proximity when the player moves|r\n\nAutomatically pauses inside instances and resumes after leaving.",
+						order = 17,
+						-- Reads the saved enable auto super track swap setting.
+						get = function() return RQE.db.profile.enableAutoSuperTrackSwap end,
+						-- Saves the enable auto super track swap setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableAutoSuperTrackSwap = newValue;
+							if RQE.IsRetail then
+								RQE:RefreshMovementQuestTracking()
+								AceConfigRegistry:NotifyChange("RQE_Main")
+							end
+						end,
+						width = "full",
+					},
+					enableNearestSuperTrack = {
+						type = "toggle",
+						name = "Enable SuperTrack Nearest when not Tracking",
+						desc = RQE.IsRetail and "When no quest is focused, focus a newly accepted quest, including active tasks and bonus objectives. Existing focus and manual choices are preserved. Nearest quest while moving takes priority when enabled. Other empty-focus events may choose a watched quest. Pauses inside instances."
+							or "Enable SuperTracking nearest when quest frame changes, such as turning in a quest, if not already supertracking\n\n" ..
+								"|cFFFF3333This setting will prioritize regular quests within the player's current zone that are being watched unless one of the two below 'Enable SuperTrack Nearest Campaign...' have been selected.|r\n\nAutomatically pauses inside instances and resumes after leaving.",
+						order = 18,
+						-- Reads the saved enable nearest super track setting.
+						get = function() return RQE.db.profile.enableNearestSuperTrack end,
+						-- Saves the enable nearest super track setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableNearestSuperTrack = newValue;
+						end,
+						width = "full",
+					},
+					enableNearestSuperTrackCampaign = {
+						type = "toggle",
+						-- Builds the campaign-tracking label with the client's maximum level.
+						name = function() 
+							-- Previous Blizzard call changed 2026.09.25: return "Enable SuperTrack Nearest Campaign Quest [Max Level: " .. GetMaxPlayerLevel() .. "]"
+							return "Enable SuperTrack Nearest Campaign Quest [Max Level: " .. RQE.API.Client.GetMaxPlayerLevel() .. "]"
+						end,
+						desc = RQE.IsRetail and "At the client's maximum level, prefer the nearest watched campaign quest whose current step has an objective coordinate or hotspot on your exact map. Otherwise choose the nearest eligible quest. Requires Nearest quest while moving."
+							or "Enable SuperTracking nearest campaign quest when frame changes, such as turning in a quest, if not already supertracking\n\nAutomatically pauses inside instances and resumes after leaving.",
+						order = 19,
+						-- Reads the saved enable nearest super track campaign setting.
+						get = function() return RQE.db.profile.enableNearestSuperTrackCampaign end,
+						-- Saves the enable nearest super track campaign setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableNearestSuperTrackCampaign = newValue;
+						end,
+						-- Hide Retail campaign controls with movement mode off without changing their saved values.
+						hidden = function()
+							if RQE.IsRetail then return not RQE.db.profile.enableAutoSuperTrackSwap end
+							return not RQE.db.profile.enableNearestSuperTrack
+						end,
+						width = "full",
+					},
+					enableNearestSuperTrackCampaignLevelingOnly = {
+						type = "toggle",
+						-- Builds the leveling campaign-tracking label with current and maximum levels.
+						name = function() 
+							-- Previous Blizzard call changed 2026.09.25: return "Enable SuperTrack Nearest Campaign Quest [Leveling Only: " .. UnitLevel("player") .. "/" .. GetMaxPlayerLevel() .. "]"
+							return "Enable SuperTrack Nearest Campaign Quest [Leveling Only: " .. RQE.API.Client.UnitLevel("player") .. "/" .. RQE.API.Client.GetMaxPlayerLevel() .. "]"
+						end,
+						desc = RQE.IsRetail and "Below the client's maximum level, prefer the nearest watched campaign quest whose current step has an objective coordinate or hotspot on your exact map. Otherwise choose the nearest eligible quest. Requires Nearest quest while moving."
+							or "Enable SuperTracking nearest campaign quest when frame changes, such as turning in a quest, if not already supertracking, but only while leveling\n\nAutomatically pauses inside instances and resumes after leaving.",
+						order = 20,
+						-- Reads the saved campaign supertracking while leveling setting.
+						get = function() return RQE.db.profile.enableNearestSuperTrackCampaignLevelingOnly end,
+						-- Saves the enable nearest super track campaign leveling only setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableNearestSuperTrackCampaignLevelingOnly = newValue;
+						end,
+						-- Hide Retail campaign controls with movement mode off without changing their saved values.
+						hidden = function()
+							if RQE.IsRetail then return not RQE.db.profile.enableAutoSuperTrackSwap end
+							return not RQE.db.profile.enableNearestSuperTrack
+						end,
+						width = "full",
+					},
+					enableQuestTypeDisplay = {
+						type = "toggle",
+						name = "Enable Quest Type Display",
+						desc = "Enable visual information of the quest type in the Quest Tracker",
+						order = 21,
+						-- Reads the saved enable quest type display setting.
+						get = function() return RQE.db.profile.enableQuestTypeDisplay end,
+						-- Saves the enable quest type display setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableQuestTypeDisplay = newValue;
+						end,
+						width = "full",
+					},
+					keyBindSetting = {
+						type = "keybinding",
+						name = "Key Binding for Macro",
+						desc = "Specify the key combination for triggering the RQE Macro MagicButton",
+						-- Reads the saved key bind setting setting.
+						get = function()
+							return RQE.db.profile.keyBindSetting
+						end,
+						-- Saves the key bind setting setting and applies the change.
+						set = function(_, value)
+							RQE.db.profile.keyBindSetting = value or "" -- Empty means explicitly unbound.
+							RQE:ReapplyMacroBinding()	-- RQE:SetupOverrideMacroBinding()  -- Update the binding whenever the user changes it
+						end,
+						order = 22,
+					},
+					enableGossipModeAutomation = {
+						type = "toggle",
+						name = "Enable Gossip Mode",
+						desc = "Enable Gossip Mode where the correct option will be chosen as part of the macro",
+						order = 23,
+						-- Reads the saved enable gossip mode automation setting.
+						get = function() return RQE.db.profile.enableGossipModeAutomation end,
+						-- Saves the enable gossip mode automation setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableGossipModeAutomation = newValue;
+						end,
+						width = "full",
+					},
+					enableMouseOverMarking = {
+						type = "toggle",
+						name = "Enable Mouseover marking",
+						desc = "If enabled will mark NPC targets that are associated with the step of your currently supertracked quest",
+						order = 24,
+						-- Reads the saved enable mouse over marking setting.
+						get = function() return RQE.db.profile.enableMouseOverMarking end,
+						-- Saves the enable mouse over marking setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableMouseOverMarking = newValue;
+						end,
+						width = "full",
+					},
+					enableTravelSuggestions = {
+						type = "toggle",
+						name = "Enable Travel Suggestion",
+						desc = "If enabled will print out travel suggestion into chat",
+						order = 25,
+						-- Reads the saved enable travel suggestions setting.
+						get = function() return RQE.db.profile.enableTravelSuggestions end,
+						-- Saves the enable travel suggestions setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableTravelSuggestions = newValue;
+						end,
+						width = "full",
+					},
+				},
+			},
+
+			-------------------------------------------------------
+			-- #4c. Frame & Tracker Geometry Options
+			-------------------------------------------------------
+
+			frame = {
+				name = "Frame Settings",
+				type = "group",
+				args = {
+					toggleBlizzObjectiveTracker = {
+						type = "toggle",
+						name = "Toggle Blizz Quest Tracker",
+						desc = "Show/Hide Blizzard's Quest Tracker",
+						-- Reads the saved toggle blizz objective tracker setting.
+						get = function(info) return RQE.db.profile.toggleBlizzObjectiveTracker end,
+						-- Saves the toggle blizz objective tracker setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.toggleBlizzObjectiveTracker = value
+						end,
+						width = "full",
+						order = 1, -- Adjust the order as needed
+					},
+					enableDugiGuidesCompatibility = {
+						type = "toggle",
+						name = "Dugi Guides Compatibility",
+						desc = "When RQE's Quest Tracker is hidden, keep Blizzard's Objective Tracker and the attached Dugi guide visible even with no watched quests. Hide both when RQE's Quest Tracker is shown.",
+						-- Hides Dugi compatibility settings when Dugi Guides is not loaded.
+						hidden = function() return not RQE.API.IsDugiGuidesLoaded() end,
+						-- Reads the saved Dugi Guides compatibility setting.
+						get = function() return RQE.db.profile.enableDugiGuidesCompatibility end,
+						-- Saves the enable dugi guides compatibility setting and applies the change.
+						set = function(_, value)
+							RQE.db.profile.enableDugiGuidesCompatibility = value
+							RQE:EnforceObjectiveTrackerVisibility()
+						end,
+						width = "full",
+						order = 1.5,
+					},
+					mythicScenarioMode = {
+						type = "toggle",
+						name = "Mythic/Scenario Mode",
+						desc = "Use Blizzard's Objective Tracker instead of RQE's quest tracker in scenarios, including Mythic dungeons. When unchecked, Blizzard's tracker stays hidden during normal play and scenarios.",
+						-- Reads the saved mythic scenario mode setting.
+						get = function(info) return RQE.db.profile.mythicScenarioMode end,
+						-- Saves the mythic scenario mode setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.mythicScenarioMode = value
+							RQE:UpdateTrackerVisibility()
+						end,
+						width = "full",
+						order = 2,
+					},
+					enableStepControls = {
+						type = "toggle",
+						name = "StepIndex Forward/Back Controls",
+						desc = "Enables the experimental logic for the Forward and Back step navigation buttons.\n\n|cFFFF3333Experimental: may behave differently while testing step navigation changes.|r",
+						-- Reads the saved enable step controls setting.
+						get = function()
+							return RQE.db.profile.enableStepControls
+						end,
+						-- Saves the enable step controls setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.enableStepControls = newValue
+							if RQE.Buttons and RQE.Buttons.UpdateHeaderNavigation then
+								RQE.Buttons.UpdateHeaderNavigation()
+							end
+						end,
+						width = "full",
+						order = 3,
+					},
+					creatureObjectPreview = {
+						type = "group",
+						name = "Creature and Object Preview",
+						inline = true,
+						order = 3.6,
+						args = {
+							enabled = {
+								type = "toggle", name = "Show previews on mouseover", order = 1, width = "full",
+								desc = "Shows a persistent NPC model or bundled object image when an NPC or object link in a step description is moused over.",
+								-- Reads the enable creature object preview setting.
+								get = function() return RQE.db.profile.enableCreatureObjectPreview ~= false end,
+								-- Saves the enable creature object preview setting and applies the change.
+								set = function(_, value)
+									RQE.db.profile.enableCreatureObjectPreview = value
+									if not value and RQE.HideCreatureObjectPreview then RQE.HideCreatureObjectPreview() end
+								end,
+							},
+							point = {
+								type = "select", name = "Preview anchor", order = 2,
+								values = { TOPLEFT="TOPLEFT", TOP="TOP", TOPRIGHT="TOPRIGHT", LEFT="LEFT", CENTER="CENTER", RIGHT="RIGHT", BOTTOMLEFT="BOTTOMLEFT", BOTTOM="BOTTOM", BOTTOMRIGHT="BOTTOMRIGHT" },
+								-- Reads the saved preview anchor point setting.
+								get = function() return RQE.db.profile.creatureObjectPreviewPosition.point end,
+								-- Saves the creature object preview position point setting and applies the change.
+								set = function(_, value) RQE.db.profile.creatureObjectPreviewPosition.point = value; if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end end,
+							},
+							relativePoint = {
+								type = "select", name = "RQEFrame anchor", order = 3,
+								values = { TOPLEFT="TOPLEFT", TOP="TOP", TOPRIGHT="TOPRIGHT", LEFT="LEFT", CENTER="CENTER", RIGHT="RIGHT", BOTTOMLEFT="BOTTOMLEFT", BOTTOM="BOTTOM", BOTTOMRIGHT="BOTTOMRIGHT" },
+								-- Reads the saved preview relative anchor point setting.
+								get = function() return RQE.db.profile.creatureObjectPreviewPosition.relativePoint end,
+								-- Saves the preview's relative anchor point and applies the change.
+								set = function(_, value) RQE.db.profile.creatureObjectPreviewPosition.relativePoint = value; if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end end,
+							},
+							x = {
+								type = "range", name = "Horizontal offset", min = -800, max = 800, step = 1, order = 4,
+								-- Reads the saved preview horizontal offset setting.
+								get = function() return RQE.db.profile.creatureObjectPreviewPosition.x end,
+								-- Saves the creature object preview position x setting and applies the change.
+								set = function(_, value) RQE.db.profile.creatureObjectPreviewPosition.x = value; if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end end,
+							},
+							y = {
+								type = "range", name = "Vertical offset", min = -800, max = 800, step = 1, order = 5,
+								-- Reads the saved preview vertical offset setting.
+								get = function() return RQE.db.profile.creatureObjectPreviewPosition.y end,
+								-- Saves the creature object preview position y setting and applies the change.
+								set = function(_, value) RQE.db.profile.creatureObjectPreviewPosition.y = value; if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end end,
+							},
+							scale = {
+								type = "range", name = "Preview size", min = 0.5, max = 2, step = 0.05, isPercent = true, order = 6,
+								-- Reads the saved preview scale setting.
+								get = function() return RQE.db.profile.creatureObjectPreviewPosition.scale end,
+								-- Saves the creature object preview position scale setting and applies the change.
+								set = function(_, value) RQE.db.profile.creatureObjectPreviewPosition.scale = value; if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end end,
+							},
+						},
+					},
+					framePosition = {
+						type = "group",
+						name = "Main Frame Position",
+						inline = true,
+						order = 4,
+						args = {
+							lockPosition = {
+								type = "toggle",
+								name = "Lock Quest Helper Position & Size",
+								desc = "Prevents mouse dragging and resizing of the Quest Helper. Position and size settings on this page remain available.",
+								-- Reads the lock RQE frame setting.
+								get = function() return RQE.db.profile.lockRQEFrame == true end,
+								-- Saves the lock RQE frame setting and applies the change.
+								set = function(_, value)
+									RQE.db.profile.lockRQEFrame = value == true
+									if RQE.SetRQEFrameLocked then RQE.SetRQEFrameLocked(value) end
+								end,
+								width = "full",
+								order = 0,
+							},
+							anchorPoint = {
+								type = 'select',
+								name = 'Anchor Point',
+								desc = 'The point where the frame will be anchored.',
+								values = {
+									'TOPLEFT', 'TOP', 'TOPRIGHT',
+									'LEFT', 'CENTER', 'RIGHT',
+									'BOTTOMLEFT', 'BOTTOM', 'BOTTOMRIGHT'
+								},
+								-- Returns the dropdown index of the saved helper-frame anchor point.
+								get = function(info)
+									local anchorPoints = { "TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "CENTER", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT" }
+									local currentAnchorPoint = RQE.db.profile.framePosition.anchorPoint
+									for index, anchor in ipairs(anchorPoints) do
+										if anchor == currentAnchorPoint then
+											return index
+										end
+									end
+									return 1  -- default to 'TOPLEFT' if not found
+								end,
+								-- Saves the frame position anchor point setting and applies the change.
+								set = function(info, value)
+									local anchorPoints = { "TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "CENTER", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT" }
+									local chosenAnchorPoint = anchorPoints[value]  -- Convert the numerical index back to the string
+									RQE.db.profile.framePosition.anchorPoint = chosenAnchorPoint
+									RQE:UpdateFramePosition()
+								end,
+								order = 1,
+							},
+							xPos = {
+								type = 'range',
+								name = 'X Position',
+								min = -500,
+								max = 500,
+								step = 1,
+								-- Reads the saved helper horizontal offset setting.
+								get = function(info)
+									return RQE.db.profile.framePosition.xPos
+								end,
+								-- Saves the frame position x pos setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.framePosition.xPos = value
+									RQE:UpdateFramePosition()
+								end,
+								order = 2,
+							},
+							yPos = {
+								type = 'range',
+								name = 'Y Position',
+								min = -500,
+								max = 500,
+								step = 1,
+								-- Reads the saved helper vertical offset setting.
+								get = function(info)
+									return RQE.db.profile.framePosition.yPos
+								end,
+								-- Saves the frame position y pos setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.framePosition.yPos = value
+									RQE:UpdateFramePosition()
+								end,
+								order = 3,
+							},
+							MainFrameOpacity = {
+								type = 'range',
+								name = 'Quest Helper Opacity',
+								desc = 'Adjust the Quest Helper frame background. Each theme saves its own opacity.',
+								min = 0,
+								max = 1,
+								step = 0.01,
+								isPercent = true,
+								-- Returns the frame background opacity.
+								get = function(info) return RQE.UI:GetFrameBackgroundOpacity("main") end,
+								-- Sets the frame background opacity.
+								set = function(info, value)
+									RQE.UI:SetFrameBackgroundOpacity("main", value)
+								end,
+								order = 4,
+							},
+							frameWidth = {
+								type = 'range',
+								name = 'Frame Width',
+								desc = 'Adjust the width of the super tracking frame.',
+								min = 100,  -- Minimum height allowed
+								max = 800,  -- Maximum height allowed
+								step = 1,
+								-- Reads the saved helper width setting.
+								get = function(info)
+									return RQE.db.profile.framePosition.frameWidth
+								end,
+								-- Saves the frame position frame width setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.framePosition.frameWidth = value
+									RQE:UpdateFrameSize()  -- Function to update frame size
+								end,
+								order = 5,
+							},
+							frameHeight = {
+								type = 'range',
+								name = 'Frame Height',
+								desc = 'Adjust the height of the super tracking frame.',
+								min = 100,  -- Minimum height allowed
+								max = 800,  -- Maximum height allowed
+								step = 1,
+								-- Reads the saved helper height setting.
+								get = function(info)
+									return RQE.db.profile.framePosition.frameHeight
+								end,
+								-- Saves the frame position frame height setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.framePosition.frameHeight = value
+									RQE:UpdateFrameSize()  -- Function to update frame size
+								end,
+								order = 6,
+							},
+						},
+					},
+					QuestFramePosition = {
+						type = "group",
+						name = "Quest Frame Position",
+						inline = true,
+						order = 5,  -- Set this order to wherever you want it to appear
+						args = {
+							lockPosition = {
+								type = "toggle",
+								name = "Lock Quest Tracker Position & Size",
+								desc = "Prevents mouse dragging and resizing of the Quest Tracker. Position and size settings on this page remain available.",
+								-- Reads the lock RQE quest frame setting.
+								get = function() return RQE.db.profile.lockRQEQuestFrame == true end,
+								-- Saves the lock RQE quest frame setting and applies the change.
+								set = function(_, value)
+									RQE.db.profile.lockRQEQuestFrame = value == true
+									if RQE.SetRQEQuestFrameLocked then RQE.SetRQEQuestFrameLocked(value) end
+								end,
+								width = "full",
+								order = 0,
+							},
+							anchorPoint = {
+								type = 'select',
+								name = 'Anchor Point',
+								desc = 'The point where the quest frame will be anchored.',
+								values = {
+									'TOPLEFT', 'TOP', 'TOPRIGHT',
+									'LEFT', 'CENTER', 'RIGHT',
+									'BOTTOMLEFT', 'BOTTOM', 'BOTTOMRIGHT'
+								},
+								-- Returns the dropdown index of the saved Quest Tracker anchor point.
+								get = function(info)
+									local anchorPoints = { "TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "CENTER", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT" }
+									local currentAnchorPoint = RQE.db.profile.QuestFramePosition.anchorPoint
+									for index, anchor in ipairs(anchorPoints) do
+										if anchor == currentAnchorPoint then
+											return index
+										end
+									end
+									return 9  -- default to 'BOTTOMRIGHT' if not found
+								end,
+								-- Saves the quest frame position anchor point setting and applies the change.
+								set = function(info, value)
+									local anchorPoints = { "TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "CENTER", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT" }
+									local chosenAnchorPoint = anchorPoints[value]  -- Convert the numerical index back to the string
+									RQE.db.profile.QuestFramePosition.anchorPoint = chosenAnchorPoint
+									RQE:UpdateQuestFramePosition()
+								end,
+								order = 1,
+							},
+							xPos = {
+								type = 'range',
+								name = 'X Position',
+								min = -500,
+								max = 500,
+								step = 1,
+								-- Reads the saved tracker horizontal offset setting.
+								get = function(info)
+									return RQE.db.profile.QuestFramePosition.xPos
+								end,
+								-- Saves the quest frame position x pos setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.QuestFramePosition.xPos = value
+									RQE:UpdateQuestFramePosition()
+								end,
+								order = 2,
+							},
+							yPos = {
+								type = 'range',
+								name = 'Y Position',
+								min = -500,
+								max = 500,
+								step = 1,
+								-- Reads the saved tracker vertical offset setting.
+								get = function(info)
+									return RQE.db.profile.QuestFramePosition.yPos
+								end,
+								-- Saves the quest frame position y pos setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.QuestFramePosition.yPos = value
+									RQE:UpdateQuestFramePosition()
+								end,
+								order = 3,
+							},
+							QuestFrameOpacity = {
+								type = 'range',
+								name = 'Quest Tracker Opacity',
+								desc = 'Adjust the Quest Tracker frame background. Each theme saves its own opacity.',
+								min = 0,
+								max = 1,
+								step = 0.01,
+								isPercent = true,
+								-- Returns the frame background opacity.
+								get = function(info) return RQE.UI:GetFrameBackgroundOpacity("tracker") end,
+								-- Sets the frame background opacity.
+								set = function(info, value)
+									RQE.UI:SetFrameBackgroundOpacity("tracker", value)
+								end,
+								order = 4,
+							},
+							frameWidth = {
+								type = 'range',
+								name = 'Frame Width',
+								desc = 'Adjust the width of the super tracking frame.',
+								min = 100,  -- Minimum height allowed
+								max = 800,  -- Maximum height allowed
+								step = 1,
+								-- Reads the saved tracker width setting.
+								get = function(info)
+									return RQE.db.profile.QuestFramePosition.frameWidth
+								end,
+								-- Saves the quest frame position frame width setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.QuestFramePosition.frameWidth = value
+									RQE:UpdateQuestFrameSize()  -- Function to update frame size
+								end,
+								order = 5,
+							},
+							frameHeight = {
+								type = 'range',
+								name = 'Frame Height',
+								desc = 'Adjust the height of the super tracking frame.',
+								min = 100,  -- Minimum height allowed
+								max = 800,  -- Maximum height allowed
+								step = 1,
+								-- Reads the saved tracker height setting.
+								get = function(info)
+									return RQE.db.profile.QuestFramePosition.frameHeight
+								end,
+								-- Saves the quest frame position frame height setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.QuestFramePosition.frameHeight = value
+									RQE:UpdateQuestFrameSize()  -- Function to update frame size
+								end,
+								order = 6,
+							},
+						},
+					},
+					trackerSectionOrder = RQE.ConfigUI:BuildTrackerOrderOptions(),
+				},
+			},
+
+			-------------------------------------------------------
+			-- #4d. Font Styling Options
+			-------------------------------------------------------
+
+			font = {
+				name = "Font Settings",
+				type = "group",
+				args = {
+					fontSizeAndColor = {
+						type = "group",
+						name = "Font Size and Color",
+						inline = true,
+						order = 1,
+						args = {
+							headerText = {
+								name = "Header Text",
+								type = "group",
+								order = 1,
+								args = {
+									fontSize = {
+										name = "Font Size",
+										desc = "Default: 18",
+										type = "range",
+										min = 8, max = 24,
+										step = 1,
+										-- Reads the saved header font size setting.
+										get = function(info) return RQE.db.profile.textSettings.headerText.size end,
+										-- Saves the header text size setting and applies the change.
+										set = function(info, val) RQE.db.profile.textSettings.headerText.size = val
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+									order = 1,
+									},
+									fontStyle = {
+										name = "Font Style",
+										type = "select",
+										values = RQE.FontStyleLabels,
+										itemControl = "Dropdown-Item-RQEFontPreview",
+										-- Returns the font style key.
+										get = function(info)
+											return RQE:GetFontStyleKey(RQE.db.profile.textSettings.headerText.font)
+										end,
+										-- Saves the header text font setting and applies the change.
+										set = function(info, val)
+											RQE.db.profile.textSettings.headerText.font = RQE:GetFontStylePath(val)
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+									order = 2,
+									},
+									fontColor = {
+										name = "Font Color",
+										desc = "Default: Cream Can",
+										type = "select",
+										values = RQE.FontColorLabels,
+										sorting = RQE.FontColorOrder,
+										dialogControl = "RQEColorDropdown",
+										itemControl = "Dropdown-Item-RQEColorPreview",
+										-- Returns the font color key.
+										get = function(info)
+											return RQE:GetFontColorKey(RQE.db.profile.textSettings.headerText.color)
+										end,
+										-- Saves the header text color setting and applies the change.
+										set = function(info, val)
+											local r, g, b = RQE:GetFontColorRGB(val)
+											if r then
+												RQE.db.profile.textSettings.headerText.color = { r, g, b }
+												RQE:ConfigurationChanged()
+											end
+										end,
+										order = 3,
+									},
+								},
+							},
+							QuestIDText = {
+								name = "Quest ID Text",
+								type = "group",
+								order = 2,  -- set an appropriate order
+								args = {
+									fontSize = {
+										name = "Font Size",
+										desc = "Default: 15",
+										type = "range",
+										min = 8,
+										max = 24,
+										step = 1,
+										-- Reads the saved quest-ID font size setting.
+										get = function(info) return RQE.db.profile.textSettings.QuestIDText.size end,
+										-- Saves the quest ID text size setting and applies the change.
+										set = function(info, val) RQE.db.profile.textSettings.QuestIDText.size = val
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+										order = 1,
+									},
+									fontStyle = {
+										name = "Font Style",
+										type = "select",
+										values = RQE.FontStyleLabels,
+										itemControl = "Dropdown-Item-RQEFontPreview",
+										-- Returns the font style key.
+										get = function(info)
+											return RQE:GetFontStyleKey(RQE.db.profile.textSettings.QuestIDText.font)
+										end,
+										-- Saves the quest ID text font setting and applies the change.
+										set = function(info, val)
+											RQE.db.profile.textSettings.QuestIDText.font = RQE:GetFontStylePath(val)
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+									order = 2,
+									},
+									fontColor = {
+										name = "Font Color",
+										desc = "Default: Yellow",
+										type = "select",
+										values = RQE.FontColorLabels,
+										sorting = RQE.FontColorOrder,
+										dialogControl = "RQEColorDropdown",
+										itemControl = "Dropdown-Item-RQEColorPreview",
+										-- Returns the font color key.
+										get = function(info)
+											return RQE:GetFontColorKey(RQE.db.profile.textSettings.QuestIDText.color)
+										end,
+										-- Saves the quest ID text color setting and applies the change.
+										set = function(info, val)
+											local r, g, b = RQE:GetFontColorRGB(val)
+											if r then
+												RQE.db.profile.textSettings.QuestIDText.color = { r, g, b }
+												RQE:ConfigurationChanged()
+											end
+										end,
+										order = 3,
+									},
+								},
+							},
+							QuestNameText = {
+								name = "Quest Name Text",
+								type = "group",
+								order = 3,  -- set an appropriate order
+								args = {
+									fontSize = {
+										name = "Font Size",
+										desc = "Default: 15",
+										type = "range",
+										min = 8,
+										max = 24,
+										step = 1,
+										-- Reads the saved quest-title font size setting.
+										get = function(info) return RQE.db.profile.textSettings.QuestNameText.size end,
+										-- Saves the quest name text size setting and applies the change.
+										set = function(info, val) RQE.db.profile.textSettings.QuestNameText.size = val
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+										order = 1,
+									},
+									fontStyle = {
+										name = "Font Style",
+										type = "select",
+										values = RQE.FontStyleLabels,
+										itemControl = "Dropdown-Item-RQEFontPreview",
+										-- Returns the font style key.
+										get = function(info)
+											return RQE:GetFontStyleKey(RQE.db.profile.textSettings.QuestNameText.font)
+										end,
+										-- Saves the quest name text font setting and applies the change.
+										set = function(info, val)
+											RQE.db.profile.textSettings.QuestNameText.font = RQE:GetFontStylePath(val)
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+									order = 2,
+									},
+									fontColor = {
+										name = "Font Color",
+										desc = "Default: Yellow",
+										type = "select",
+										values = RQE.FontColorLabels,
+										sorting = RQE.FontColorOrder,
+										dialogControl = "RQEColorDropdown",
+										itemControl = "Dropdown-Item-RQEColorPreview",
+										-- Returns the font color key.
+										get = function(info)
+											return RQE:GetFontColorKey(RQE.db.profile.textSettings.QuestNameText.color)
+										end,
+										-- Saves the quest name text color setting and applies the change.
+										set = function(info, val)
+											local r, g, b = RQE:GetFontColorRGB(val)
+											if r then
+												RQE.db.profile.textSettings.QuestNameText.color = { r, g, b }
+												RQE:ConfigurationChanged()
+											end
+										end,
+										order = 3,
+									},
+								},
+							},
+							DirectionTextFrame = {
+								name = "Direction Text",
+								type = "group",
+								order = 4,  -- set an appropriate order
+								args = {
+									fontSize = {
+										name = "Font Size",
+										desc = "Default: 13",
+										type = "range",
+										min = 8,
+										max = 24,
+										step = 1,
+										-- Reads the saved direction font size setting.
+										get = function(info) return RQE.db.profile.textSettings.DirectionTextFrame.size end,
+										-- Saves the direction text frame size setting and applies the change.
+										set = function(info, val) RQE.db.profile.textSettings.DirectionTextFrame.size = val
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+										order = 1,
+									},
+									fontStyle = {
+										name = "Font Style",
+										type = "select",
+										values = RQE.FontStyleLabels,
+										itemControl = "Dropdown-Item-RQEFontPreview",
+										-- Returns the font style key.
+										get = function(info)
+											return RQE:GetFontStyleKey(RQE.db.profile.textSettings.DirectionTextFrame.font)
+										end,
+										-- Saves the direction text frame font setting and applies the change.
+										set = function(info, val)
+											RQE.db.profile.textSettings.DirectionTextFrame.font = RQE:GetFontStylePath(val)
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+									order = 2,
+									},
+									fontColor = {
+										name = "Font Color",
+										desc = "Default: Yellow",
+										type = "select",
+										values = RQE.FontColorLabels,
+										sorting = RQE.FontColorOrder,
+										dialogControl = "RQEColorDropdown",
+										itemControl = "Dropdown-Item-RQEColorPreview",
+										-- Returns the font color key.
+										get = function(info)
+											return RQE:GetFontColorKey(RQE.db.profile.textSettings.DirectionTextFrame.color)
+										end,
+										-- Saves the direction text frame color setting and applies the change.
+										set = function(info, val)
+											local r, g, b = RQE:GetFontColorRGB(val)
+											if r then
+												RQE.db.profile.textSettings.DirectionTextFrame.color = { r, g, b }
+												RQE:ConfigurationChanged()
+											end
+										end,
+										order = 3,
+									},
+								},
+							},
+							QuestDescription = {
+								name = "Quest Description",
+								type = "group",
+								order = 5,  -- set an appropriate order
+								args = {
+									fontSize = {
+										name = "Font Size",
+										desc = "Default: 14",
+										type = "range",
+										min = 8,
+										max = 24,
+										step = 1,
+										-- Reads the saved quest-description font size setting.
+										get = function(info) return RQE.db.profile.textSettings.QuestDescription.size end,
+										-- Saves the quest description size setting and applies the change.
+										set = function(info, val) RQE.db.profile.textSettings.QuestDescription.size = val
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+										order = 1,
+									},
+									fontStyle = {
+										name = "Font Style",
+										type = "select",
+										values = RQE.FontStyleLabels,
+										itemControl = "Dropdown-Item-RQEFontPreview",
+										-- Returns the font style key.
+										get = function(info)
+											return RQE:GetFontStyleKey(RQE.db.profile.textSettings.QuestDescription.font)
+										end,
+										-- Saves the quest description font setting and applies the change.
+										set = function(info, val)
+											RQE.db.profile.textSettings.QuestDescription.font = RQE:GetFontStylePath(val)
+											RQE:ConfigurationChanged()  -- Notify the system that a change has occurred
+										end,
+									order = 2,
+									},
+									fontColor = {
+										name = "Font Color",
+										desc = "Default: Maya Blue",
+										type = "select",
+										values = RQE.FontColorLabels,
+										sorting = RQE.FontColorOrder,
+										dialogControl = "RQEColorDropdown",
+										itemControl = "Dropdown-Item-RQEColorPreview",
+										-- Returns the font color key.
+										get = function(info)
+											return RQE:GetFontColorKey(RQE.db.profile.textSettings.QuestDescription.color)
+										end,
+										-- Saves the quest description color setting and applies the change.
+										set = function(info, val)
+											local r, g, b = RQE:GetFontColorRGB(val)
+											if r then
+												RQE.db.profile.textSettings.QuestDescription.color = { r, g, b }
+												RQE:ConfigurationChanged()
+											end
+										end,
+										order = 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			-------------------------------------------------------
+			-- #4e. Debug & Performance Options
+			-------------------------------------------------------
+
+			debug = {
+				name = "Debug Options",
+				type = "group",
+				args = {
+					debugMode = {
+						type = "toggle",
+						name = "Enable Debug Mode",
+						desc = "Enable or disable debug mode for additional logging.",
+						order = 1,
+						-- Reads the saved debug mode setting.
+						get = function(info)
+							return RQE.db.profile.debugMode
+						end,
+						-- Saves the debug mode setting and applies the change.
+						set = function(info, value)
+							RQE.db.profile.debugMode = value
+							if not value then
+								RQE.db.profile.debugLevel = "NONE"
+							end
+						end,
+					},
+					displayRQEmemUsage = {
+						type = "toggle",
+						name = "Display Memory Usage",
+						desc = "Displays the memory usage for the RQE addon",
+						order = 2,
+						-- Reads the saved addon memory display setting.
+						get = function() return RQE.db.profile.displayRQEmemUsage end,
+						-- Saves the display RQ emem usage setting and applies the change.
+						set = function(_, newValue)
+							RQE.db.profile.displayRQEmemUsage = newValue;
+							RQE:CheckMemoryUsage();  -- Immediately update the memory usage display
+						end,
+					},
+					-- Display CPU Usage Checkbox -- alternative is /run SetCVar("scriptProfile", 1) or /run SetCVar("scriptProfile", 0)
+					displayRQEcpuUsage = {
+						type = "toggle",
+						name = "Display CPU Usage",
+						desc = "Displays the CPU usage for the RQE addon",
+						order = 3,
+						-- get = function() return RQE.db.profile.displayRQEcpuUsage end,
+						get = function() 
+							-- Get the actual scriptProfile state instead of just saved profile value
+							-- Previous Blizzard call changed 2026.09.25: return GetCVar("scriptProfile") == "1"
+							return RQE.API.Client.GetCVar("scriptProfile") == "1"
+						end,
+						-- Saves the display RQ ecpu usage setting and applies the change.
+						set = function(_, newValue)
+							-- Save setting
+							RQE.db.profile.displayRQEcpuUsage = newValue
+
+							-- If the new value differs from scriptProfile, toggle it and show the popup
+							-- Previous Blizzard call changed 2026.09.25: if (GetCVar("scriptProfile") == "1") ~= newValue then
+							if (RQE.API.Client.GetCVar("scriptProfile") == "1") ~= newValue then
+								RQE:ToggleCPUProfiling()  -- Only toggle if needed
+							end
+
+							-- Immediately update the displayed CPU usage
+							RQE:CheckCPUUsage()
+						end,
+					},
+					debugTimeStampCheckbox = {
+						type = "toggle",
+						name = "Enable Debug Timestamps",
+						desc = "Enable or disable timestamp in the debug frame.",
+						order = 4,
+						-- Reads the saved debug time stamp checkbox setting.
+						get = function(info)
+							return RQE.db.profile.debugTimeStampCheckbox
+						end,
+						-- Saves the debug time stamp checkbox setting and applies the change.
+						set = function(info, value)
+							-- Timestamps are independent of the chosen diagnostic level.
+							RQE.db.profile.debugTimeStampCheckbox = value
+						end,
+					},
+					debug = {
+						type = "group",
+						name = "Debug",
+						inline = true,
+						order = 5,
+						-- Uses the debug mode setting to control option availability.
+						hidden = function()
+							return not RQE.db.profile.debugMode  -- Hide when Debug Mode is off
+						end,
+						args = {
+							debugLevel = {
+								type = 'select',
+								name = 'Debug Level',
+								desc = "Set the level of debug logging.\n\n" ..
+								"|cFFFF3333The INFO and INFO+ settings are designed for the author ONLY. Using this may inadvertently impact your experience!|r",
+								values = debugLevelOptions,
+								-- Returns the debug level index.
+								get = function(info)
+									return getDebugLevelIndex(RQE.db.profile.debugLevel)  -- Convert string to index
+								end,
+								-- Saves the debug level setting and applies the change.
+								set = function(info, value)
+									RQE.db.profile.debugLevel = debugLevelOptions[value]  -- Convert index to string
+								end,
+								order = 1,
+							},
+							resetFramePosition = {
+								type = "execute",
+								name = "Reset Position",
+								desc = "Reset the position of the frame to its default coded location.",
+								-- Restores the saved or default frame position and refreshes the layout.
+								func = function()
+									RQE:ResetFramePositionToDBorDefault()
+									RQE:ResetQuestFramePositionToDBorDefault()
+								end,
+								-- Hides informational debug controls when their logging mode is inactive.
+								hidden = function()
+									return not (RQE.db.profile.debugMode and (RQE.db.profile.debugLevel == "INFO") or (RQE.db.profile.debugLevel == "INFO+"))
+								end,
+								order = 2,
+							},
+							resetFrameSize = {
+								type = "execute",
+								name = "Reset Size",
+								desc = "Reset the size of the frame to its default coded size.",
+								-- Restores the saved or default frame dimensions.
+								func = function()
+									RQE:ResetFrameSizeToDBorDefault()
+								end,
+								-- Hides informational debug controls when their logging mode is inactive.
+								hidden = function()
+									return not (RQE.db.profile.debugMode and (RQE.db.profile.debugLevel == "INFO") or (RQE.db.profile.debugLevel == "INFO+"))
+								end,
+								order = 3,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	-------------------------------------------------------
+	-- #4f. Chat Command Panel Routes
+	-------------------------------------------------------
+
+	-- Event Manager dealing with opening different panels in the addon options
+	RQE:RegisterChatCommand("rqe_frame", "OpenFrameSettings")
+		RQE:RegisterChatCommand("rqe_themes", "OpenThemeSettings")
+	RQE:RegisterChatCommand("rqe_font", "OpenFontSettings")
+	RQE:RegisterChatCommand("rqe_debug", "OpenDebugOptions")
+	RQE:RegisterChatCommand("RQE_Profiles", "OpenProfiles")
+
+
+--------------------------------------------------
+-- #5. 🧩 Configuration Window & Widget Builders
+--------------------------------------------------
+
+	-------------------------------------------------------
+	-- #5a. Config Window & Tab Shell
+	-------------------------------------------------------
+
+	local AceGUI = LibStub("AceGUI-3.0")
+	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
+	-- Creates the frame to handle the Configuration
+	function RQE:CreateConfigFrame()
+		if not self.configFrame then  -- Check if the frame already exists
+			local frame = AceGUI:Create("Frame")
+			frame:SetTitle("Rhodan's Quest Explorer Settings")
+			frame:SetStatusText("Configure your settings")
+			-- Hides the associated frame or control.
+			frame:SetCallback("OnClose", function(widget)
+				widget:Hide()
+			end)
+			frame:SetLayout("Flow")
+			frame:SetWidth(920)
+			frame:SetHeight(680)
+			RQE.ConfigUI:SkinConfigFrame(frame)
+
+			local tabGroup = AceGUI:Create("TabGroup")
+			tabGroup:SetLayout("Flow")
+			tabGroup:SetFullWidth(true)  -- Ensure it uses the full width of the frame
+			tabGroup:SetFullHeight(true) -- Ensure it uses the full height of the frame
+			tabGroup:SetTabs({
+				{text = "General Settings", value = "general"},
+				{text = "Frame Settings", value = "frame"},
+				{text = "Themes", value = "themes"},
+				{text = "Font Settings", value = "font"},
+				{text = "Debug Options", value = "debug"},
+				{text = "Profiles", value = "profiles"}
+			})
+
+			-- Opens the options page.
+			tabGroup:SetCallback("OnGroupSelected", function(container, event, group)
+				local pages = {
+					general = "RQE_Main",
+					frame = "RQE_Frame",
+					themes = "RQE_Themes",
+					font = "RQE_Font",
+					debug = "RQE_Debug",
+					profiles = "RQE_Profiles",
+				}
+				RQE.ConfigUI:OpenOptionsPage(container, pages[group])
+			end)
+
+			tabGroup:SelectTab("general")
+			frame:AddChild(tabGroup)
+
+			self.configFrame = frame  -- Store the frame reference in RQE
+		end
+	end
+
+	-------------------------------------------------------
+	-- #5b. Config Window Visibility Toggle
+	-------------------------------------------------------
+
+	-- Function to toggle show/hide the Configuration Frame
+	function RQE:ToggleConfigFrame()
+		if self.configFrame then
+			if self.configFrame:IsVisible() then
+				self.configFrame:Hide()
+			else
+				self.configFrame:Show()
+			end
+		else
+			self:CreateConfigFrame()
+		end
+	end
+
+	-------------------------------------------------------
+	-- #5c. General Settings Widgets
+	-------------------------------------------------------
+
+	-- Displays the Widget Container General Settings in Config Frame
+	function RQE:AddGeneralSettingsWidgets(container)
+		if self.IsRetail and self.ConfigUI then
+			self.ConfigUI:OpenOptionsPage(container, "RQE_Main")
+			return
+		end
+		-- Create a Scroll Frame
+		local scrollFrame = AceGUI:Create("ScrollFrame")
+		scrollFrame:SetLayout("Flow")
+		scrollFrame:SetFullWidth(true)
+		scrollFrame:SetFullHeight(true) -- This will allow the scroll frame to take up the full height of the parent container
+		container:AddChild(scrollFrame)
+
+		-------------------------------------------------------
+		-- #5c.i. Core Frame & Map Display Controls
+		-------------------------------------------------------
+
+		-- Enable Frame Checkbox
+		local enableFrameCheckbox = AceGUI:Create("CheckBox")
+		enableFrameCheckbox:SetLabel("Enable Frame")
+		enableFrameCheckbox:SetValue(RQE.db.profile.enableFrame)
+		-- Saves the enable frame setting and applies the change.
+		enableFrameCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableFrame = value
+			RQE:ToggleRQEFrame()
+		end)
+
+		-- Add a tooltip description for enableFrameCheckbox (RQE.db.profile.enableFrame)
+		enableFrameCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable or disable the frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableFrameCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableFrameCheckbox)
+
+		-- Hide SuperTrack Frame When Empty Checkbox
+		local hideRQEFrameWhenEmptyCheckbox = AceGUI:Create("CheckBox")
+		hideRQEFrameWhenEmptyCheckbox:SetLabel("Hide SuperTrack Frame When Empty")
+		hideRQEFrameWhenEmptyCheckbox:SetValue(RQE.db.profile.hideRQEFrameWhenEmpty)
+		-- Saves the hide RQE frame when empty setting and applies the change.
+		hideRQEFrameWhenEmptyCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.hideRQEFrameWhenEmpty = value
+			RQE:UpdateRQEFrameVisibility()
+		end)
+
+		hideRQEFrameWhenEmptyCheckbox:SetFullWidth(false)
+		hideRQEFrameWhenEmptyCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for hideRQEFrameWhenEmptyCheckbox (RQE.db.profile.hideRQEFrameWhenEmpty)
+		hideRQEFrameWhenEmptyCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Automatically hide the SuperTrack Frame when there are no quests being super tracked or searched.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		hideRQEFrameWhenEmptyCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(hideRQEFrameWhenEmptyCheckbox)
+
+		-- Enable Quest Frame Checkbox
+		local enableQuestFrameCheckbox = AceGUI:Create("CheckBox")
+		enableQuestFrameCheckbox:SetLabel("Enable Quest Frame")
+		enableQuestFrameCheckbox:SetValue(RQE.db.profile.enableQuestFrame)
+		-- Saves the enable quest frame setting and applies the change.
+		enableQuestFrameCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableQuestFrame = value
+			RQE:UpdateTrackerVisibility()
+		end)
+
+		-- Add a tooltip description for enableQuestFrameCheckbox (RQE.db.profile.enableQuestFrame)
+		enableQuestFrameCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable or disable the Quest Frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableQuestFrameCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableQuestFrameCheckbox)
+
+		-- Hide Quest Frame When Empty Checkbox
+		local hideRQEQuestFrameWhenEmptyCheckbox = AceGUI:Create("CheckBox")
+		hideRQEQuestFrameWhenEmptyCheckbox:SetLabel("Hide Quest Frame When Empty")
+		hideRQEQuestFrameWhenEmptyCheckbox:SetValue(RQE.db.profile.hideRQEQuestFrameWhenEmpty)
+		-- Saves the hide RQE quest frame when empty setting and applies the change.
+		hideRQEQuestFrameWhenEmptyCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.hideRQEQuestFrameWhenEmpty = value
+			RQE:UpdateRQEQuestFrameVisibility()
+		end)
+
+		hideRQEQuestFrameWhenEmptyCheckbox:SetFullWidth(false)
+		hideRQEQuestFrameWhenEmptyCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for hideRQEQuestFrameWhenEmptyCheckbox (RQE.db.profile.hideRQEQuestFrameWhenEmpty)
+		hideRQEQuestFrameWhenEmptyCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Automatically hide the Quest Tracker when no quests or achievements are being watched.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		hideRQEQuestFrameWhenEmptyCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(hideRQEQuestFrameWhenEmptyCheckbox)
+
+		-- Minimap Button Position Slider
+		local minimapButtonAngleSlider = AceGUI:Create("Slider")
+		minimapButtonAngleSlider:SetLabel("Minimap Button Position")
+		minimapButtonAngleSlider:SetSliderValues(0, 360, 1)
+		minimapButtonAngleSlider:SetValue(RQE.db.profile.minimapButtonAngle)
+		-- Saves the minimap button angle setting and applies the change.
+		minimapButtonAngleSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.minimapButtonAngle = value
+			RQE:UpdateMinimapButtonPosition()
+		end)
+
+		-- Add a tooltip description for the minimapButtonAngleSlider (RQE.db.profile.minimapButtonAngle)
+		minimapButtonAngleSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Set the position of the Minimap button around the Minimap.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		minimapButtonAngleSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(minimapButtonAngleSlider)
+
+		-- Add a description label below the slider
+		local minimapButtonAngleLabel = AceGUI:Create("Label")
+		minimapButtonAngleLabel:SetText("Set the position of the Minimap button around the Minimap.")
+		minimapButtonAngleLabel:SetFullWidth(true)
+		scrollFrame:AddChild(minimapButtonAngleLabel)
+
+		-- Show Minimap Button Checkbox
+		local minimapToggleCheckbox = AceGUI:Create("CheckBox")
+		minimapToggleCheckbox:SetLabel("Show Minimap Button")
+		minimapToggleCheckbox:SetValue(RQE.db.profile.showMinimapIcon) -- Get the current value from the profile
+		-- Saves the show minimap icon setting and applies the change.
+		minimapToggleCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.showMinimapIcon = value
+			RQE:ToggleMinimapIcon()
+		end)
+
+		-- Add a tooltip description for minimapToggleCheckbox (RQE.db.profile.showMinimapIcon)
+		minimapToggleCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Toggle the minimap button on or off", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		minimapToggleCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(minimapToggleCheckbox)
+
+		-- Show Current MapID Checkbox
+		local showMapIDCheckbox = AceGUI:Create("CheckBox")
+		showMapIDCheckbox:SetLabel("Show Current MapID")
+		showMapIDCheckbox:SetValue(RQE.db.profile.showMapID)
+		-- Saves the show map ID setting and applies the change.
+		showMapIDCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.showMapID = value
+			RQE:UpdateMapIDDisplay()
+		end)
+
+		-- Add a tooltip description for showMapIDCheckbox (RQE.db.profile.showMapID)
+		showMapIDCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Toggles the display of the current MapID on the frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		showMapIDCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(showMapIDCheckbox)
+
+		-- Show Current X, Y Checkbox
+		local showCoordinatesCheckbox = AceGUI:Create("CheckBox")
+		showCoordinatesCheckbox:SetLabel("Show Current X, Y")
+		showCoordinatesCheckbox:SetValue(RQE.db.profile.showCoordinates)
+		-- Saves the show coordinates setting and applies the change.
+		showCoordinatesCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.showCoordinates = value
+			RQE:UpdateCoordinates()
+			RQE.StepDistanceOverride = true
+			RQE:UpdateStepDistance()
+			RQE.StepDistanceOverride = false
+		end)
+
+		-- Add a tooltip description for showCoordinatesCheckbox (RQE.db.profile.showCoordinates)
+		showCoordinatesCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Toggles the display of the current coordinates on the frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		showCoordinatesCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(showCoordinatesCheckbox)
+
+		-------------------------------------------------------
+		-- #5c.ii. Quest Automation & World Quest Controls
+		-------------------------------------------------------
+
+		-- Auto Quest Watch Checkbox
+		local autoQuestWatchCheckbox = AceGUI:Create("CheckBox")
+		autoQuestWatchCheckbox:SetLabel("Auto Quest Watch")
+		-- Previous Blizzard call changed 2026.09.25: autoQuestWatchCheckbox:SetValue(GetCVarBool("autoQuestWatch"))
+		autoQuestWatchCheckbox:SetValue(RQE.API.Client.GetCVarBool("autoQuestWatch"))
+		-- Saves the auto quest watch setting and applies the change.
+		autoQuestWatchCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.autoQuestWatch = value
+			-- Previous Blizzard call changed 2026.09.25: SetCVar("autoQuestWatch", value and "1" or "0")
+			RQE.API.Client.SetCVar("autoQuestWatch", value and "1" or "0")
+		end)
+
+		-- Add a tooltip description for autoQuestWatchCheckbox (RQE.db.profile.autoQuestWatch)
+		autoQuestWatchCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Automatically track quests as soon as you obtain them and after achieving an objective.\n\n|cFFFF3333If the Auto Quest Watch setting changes 'on its own' check if another quest tracking addon may be interfering with your choice and set it to the same as this setting.|r", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		autoQuestWatchCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(autoQuestWatchCheckbox)
+
+		-- Auto Quest Progress Checkbox
+		local autoQuestProgressCheckbox = AceGUI:Create("CheckBox")
+		autoQuestProgressCheckbox:SetLabel("Auto Quest Progress")
+		-- Previous Blizzard call changed 2026.09.25: autoQuestProgressCheckbox:SetValue(GetCVarBool("autoQuestProgress"))
+		autoQuestProgressCheckbox:SetValue(RQE.API.Client.GetCVarBool("autoQuestProgress"))
+		-- Saves the auto quest progress setting and applies the change.
+		autoQuestProgressCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.autoQuestProgress = value
+			-- Previous Blizzard call changed 2026.09.25: SetCVar("autoQuestProgress", value and "1" or "0")
+			RQE.API.Client.SetCVar("autoQuestProgress", value and "1" or "0")
+		end)
+
+		-- Add a tooltip description for autoQuestProgressCheckbox (RQE.db.profile.autoQuestProgress)
+		autoQuestProgressCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Quests are automatically watched for 5 minutes when you achieve a quest objective.\n\n|cFFFF3333If the Auto Quest Progress setting changes 'on its own' check if another quest tracking addon may be interfering with your choice and set it to the same as this setting.|r", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		autoQuestProgressCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(autoQuestProgressCheckbox)
+
+		-- Accept quest offers when their detail view opens.
+		do
+			local checkbox = AceGUI:Create("CheckBox")
+			checkbox:SetLabel("Auto-Accept Quests")
+			checkbox:SetValue(RQE.db.profile.autoAcceptQuestDetail)
+			-- Saves the auto accept quest detail setting and applies the change.
+			checkbox:SetCallback("OnValueChanged", function(_, _, value)
+				RQE.db.profile.autoAcceptQuestDetail = value
+			end)
+			-- Shows this control's tooltip while the pointer is over it.
+			checkbox:SetCallback("OnEnter", function(widget)
+				GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetText("Automatically accept a quest when its detail window opens, regardless of the QUEST_DETAIL item payload.", nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			end)
+			-- Hides the tooltip when the pointer leaves this control.
+			checkbox:SetCallback("OnLeave", function() GameTooltip:Hide() end)
+			scrollFrame:AddChild(checkbox)
+		end
+
+		-- Complete the selected turn-in only when no reward choice is needed.
+		do
+			local checkbox = AceGUI:Create("CheckBox")
+			checkbox:SetLabel("Auto-Complete when No Reward Choices")
+			checkbox:SetValue(RQE.db.profile.autoCompleteNoRewardChoices)
+			-- Saves the auto complete no reward choices setting and applies the change.
+			checkbox:SetCallback("OnValueChanged", function(_, _, value)
+				RQE.db.profile.autoCompleteNoRewardChoices = value
+			end)
+			-- Shows this control's tooltip while the pointer is over it.
+			checkbox:SetCallback("OnEnter", function(widget)
+				GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetText("Allow the Contribution turn-in macro to complete the supertracked quest when no reward choice is needed. Multiple reward choices or a required payment remain manual. Reopen the Contribution menu to copy the updated macro.", nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			end)
+			-- Hides the tooltip when the pointer leaves this control.
+			checkbox:SetCallback("OnLeave", function() GameTooltip:Hide() end)
+			scrollFrame:AddChild(checkbox)
+		end
+
+		-- Remove WQ after login Checkbox
+		local removeWQatLoginCheckbox = AceGUI:Create("CheckBox")
+		removeWQatLoginCheckbox:SetLabel("Remove WQ after login")
+		removeWQatLoginCheckbox:SetValue(RQE.db.profile.removeWQatLogin)
+		-- Saves the remove w qat login setting and applies the change.
+		removeWQatLoginCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.removeWQatLogin = value
+		end)
+
+		-- Add a tooltip description for removeWQatLoginCheckbox (RQE.db.profile.removeWQatLogin)
+		removeWQatLoginCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Removes all of the WQ on player login.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		removeWQatLoginCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(removeWQatLoginCheckbox)
+
+		-- Auto Track Zone Quests Checkbox
+		local autoTrackZoneQuestsCheckbox = AceGUI:Create("CheckBox")
+		autoTrackZoneQuestsCheckbox:SetLabel("Auto Track Zone Quests")
+		autoTrackZoneQuestsCheckbox:SetValue(RQE.db.profile.autoTrackZoneQuests)
+		-- Enables or disables automatic tracking of the current zone's quests.
+		autoTrackZoneQuestsCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE:SetAutoTrackZoneQuestsEnabled(value)
+		end)
+
+		-- Add a tooltip description for autoTrackZoneQuestsCheckbox (RQE.db.profile.autoTrackZoneQuests)
+		autoTrackZoneQuestsCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Updates watch list on zone change to display quests specific to the player's zone", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		autoTrackZoneQuestsCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(autoTrackZoneQuestsCheckbox)
+
+		-- Auto Click Waypoint Button Checkbox
+		local autoClickWaypointButtonCheckbox = AceGUI:Create("CheckBox")
+		autoClickWaypointButtonCheckbox:SetLabel("Auto Click Waypoint Button")
+		autoClickWaypointButtonCheckbox:SetValue(RQE.db.profile.autoClickWaypointButton)
+		-- Saves the auto click waypoint button setting and applies the change.
+		autoClickWaypointButtonCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.autoClickWaypointButton = value
+		end)
+
+		-- Add a tooltip description for autoClickWaypointButtonCheckbox (RQE.db.profile.autoClickWaypointButton)
+		autoClickWaypointButtonCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Automatically click on the Waypoint Button in the Super Tracked frame when you progress through quest objectives.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		autoClickWaypointButtonCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(autoClickWaypointButtonCheckbox)
+
+		-- Auto Abandon Quest Checkbox
+		local enableQuestAbandonConfirmCheckbox = AceGUI:Create("CheckBox")
+		enableQuestAbandonConfirmCheckbox:SetLabel("Auto Abandon Quest")
+		enableQuestAbandonConfirmCheckbox:SetValue(RQE.db.profile.enableQuestAbandonConfirm)
+		-- Saves the enable quest abandon confirm setting and applies the change.
+		enableQuestAbandonConfirmCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableQuestAbandonConfirm = value
+		end)
+
+		-- Add a tooltip description for enableQuestAbandonConfirmCheckbox (RQE.db.profile.enableQuestAbandonConfirm)
+		enableQuestAbandonConfirmCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("If enabled will hide confirmation pop up when abandoning quest via right-clicking quest in the addon. If disabled, pop up will appear with confirmation to abandon the selected quest", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableQuestAbandonConfirmCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableQuestAbandonConfirmCheckbox)
+
+		-------------------------------------------------------
+		-- #5c.iii. Provider Compatibility & Super-Tracking Controls
+		-------------------------------------------------------
+
+		-- Enable TomTom Compatibility Checkbox
+		local enableTomTomCompatibilityCheckbox = AceGUI:Create("CheckBox")
+		enableTomTomCompatibilityCheckbox:SetLabel("Enable TomTom Compatibility")
+		enableTomTomCompatibilityCheckbox:SetValue(RQE.db.profile.enableTomTomCompatibility)
+		-- Saves the enable tom tom compatibility setting and applies the change.
+		enableTomTomCompatibilityCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableTomTomCompatibility = value
+		end)
+
+		enableTomTomCompatibilityCheckbox:SetFullWidth(false)
+		enableTomTomCompatibilityCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for enableTomTomCompatibilityCheckbox (RQE.db.profile.enableTomTomCompatibility)
+		enableTomTomCompatibilityCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("If enabled will create waypoints via TomTom addon (if you have this addon also installed)", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableTomTomCompatibilityCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableTomTomCompatibilityCheckbox)
+
+		-- Enable Carbonite Compatibility Checkbox
+		local enableCarboniteCompatibilityCheckbox = AceGUI:Create("CheckBox")
+		enableCarboniteCompatibilityCheckbox:SetLabel("Enable Carbonite Compatibility")
+		enableCarboniteCompatibilityCheckbox:SetValue(RQE.db.profile.enableCarboniteCompatibility)
+		-- Saves the enable carbonite compatibility setting and applies the change.
+		enableCarboniteCompatibilityCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableCarboniteCompatibility = value
+		end)
+
+		enableCarboniteCompatibilityCheckbox:SetFullWidth(false)
+		enableCarboniteCompatibilityCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for enableCarboniteCompatibilityCheckbox (RQE.db.profile.enableCarboniteCompatibility)
+		enableCarboniteCompatibilityCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("If enabled will create waypoints via Carbonite addon (if you have this addon also installed)", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableCarboniteCompatibilityCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableCarboniteCompatibilityCheckbox)
+
+		-- Enable SuperTrack Nearest Checkbox
+		local enableAutoSuperTrackSwap = AceGUI:Create("CheckBox")
+		enableAutoSuperTrackSwap:SetLabel("Enable SuperTrack Nearest on Movement")
+		enableAutoSuperTrackSwap:SetValue(RQE.db.profile.enableAutoSuperTrackSwap)
+		-- Saves the enable auto super track swap setting and applies the change.
+		enableAutoSuperTrackSwap:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableAutoSuperTrackSwap = value
+		end)
+
+		enableAutoSuperTrackSwap:SetFullWidth(false)
+		enableAutoSuperTrackSwap:SetWidth(300)
+
+		-- Add a tooltip description for enableAutoSuperTrackSwap (RQE.db.profile.enableAutoSuperTrackSwap)
+		enableAutoSuperTrackSwap:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable the super tracking to change to the nearest watched non-world quest\n\n|cFFFF3333EXPERIMENTAL feature designed to auto update nearest supertracked quest based on proximity when the player moves.|r\n\nAutomatically pauses inside instances and resumes after leaving.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableAutoSuperTrackSwap:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableAutoSuperTrackSwap)
+
+		-- Enable SuperTrack Nearest Checkbox
+		local enableNearestSuperTrack = AceGUI:Create("CheckBox")
+		enableNearestSuperTrack:SetLabel("Enable SuperTrack Nearest when not Tracking")
+		enableNearestSuperTrack:SetValue(RQE.db.profile.enableNearestSuperTrack)
+		-- Saves the enable nearest super track setting and applies the change.
+		enableNearestSuperTrack:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableNearestSuperTrack = value
+		end)
+
+		enableNearestSuperTrack:SetFullWidth(false)
+		enableNearestSuperTrack:SetWidth(300)
+
+		-- Add a tooltip description for enableNearestSuperTrack (RQE.db.profile.enableNearestSuperTrack)
+		enableNearestSuperTrack:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable SuperTracking nearest when quest frame changes, such as turning in a quest, if not already supertracking\n\n|cFFFF3333This setting will prioritize regular quests within the player's current zone that are being watched unless one of the two below 'Enable SuperTrack Nearest Campaign...' have been selected.|r\n\nAutomatically pauses inside instances and resumes after leaving.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableNearestSuperTrack:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableNearestSuperTrack)
+
+		-- Enable SuperTrack Nearest Campaign Quest Checkbox
+		-- Previous Blizzard call changed 2026.09.25: local maxPlayerLevel = GetMaxPlayerLevel()
+		local maxPlayerLevel = RQE.API.Client.GetMaxPlayerLevel()
+		local enableNearestSuperTrackCampaign = AceGUI:Create("CheckBox")
+		enableNearestSuperTrackCampaign:SetLabel("Enable SuperTrack Nearest Campaign Quest [Max Level: " .. maxPlayerLevel .. "]")
+		enableNearestSuperTrackCampaign:SetValue(RQE.db.profile.enableNearestSuperTrackCampaign)
+		-- Saves the enable nearest super track campaign setting and applies the change.
+		enableNearestSuperTrackCampaign:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableNearestSuperTrackCampaign = value
+		end)
+
+		enableNearestSuperTrackCampaign:SetFullWidth(true)
+		enableNearestSuperTrackCampaign:SetWidth(300)
+
+		-- Add a tooltip description for enableNearestSuperTrackCampaign (RQE.db.profile.enableNearestSuperTrackCampaign)
+		enableNearestSuperTrackCampaign:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable SuperTracking nearest campaign quest when frame changes, such as turning in a quest, if not already supertracking\n\nAutomatically pauses inside instances and resumes after leaving.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableNearestSuperTrackCampaign:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableNearestSuperTrackCampaign)
+
+		-- Enable SuperTrack Nearest Campaign Quest Checkbox
+		-- Previous Blizzard call changed 2026.09.25: local playerLevel = UnitLevel("player")
+		local playerLevel = RQE.API.Client.UnitLevel("player")
+		-- Previous Blizzard call changed 2026.09.25: local maxPlayerLevel = GetMaxPlayerLevel()
+		local maxPlayerLevel = RQE.API.Client.GetMaxPlayerLevel()
+		local enableNearestSuperTrackCampaignLevelingOnly = AceGUI:Create("CheckBox")
+		enableNearestSuperTrackCampaignLevelingOnly:SetLabel("Enable SuperTrack Nearest Campaign Quest [Leveling Only: " .. playerLevel .. "/" .. maxPlayerLevel .. "]")
+		enableNearestSuperTrackCampaignLevelingOnly:SetValue(RQE.db.profile.enableNearestSuperTrackCampaignLevelingOnly)
+		-- Saves the enable nearest super track campaign leveling only setting and applies the change.
+		enableNearestSuperTrackCampaignLevelingOnly:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableNearestSuperTrackCampaignLevelingOnly = value
+		end)
+
+		enableNearestSuperTrackCampaignLevelingOnly:SetFullWidth(true)
+		enableNearestSuperTrackCampaignLevelingOnly:SetWidth(300)
+
+		-- Add a tooltip description for enableNearestSuperTrackCampaignLevelingOnly (RQE.db.profile.enableNearestSuperTrackCampaignLevelingOnly)
+		enableNearestSuperTrackCampaignLevelingOnly:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable SuperTracking nearest campaign quest when frame changes, such as turning in a quest, if not already supertracking, but only while leveling\n\nAutomatically pauses inside instances and resumes after leaving.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableNearestSuperTrackCampaignLevelingOnly:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableNearestSuperTrackCampaignLevelingOnly)
+
+		-- Enable QuestType Display Checkbox
+		local enableQuestTypeDisplay = AceGUI:Create("CheckBox")
+		enableQuestTypeDisplay:SetLabel("Enable QuestType Info")
+		enableQuestTypeDisplay:SetValue(RQE.db.profile.enableQuestTypeDisplay)
+		-- Saves the enable quest type display setting and applies the change.
+		enableQuestTypeDisplay:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableQuestTypeDisplay = value
+		end)
+
+		enableQuestTypeDisplay:SetFullWidth(false)
+		enableQuestTypeDisplay:SetWidth(300)
+
+		-- Add a tooltip description for enableQuestTypeDisplay (RQE.db.profile.enableQuestTypeDisplay)
+		enableQuestTypeDisplay:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable visual information of the quest type in the Quest Tracker\n\n|cFFFF3333Reload of the UI may be required to get quest anchors to line up properly.|r", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableQuestTypeDisplay:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableQuestTypeDisplay)
+
+		-- Key Binding for Macro Keybinding
+		local keyBindSettingKeybind = AceGUI:Create("Keybinding")
+		keyBindSettingKeybind:SetLabel("Key Binding for Macro")
+		keyBindSettingKeybind:SetKey(RQE.db.profile.keyBindSetting)
+		-- Saves the key bind setting setting and applies the change.
+		keyBindSettingKeybind:SetCallback("OnKeyChanged", function(widget, event, key)
+			RQE.db.profile.keyBindSetting = key
+			RQE:ReapplyMacroBinding()
+			RQE:SetupOverrideMacroBinding()
+		end)
+
+		-- Add a tooltip description for keyBindSettingKeybind (RQE.db.profile.keyBindSetting)
+		keyBindSettingKeybind:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Specify the key combination for triggering the RQE Macro MagicButton", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		keyBindSettingKeybind:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(keyBindSettingKeybind)
+
+		-- Enable GossipMode Display Checkbox
+		local enableGossipModeAutomation = AceGUI:Create("CheckBox")
+		enableGossipModeAutomation:SetLabel("Enable Gossip Mode")
+		enableGossipModeAutomation:SetValue(RQE.db.profile.enableGossipModeAutomation)
+		-- Saves the enable gossip mode automation setting and applies the change.
+		enableGossipModeAutomation:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableGossipModeAutomation = value
+		end)
+
+		enableGossipModeAutomation:SetFullWidth(false)
+		enableGossipModeAutomation:SetWidth(300)
+
+		-- Add a tooltip description for enableGossipModeAutomation (RQE.db.profile.enableGossipModeAutomation)
+		enableGossipModeAutomation:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enable Gossip Mode where the correct option will be chosen as part of the macro", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableGossipModeAutomation:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableGossipModeAutomation)
+
+		-- Enable Mouseover marking Checkbox
+		local enableMouseoverMarkingCheckbox = AceGUI:Create("CheckBox")
+		enableMouseoverMarkingCheckbox:SetLabel("Enable Mouseover Marking")
+		enableMouseoverMarkingCheckbox:SetValue(RQE.db.profile.enableMouseOverMarking)
+		-- Saves the enable mouse over marking setting and applies the change.
+		enableMouseoverMarkingCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableMouseOverMarking = value
+		end)
+
+		enableMouseoverMarkingCheckbox:SetFullWidth(false)
+		enableMouseoverMarkingCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for enableMouseoverMarkingCheckbox (RQE.db.profile.enableMouseOverMarking)
+		enableMouseoverMarkingCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("If enabled will mark NPC targets that are associated with the step of your currently supertracked quest.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableMouseoverMarkingCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableMouseoverMarkingCheckbox)
+
+		-- Enable Travel Suggestion Checkbox
+		local enableTravelSuggestionCheckbox = AceGUI:Create("CheckBox")
+		enableTravelSuggestionCheckbox:SetLabel("Enable Travel Suggestion")
+		enableTravelSuggestionCheckbox:SetValue(RQE.db.profile.enableTravelSuggestions)
+		-- Saves the enable travel suggestions setting and applies the change.
+		enableTravelSuggestionCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableTravelSuggestions = value
+		end)
+
+		enableTravelSuggestionCheckbox:SetFullWidth(false)
+		enableTravelSuggestionCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for enableTravelSuggestionCheckbox (RQE.db.profile.enableTravelSuggestions)
+		enableTravelSuggestionCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("If enabled will print out travel suggestion into chat", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableTravelSuggestionCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableTravelSuggestionCheckbox)
+
+		-- Spacer to ensure the scroll goes to the bottom
+		local spacer = AceGUI:Create("Label")
+		spacer:SetText(" ")
+		spacer:SetFullWidth(true)
+		scrollFrame:AddChild(spacer)
+	end
+
+	-------------------------------------------------------
+	-- #5d. Frame Settings Widgets
+	-------------------------------------------------------
+
+	-- Displays the Widget Container Frame Settings in Config Frame
+	function RQE:AddFrameSettingsWidgets(container)
+		-- Create a Scroll Frame
+		local scrollFrame = AceGUI:Create("ScrollFrame")
+		scrollFrame:SetLayout("Flow")
+		scrollFrame:SetFullWidth(true)
+		scrollFrame:SetFullHeight(true) -- This will allow the scroll frame to take up the full height of the parent container
+		container:AddChild(scrollFrame)
+
+		-- Create the Frame Settings
+		local framePositionGroup = AceGUI:Create("InlineGroup")
+		framePositionGroup:SetTitle("Frame Settings")
+		framePositionGroup:SetFullWidth(true)
+		framePositionGroup:SetLayout("Flow")
+		scrollFrame:AddChild(framePositionGroup)
+
+		-------------------------------------------------------
+		-- #5d.i. Tracker Behavior & Theme Controls
+		-------------------------------------------------------
+
+		-- Add Toggle Blizz Quest Tracker CheckBox to the Frame Settings Widgets
+		local toggleBlizzObjectiveTrackerCheckbox = AceGUI:Create("CheckBox")
+		toggleBlizzObjectiveTrackerCheckbox:SetLabel("Toggle Blizz Quest Tracker")
+		toggleBlizzObjectiveTrackerCheckbox:SetDescription("Show/Hide Blizzard's Quest Tracker")
+		toggleBlizzObjectiveTrackerCheckbox:SetValue(RQE.db.profile.toggleBlizzObjectiveTracker)
+		toggleBlizzObjectiveTrackerCheckbox:SetFullWidth(true)
+		-- Saves the toggle blizz objective tracker setting and applies the change.
+		toggleBlizzObjectiveTrackerCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.toggleBlizzObjectiveTracker = value
+		end)
+
+		-- Optionally add a tooltip for more information
+		toggleBlizzObjectiveTrackerCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Toggles the visibility of Blizzard's default quest tracker frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		toggleBlizzObjectiveTrackerCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		-- Add the checkbox to the desired group (e.g., framePositionGroup)
+		framePositionGroup:AddChild(toggleBlizzObjectiveTrackerCheckbox)
+
+		if RQE.API.IsDugiGuidesLoaded() then
+			local dugiGuidesCompatibilityCheckbox = AceGUI:Create("CheckBox")
+			dugiGuidesCompatibilityCheckbox:SetLabel("Dugi Guides Compatibility")
+			dugiGuidesCompatibilityCheckbox:SetValue(RQE.db.profile.enableDugiGuidesCompatibility)
+			dugiGuidesCompatibilityCheckbox:SetFullWidth(true)
+			-- Saves the enable dugi guides compatibility setting and applies the change.
+			dugiGuidesCompatibilityCheckbox:SetCallback("OnValueChanged", function(_, _, value)
+				RQE.db.profile.enableDugiGuidesCompatibility = value
+				RQE:EnforceObjectiveTrackerVisibility()
+			end)
+			-- Shows this control's tooltip while the pointer is over it.
+			dugiGuidesCompatibilityCheckbox:SetCallback("OnEnter", function(widget)
+				GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetText("When RQE's Quest Tracker is hidden, keep Blizzard's Objective Tracker and the attached Dugi guide visible even with no watched quests. Hide both when RQE's Quest Tracker is shown.", nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			end)
+			-- Hides the tooltip when the pointer leaves this control.
+			dugiGuidesCompatibilityCheckbox:SetCallback("OnLeave", function()
+				GameTooltip:Hide()
+			end)
+			framePositionGroup:AddChild(dugiGuidesCompatibilityCheckbox)
+		end
+
+		-- Hide Quest Frame When Empty Checkbox
+		local mythicScenarioModeCheckbox = AceGUI:Create("CheckBox")
+		mythicScenarioModeCheckbox:SetLabel("Mythic/Scenario Mode")
+		mythicScenarioModeCheckbox:SetValue(RQE.db.profile.mythicScenarioMode)
+		-- Saves the mythic scenario mode setting and applies the change.
+		mythicScenarioModeCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.mythicScenarioMode = value
+			RQE:UpdateTrackerVisibility()
+		end)
+
+		mythicScenarioModeCheckbox:SetFullWidth(false)
+		mythicScenarioModeCheckbox:SetWidth(300)
+
+		-- Add a tooltip description for mythicScenarioModeCheckbox (RQE.db.profile.mythicScenarioMode)
+		mythicScenarioModeCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Use Blizzard's Objective Tracker instead of RQE's quest tracker in scenarios, including Mythic dungeons. When unchecked, Blizzard's tracker stays hidden during normal play and scenarios.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		mythicScenarioModeCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(mythicScenarioModeCheckbox)
+
+		-- Forward/Back Controls Checkbox
+		local enableStepControlsCheckbox = AceGUI:Create("CheckBox")
+		enableStepControlsCheckbox:SetLabel("StepIndex Forward/Back Controls")
+		enableStepControlsCheckbox:SetValue(RQE.db.profile.enableStepControls)
+		-- Saves the enable step controls setting and applies the change.
+		enableStepControlsCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.enableStepControls = value
+			if RQE.Buttons and RQE.Buttons.UpdateHeaderNavigation then
+				RQE.Buttons.UpdateHeaderNavigation()
+			end
+		end)
+
+		enableStepControlsCheckbox:SetFullWidth(true)
+
+		-- Shows this control's tooltip while the pointer is over it.
+		enableStepControlsCheckbox:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Enables the logic for the Forward and Back step navigation buttons.\n\n|cFFFF3333Experimental: may behave differently while testing step navigation changes.|r", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		enableStepControlsCheckbox:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		scrollFrame:AddChild(enableStepControlsCheckbox)
+
+		local previewPosition = RQE.db.profile.creatureObjectPreviewPosition
+		local previewAnchorPoints = {
+			TOPLEFT = "TOPLEFT", TOP = "TOP", TOPRIGHT = "TOPRIGHT",
+			LEFT = "LEFT", CENTER = "CENTER", RIGHT = "RIGHT",
+			BOTTOMLEFT = "BOTTOMLEFT", BOTTOM = "BOTTOM", BOTTOMRIGHT = "BOTTOMRIGHT",
+		}
+		local previewGroup = AceGUI:Create("InlineGroup")
+		previewGroup:SetTitle("Creature and Object Preview")
+		previewGroup:SetFullWidth(true)
+		previewGroup:SetLayout("Flow")
+
+		local previewEnabled = AceGUI:Create("CheckBox")
+		previewEnabled:SetLabel("Show previews on mouseover")
+		previewEnabled:SetDescription("Shows a persistent NPC model or bundled object image when an NPC or object link in a step description is moused over.")
+		previewEnabled:SetValue(RQE.db.profile.enableCreatureObjectPreview ~= false)
+		previewEnabled:SetFullWidth(true)
+		-- Saves the enable creature object preview setting and applies the change.
+		previewEnabled:SetCallback("OnValueChanged", function(_, _, value)
+			RQE.db.profile.enableCreatureObjectPreview = value
+			if not value and RQE.HideCreatureObjectPreview then RQE.HideCreatureObjectPreview() end
+		end)
+		previewGroup:AddChild(previewEnabled)
+
+		-- Adds the preview dropdown.
+		local function AddPreviewDropdown(label, field)
+			local widget = AceGUI:Create("Dropdown")
+			widget:SetLabel(label)
+			widget:SetList(previewAnchorPoints)
+			widget:SetValue(previewPosition[field])
+			widget:SetRelativeWidth(0.5)
+			-- Applies the creature object preview layout.
+			widget:SetCallback("OnValueChanged", function(_, _, value)
+				previewPosition[field] = value
+				if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end
+			end)
+			previewGroup:AddChild(widget)
+		end
+		AddPreviewDropdown("Preview anchor", "point")
+		AddPreviewDropdown("RQEFrame anchor", "relativePoint")
+
+		-- Adds the preview slider.
+		local function AddPreviewSlider(label, field, minimum, maximum, step)
+			local widget = AceGUI:Create("Slider")
+			widget:SetLabel(label)
+			widget:SetSliderValues(minimum, maximum, step)
+			widget:SetValue(previewPosition[field])
+			widget:SetRelativeWidth(field == "scale" and 1 or 0.5)
+			-- Applies the creature object preview layout.
+			widget:SetCallback("OnValueChanged", function(_, _, value)
+				previewPosition[field] = value
+				if RQE.ApplyCreatureObjectPreviewLayout then RQE.ApplyCreatureObjectPreviewLayout() end
+			end)
+			previewGroup:AddChild(widget)
+		end
+		AddPreviewSlider("Horizontal offset", "x", -800, 800, 1)
+		AddPreviewSlider("Vertical offset", "y", -800, 800, 1)
+		AddPreviewSlider("Preview size", "scale", 0.5, 2, 0.05)
+		scrollFrame:AddChild(previewGroup)
+
+		-- Main Frame Position Group
+		local framePositionGroup = AceGUI:Create("InlineGroup")
+		framePositionGroup:SetTitle("Main Frame Position")
+		framePositionGroup:SetFullWidth(true)
+		framePositionGroup:SetLayout("Flow")
+		scrollFrame:AddChild(framePositionGroup)
+
+		local lockFrameCheckbox = AceGUI:Create("CheckBox")
+		lockFrameCheckbox:SetLabel("Lock Quest Helper Position & Size")
+		lockFrameCheckbox:SetDescription("Prevents mouse dragging and resizing; the position and size controls below remain available.")
+		lockFrameCheckbox:SetValue(RQE.db.profile.lockRQEFrame == true)
+		lockFrameCheckbox:SetFullWidth(true)
+		-- Saves the lock RQE frame setting and applies the change.
+		lockFrameCheckbox:SetCallback("OnValueChanged", function(_, _, value)
+			RQE.db.profile.lockRQEFrame = value == true
+			if RQE.SetRQEFrameLocked then RQE.SetRQEFrameLocked(value) end
+		end)
+		framePositionGroup:AddChild(lockFrameCheckbox)
+
+		-- Anchor Points List
+		local anchorPoints = {
+			TOPLEFT = "TOPLEFT",
+			TOP = "TOP",
+			TOPRIGHT = "TOPRIGHT",
+			LEFT = "LEFT",
+			CENTER = "CENTER",
+			RIGHT = "RIGHT",
+			BOTTOMLEFT = "BOTTOMLEFT",
+			BOTTOM = "BOTTOM",
+			BOTTOMRIGHT = "BOTTOMRIGHT",
+		}
+
+		-------------------------------------------------------
+		-- #5d.ii. Main Frame Geometry Controls
+		-------------------------------------------------------
+
+		-- Anchor Point Dropdown for Main Frame
+		local anchorPointDropdown = AceGUI:Create("Dropdown")
+		anchorPointDropdown:SetLabel("Anchor Point")
+		anchorPointDropdown:SetList(anchorPoints)
+		anchorPointDropdown:SetValue(RQE.db.profile.framePosition.anchorPoint)
+		anchorPointDropdown:SetFullWidth(true)
+		-- Saves the frame position anchor point setting and applies the change.
+		anchorPointDropdown:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.framePosition.anchorPoint = value
+			RQE:UpdateFramePosition()
+		end)
+
+		-- Add a tooltip description for anchorPointDropdown (RQE.db.profile.framePosition.anchorPoint)
+		anchorPointDropdown:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("The point where the frame will be anchored.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		anchorPointDropdown:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		framePositionGroup:AddChild(anchorPointDropdown)
+
+		-- X Position Slider
+		local xPosSlider = AceGUI:Create("Slider")
+		xPosSlider:SetLabel("X Position")
+		xPosSlider:SetSliderValues(-500, 500, 1)
+		xPosSlider:SetValue(RQE.db.profile.framePosition.xPos)
+		xPosSlider:SetFullWidth(true)
+		-- Saves the frame position x pos setting and applies the change.
+		xPosSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.framePosition.xPos = value
+			RQE:UpdateFramePosition()
+		end)
+		framePositionGroup:AddChild(xPosSlider)
+
+		-- Y Position Slider
+		local yPosSlider = AceGUI:Create("Slider")
+		yPosSlider:SetLabel("Y Position")
+		yPosSlider:SetSliderValues(-500, 500, 1)
+		yPosSlider:SetValue(RQE.db.profile.framePosition.yPos)
+		yPosSlider:SetFullWidth(true)
+		-- Saves the frame position y pos setting and applies the change.
+		yPosSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.framePosition.yPos = value
+			RQE:UpdateFramePosition()
+		end)
+		framePositionGroup:AddChild(yPosSlider)
+
+		-- Frame Opacity Slider
+		local frameOpacitySlider = AceGUI:Create("Slider")
+		frameOpacitySlider:SetLabel("Quest Helper Opacity")
+		frameOpacitySlider:SetSliderValues(0, 1, 0.01)
+		frameOpacitySlider:SetIsPercent(true)
+		frameOpacitySlider:SetValue(RQE.UI:GetFrameBackgroundOpacity("main"))
+		frameOpacitySlider:SetFullWidth(true)
+		-- Sets the frame background opacity.
+		frameOpacitySlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.UI:SetFrameBackgroundOpacity("main", value)
+		end)
+
+		-- Add a tooltip description for frameOpacitySlider (RQE.db.profile.MainFrameOpacity)
+		frameOpacitySlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Adjust the opacity of the main helper frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		frameOpacitySlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		framePositionGroup:AddChild(frameOpacitySlider)
+
+		-- Frame Width Slider
+		local frameWidthSlider = AceGUI:Create("Slider")
+		frameWidthSlider:SetLabel("Frame Width")
+		frameWidthSlider:SetSliderValues(100, 800, 1)
+		frameWidthSlider:SetValue(RQE.db.profile.framePosition.frameWidth)
+		frameWidthSlider:SetFullWidth(true)
+		-- Saves the frame position frame width setting and applies the change.
+		frameWidthSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.framePosition.frameWidth = value
+			RQE:UpdateFrameSize()
+		end)
+
+		-- Add a tooltip description for frameWidthSlider (RQE.db.profile.framePosition.frameWidth)
+		frameWidthSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Adjust the width of the super tracking frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		frameWidthSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		framePositionGroup:AddChild(frameWidthSlider)
+
+		-- Frame Height Slider
+		local frameHeightSlider = AceGUI:Create("Slider")
+		frameHeightSlider:SetLabel("Frame Height")
+		frameHeightSlider:SetSliderValues(100, 800, 1)
+		frameHeightSlider:SetValue(RQE.db.profile.framePosition.frameHeight)
+		frameHeightSlider:SetFullWidth(true)
+		-- Saves the frame position frame height setting and applies the change.
+		frameHeightSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.framePosition.frameHeight = value
+			RQE:UpdateFrameSize()
+		end)
+
+		-- Add a tooltip description for frameHeightSlider (RQE.db.profile.framePosition.frameHeight)
+		frameHeightSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Adjust the height of the super tracking frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		frameHeightSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		framePositionGroup:AddChild(frameHeightSlider)
+
+		-- Quest Frame Position Group
+		local questFramePositionGroup = AceGUI:Create("InlineGroup")
+		questFramePositionGroup:SetTitle("Quest Frame Position")
+		questFramePositionGroup:SetFullWidth(true)
+		questFramePositionGroup:SetLayout("Flow")
+		scrollFrame:AddChild(questFramePositionGroup)
+
+		local lockQuestFrameCheckbox = AceGUI:Create("CheckBox")
+		lockQuestFrameCheckbox:SetLabel("Lock Quest Tracker Position & Size")
+		lockQuestFrameCheckbox:SetDescription("Prevents mouse dragging and resizing; the position and size controls below remain available.")
+		lockQuestFrameCheckbox:SetValue(RQE.db.profile.lockRQEQuestFrame == true)
+		lockQuestFrameCheckbox:SetFullWidth(true)
+		-- Saves the lock RQE quest frame setting and applies the change.
+		lockQuestFrameCheckbox:SetCallback("OnValueChanged", function(_, _, value)
+			RQE.db.profile.lockRQEQuestFrame = value == true
+			if RQE.SetRQEQuestFrameLocked then RQE.SetRQEQuestFrameLocked(value) end
+		end)
+		questFramePositionGroup:AddChild(lockQuestFrameCheckbox)
+
+		-------------------------------------------------------
+		-- #5d.iii. Quest Tracker Geometry Controls
+		-------------------------------------------------------
+
+		-- Anchor Point Dropdown for Quest Frame
+		local questAnchorPointDropdown = AceGUI:Create("Dropdown")
+		questAnchorPointDropdown:SetLabel("Anchor Point")
+		questAnchorPointDropdown:SetList(anchorPoints)
+		questAnchorPointDropdown:SetValue(RQE.db.profile.QuestFramePosition.anchorPoint)
+		questAnchorPointDropdown:SetFullWidth(true)
+		-- Saves the quest frame position anchor point setting and applies the change.
+		questAnchorPointDropdown:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.QuestFramePosition.anchorPoint = value
+			RQE:UpdateQuestFramePosition()
+		end)
+
+		-- Add a tooltip description for questAnchorPointDropdown (RQE.db.profile.QuestFramePosition.anchorPoint)
+		questAnchorPointDropdown:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("The point where the quest frame will be anchored.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questAnchorPointDropdown:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questFramePositionGroup:AddChild(questAnchorPointDropdown)
+
+		-- Quest Frame X Position Slider
+		local questXPosSlider = AceGUI:Create("Slider")
+		questXPosSlider:SetLabel("X Position")
+		questXPosSlider:SetSliderValues(-500, 500, 1)
+		questXPosSlider:SetValue(RQE.db.profile.QuestFramePosition.xPos)
+		questXPosSlider:SetFullWidth(true)
+		-- Saves the quest frame position x pos setting and applies the change.
+		questXPosSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.QuestFramePosition.xPos = value
+			RQE:UpdateQuestFramePosition()
+		end)
+		questFramePositionGroup:AddChild(questXPosSlider)
+
+		-- Quest Frame Y Position Slider
+		local questYPosSlider = AceGUI:Create("Slider")
+		questYPosSlider:SetLabel("Y Position")
+		questYPosSlider:SetSliderValues(-500, 500, 1)
+		questYPosSlider:SetValue(RQE.db.profile.QuestFramePosition.yPos)
+		questYPosSlider:SetFullWidth(true)
+		-- Saves the quest frame position y pos setting and applies the change.
+		questYPosSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.QuestFramePosition.yPos = value
+			RQE:UpdateQuestFramePosition()
+		end)
+		questFramePositionGroup:AddChild(questYPosSlider)
+
+		-- Quest Frame Opacity Slider
+		local questFrameOpacitySlider = AceGUI:Create("Slider")
+		questFrameOpacitySlider:SetLabel("Quest Tracker Opacity")
+		questFrameOpacitySlider:SetSliderValues(0, 1, 0.01)
+		questFrameOpacitySlider:SetIsPercent(true)
+		questFrameOpacitySlider:SetValue(RQE.UI:GetFrameBackgroundOpacity("tracker"))
+		questFrameOpacitySlider:SetFullWidth(true)
+		-- Sets the frame background opacity.
+		questFrameOpacitySlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.UI:SetFrameBackgroundOpacity("tracker", value)
+		end)
+
+		-- Add a tooltip description for questFrameOpacitySlider (RQE.db.profile.QuestFrameOpacity)
+		questFrameOpacitySlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Adjust the opacity of the quest tracking frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questFrameOpacitySlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questFramePositionGroup:AddChild(questFrameOpacitySlider)
+
+		-- Quest Frame Width Slider
+		local questFrameWidthSlider = AceGUI:Create("Slider")
+		questFrameWidthSlider:SetLabel("Frame Width")
+		questFrameWidthSlider:SetSliderValues(100, 800, 1)
+		questFrameWidthSlider:SetValue(RQE.db.profile.QuestFramePosition.frameWidth)
+		questFrameWidthSlider:SetFullWidth(true)
+		-- Saves the quest frame position frame width setting and applies the change.
+		questFrameWidthSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.QuestFramePosition.frameWidth = value
+			RQE:UpdateQuestFrameSize()
+		end)
+
+		-- Add a tooltip description for questFrameWidthSlider (RQE.db.profile.QuestFramePosition.frameWidth)
+		questFrameWidthSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Adjust the width of the super tracking frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questFrameWidthSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questFramePositionGroup:AddChild(questFrameWidthSlider)
+
+		-- Quest Frame Height Slider
+		local questFrameHeightSlider = AceGUI:Create("Slider")
+		questFrameHeightSlider:SetLabel("Frame Height")
+		questFrameHeightSlider:SetSliderValues(100, 800, 1)
+		questFrameHeightSlider:SetValue(RQE.db.profile.QuestFramePosition.frameHeight)
+		questFrameHeightSlider:SetFullWidth(true)
+		-- Saves the quest frame position frame height setting and applies the change.
+		questFrameHeightSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.QuestFramePosition.frameHeight = value
+			RQE:UpdateQuestFrameSize()
+		end)
+
+		-- Add a tooltip description for questFrameHeightSlider (RQE.db.profile.QuestFramePosition.frameHeight)
+		questFrameHeightSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Adjust the height of the super tracking frame.", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questFrameHeightSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questFramePositionGroup:AddChild(questFrameHeightSlider)
+
+		-- Spacer to ensure the scroll goes to the bottom
+		local spacer = AceGUI:Create("Label")
+		spacer:SetText(" ")
+		spacer:SetFullWidth(true)
+		scrollFrame:AddChild(spacer)
+	end
+
+	-------------------------------------------------------
+	-- #5e. Font Settings Widgets
+	-------------------------------------------------------
+
+	-- Displays the Widget Container Font Settings in Config Frame
+	function RQE:AddFontSettingsWidgets(container)
+		-- Create a Scroll Frame
+		local scrollFrame = AceGUI:Create("ScrollFrame")
+		scrollFrame:SetLayout("Flow")
+		scrollFrame:SetFullWidth(true)
+		scrollFrame:SetFullHeight(true)
+		container:AddChild(scrollFrame)
+
+		-- Font Size and Color Group
+		local fontSizeAndColorGroup = AceGUI:Create("InlineGroup")
+		fontSizeAndColorGroup:SetTitle("Font Size and Color")
+		fontSizeAndColorGroup:SetFullWidth(true)
+		fontSizeAndColorGroup:SetLayout("Flow")
+		scrollFrame:AddChild(fontSizeAndColorGroup)
+
+		-------------------------------------------------------
+		-- #5e.i. Font Color & Style Dropdown Helpers
+		-------------------------------------------------------
+
+		-- Function to convert a saved RGB color into its dropdown hexadecimal key
+		local function SetColorDropdownValue(color)
+			local key = RQE:GetFontColorKey(color)
+			return key and RQE.FontColorOptions[key].hex or nil
+		end
+
+		-- Helper function to create font color dropdown
+		local function CreateFontColorDropdown(group, label, profilePath)
+			local dropdown = AceGUI:Create("RQEColorDropdown")
+			dropdown:SetLabel(label)
+			dropdown:SetList(RQE.FontColorLabelsByHex, RQE.FontColorHexOrder, "Dropdown-Item-RQEColorPreview")
+			dropdown:SetValue(SetColorDropdownValue(RQE.db.profile.textSettings[profilePath].color))
+			dropdown:SetFullWidth(true)
+			-- Saves the selected font color for this text role and refreshes the UI.
+			dropdown:SetCallback("OnValueChanged", function(widget, event, value)
+				local r, g, b = RQE:GetFontColorRGB(value)
+				if r then
+					RQE.db.profile.textSettings[profilePath].color = { r, g, b }
+					RQE:ConfigurationChanged()
+				end
+			end)
+			group:AddChild(dropdown)
+		end
+
+		-- Creates the custom configuration window's standard Font Style dropdown.
+		-- Typeface previews remain exclusive to Blizzard's AddOn Settings panel.
+		local function CreateFontStyleDropdown(group, profilePath)
+			local dropdown = AceGUI:Create("Dropdown")
+			local styleKey = RQE:GetFontStyleKey(RQE.db.profile.textSettings[profilePath].font)
+
+			dropdown:SetLabel("Font Style")
+			dropdown:SetList(RQE.FontStyleLabels, RQE.FontStyleOrder)
+			dropdown:SetValue(styleKey)
+			dropdown:SetFullWidth(true)
+			dropdown:SetPulloutWidth(250)
+			-- Saves the selected font path for this text role and refreshes the UI.
+			dropdown:SetCallback("OnValueChanged", function(widget, event, value)
+				RQE.db.profile.textSettings[profilePath].font = RQE:GetFontStylePath(value)
+				RQE:ConfigurationChanged()
+			end)
+			group:AddChild(dropdown)
+		end
+
+		-- Header Text Group
+		local headerTextGroup = AceGUI:Create("InlineGroup")
+		headerTextGroup:SetTitle("Header Text")
+		headerTextGroup:SetFullWidth(true)
+		headerTextGroup:SetLayout("Flow")
+		fontSizeAndColorGroup:AddChild(headerTextGroup)
+
+		-------------------------------------------------------
+		-- #5e.ii. Text Element Style Controls
+		-------------------------------------------------------
+
+		-- Header Text Font Size Slider
+		local headerFontSizeSlider = AceGUI:Create("Slider")
+		headerFontSizeSlider:SetLabel("Font Size")
+		headerFontSizeSlider:SetSliderValues(8, 24, 1)
+		headerFontSizeSlider:SetValue(RQE.db.profile.textSettings.headerText.size)
+		headerFontSizeSlider:SetFullWidth(true)
+		-- Saves the header text size setting and applies the change.
+		headerFontSizeSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.textSettings.headerText.size = value
+			RQE:ConfigurationChanged()
+		end)
+
+		-- Add a tooltip description for headerFontSizeSlider (RQE.db.profile.textSettings.headerText.size)
+		headerFontSizeSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Default: 18", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		headerFontSizeSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		headerTextGroup:AddChild(headerFontSizeSlider)
+
+		-- Header Text Font Style Dropdown
+		CreateFontStyleDropdown(headerTextGroup, "headerText")
+
+		-- Header Text Font Color Dropdown
+		CreateFontColorDropdown(headerTextGroup, "Font Color", "headerText")
+
+		-- Quest ID Text Group
+		local questIDTextGroup = AceGUI:Create("InlineGroup")
+		questIDTextGroup:SetTitle("Quest ID Text")
+		questIDTextGroup:SetFullWidth(true)
+		questIDTextGroup:SetLayout("Flow")
+		fontSizeAndColorGroup:AddChild(questIDTextGroup)
+
+		-- Quest ID Text Font Size Slider
+		local questIDFontSizeSlider = AceGUI:Create("Slider")
+		questIDFontSizeSlider:SetLabel("Font Size")
+		questIDFontSizeSlider:SetSliderValues(8, 24, 1)
+		questIDFontSizeSlider:SetValue(RQE.db.profile.textSettings.QuestIDText.size)
+		questIDFontSizeSlider:SetFullWidth(true)
+		-- Saves the quest ID text size setting and applies the change.
+		questIDFontSizeSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.textSettings.QuestIDText.size = value
+			RQE:ConfigurationChanged()
+		end)
+
+		-- Add a tooltip description for questIDFontSizeSlider (RQE.db.profile.textSettings.QuestIDText.size)
+		questIDFontSizeSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Default: 15", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questIDFontSizeSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questIDTextGroup:AddChild(questIDFontSizeSlider)
+
+		-- Quest ID Text Font Style Dropdown
+		CreateFontStyleDropdown(questIDTextGroup, "QuestIDText")
+
+		-- Quest ID Text Font Color Dropdown
+		CreateFontColorDropdown(questIDTextGroup, "Font Color", "QuestIDText")
+
+		-- Quest Name Text Group
+		local questNameTextGroup = AceGUI:Create("InlineGroup")
+		questNameTextGroup:SetTitle("Quest Name Text")
+		questNameTextGroup:SetFullWidth(true)
+		questNameTextGroup:SetLayout("Flow")
+		fontSizeAndColorGroup:AddChild(questNameTextGroup)
+
+		-- Quest Name Text Font Size Slider
+		local questNameFontSizeSlider = AceGUI:Create("Slider")
+		questNameFontSizeSlider:SetLabel("Font Size")
+		questNameFontSizeSlider:SetSliderValues(8, 24, 1)
+		questNameFontSizeSlider:SetValue(RQE.db.profile.textSettings.QuestNameText.size)
+		questNameFontSizeSlider:SetFullWidth(true)
+		-- Saves the quest name text size setting and applies the change.
+		questNameFontSizeSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.textSettings.QuestNameText.size = value
+			RQE:ConfigurationChanged()
+		end)
+
+		-- Add a tooltip description for questNameFontSizeSlider (RQE.db.profile.textSettings.QuestNameText.size)
+		questNameFontSizeSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Default: 15", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questNameFontSizeSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questNameTextGroup:AddChild(questNameFontSizeSlider)
+
+		-- Quest Name Text Font Style Dropdown
+		CreateFontStyleDropdown(questNameTextGroup, "QuestNameText")
+
+		-- Quest Name Text Font Color Dropdown
+		CreateFontColorDropdown(questNameTextGroup, "Font Color", "QuestNameText")
+
+		-- Direction Text Group
+		local directionTextGroup = AceGUI:Create("InlineGroup")
+		directionTextGroup:SetTitle("Direction Text")
+		directionTextGroup:SetFullWidth(true)
+		directionTextGroup:SetLayout("Flow")
+		fontSizeAndColorGroup:AddChild(directionTextGroup)
+
+		-- Direction Text Font Size Slider
+		local directionFontSizeSlider = AceGUI:Create("Slider")
+		directionFontSizeSlider:SetLabel("Font Size")
+		directionFontSizeSlider:SetSliderValues(8, 24, 1)
+		directionFontSizeSlider:SetValue(RQE.db.profile.textSettings.DirectionTextFrame.size)
+		directionFontSizeSlider:SetFullWidth(true)
+		-- Saves the direction text frame size setting and applies the change.
+		directionFontSizeSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.textSettings.DirectionTextFrame.size = value
+			RQE:ConfigurationChanged()
+		end)
+
+		-- Add a tooltip description for directionFontSizeSlider (RQE.db.profile.textSettings.DirectionTextFrame.size)
+		directionFontSizeSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Default: 13", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		directionFontSizeSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		directionTextGroup:AddChild(directionFontSizeSlider)
+
+		-- Direction Text Font Style Dropdown
+		CreateFontStyleDropdown(directionTextGroup, "DirectionTextFrame")
+
+		-- Direction Text Font Color Dropdown
+		CreateFontColorDropdown(directionTextGroup, "Font Color", "DirectionTextFrame")
+
+		-- Quest Description Group
+		local questDescriptionGroup = AceGUI:Create("InlineGroup")
+		questDescriptionGroup:SetTitle("Quest Description")
+		questDescriptionGroup:SetFullWidth(true)
+		questDescriptionGroup:SetLayout("Flow")
+		fontSizeAndColorGroup:AddChild(questDescriptionGroup)
+
+		-- Quest Description Font Size Slider
+		local questDescriptionFontSizeSlider = AceGUI:Create("Slider")
+		questDescriptionFontSizeSlider:SetLabel("Font Size")
+		questDescriptionFontSizeSlider:SetSliderValues(8, 24, 1)
+		questDescriptionFontSizeSlider:SetValue(RQE.db.profile.textSettings.QuestDescription.size)
+		questDescriptionFontSizeSlider:SetFullWidth(true)
+		-- Saves the quest description size setting and applies the change.
+		questDescriptionFontSizeSlider:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db.profile.textSettings.QuestDescription.size = value
+			RQE:ConfigurationChanged()
+		end)
+
+		-- Add a tooltip description for questDescriptionFontSizeSlider (RQE.db.profile.textSettings.QuestDescription.size)
+		questDescriptionFontSizeSlider:SetCallback("OnEnter", function(widget, event)
+			GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+			GameTooltip:SetText("Default: 14", nil, nil, nil, nil, true)
+			GameTooltip:Show()
+		end)
+		-- Hides the tooltip when the pointer leaves this control.
+		questDescriptionFontSizeSlider:SetCallback("OnLeave", function(widget, event)
+			GameTooltip:Hide()
+		end)
+
+		questDescriptionGroup:AddChild(questDescriptionFontSizeSlider)
+
+		-- Quest Description Font Style Dropdown
+		CreateFontStyleDropdown(questDescriptionGroup, "QuestDescription")
+
+		-- Quest Description Font Color Dropdown
+		CreateFontColorDropdown(questDescriptionGroup, "Font Color", "QuestDescription")
+
+		-- Spacer to ensure the scroll goes to the bottom
+		local spacer = AceGUI:Create("Label")
+		spacer:SetText(" ")
+		spacer:SetFullWidth(true)
+		scrollFrame:AddChild(spacer)
+	end
+
+	-------------------------------------------------------
+	-- #5f. Debug Settings Widgets
+	-------------------------------------------------------
+
+	-- Displays the Widget Container Debug Options in Config Frame
+	function RQE:AddDebugSettingsWidgets(container)
+		-- Create a Scroll Frame
+		local scrollFrame = AceGUI:Create("ScrollFrame")
+		scrollFrame:SetLayout("Flow")
+		scrollFrame:SetFullWidth(true)
+		scrollFrame:SetFullHeight(true) -- This will allow the scroll frame to take up the full height of the parent container
+		container:AddChild(scrollFrame)
+
+		-- Function to refresh the contents of the Debug tab
+		local function RefreshDebugTab()
+			scrollFrame:ReleaseChildren() -- Clear all current children
+
+			-------------------------------------------------------
+			-- #5f.i. Debug Mode & Resource Metrics
+			-------------------------------------------------------
+
+			-- Enable Debug Mode Checkbox
+			local debugModeCheckbox = AceGUI:Create("CheckBox")
+			debugModeCheckbox:SetLabel("Enable Debug Mode")
+			debugModeCheckbox:SetValue(RQE.db.profile.debugMode)
+			-- Saves the debug mode setting and applies the change.
+			debugModeCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+				RQE.db.profile.debugMode = value
+				RQE.db.profile.debugLevel = value and RQE.db.profile.debugLevel or "NONE"
+				RefreshDebugTab()
+			end)
+
+			-- Add a tooltip description for debugModeCheckbox (RQE.db.profile.debugMode)
+			debugModeCheckbox:SetCallback("OnEnter", function(widget, event)
+				GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetText("Enable or disable debug mode for additional logging.", nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			end)
+			-- Hides the tooltip when the pointer leaves this control.
+			debugModeCheckbox:SetCallback("OnLeave", function(widget, event)
+				GameTooltip:Hide()
+			end)
+
+			scrollFrame:AddChild(debugModeCheckbox)
+
+			-- Display Memory Usage Checkbox
+			local displayMemoryUsageCheckbox = AceGUI:Create("CheckBox")
+			displayMemoryUsageCheckbox:SetLabel("Display Memory Usage")
+			displayMemoryUsageCheckbox:SetValue(RQE.db.profile.displayRQEmemUsage)
+			-- Saves the display RQ emem usage setting and applies the change.
+			displayMemoryUsageCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+				RQE.db.profile.displayRQEmemUsage = value
+				RQE:CheckMemoryUsage()  -- Immediately update the memory usage display
+			end)
+
+			-- Add a tooltip description for displayMemoryUsageCheckbox (RQE.db.profile.displayRQEmemUsage)
+			displayMemoryUsageCheckbox:SetCallback("OnEnter", function(widget, event)
+				GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetText("Displays the memory usage for the RQE addon", nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			end)
+			-- Hides the tooltip when the pointer leaves this control.
+			displayMemoryUsageCheckbox:SetCallback("OnLeave", function(widget, event)
+				GameTooltip:Hide()
+			end)
+
+			scrollFrame:AddChild(displayMemoryUsageCheckbox)
+
+			if RQE.db.profile.debugMode then
+				-- Debug Logging Toggle
+				local debugLoggingCheckbox = AceGUI:Create("CheckBox")
+				debugLoggingCheckbox:SetLabel("Debug Logging")
+				debugLoggingCheckbox:SetValue(RQE.db.profile.debugLoggingCheckbox)
+				-- Saves the debug logging checkbox setting and applies the change.
+				debugLoggingCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+					RQE.db.profile.debugLoggingCheckbox = value
+				end)
+
+				-- Add a tooltip description for debugLoggingCheckbox (RQE.db.profile.debugLoggingCheckbox)
+				debugLoggingCheckbox:SetCallback("OnEnter", function(widget, event)
+					GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+					GameTooltip:SetText("Toggles the option to log debug messages", nil, nil, nil, nil, true)
+					GameTooltip:Show()
+				end)
+				-- Hides the tooltip when the pointer leaves this control.
+				debugLoggingCheckbox:SetCallback("OnLeave", function(widget, event)
+					GameTooltip:Hide()
+				end)
+
+				scrollFrame:AddChild(debugLoggingCheckbox)
+			end
+
+			-- Display CPU Usage Checkbox -- alternative is /run SetCVar("scriptProfile", 1) or /run SetCVar("scriptProfile", 0)
+			local displayCPUUsageCheckbox = AceGUI:Create("CheckBox")
+			displayCPUUsageCheckbox:SetLabel("Display CPU Usage")
+
+			-- Set checkbox to reflect scriptProfile setting
+			-- Previous Blizzard call changed 2026.09.25: displayCPUUsageCheckbox:SetValue(GetCVar("scriptProfile") == "1")
+			displayCPUUsageCheckbox:SetValue(RQE.API.Client.GetCVar("scriptProfile") == "1")
+
+			-- Saves the display RQ ecpu usage setting and applies the change.
+			displayCPUUsageCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+				RQE.db.profile.displayRQEcpuUsage = value
+				
+				-- Only toggle profiling if the state actually needs to change
+				-- Previous Blizzard call changed 2026.09.25: if (GetCVar("scriptProfile") == "1") ~= value then
+				if (RQE.API.Client.GetCVar("scriptProfile") == "1") ~= value then
+					RQE:ToggleCPUProfiling()
+				end
+
+				-- Immediately update CPU usage display
+				RQE:CheckCPUUsage()
+			end)
+
+			-- Add tooltip description for displayCPUUsageCheckbox
+			displayCPUUsageCheckbox:SetCallback("OnEnter", function(widget, event)
+				GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+				GameTooltip:SetText("Displays the CPU usage for the RQE addon", nil, nil, nil, nil, true)
+				GameTooltip:Show()
+			end)
+			-- Hides the tooltip when the pointer leaves this control.
+			displayCPUUsageCheckbox:SetCallback("OnLeave", function(widget, event)
+				GameTooltip:Hide()
+			end)
+
+			scrollFrame:AddChild(displayCPUUsageCheckbox)
+
+			if RQE.db.profile.debugMode then
+				-- Debug Timestamp Enable/Disable checkbox
+				local debugTimeStampCheckbox = AceGUI:Create("CheckBox")
+				debugTimeStampCheckbox:SetLabel("Debug Timestamps")
+				debugTimeStampCheckbox:SetValue(RQE.db.profile.debugTimeStampCheckbox)
+				-- Saves the debug time stamp checkbox setting and applies the change.
+				debugTimeStampCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+					RQE.db.profile.debugTimeStampCheckbox = value
+				end)
+
+				-- Add a tooltip description for debugTimeStampCheckbox (RQE.db.profile.debugTimeStampCheckbox)
+				debugTimeStampCheckbox:SetCallback("OnEnter", function(widget, event)
+					GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+					GameTooltip:SetText("Toggles the option to include timestamp with debug messages", nil, nil, nil, nil, true)
+					GameTooltip:Show()
+				end)
+				-- Hides the tooltip when the pointer leaves this control.
+				debugTimeStampCheckbox:SetCallback("OnLeave", function(widget, event)
+					GameTooltip:Hide()
+				end)
+
+				scrollFrame:AddChild(debugTimeStampCheckbox)
+			end
+
+			-- Only show these options if Debug Mode is enabled
+			if RQE.db.profile.debugMode then
+				-- Debug Inline Group (appears when Debug Mode is enabled)
+				local debugInlineGroup = AceGUI:Create("InlineGroup")
+				debugInlineGroup:SetTitle("Debug")
+				debugInlineGroup:SetFullWidth(true)
+				debugInlineGroup:SetLayout("Flow")
+				scrollFrame:AddChild(debugInlineGroup)
+
+				-------------------------------------------------------
+				-- #5f.ii. Debug Level & Frame Reset Actions
+				-------------------------------------------------------
+
+				-- Debug Level Dropdown
+				local debugLevelDropdown = AceGUI:Create("Dropdown")
+				debugLevelDropdown:SetLabel("Debug Level")
+				debugLevelDropdown:SetList(debugLevelOptions)
+				debugLevelDropdown:SetValue(getDebugLevelIndex(RQE.db.profile.debugLevel))
+				-- Saves the debug level setting and applies the change.
+				debugLevelDropdown:SetCallback("OnValueChanged", function(widget, event, value)
+					RQE.db.profile.debugLevel = debugLevelOptions[value]
+					RefreshDebugTab()  -- Refresh the tab after changing the debug level
+				end)
+
+				-- Add a tooltip description for debugLevelDropdown (RQE.db.profile.debugLevel)
+				debugLevelDropdown:SetCallback("OnEnter", function(widget, event)
+					GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+					GameTooltip:SetText("Set the level of debug logging.\n\n|cFFFF3333The INFO and INFO+ settings are designed for the author ONLY. Using this may inadvertently impact your experience!|r", nil, nil, nil, nil, true)
+					GameTooltip:Show()
+				end)
+				-- Hides the tooltip when the pointer leaves this control.
+				debugLevelDropdown:SetCallback("OnLeave", function(widget, event)
+					GameTooltip:Hide()
+				end)
+
+				debugInlineGroup:AddChild(debugLevelDropdown)
+
+				-- Reset Frame Position Button (only shown if debug level is "INFO")
+				if RQE.db.profile.debugLevel == "INFO" or RQE.db.profile.debugLevel == "INFO+" then
+					local resetFramePositionButton = AceGUI:Create("Button")
+					resetFramePositionButton:SetText("Reset Position")
+					-- Restores the saved or default frame position and refreshes the layout.
+					resetFramePositionButton:SetCallback("OnClick", function()
+						RQE:ResetFramePositionToDBorDefault()
+						RQE:ResetQuestFramePositionToDBorDefault()
+					end)
+					debugInlineGroup:AddChild(resetFramePositionButton)
+
+					local resetFrameSizeButton = AceGUI:Create("Button")
+					resetFrameSizeButton:SetText("Reset Size")
+					-- Restores the saved or default frame dimensions.
+					resetFrameSizeButton:SetCallback("OnClick", function()
+						RQE:ResetFrameSizeToDBorDefault()
+					end)
+					debugInlineGroup:AddChild(resetFrameSizeButton)
+				end
+
+				-- Additional options for "INFO" level
+				if RQE.db.profile.debugLevel == "INFO" or RQE.db.profile.debugLevel == "INFO+" then
+
+					-------------------------------------------------------
+					-- #5f.iii. Event Trace Toggles
+					-------------------------------------------------------
+
+					-- Checkbox for displaying specific event debug info
+					local showEventDebugInfoCheckbox = AceGUI:Create("CheckBox")
+					showEventDebugInfoCheckbox:SetLabel("Show Event Debug Info")
+					showEventDebugInfoCheckbox:SetValue(RQE.db.profile.showEventDebugInfo)
+					-- Saves the show event debug info setting and applies the change.
+					showEventDebugInfoCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showEventDebugInfo = value
+					end)
+
+					-- Add tooltip for the Show Event Debug Info checkbox
+					showEventDebugInfoCheckbox:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug information for specific events.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showEventDebugInfoCheckbox:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showEventDebugInfoCheckbox)
+				end
+
+				-- Additional options for "INFO+" level
+				if RQE.db.profile.debugLevel == "INFO" or RQE.db.profile.debugLevel == "INFO+" then
+					-- Checkbox for displaying Argument/Payload returns on event listeners
+					local showArgPayloadInfo = AceGUI:Create("CheckBox")
+					showArgPayloadInfo:SetLabel("Show Arg/Payload Info")
+					showArgPayloadInfo:SetValue(RQE.db.profile.showArgPayloadInfo)
+					-- Saves the show arg payload info setting and applies the change.
+					showArgPayloadInfo:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showArgPayloadInfo = value
+					end)
+
+					-- Add tooltip for the Argument/Payload returns checkbox
+					showArgPayloadInfo:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Display Argument/Payload Info for events.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showArgPayloadInfo:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showArgPayloadInfo)
+				end
+				
+				if RQE.db.profile.debugLevel == "INFO+" then
+					-- Checkbox for displaying RQE:StartPeriodicChecks() returns
+					local showStartPeriodicCheckInfo = AceGUI:Create("CheckBox")
+					showStartPeriodicCheckInfo:SetLabel("Show StartPeriodicChecks Info")
+					showStartPeriodicCheckInfo:SetValue(RQE.db.profile.showStartPeriodicCheckInfo)
+					-- Saves the show start periodic check info setting and applies the change.
+					showStartPeriodicCheckInfo:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showStartPeriodicCheckInfo = value
+					end)
+
+					-- Add tooltip for the Argument/Payload returns checkbox
+					showStartPeriodicCheckInfo:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Display StartPeriodicChecks Info for events.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showStartPeriodicCheckInfo:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showStartPeriodicCheckInfo)
+
+					-- Checkbox for displaying ADDON_LOADED event debug info
+					local showAddonLoaded = AceGUI:Create("CheckBox")
+					showAddonLoaded:SetLabel("Show ADDON_LOADED Event Info")
+					showAddonLoaded:SetValue(RQE.db.profile.showAddonLoaded)
+					showAddonLoaded:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show addon loaded setting and applies the change.
+					showAddonLoaded:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showAddonLoaded = value
+					end)
+
+					-- Add tooltip for the ADDON_LOADED event checkbox
+					showAddonLoaded:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the ADDON LOADED event listener.\n\n|cFF4AA458Fires after an AddOn has been loaded and is typically the first event to fire (running after all .lua files have been run and SavedVariables have loaded).|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showAddonLoaded:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showAddonLoaded)
+
+					-- Checkbox for displaying ACHIEVEMENT_EARNED event debug info
+					local showEventAchievementEarned = AceGUI:Create("CheckBox")
+					showEventAchievementEarned:SetLabel("Show ACHIEVEMENT_EARNED Event Info")
+					showEventAchievementEarned:SetValue(RQE.db.profile.showEventAchievementEarned)
+					showEventAchievementEarned:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show event achievement earned setting and applies the change.
+					showEventAchievementEarned:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showEventAchievementEarned = value
+					end)
+
+					-- Add tooltip for the ACHIEVEMENT_EARNED event checkbox
+					showEventAchievementEarned:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the ACHIEVEMENT EARNED event listener.\n\n|cFF4AA458Fired when an achievement is gained.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showEventAchievementEarned:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showEventAchievementEarned)
+
+					-- Checkbox for displaying BOSS_KILL event debug info
+					local BossKill = AceGUI:Create("CheckBox")
+					BossKill:SetLabel("Show BOSS_KILL Event Info")
+					BossKill:SetValue(RQE.db.profile.BossKill)
+					BossKill:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the boss kill setting and applies the change.
+					BossKill:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.BossKill = value
+					end)
+
+					-- Add tooltip for the BOSS_KILL event checkbox
+					BossKill:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the BOSS KILL event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					BossKill:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(BossKill)
+
+					-- Checkbox for displaying CLIENT_SCENE_CLOSED event debug info
+					local ClientSceneClosed = AceGUI:Create("CheckBox")
+					ClientSceneClosed:SetLabel("Show CLIENT_SCENE_CLOSED Event Info")
+					ClientSceneClosed:SetValue(RQE.db.profile.ClientSceneClosed)
+					ClientSceneClosed:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the client scene closed setting and applies the change.
+					ClientSceneClosed:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.ClientSceneClosed = value
+					end)
+
+					-- Add tooltip for the CLIENT_SCENE_CLOSED event checkbox
+					ClientSceneClosed:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the CLIENT SCENE CLOSED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					ClientSceneClosed:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(ClientSceneClosed)
+
+					-- Checkbox for displaying CLIENT_SCENE_OPENED event debug info
+					local ClientSceneOpened = AceGUI:Create("CheckBox")
+					ClientSceneOpened:SetLabel("Show CLIENT_SCENE_OPENED Event Info")
+					ClientSceneOpened:SetValue(RQE.db.profile.ClientSceneOpened)
+					ClientSceneOpened:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the client scene opened setting and applies the change.
+					ClientSceneOpened:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.ClientSceneOpened = value
+					end)
+
+					-- Add tooltip for the CLIENT_SCENE_OPENED event checkbox
+					ClientSceneOpened:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the CLIENT SCENE OPENED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					ClientSceneOpened:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(ClientSceneOpened)
+
+					-- Checkbox for displaying CONTENT_TRACKING_UPDATE event debug info
+					local showEventContentTrackingUpdate = AceGUI:Create("CheckBox")
+					showEventContentTrackingUpdate:SetLabel("Show CONTENT_TRACKING_UPDATE Event Info")
+					showEventContentTrackingUpdate:SetValue(RQE.db.profile.showEventContentTrackingUpdate)
+					showEventContentTrackingUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show event content tracking update setting and applies the change.
+					showEventContentTrackingUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showEventContentTrackingUpdate = value
+					end)
+
+					-- Add tooltip for the CONTENT_TRACKING_UPDATE event checkbox
+					showEventContentTrackingUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the CONTENT TRACKING UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showEventContentTrackingUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showEventContentTrackingUpdate)
+
+					-- Checkbox for displaying CRITERIA_EARNED event debug info
+					local showEventCriteriaEarned = AceGUI:Create("CheckBox")
+					showEventCriteriaEarned:SetLabel("Show CRITERIA_EARNED Event Info")
+					showEventCriteriaEarned:SetValue(RQE.db.profile.showEventCriteriaEarned)
+					showEventCriteriaEarned:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show event criteria earned setting and applies the change.
+					showEventCriteriaEarned:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showEventCriteriaEarned = value
+					end)
+
+					-- Add tooltip for the CRITERIA_EARNED event checkbox
+					showEventCriteriaEarned:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the CRITERIA EARNED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showEventCriteriaEarned:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showEventCriteriaEarned)
+
+					-- Checkbox for displaying ENCOUNTER_END event debug info
+					local EncounterEnd = AceGUI:Create("CheckBox")
+					EncounterEnd:SetLabel("Show ENCOUNTER_END Event Info")
+					EncounterEnd:SetValue(RQE.db.profile.EncounterEnd)
+					EncounterEnd:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the encounter end setting and applies the change.
+					EncounterEnd:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.EncounterEnd = value
+					end)
+
+					-- Add tooltip for the ENCOUNTER_END event checkbox
+					EncounterEnd:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the ENCOUNTER END event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					EncounterEnd:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(EncounterEnd)
+
+					-- Checkbox for displaying ITEM_COUNT_CHANGED event debug info
+					local showItemCountChanged = AceGUI:Create("CheckBox")
+					showItemCountChanged:SetLabel("Show ITEM_COUNT_CHANGED Event Info")
+					showItemCountChanged:SetValue(RQE.db.profile.showItemCountChanged)
+					showItemCountChanged:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show item count changed setting and applies the change.
+					showItemCountChanged:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showItemCountChanged = value
+					end)
+
+					-- Add tooltip for the ITEM_COUNT_CHANGED event checkbox
+					showItemCountChanged:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the ITEM COUNT CHANGED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showItemCountChanged:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showItemCountChanged)
+
+					-- Checkbox for displaying JAILERS_TOWER_LEVEL_UPDATE event debug info
+					local JailorsTowerLevelUpdate = AceGUI:Create("CheckBox")
+					JailorsTowerLevelUpdate:SetLabel("Show JAILERS_TOWER_LEVEL_UPDATE Event Info")
+					JailorsTowerLevelUpdate:SetValue(RQE.db.profile.JailorsTowerLevelUpdate)
+					JailorsTowerLevelUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the jailors tower level update setting and applies the change.
+					JailorsTowerLevelUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.JailorsTowerLevelUpdate = value
+					end)
+
+					-- Add tooltip for the JAILERS_TOWER_LEVEL_UPDATE event checkbox
+					JailorsTowerLevelUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the JAILERS TOWER LEVEL UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					JailorsTowerLevelUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(JailorsTowerLevelUpdate)
+
+					-- Checkbox for displaying LFG_LIST_ACTIVE_ENTRY_UPDATE event debug info
+					local LFGActiveEntryUpdate = AceGUI:Create("CheckBox")
+					LFGActiveEntryUpdate:SetLabel("Show LFG_LIST_ACTIVE_ENTRY_UPDATE Event Info")
+					LFGActiveEntryUpdate:SetValue(RQE.db.profile.LFGActiveEntryUpdate)
+					LFGActiveEntryUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the LFG active entry update setting and applies the change.
+					LFGActiveEntryUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.LFGActiveEntryUpdate = value
+					end)
+
+					-- Add tooltip for the LFG_LIST_ACTIVE_ENTRY_UPDATE event checkbox
+					LFGActiveEntryUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the LFG LIST ACTIVE ENTRY UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					LFGActiveEntryUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(LFGActiveEntryUpdate)
+
+					-- Checkbox for displaying PLAYER_REGEN_ENABLED event debug info
+					local showPlayerRegenEnabled = AceGUI:Create("CheckBox")
+					showPlayerRegenEnabled:SetLabel("Show PLAYER_REGEN Event Info")
+					showPlayerRegenEnabled:SetValue(RQE.db.profile.showPlayerRegenEnabled)
+					showPlayerRegenEnabled:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show player regen enabled setting and applies the change.
+					showPlayerRegenEnabled:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showPlayerRegenEnabled = value
+					end)
+
+					-- Add tooltip for the PLAYER_REGEN_ENABLED event checkbox
+					showPlayerRegenEnabled:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the PLAYER REGEN ENABLED event listener.\n\n|cFF4AA458Fired after ending combat, as regen rates return to normal. Useful for determining when a player has left combat. This occurs when you are not on the hate list of any NPC, or a few seconds after the latest pvp attack that you were involved with.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showPlayerRegenEnabled:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showPlayerRegenEnabled)
+
+					-- Checkbox for displaying PLAYER_MOUNT_DISPLAY_CHANGED event debug info
+					local showPlayerMountDisplayChanged = AceGUI:Create("CheckBox")
+					showPlayerMountDisplayChanged:SetLabel("Show PLAYER_MOUNT Event Info")
+					showPlayerMountDisplayChanged:SetValue(RQE.db.profile.showPlayerMountDisplayChanged)
+					showPlayerMountDisplayChanged:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show player mount display changed setting and applies the change.
+					showPlayerMountDisplayChanged:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showPlayerMountDisplayChanged = value
+					end)
+
+					-- Add tooltip for the PLAYER_MOUNT_DISPLAY_CHANGED event checkbox
+					showPlayerMountDisplayChanged:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the PLAYER MOUNT DISPLAY CHANGED event listener.\n\n|cFF4AA458Fired after activating/deactivating a player mount.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showPlayerMountDisplayChanged:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showPlayerMountDisplayChanged)
+
+					-- Checkbox for displaying PLAYER_LOGIN event debug info
+					local showPlayerLogin = AceGUI:Create("CheckBox")
+					showPlayerLogin:SetLabel("Show PLAYER_LOGIN Event Info")
+					showPlayerLogin:SetValue(RQE.db.profile.showPlayerLogin)
+					showPlayerLogin:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show player login setting and applies the change.
+					showPlayerLogin:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showPlayerLogin = value
+					end)
+
+					-- Add tooltip for the PLAYER_LOGIN event checkbox
+					showPlayerLogin:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the PLAYER LOGIN event listener.\n\n|cFF4AA458Triggered immediately before PLAYER_ENTERING_WORLD on login and UI Reload, but NOT when entering/leaving instances.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showPlayerLogin:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showPlayerLogin)
+
+					-- Checkbox for displaying PLAYER_ENTERING_WORLD event debug info
+					local PlayerEnteringWorld = AceGUI:Create("CheckBox")
+					PlayerEnteringWorld:SetLabel("Show PLAYER_ENTERING_WORLD Event Info")
+					PlayerEnteringWorld:SetValue(RQE.db.profile.PlayerEnteringWorld)
+					PlayerEnteringWorld:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the player entering world setting and applies the change.
+					PlayerEnteringWorld:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.PlayerEnteringWorld = value
+					end)
+
+					-- Add tooltip for the PLAYER_ENTERING_WORLD event checkbox
+					PlayerEnteringWorld:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the PLAYER ENTERING WORLD event listener.\n\n|cFF4AA458Fires when the player logs in, /reloads the UI or zones between map instances. Basically whenever the loading screen appears.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					PlayerEnteringWorld:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(PlayerEnteringWorld)
+
+					-- Checkbox for displaying PLAYER_STARTED_MOVING event debug info
+					local PlayerStartedMoving = AceGUI:Create("CheckBox")
+					PlayerStartedMoving:SetLabel("Show PLAYER_STARTED_MOVING Event Info")
+					PlayerStartedMoving:SetValue(RQE.db.profile.PlayerStartedMoving)
+					PlayerStartedMoving:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the player started moving setting and applies the change.
+					PlayerStartedMoving:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.PlayerStartedMoving = value
+					end)
+
+					-- Add tooltip for the PLAYER_STARTED_MOVING event checkbox
+					PlayerStartedMoving:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the PLAYER STARTED MOVING event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					PlayerStartedMoving:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(PlayerStartedMoving)
+
+					-- Checkbox for displaying PLAYER_STOPPED_MOVING event debug info
+					local PlayerStoppedMoving = AceGUI:Create("CheckBox")
+					PlayerStoppedMoving:SetLabel("Show PLAYER_STOPPED_MOVING Event Info")
+					PlayerStoppedMoving:SetValue(RQE.db.profile.PlayerStoppedMoving)
+					PlayerStoppedMoving:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the player stopped moving setting and applies the change.
+					PlayerStoppedMoving:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.PlayerStoppedMoving = value
+					end)
+
+					-- Add tooltip for the PLAYER_STOPPED_MOVING event checkbox
+					PlayerStoppedMoving:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the PLAYER STOPPED MOVING event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					PlayerStoppedMoving:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(PlayerStoppedMoving)
+
+					-- Checkbox for displaying QUEST_ACCEPTED event debug info
+					local QuestAccepted = AceGUI:Create("CheckBox")
+					QuestAccepted:SetLabel("Show QUEST_ACCEPTED Event Info")
+					QuestAccepted:SetValue(RQE.db.profile.QuestAccepted)
+					QuestAccepted:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest accepted setting and applies the change.
+					QuestAccepted:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestAccepted = value
+					end)
+
+					-- Add tooltip for the QUEST_ACCEPTED event checkbox
+					QuestAccepted:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST ACCEPTED event listener.\n\n|cFF4AA458Fires whenever the player accepts a quest.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestAccepted:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestAccepted)
+
+					-- Checkbox for displaying QUEST_LOG_UPDATE, QUEST_POI_UPDATE and TASK_PROGRESS_UPDATE event debug info
+					local QuestStatusUpdate = AceGUI:Create("CheckBox")
+					QuestStatusUpdate:SetLabel("Show various Quest Status Update Event Info")
+					QuestStatusUpdate:SetValue(RQE.db.profile.QuestStatusUpdate)
+					QuestStatusUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest status update setting and applies the change.
+					QuestStatusUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestStatusUpdate = value
+					end)
+
+					-- Add tooltip for the QUEST_LOG_UPDATE, QUEST_POI_UPDATE and TASK_PROGRESS_UPDATE event checkbox
+					QuestStatusUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST LOG UPDATE, QUEST POI UPDATE and TASK PROGRESS UPDATE event listener.\n\n|cFF4AA458Fires when the quest log updates, or whenever Quest POIs change (For example after accepting an quest).|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestStatusUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestStatusUpdate)
+
+					-- Checkbox for displaying QUEST_CURRENCY_LOOT_RECEIVED event debug info
+					local QuestCurrencyLootReceived = AceGUI:Create("CheckBox")
+					QuestCurrencyLootReceived:SetLabel("Show QUEST_CURRENCY_LOOT_RECEIVED Event Info")
+					QuestCurrencyLootReceived:SetValue(RQE.db.profile.QuestCurrencyLootReceived)
+					QuestCurrencyLootReceived:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest currency loot received setting and applies the change.
+					QuestCurrencyLootReceived:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestCurrencyLootReceived = value
+					end)
+
+					-- Add tooltip for the QUEST_CURRENCY_LOOT_RECEIVED event checkbox
+					QuestCurrencyLootReceived:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST CURRENCY LOOT RECEIVED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestCurrencyLootReceived:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestCurrencyLootReceived)
+
+					-- Checkbox for displaying QUEST_LOG_CRITERIA_UPDATE event debug info
+					local QuestLogCriteriaUpdate = AceGUI:Create("CheckBox")
+					QuestLogCriteriaUpdate:SetLabel("Show QUEST_LOG_CRITERIA_UPDATE Event Info")
+					QuestLogCriteriaUpdate:SetValue(RQE.db.profile.QuestLogCriteriaUpdate)
+					QuestLogCriteriaUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest log criteria update setting and applies the change.
+					QuestLogCriteriaUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestLogCriteriaUpdate = value
+					end)
+
+					-- Add tooltip for the QUEST_LOG_CRITERIA_UPDATE event checkbox
+					QuestLogCriteriaUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST LOG CRITERIA UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestLogCriteriaUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestLogCriteriaUpdate)
+
+					-- Checkbox for displaying QUEST_LOOT_RECEIVED event debug info
+					local QuestLootReceived = AceGUI:Create("CheckBox")
+					QuestLootReceived:SetLabel("Show QUEST_LOOT_RECEIVED Event Info")
+					QuestLootReceived:SetValue(RQE.db.profile.QuestLootReceived)
+					QuestLootReceived:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest loot received setting and applies the change.
+					QuestLootReceived:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestLootReceived = value
+					end)
+
+					-- Add tooltip for the QUEST_LOOT_RECEIVED event checkbox
+					QuestLootReceived:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST LOOT RECEIVED event listener.\n\n|cFF4AA458Fires when player receives loot from quest turn in (Runs once per quest loot received).|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestLootReceived:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestLootReceived)
+
+					-- Checkbox for displaying QUESTLINE_UPDATE event debug info
+					local QuestlineUpdate = AceGUI:Create("CheckBox")
+					QuestlineUpdate:SetLabel("Show QUESTLINE_UPDATE Event Info")
+					QuestlineUpdate:SetValue(RQE.db.profile.QuestlineUpdate)
+					QuestlineUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the questline update setting and applies the change.
+					QuestlineUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestlineUpdate = value
+					end)
+
+					-- Add tooltip for the QUESTLINE_UPDATE event checkbox
+					QuestlineUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUESTLINE UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestlineUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestlineUpdate)
+
+					-- Checkbox for displaying QUEST_COMPLETE event debug info
+					local QuestComplete = AceGUI:Create("CheckBox")
+					QuestComplete:SetLabel("Show QUEST_COMPLETE Event Info")
+					QuestComplete:SetValue(RQE.db.profile.QuestComplete)
+					QuestComplete:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest complete setting and applies the change.
+					QuestComplete:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestComplete = value
+					end)
+
+					-- Add tooltip for the QUEST_COMPLETE event checkbox
+					QuestComplete:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST COMPLETE event listener.\n\n|cFF4AA458Fired after the player hits the 'Continue' button in the quest-information page, before the 'Complete Quest' button. In other words, it fires when you are given the option to complete a quest, but just before you actually complete the quest. .|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestComplete:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestComplete)
+
+					-- Checkbox for displaying QUEST_AUTOCOMPLETE event debug info
+					local QuestAutocomplete = AceGUI:Create("CheckBox")
+					QuestAutocomplete:SetLabel("Show QUEST_AUTOCOMPLETE Event Info")
+					QuestAutocomplete:SetValue(RQE.db.profile.QuestAutocomplete)
+					QuestAutocomplete:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest autocomplete setting and applies the change.
+					QuestAutocomplete:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestAutocomplete = value
+					end)
+
+					-- Add tooltip for the QUEST_AUTOCOMPLETE event checkbox
+					QuestAutocomplete:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST AUTOCOMPLETE event listener.\n\n|cFF4AA458Fires when a quest that can be auto-completed is completed.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestAutocomplete:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestAutocomplete)
+
+					-- Checkbox for displaying QUEST_REMOVED event debug info
+					local QuestRemoved = AceGUI:Create("CheckBox")
+					QuestRemoved:SetLabel("Show QUEST_REMOVED Event Info")
+					QuestRemoved:SetValue(RQE.db.profile.QuestRemoved)
+					QuestRemoved:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest removed setting and applies the change.
+					QuestRemoved:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestRemoved = value
+					end)
+
+					-- Add tooltip for the QUEST_REMOVED event checkbox
+					QuestRemoved:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST REMOVED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestRemoved:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestRemoved)
+
+					-- Checkbox for displaying QUEST_WATCH_UPDATE event debug info
+					local QuestWatchUpdate = AceGUI:Create("CheckBox")
+					QuestWatchUpdate:SetLabel("Show QUEST_WATCH_UPDATE Event Info")
+					QuestWatchUpdate:SetValue(RQE.db.profile.QuestWatchUpdate)
+					QuestWatchUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest watch update setting and applies the change.
+					QuestWatchUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestWatchUpdate = value
+					end)
+
+					-- Add tooltip for the QUEST_WATCH_UPDATE event checkbox
+					QuestWatchUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST WATCH UPDATE event listener.\n\n|cFF4AA458Fires each time the objectives of the quest with the supplied questID update, i.e. whenever a partial objective has been accomplished: killing a mob, looting a quest item etc. UNIT_QUEST_LOG_CHANGED and QUEST_LOG_UPDATE both also seem to fire consistently – in that order – after each QUEST_WATCH_UPDATE.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestWatchUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestWatchUpdate)
+
+					-- Checkbox for displaying QUEST_WATCH_LIST_CHANGED event debug info
+					local QuestListWatchListChanged = AceGUI:Create("CheckBox")
+					QuestListWatchListChanged:SetLabel("Show QUEST_WATCH_LIST_CHANGED Event Info")
+					QuestListWatchListChanged:SetValue(RQE.db.profile.QuestListWatchListChanged)
+					QuestListWatchListChanged:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest list watch list changed setting and applies the change.
+					QuestListWatchListChanged:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestListWatchListChanged = value
+					end)
+
+					-- Add tooltip for the QUEST_WATCH_LIST_CHANGED event checkbox
+					QuestListWatchListChanged:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST WATCH LIST CHANGED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestListWatchListChanged:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestListWatchListChanged)
+
+					-- Checkbox for displaying QUEST_TURNED_IN event debug info
+					local QuestTurnedIn = AceGUI:Create("CheckBox")
+					QuestTurnedIn:SetLabel("Show QUEST_TURNED_IN Event Info")
+					QuestTurnedIn:SetValue(RQE.db.profile.QuestTurnedIn)
+					QuestTurnedIn:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest turned in setting and applies the change.
+					QuestTurnedIn:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestTurnedIn = value
+					end)
+
+					-- Add tooltip for the QUEST_TURNED_IN event checkbox
+					QuestTurnedIn:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST TURNED IN event listener.\n\n|cFF4AA458This event fires whenever the player turns in a quest, whether automatically with a Task-type quest (Bonus Objectives/World Quests), or by pressing the Complete button in a quest dialog window. .|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestTurnedIn:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestTurnedIn)
+
+					-- Checkbox for displaying QUEST_FINISHED event debug info
+					local QuestFinished = AceGUI:Create("CheckBox")
+					QuestFinished:SetLabel("Show QUEST_FINISHED Event Info")
+					QuestFinished:SetValue(RQE.db.profile.QuestFinished)
+					QuestFinished:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the quest finished setting and applies the change.
+					QuestFinished:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.QuestFinished = value
+					end)
+
+					-- Add tooltip for the QUEST_FINISHED event checkbox
+					QuestFinished:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the QUEST FINISHED event listener.\n\n|cFF4AA458Fired whenever the quest frame changes (from Detail to Progress to Reward, etc.) or is closed.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					QuestFinished:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(QuestFinished)
+
+					-- Checkbox for displaying SCENARIO_COMPLETED event debug info
+					local ScenarioCompleted = AceGUI:Create("CheckBox")
+					ScenarioCompleted:SetLabel("Show SCENARIO_COMPLETED Event Info")
+					ScenarioCompleted:SetValue(RQE.db.profile.ScenarioCompleted)
+					ScenarioCompleted:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the scenario completed setting and applies the change.
+					ScenarioCompleted:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.ScenarioCompleted = value
+					end)
+
+					-- Add tooltip for the SCENARIO_COMPLETED event checkbox
+					ScenarioCompleted:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the SCENARIO COMPLETED event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					ScenarioCompleted:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(ScenarioCompleted)
+
+					-- Checkbox for displaying SCENARIO_CRITERIA_UPDATE event debug info
+					local ScenarioCriteriaUpdate = AceGUI:Create("CheckBox")
+					ScenarioCriteriaUpdate:SetLabel("Show SCENARIO_CRITERIA_UPDATE Event Info")
+					ScenarioCriteriaUpdate:SetValue(RQE.db.profile.ScenarioCriteriaUpdate)
+					ScenarioCriteriaUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the scenario criteria update setting and applies the change.
+					ScenarioCriteriaUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.ScenarioCriteriaUpdate = value
+					end)
+
+					-- Add tooltip for the SCENARIO_CRITERIA_UPDATE event checkbox
+					ScenarioCriteriaUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the SCENARIO CRITERIA UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					ScenarioCriteriaUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(ScenarioCriteriaUpdate)
+
+					-- Checkbox for displaying SCENARIO_UPDATE event debug info
+					local ScenarioUpdate = AceGUI:Create("CheckBox")
+					ScenarioUpdate:SetLabel("Show SCENARIO_UPDATE Event Info")
+					ScenarioUpdate:SetValue(RQE.db.profile.ScenarioUpdate)
+					ScenarioUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the scenario update setting and applies the change.
+					ScenarioUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.ScenarioUpdate = value
+					end)
+
+					-- Add tooltip for the SCENARIO_UPDATE event checkbox
+					ScenarioUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the SCENARIO UPDATE event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					ScenarioUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(ScenarioUpdate)
+
+					-- Checkbox for displaying START_TIMER event debug info
+					local StartTimer = AceGUI:Create("CheckBox")
+					StartTimer:SetLabel("Show START_TIMER Event Info")
+					StartTimer:SetValue(RQE.db.profile.StartTimer)
+					StartTimer:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the start timer setting and applies the change.
+					StartTimer:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.StartTimer = value
+					end)
+
+					-- Add tooltip for the START_TIMER event checkbox
+					StartTimer:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the START TIMER event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					StartTimer:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(StartTimer)
+
+					-- Checkbox for displaying SUPER_TRACKING_CHANGED event debug info
+					local showEventSuperTrackingChanged = AceGUI:Create("CheckBox")
+					showEventSuperTrackingChanged:SetLabel("Show SUPER_TRACKING_CHANGED Event Info")
+					showEventSuperTrackingChanged:SetValue(RQE.db.profile.showEventSuperTrackingChanged)
+					showEventSuperTrackingChanged:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show event super tracking changed setting and applies the change.
+					showEventSuperTrackingChanged:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showEventSuperTrackingChanged = value
+					end)
+
+					-- Add tooltip for the SUPER_TRACKING_CHANGED event checkbox
+					showEventSuperTrackingChanged:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the SUPER TRACKING CHANGED event listener.\n\n|cFF4AA458Fired when the actively tracked location is changed.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showEventSuperTrackingChanged:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showEventSuperTrackingChanged)
+
+					-- Checkbox for displaying TRACKED_ACHIEVEMENT_UPDATE event debug info
+					local showTrackedAchievementUpdate = AceGUI:Create("CheckBox")
+					showTrackedAchievementUpdate:SetLabel("Show TRACKED_ACHIEVEMENT_UPDATE Event Info")
+					showTrackedAchievementUpdate:SetValue(RQE.db.profile.showTrackedAchievementUpdate)
+					showTrackedAchievementUpdate:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the show tracked achievement update setting and applies the change.
+					showTrackedAchievementUpdate:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.showTrackedAchievementUpdate = value
+					end)
+
+					-- Add tooltip for the TRACKED_ACHIEVEMENT_UPDATE event checkbox
+					showTrackedAchievementUpdate:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the TRACKED ACHIEVEMENT UPDATE event listener.\n\n|cFF4AA458Fired when a timed event for an achievement begins or ends. The achievement does not have to be actively tracked for this to trigger.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					showTrackedAchievementUpdate:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(showTrackedAchievementUpdate)
+
+					-- Checkbox for displaying UNIT_EXITING_VEHICLE, ZONE_CHANGED, ZONE_CHANGED_INDOORS, and ZONE_CHANGED_NEW_AREA event debug info
+					local ZoneChange = AceGUI:Create("CheckBox")
+					ZoneChange:SetLabel("Show ZONE CHANGE and UNIT EXIT VEHICLE Event Info")
+					ZoneChange:SetValue(RQE.db.profile.ZoneChange)
+					ZoneChange:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the zone change setting and applies the change.
+					ZoneChange:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.ZoneChange = value
+					end)
+
+					-- Add tooltip for the UNIT_EXITING_VEHICLE, ZONE_CHANGED, ZONE_CHANGED_INDOORS, and ZONE_CHANGED_NEW_AREA event checkbox
+					ZoneChange:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the UNIT EXITING VEHICLE, ZONE CHANGED, ZONE CHANGED INDOORS, and ZONE CHANGED NEW AREA event listener.\n\n|cFF4AA458Fired as a unit is about to exit a vehicle, as compared to UNIT_EXITED_VEHICLE which happens afterward or Fires when the player enters a subzone or when the player enters a new zone.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					ZoneChange:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(ZoneChange)
+
+					-- Checkbox for displaying UPDATE_INSTANCE_INFO event debug info
+					local UpdateInstanceInfo = AceGUI:Create("CheckBox")
+					UpdateInstanceInfo:SetLabel("Show UPDATE_INSTANCE_INFO Event Info")
+					UpdateInstanceInfo:SetValue(RQE.db.profile.UpdateInstanceInfo)
+					UpdateInstanceInfo:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the update instance info setting and applies the change.
+					UpdateInstanceInfo:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.UpdateInstanceInfo = value
+					end)
+
+					-- Add tooltip for the UPDATE_INSTANCE_INFO event checkbox
+					UpdateInstanceInfo:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the UPDATE INSTANCE INFO event listener.\n\n|cFF4AA458Fired when data from RequestRaidInfo is available and also when player uses portals.|r", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					UpdateInstanceInfo:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(UpdateInstanceInfo)
+
+					-- Checkbox for displaying WORLD_STATE_TIMER_START event debug info
+					local WorldStateTimerStart = AceGUI:Create("CheckBox")
+					WorldStateTimerStart:SetLabel("Show WORLD_STATE_TIMER_START Event Info")
+					WorldStateTimerStart:SetValue(RQE.db.profile.WorldStateTimerStart)
+					WorldStateTimerStart:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the world state timer start setting and applies the change.
+					WorldStateTimerStart:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.WorldStateTimerStart = value
+					end)
+
+					-- Add tooltip for the WORLD_STATE_TIMER_START event checkbox
+					WorldStateTimerStart:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the WORLD STATE TIMER START event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					WorldStateTimerStart:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(WorldStateTimerStart)
+
+					-- Checkbox for displaying WORLD_STATE_TIMER_STOP event debug info
+					local WorldStateTimerStop = AceGUI:Create("CheckBox")
+					WorldStateTimerStop:SetLabel("Show WORLD_STATE_TIMER_STOP Event Info")
+					WorldStateTimerStop:SetValue(RQE.db.profile.WorldStateTimerStop)
+					WorldStateTimerStop:SetFullWidth(true)	-- Make the checkbox full width
+					-- Saves the world state timer stop setting and applies the change.
+					WorldStateTimerStop:SetCallback("OnValueChanged", function(widget, event, value)
+						RQE.db.profile.WorldStateTimerStop = value
+					end)
+
+					-- Add tooltip for the WORLD_STATE_TIMER_STOP event checkbox
+					WorldStateTimerStop:SetCallback("OnEnter", function(widget, event)
+						GameTooltip:SetOwner(widget.frame, "ANCHOR_TOPRIGHT")
+						GameTooltip:SetText("Toggle the display of debug print messages for the WORLD STATE TIMER STOP event listener.", nil, nil, nil, nil, true)
+						GameTooltip:Show()
+					end)
+					-- Hides the tooltip when the pointer leaves this control.
+					WorldStateTimerStop:SetCallback("OnLeave", function(widget, event)
+						GameTooltip:Hide()
+					end)
+					debugInlineGroup:AddChild(WorldStateTimerStop)
+				end
+			end
+
+			-- Spacer to ensure the scroll goes to the bottom
+			local spacer = AceGUI:Create("Label")
+			spacer:SetText(" ")
+			spacer:SetFullWidth(true)
+			scrollFrame:AddChild(spacer)
+		end
+
+		-- Initial setup of the Debug tab
+		RefreshDebugTab()
+	end
+
+	-------------------------------------------------------
+	-- #5g. Profile Management Widgets
+	-------------------------------------------------------
+
+	-- Displays the Widget Container Profiles in Config Frame
+	function RQE:AddProfileSettingsWidgets(container)
+		-- Profile Management Section Label
+		local label = AceGUI:Create("Label")
+		label:SetText("Profile Management")
+		label:SetFullWidth(true)
+		container:AddChild(label)
+
+		-- Dropdown for existing profiles
+		local profileDropdown = AceGUI:Create("Dropdown")
+		profileDropdown:SetLabel("Select Profile")
+		local profiles = {}
+		local currentProfile = RQE.db:GetCurrentProfile()
+
+		-- Populate profiles dropdown
+		for _, profileName in pairs(RQE.db:GetProfiles()) do
+			profiles[profileName] = profileName
+		end
+		profileDropdown:SetList(profiles)
+		profileDropdown:SetValue(currentProfile)
+		-- Sets the profile.
+		profileDropdown:SetCallback("OnValueChanged", function(widget, event, value)
+			RQE.db:SetProfile(value)
+		end)
+		container:AddChild(profileDropdown)
+
+		-- Button for creating a new profile
+		local newProfileButton = AceGUI:Create("Button")
+		newProfileButton:SetText("Create New Profile")
+		-- Sets the profile.
+		newProfileButton:SetCallback("OnClick", function()
+			local newProfileName = "NewProfile"  -- You can prompt the user for this name if you want
+			RQE.db:SetProfile(newProfileName)
+			profiles[newProfileName] = newProfileName
+			profileDropdown:SetList(profiles)
+			profileDropdown:SetValue(newProfileName)
+		end)
+		container:AddChild(newProfileButton)
+
+		-- Button for copying a profile
+		local copyProfileButton = AceGUI:Create("Button")
+		copyProfileButton:SetText("Copy Current Profile")
+		-- Copies the profile.
+		copyProfileButton:SetCallback("OnClick", function()
+			local newProfileName = currentProfile .. "_Copy"
+			RQE.db:CopyProfile(currentProfile, newProfileName)
+			profiles[newProfileName] = newProfileName
+			profileDropdown:SetList(profiles)
+			profileDropdown:SetValue(newProfileName)
+		end)
+		container:AddChild(copyProfileButton)
+
+		-- Button for deleting a profile
+		local deleteProfileButton = AceGUI:Create("Button")
+		deleteProfileButton:SetText("Delete Profile")
+		-- Deletes the profile.
+		deleteProfileButton:SetCallback("OnClick", function()
+			RQE.db:DeleteProfile(currentProfile)
+			profiles[currentProfile] = nil
+			profileDropdown:SetList(profiles)
+			profileDropdown:SetValue(next(profiles))  -- Select the first available profile
+		end)
+		container:AddChild(deleteProfileButton)
+
+		-- Button for resetting the profile
+		local resetProfileButton = AceGUI:Create("Button")
+		resetProfileButton:SetText("Reset Profile")
+		-- Resets the profile.
+		resetProfileButton:SetCallback("OnClick", function()
+			RQE.db:ResetProfile()
+		end)
+		container:AddChild(resetProfileButton)
+	end

@@ -1,8 +1,13 @@
 local ADDON, ns = ...
 
 local panel
+ns.optControls = { group = {} }
+local groupButton, buildDisplayOptions
 local rows = {}   -- pooled row frames
-local WIDTH = 340
+local WIDTH = 340          -- left column (buff list)
+local RIGHT_X = WIDTH + 4  -- right column (display settings)
+local FULL_W = WIDTH + 300
+local GROUP_ORDER = { SELF = "GROUP", GROUP = "OPTIONAL", OPTIONAL = "SELF" }
 
 local function getRow(i)
     local r = rows[i]
@@ -25,11 +30,15 @@ local function getRow(i)
     r.check:SetFrameLevel(panel:GetFrameLevel() + 5)
     r.label = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     r.label:SetPoint("LEFT", r.check, "RIGHT", 4, 0)
-    r.label:SetWidth(WIDTH - 110)
+    r.label:SetWidth(WIDTH - 170)
     r.label:SetJustifyH("LEFT")
     r.del = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
     r.del:SetSize(22, 22)
     r.del:SetFrameLevel(panel:GetFrameLevel() + 5)
+    -- Self / Group / Optional: which display group this buff goes in (click cycles)
+    r.grp = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    r.grp:SetSize(70, 20)
+    r.grp:SetFrameLevel(panel:GetFrameLevel() + 5)
     rows[i] = r
     return r
 end
@@ -55,11 +64,27 @@ local function header(text, y)
     return h
 end
 
+-- cycle button on a buff row: Self -> Group -> Optional
+groupButton = function(r, cfg, key, default, xOff)
+    local function label() return ns.GROUP_NAMES[cfg.groups[key] or default] end
+    r.grp:ClearAllPoints()
+    r.grp:SetPoint("RIGHT", r.bg, "RIGHT", xOff, 0)
+    r.grp:SetText(label())
+    r.grp:SetScript("OnClick", function(self)
+        cfg.groups[key] = GROUP_ORDER[cfg.groups[key] or default]
+        self:SetText(label())
+        ns.Refresh()
+    end)
+    r.grp:Show()
+    ns.optControls.group[key] = r.grp
+end
+
 function ns.RefreshOptions()
     if not panel then return end
     local class = ns.PlayerClass()
     local cfg = ns.ClassConfig(class)
-    for _, r in ipairs(rows) do r.bg:Hide(); r.check:Hide(); r.label:Hide(); r.del:Hide() end
+    for _, r in ipairs(rows) do r.bg:Hide(); r.check:Hide(); r.label:Hide(); r.del:Hide(); r.grp:Hide() end
+    ns.optControls.group = {}
     if panel.headers then for _, h in pairs(panel.headers) do h:Hide(); h.line:Hide() end end
 
     local y, idx = -40, 0
@@ -86,6 +111,7 @@ function ns.RefreshOptions()
                 ns.Refresh()
             end)
             r.label:SetText(e.label)
+            groupButton(r, cfg, e.key, e.group, -16)
             r.check:Show(); r.label:Show(); r.del:Hide()
             y = y - 24
         end
@@ -106,6 +132,8 @@ function ns.RefreshOptions()
             ns.Refresh()
         end)
         r.label:SetText(m.input)
+        local name = ns.ResolveSpell(tonumber(m.input) or m.input)
+        groupButton(r, cfg, ns.ManualKey(name or m.input), "SELF", -40)
         r.del:ClearAllPoints()
         r.del:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -12, y + 1)
         r.del:SetScript("OnClick", function()
@@ -137,9 +165,10 @@ function ns.RefreshOptions()
     y = y - 22
 
     panel.footer:ClearAllPoints()
-    panel.footer:SetPoint("TOP", panel, "TOP", 0, y)
+    panel.footer:SetPoint("TOP", panel, "TOPLEFT", WIDTH / 2, y)
     panel.footer:SetText(idx .. " buffs listed")
-    panel:SetHeight(-y + 28)
+    ns.UpdateDisplayOptions()
+    panel:SetHeight(math.max(-y + 28, panel.rightHeight or 0))
 end
 
 local function addManual()
@@ -160,6 +189,133 @@ local function addManual()
     panel.edit:ClearFocus()
     ns.RefreshOptions()
     ns.Refresh()
+end
+
+----------------------------------------------------------------------
+-- Right column: layout, size and spacing, look, grouping, when to show
+----------------------------------------------------------------------
+local LAYOUT_NAMES = { list = "Grouped list", strip = "Icon strip", panels = "Big panels" }
+local LAYOUT_NEXT = { list = "strip", strip = "panels", panels = "list" }
+local updaters = {}
+
+local function rheader(text, y)
+    local h = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    h:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 4, y)
+    h:SetText(text)
+    local line = panel:CreateTexture(nil, "ARTWORK")
+    line:SetColorTexture(1, 0.82, 0, 0.35)
+    line:SetHeight(1)
+    line:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 2, y - 16)
+    line:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -14, y - 16)
+    return y - 22
+end
+
+local function button(y, onClick)
+    local b = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    b:SetSize(220, 22)
+    b:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 6, y)
+    b:SetScript("OnClick", function(self) onClick(self); ns.RefreshOptions() end)
+    return b, y - 26
+end
+
+-- "-" / "+" buttons and the value; clamped and saved through ns.SetOption
+local function stepper(key, label, step, lo, hi, fmt, y)
+    local t = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    t:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 62, y - 4)
+    local function set(d)
+        local v = ns.clamp(tonumber(string.format("%.2f", ns.db[key] + d)), lo, hi)
+        ns.SetOption(key, v)
+        ns.RefreshOptions()
+    end
+    local minus = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    minus:SetSize(26, 20)
+    minus:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 6, y)
+    minus:SetText("-")
+    minus:SetScript("OnClick", function() set(-step) end)
+    local plus = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    plus:SetSize(26, 20)
+    plus:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 33, y)
+    plus:SetText("+")
+    plus:SetScript("OnClick", function() set(step) end)
+    updaters[#updaters + 1] = function() t:SetText(label .. ": " .. string.format(fmt, ns.db[key])) end
+    ns.optControls[key] = { minus = minus, plus = plus, text = t }
+    return y - 24
+end
+
+local function checkbox(key, label, y)
+    local c = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    c:SetSize(22, 22)
+    c:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 6, y + 2)
+    local t = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    t:SetPoint("LEFT", c, "RIGHT", 2, 0)
+    t:SetText(label)
+    -- flip the saved value (not GetChecked) so the box always matches what is saved
+    c:SetScript("OnClick", function(self)
+        ns.SetOption(key, not ns.db[key])
+        self:SetChecked(ns.db[key] and true or false)
+        ns.RefreshOptions()
+    end)
+    updaters[#updaters + 1] = function() c:SetChecked(ns.db[key] and true or false) end
+    ns.optControls[key] = c
+    return y - 22
+end
+
+buildDisplayOptions = function()
+    local C = ns.optControls
+    local y = -40
+    y = rheader("Layout", y)
+    C.layout, y = button(y, function() ns.SetOption("layout", LAYOUT_NEXT[ns.db.layout] or "list") end)
+    updaters[#updaters + 1] = function() C.layout:SetText("Layout: " .. (LAYOUT_NAMES[ns.db.layout] or "?")) end
+
+    y = rheader("Size and spacing", y - 4)
+    y = stepper("scale", "Scale", 0.05, 0.4, 4, "%.2f", y)
+    y = stepper("iconSize", "Icon size", 2, 10, 48, "%d", y)
+    y = stepper("spacing", "Row spacing", 1, 0, 12, "%d", y)
+    y = stepper("fontSize", "Font size", 1, 8, 24, "%d", y)
+    y = checkbox("growUp", "Grow upwards", y)
+
+    y = rheader("Look", y - 4)
+    y = checkbox("showBg", "Background", y)
+    y = stepper("bgAlpha", "Background opacity", 0.1, 0, 1, "%.1f", y)
+    y = checkbox("showBorder", "Border", y)
+    y = checkbox("redEdge", "Red edge on missing icons", y)
+    C.headerColor, y = button(y, function()
+        local list, nextId = ns.HEADER_COLORS, nil
+        for i, c in ipairs(list) do
+            if c.id == ns.db.headerColor then nextId = list[i % #list + 1].id end
+        end
+        ns.SetOption("headerColor", nextId or list[1].id)
+    end)
+    updaters[#updaters + 1] = function()
+        local name = "Gold"
+        for _, c in ipairs(ns.HEADER_COLORS) do if c.id == ns.db.headerColor then name = c.name end end
+        C.headerColor:SetText("Header colour: " .. name)
+    end
+
+    y = rheader("Grouping", y - 4)
+    y = checkbox("showWho", "Show who in the party misses a group buff", y)
+    local note = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    note:SetPoint("TOPLEFT", panel, "TOPLEFT", RIGHT_X + 10, y)
+    note:SetWidth(270)
+    note:SetJustifyH("LEFT")
+    note:SetText("Party buffs are read out of combat only. Pick Self/Group/Optional per buff on the left; click a group header in the list to collapse it.")
+    y = y - 30
+
+    y = rheader("When to show", y - 4)
+    y = checkbox("showInCombat", "Show in combat", y)
+    y = checkbox("onlyInGroup", "Only in a group or raid", y)
+    C.whenNone, y = button(y, function()
+        ns.SetOption("whenNone", ns.db.whenNone == "hide" and "fade" or "hide")
+    end)
+    updaters[#updaters + 1] = function()
+        C.whenNone:SetText("Nothing missing: " .. (ns.db.whenNone == "fade" and "Fade" or "Hide"))
+    end
+    C.lock = panel.unlock
+    panel.rightHeight = -y + 20
+end
+
+function ns.UpdateDisplayOptions()
+    for _, u in ipairs(updaters) do u() end
 end
 
 local function build()
@@ -185,7 +341,7 @@ local function build()
         local close = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
         close:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -2, -2)
     end
-    panel:SetSize(WIDTH, 360)
+    panel:SetSize(FULL_W, 360)
     panel:SetPoint("CENTER")
     panel:SetFrameStrata("DIALOG")
     panel:SetMovable(true)
@@ -228,8 +384,12 @@ local function build()
     panel.footer = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 
     ns.OnScaleChanged = function(sc)
-        if panel:IsShown() then panel.scaleText:SetText(("Scale: %.2f"):format(sc)) end
+        if panel:IsShown() then
+            panel.scaleText:SetText(("Scale: %.2f"):format(sc))
+            ns.UpdateDisplayOptions()
+        end
     end
+    buildDisplayOptions()
 
     tinsert(UISpecialFrames, "MissingBuffWarningOptions")
     panel:Hide()

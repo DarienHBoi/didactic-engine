@@ -1,0 +1,41 @@
+## Interface: 16001
+## Title: Forever Quest Pins
+## Notes: Colored ! start markers on the Forever map for unaccepted quests, plus quest icons on NPC nameplates.
+## Author: Tyler Akins
+## Version: v1.1.1
+## X-License: GPL-3.0-or-later
+## X-Category: Quests
+## Category: Quests
+## X-Website: https://github.com/TylerAkins/forever-quest-markers
+## X-Source: https://github.com/TylerAkins/forever-quest-markers
+## X-Issues: https://github.com/TylerAkins/forever-quest-markers/issues
+## SavedVariables: ForeverQuestPinsDB, ForeverQuestPinsDB_Settings
+## SavedVariablesPerCharacter: ForeverQuestPinsCharDB, ForeverQuestPinsCharacterSettings
+## IconTexture: Interface\GossipFrame\AvailableQuestIcon
+## OptionalDeps: TomTom
+## DefaultState: enabled
+
+Database\Metadata.lua
+Database\ForeverQuests.lua
+Database\QuestTagCorrections.lua
+Database\EventPolicy.lua
+Database\ExcludedQuests.lua
+Database\VanillaQuests.lua
+Localization.lua
+Config.lua
+Sparkle.lua
+WhatsNew.lua
+Setup.lua
+HiddenQuests.lua
+WarEffort.lua
+Events.lua
+Eligibility.lua
+NPCTooltips.lua
+Nameplates.lua
+Waypoints.lua
+Breadcrumbs.lua
+MapPins.lua
+AutoQuests.lua
+QuestLinks.lua
+Tracker.lua
+Core.lua

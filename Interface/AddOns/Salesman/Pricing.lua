@@ -15,6 +15,24 @@ function S.Pricing.matsCost(reagents, lookup, staleSecs)
     return { state = stale and "stale" or "ok", copper = total }
 end
 
+-- Like matsCost, but a reagent with no price at all counts as free (you farm it); `missing` says how many.
+function S.Pricing.matsCostFarmed(reagents, lookup, staleSecs)
+    staleSecs = staleSecs or 86400
+    if type(reagents) ~= "table" or #reagents == 0 then return { state = "unknown" } end
+    local total, stale, missing = 0, false, 0
+    for _, r in ipairs(reagents) do
+        if r[1] == false or type(r[2]) ~= "number" or r[2] <= 0 then return { state = "unknown" } end
+        local p = lookup(r[1])
+        if not p or p.copper == nil or p.copper <= 0 then
+            missing = missing + 1
+        else
+            total = total + p.copper * r[2]
+            if p.ageSecs and p.ageSecs >= staleSecs then stale = true end
+        end
+    end
+    return { state = stale and "stale" or "ok", copper = total, missing = missing }
+end
+
 -- Plain decimal only ("15", "12.5"); anything else is nil. Clamped to 0..1000.
 function S.Pricing.parseMargin(text)
     if type(text) ~= "string" or not text:match("^%d+%.?%d*$") then return nil end

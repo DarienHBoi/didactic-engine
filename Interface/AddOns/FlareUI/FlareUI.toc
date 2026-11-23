@@ -1,0 +1,124 @@
+## Interface: 16001
+## Title: FlareUI
+## Version: 6.5.1
+## Author: Malkkav
+## X-Curse-Project-ID: 1718307
+## X-Wago-ID: O67bb0N3
+## Notes: Your friendly UI overhowl
+## Category: User Interface
+## Category-deDE: Benutzeroberfläche
+## Category-esES: Interfaz
+## Category-esMX: Interfaz
+## Category-frFR: Interface
+## Category-itIT: Interfaccia
+## Category-koKR: 인터페이스
+## Category-nlNL: Gebruikersinterface
+## Category-ptBR: Interface
+## Category-ruRU: Интерфейс
+## Category-zhCN: 界面
+## Category-zhTW: 介面
+## SavedVariables: FlareUI2_DB, FlareUI_DB
+## LoadSavedVariablesFirst: 1
+## IconTexture: Interface\AddOns\FlareUI\Media\Art\Icon.png
+## AddonCompartmentFunc: FlareUI_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: FlareUI_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: FlareUI_OnAddonCompartmentLeave
+
+# ----------------------------------------------------
+# Libraries (the load check first: it needs nothing else)
+# ----------------------------------------------------
+LoadCheck.lua
+Libs\Libs.xml
+PerfTrace.lua
+
+# ----------------------------------------------------
+# Addon Files
+# ----------------------------------------------------
+# Localization (before anything that builds labels as it loads)
+Locales\Locale.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\esMX.lua
+Locales\frFR.lua
+Locales\itIT.lua
+Locales\koKR.lua
+Locales\nlNL.lua
+Locales\ptBR.lua
+Locales\ruRU.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+
+Core.lua
+Import.lua
+Dialog.lua
+ProfileLayout.lua
+GamepadMode.lua
+Media.lua
+EditModeOverlays.lua
+
+# Modules (Logic)
+Modules\Chat.lua
+Modules\DamageMeter.lua
+Modules\ActionBars.lua
+Modules\ProcGlow.lua
+Modules\XPBar.lua
+Modules\Visibility.lua
+Modules\UnitFrames.lua
+Modules\UnitFramesRing.lua
+Modules\UnitFramesDoesItDie.lua
+Modules\PartyFrames.lua
+Modules\RaidFrames.lua
+Modules\BossFrames.lua
+Modules\ResourceBars.lua
+Modules\Totems.lua
+Modules\Auras.lua
+Modules\BuffReminders.lua
+Modules\Minimap.lua
+Modules\MinimapBag.lua
+Modules\TweaksCVars.lua
+Modules\Tweaks.lua
+Modules\JunkDelete.lua
+Modules\Fishing.lua
+Modules\Bags.lua
+Modules\Movers.lua
+Modules\LootFeed.lua
+Modules\ZoneText.lua
+Modules\MouseRing.lua
+Modules\Tooltips.lua
+Modules\ItemStats.lua
+Modules\ObjectiveTracker.lua
+Modules\RadialMenu.lua
+
+# Settings panel
+Launcher.lua
+Perf.lua
+TaintWatch.lua
+SayLog.lua
+Settings\EditModeLayout.lua
+Settings\Welcome.lua
+Settings\RadialEditor.lua
+Settings\Copy.lua
+Settings\WhatsNew.lua
+Settings\Registry.lua
+Settings\Preview.lua
+Settings\PreviewSamples.lua
+Settings\Fonts.lua
+Settings\Pages\About.lua
+Settings\Pages\ActionBars.lua
+Settings\Pages\UnitFrames.lua
+Settings\Pages\ResourceBars.lua
+Settings\Pages\Chat.lua
+Settings\Pages\DamageMeter.lua
+Settings\Pages\Tooltips.lua
+Settings\Pages\Auras.lua
+Settings\Pages\BuffReminders.lua
+Settings\Pages\Minimap.lua
+Settings\Pages\QuestTracker.lua
+Settings\Pages\RadialMenu.lua
+Settings\Pages\QualityOfLife.lua
+Settings\Pages\BagsLooting.lua
+Settings\Pages\Advanced.lua
+Settings\Pages\Language.lua
+Settings\PadNav.lua
+Settings\Panel.lua
+Settings\ColorPicker.lua

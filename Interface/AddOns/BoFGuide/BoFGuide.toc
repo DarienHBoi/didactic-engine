@@ -1,0 +1,86 @@
+## Interface: 16001
+## Title: Bind on Forever Guide
+## IconTexture: Interface\AddOns\BoFGuide\Media\seal
+## Notes: Leveling guide for WoW Forever. Steps are worked out from your quest log and level, so you can start at any level and in any order. Type /bofg.
+## Author: Bind on Forever
+## X-License: All Rights Reserved. See LICENSE.txt
+## Version: 0.9.151
+## SavedVariables: BoFGuideDB
+## AddonCompartmentFunc: BoFGuide_OnAddonCompartmentClick
+## Category: Quests
+## X-Curse-Project-ID: 1744885
+## X-Wago-ID: RNL4O8No
+## SavedVariablesPerCharacter: BoFGuideCharDB
+
+Locale/enUS.lua
+Locale/deDE.lua
+Locale/esMX.lua
+Locale/ptBR.lua
+Locale/frFR.lua
+Locale/koKR.lua
+Core/Init.lua
+Core/Util.lua
+Core/Lang.lua
+Core/Events.lua
+Core/Codec.lua
+Core/State.lua
+Core/Evaluator.lua
+Core/Stops.lua
+Core/Packs.lua
+Core/Paid.lua
+Core/Cleanup.lua
+Core/Text.lua
+Core/Clash.lua
+Core/Party.lua
+Core/LevelLog.lua
+Core/Talents.lua
+UI/Skin.lua
+Nav/Geo.lua
+Nav/Waypoint.lua
+Nav/Arrow.lua
+Nav/Travel.lua
+UI/Window.lua
+UI/Panels.lua
+UI/Import.lua
+UI/Feedback.lua
+UI/Link.lua
+UI/Welcome.lua
+UI/Extras.lua
+UI/Book.lua
+UI/Breath.lua
+UI/Alerts.lua
+UI/Danger.lua
+UI/Marks.lua
+UI/Tour.lua
+Engine.lua
+Auto/Quest.lua
+Auto/Junk.lua
+Slash.lua
+
+# the guide's data (forever guide-build, guide-i18n): your faction's routes and your language run, the rest is let go
+Data/Routes_Alliance.lua
+Data/Routes_Horde.lua
+Data/Lang_deDE.lua
+Data/Lang_esMX.lua
+Data/Lang_frFR.lua
+Data/Lang_koKR.lua
+Data/Lang_ptBR.lua
+Data/Paid_bof-alliance-30.lua
+Data/Paid_bof-alliance-30_deDE.lua
+Data/Paid_bof-alliance-30_esMX.lua
+Data/Paid_bof-alliance-30_frFR.lua
+Data/Paid_bof-alliance-30_koKR.lua
+Data/Paid_bof-alliance-30_ptBR.lua
+Data/Paid_bof-horde-30.lua
+Data/Paid_bof-horde-30_deDE.lua
+Data/Paid_bof-horde-30_esMX.lua
+Data/Paid_bof-horde-30_frFR.lua
+Data/Paid_bof-horde-30_koKR.lua
+Data/Paid_bof-horde-30_ptBR.lua
+Data/Paid_bof-professions.lua
+Data/Paid_bof-professions_deDE.lua
+Data/Paid_bof-professions_esMX.lua
+Data/Paid_bof-professions_frFR.lua
+Data/Paid_bof-professions_koKR.lua
+Data/Paid_bof-professions_ptBR.lua
+Data/Talents.lua

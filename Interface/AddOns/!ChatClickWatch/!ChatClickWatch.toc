@@ -1,0 +1,4 @@
+## Interface: 16001
+## Title: !ChatClickWatch
+## Notes: Keeps chat clickable (undoes "Make Uninteractable" at login).
+ChatClickWatch.lua

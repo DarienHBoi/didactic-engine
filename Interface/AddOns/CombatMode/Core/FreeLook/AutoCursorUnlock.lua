@@ -1,0 +1,260 @@
+---------------------------------------------------------------------------------------
+--  Core/FreeLook/AutoCursorUnlock.lua — FREELOOK — unlock predicates
+---------------------------------------------------------------------------------------
+--  What it does: Answers whether the cursor should stay unlocked: watched frames,
+--  wildcard groups (incl. OPie), vendor mounts, pet battle, feign death, and optional
+--  customCondition loadstring. customLockCondition is the inverse snippet (force
+--  Mouse Look on). OPie visibility also notifies FreeLookController so centering
+--  can rematch after the ring closes.
+--  Architecture / how it works:
+--    • IsUnlockFrameVisible — FramesToCheck + watchlist + wildcard tracking when
+--      DB.global.frameWatching.
+--    • Blizzard menus (unit popup, dropdowns) are unnamed, so they are detected through
+--      Menu.GetManager():IsAnyMenuOpen() (same frameWatching gate).
+--    • InitializeWildcardFrameTracking — hooks/create listeners for dynamic names.
+--    • IsVendorMountOut / IsInPetBattle / IsFeignDeathActive / IsCustomConditionTrue
+--      / IsCustomLockConditionTrue (DB.global.customLockCondition).
+--    • OPie path may free centering + hide crosshair via FreeLook helpers.
+--    • CloseUnlockWindows — closes those same windows, in combat only the unprotected ones (Close Windows
+--      option, called by the Mouse Look key).
+--  Does not: Own Lock/Unlock or ShouldFreeLookBeOff aggregation.
+--  Related: Constants/FrameWatch.lua, Core/FreeLook/FreeLookController.lua,
+--  Core/Runtime/UserLuaCondition.lua, UI/Options/Tabs/TabAutoCursorUnlock.lua,
+--  UI/Options/Tabs/TabGeneral.lua, Core/Crosshair/Crosshair.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+local _G = _G
+
+-- WoW API
+local GetPlayerAuraBySpellID = _G.C_UnitAuras.GetPlayerAuraBySpellID
+local GetUIPanel = _G.GetUIPanel
+-- Retail, Forever and Mists Classic have pet battles: check the API, not the client.
+local IsInBattle = _G.C_PetBattles and _G.C_PetBattles.IsInBattle
+
+-- Lua stdlib
+local ipairs = _G.ipairs
+local pairs = _G.pairs
+local pcall = _G.pcall
+local string = _G.string
+local tinsert = _G.table.insert
+
+local function CursorUnlockFrameVisible(frameArr)
+  local allowFrameWatching = CM.DB.global.frameWatching
+  if not allowFrameWatching then
+    return false
+  end
+
+  for _, frameName in ipairs(frameArr) do
+    local curFrame = _G[frameName]
+    -- A forbidden frame (tainted caller) errors on every method except IsForbidden:
+    -- skip it instead of throwing each tick.
+    local usable = curFrame and not (curFrame.IsForbidden and curFrame:IsForbidden())
+    if usable and curFrame.IsVisible and curFrame:IsVisible() then
+      CM.DebugPrintThrottled("cursorUnlock", frameName .. " is visible, preventing re-locking.")
+      return true
+    end
+  end
+
+  return false
+end
+
+local function CursorUnlockFrameGroupVisible(frameNameGroups)
+  for wildcardFrameName, frameNames in pairs(frameNameGroups) do
+    if CursorUnlockFrameVisible(frameNames) then
+      if wildcardFrameName == "OPieRT" then
+        -- OPie calls MouselookStop() itself, so UnlockFreeLook often no-ops (already
+        -- stopped). Still hide the crosshair and free CursorFreelookCentering so the
+        -- ring gets a usable cursor; FreeLookController latches this for a bounce rematch
+        -- when the ring closes.
+        if CM.NotifyOpieUnlockFrameVisible then
+          CM.NotifyOpieUnlockFrameVisible()
+        end
+        if CM.IsCrosshairEnabled() then
+          CM.DisplayCrosshair(false)
+        end
+        CM.SetCursorFreelookCentering(false)
+      end
+      return true
+    end
+  end
+
+  return false
+end
+
+-- Blizzard's context menus (unit popups, dropdowns) are unnamed frames, so the frame
+-- lists can't see them; ask the menu manager instead.
+local function IsBlizzardMenuOpen()
+  local Menu = _G.Menu
+  if not (Menu and Menu.GetManager) then
+    return false
+  end
+  local ok, open = pcall(function()
+    return Menu.GetManager():IsAnyMenuOpen()
+  end)
+  if ok and open == true then
+    CM.DebugPrintThrottled("cursorUnlock", "A Blizzard menu is open, preventing re-locking.")
+    return true
+  end
+  return false
+end
+
+function CM.IsUnlockFrameVisible()
+  if GetUIPanel("left") or GetUIPanel("right") or GetUIPanel("center") then
+    return true
+  end
+
+  if CM.DB.global.frameWatching and IsBlizzardMenuOpen() then
+    return true
+  end
+
+  return CursorUnlockFrameVisible(CM.Constants.FramesToCheck)
+    or CursorUnlockFrameVisible(CM.DB.global.watchlist)
+    or CursorUnlockFrameGroupVisible(CM.Constants.WildcardFramesToCheck)
+end
+
+-- Closes what CM.IsUnlockFrameVisible sees (UI panels, bags, menus, watched frames) so the
+-- Mouse Look key can re-lock. In lockdown protected frames are skipped (hiding them is
+-- blocked); the rest are hidden one by one. OPie / wildcard groups are left to their owner.
+function CM.CloseUnlockWindows()
+  local inCombat = _G.InCombatLockdown()
+  local closed = false
+  -- In lockdown a protected frame can't be hidden by addon code (and trying prints an
+  -- ADDON_ACTION_BLOCKED), so each frame is checked first; the bulk helpers are out of
+  -- combat only.
+  local function CanHide(frame)
+    if not frame or (frame.IsForbidden and frame:IsForbidden()) then
+      return false
+    end
+    if not (frame.IsVisible and frame:IsVisible()) then
+      return false
+    end
+    return not (inCombat and frame.IsProtected and frame:IsProtected())
+  end
+  if inCombat then
+    for _, position in ipairs({ "left", "center", "right" }) do
+      local panel = GetUIPanel(position)
+      if CanHide(panel) then
+        if not pcall(_G.HideUIPanel, panel) then
+          pcall(panel.Hide, panel)
+        end
+        closed = true
+      end
+    end
+    local bagFrames = { _G.ContainerFrameCombinedBags }
+    for i = 1, 13 do
+      bagFrames[#bagFrames + 1] = _G["ContainerFrame" .. i]
+    end
+    for _, bag in pairs(bagFrames) do
+      if CanHide(bag) then
+        pcall(bag.Hide, bag)
+        closed = true
+      end
+    end
+  else
+    if _G.CloseAllWindows then
+      pcall(_G.CloseAllWindows)
+    end
+    if _G.CloseAllBags then
+      pcall(_G.CloseAllBags)
+    end
+  end
+  local Menu = _G.Menu
+  if Menu and Menu.GetManager then
+    pcall(function()
+      local manager = Menu.GetManager()
+      if manager:IsAnyMenuOpen() then
+        manager:CloseMenus()
+      end
+    end)
+  end
+  local function HideList(frameArr)
+    for _, frameName in ipairs(frameArr) do
+      local frame = _G[frameName]
+      if CanHide(frame) then
+        pcall(frame.Hide, frame)
+        closed = true
+      end
+    end
+  end
+  HideList(CM.Constants.FramesToCheck)
+  HideList(CM.DB.global.watchlist)
+  return closed
+end
+
+-- Cache compiled custom-condition Lua; OnUpdate calls this often and empty/default
+-- strings must not recompile every tick.
+local customConditionCache = {}
+
+function CM.IsCustomConditionTrue()
+  return CM.EvaluateUserLuaCondition(
+    CM.DB.global.customCondition,
+    customConditionCache,
+    "Invalid custom condition"
+  )
+end
+
+-- Force Mouse Look on while the snippet returns true. Empty source is false.
+-- ShouldFreeLookBeOff decides what this beats (tap-unlock + custom unlock only).
+local customLockConditionCache = {}
+
+function CM.IsCustomLockConditionTrue()
+  return CM.EvaluateUserLuaCondition(
+    CM.DB.global.customLockCondition,
+    customLockConditionCache,
+    "Invalid force lock condition"
+  )
+end
+
+function CM.IsVendorMountOut()
+  local csv = CM.DB.global.mountsToUnlock
+  if not csv or csv == "" then
+    return false
+  end
+
+  for part in csv:gmatch("[^,]+") do
+    local id = tonumber(part:match("^%s*(.-)%s*$"))
+    if id and GetPlayerAuraBySpellID(id) then
+      return true
+    end
+  end
+
+  return false
+end
+
+function CM.IsFeignDeathActive()
+  return GetPlayerAuraBySpellID(5384) ~= nil
+end
+
+function CM.IsInPetBattle()
+  return IsInBattle ~= nil and IsInBattle() == true
+end
+
+function CM.InitializeWildcardFrameTracking(frameArr)
+  CM.DebugPrint("Looking for wildcard frames...")
+
+  for _, frameNameToFind in pairs(frameArr) do
+    CM.Constants.WildcardFramesToCheck[frameNameToFind] = {}
+    local frameGroup = CM.Constants.WildcardFramesToCheck[frameNameToFind]
+    local staticCandidates = CM.Constants.WildcardFrameCandidates
+      and CM.Constants.WildcardFrameCandidates[frameNameToFind]
+    if staticCandidates then
+      for _, candidateFrame in ipairs(staticCandidates) do
+        if _G[candidateFrame] then
+          CM.DebugPrint("Matched " .. frameNameToFind .. " to frame " .. candidateFrame)
+          tinsert(frameGroup, candidateFrame)
+        end
+      end
+    end
+    if #frameGroup == 0 then
+      -- Fallback scan keeps compatibility for addons that generate runtime frame IDs.
+      for frameName in pairs(_G) do
+        if string.match(frameName, frameNameToFind) then
+          CM.DebugPrint("Matched " .. frameNameToFind .. " to frame " .. frameName)
+          tinsert(frameGroup, frameName)
+        end
+      end
+    end
+  end
+
+  CM.DebugPrint("Wildcard frames initialized")
+end

@@ -16,6 +16,46 @@ FDJ.BOSS_LEVELS = {
         ["Arcanic Enigma"] = "30",
         ["Shade of the Archmage"] = "33",
     },
+    ["Shaper's Terrace"] = {
+        ["Titanosaur"] = "61",
+        ["Venomridge"] = "61",
+        ["Thunderhoof"] = "61",
+        ["Direhorn Matriarch"] = "61",
+        ["Cinder"] = "61",
+        ["Bolt"] = "62",
+        ["Snowtalon"] = "62",
+        ["Vitrix"] = "62",
+        ["Izha'Rel and Tor'Rel"] = "61",
+        ["Nanaya"] = "62",
+    },
+    ["Blackmaw Hold"] = {
+        ["Withermaw"] = "58",
+        ["Impaan the Imprisoner"] = "57",
+        ["Bonesnout the Unbroken"] = "58",
+        ["Varrox Bleakhoof"] = "60",
+        ["Elder Shaman Bloodmane"] = "59",
+        ["Blackmaw Behemoth"] = "59",
+        ["Unbound Spirit"] = "59",
+        ["Moontouched Wanderer"] = "55",
+        ["Gortek the Apprentice"] = "55",
+        ["Tunnelweb Matriarch"] = "55",
+    },
+    ["Alcaz Prison"] = {
+        ["Overseer Wrex"] = "50",
+        ["Tidemistress Ca'zass"] = "50",
+        ["Katerina the Cleaner"] = "52",
+        ["The Questioner"] = "51",
+        ["Blazeroar"] = "53",
+    },
+    ["Krol'dok Stronghold"] = {
+        ["Slavecrusher Grox"] = "42",
+        ["Twilight Commander Zarmok"] = "43",
+        ["War Handler Ashka"] = "43",
+        ["Nar'gurk"] = "44",
+        ["Bossman Toof"] = "42",
+        ["Overlord Mugg"] = "45",
+        ["Kroog"] = "41", -- in-game screenshot, 12 Nov 2026
+    },
     ["Gnomeregan"] = {
         ["Grubbis"] = "32",
         ["Viscous Fallout"] = "30",
@@ -57,15 +97,20 @@ FDJ.BOSS_LEVELS = {
         ["Revelosh"] = "40",
         ["The Lost Dwarves"] = "41",
         ["Ironaya"] = "40",
+        ["Obsidian Sentinel"] = "42",
         ["Ancient Stone Keeper"] = "44",
         ["Galgann Firehammer"] = "45",
         ["Grimlok"] = "45",
         ["Archaedas"] = "47",
     },
     ["Zul'Farrak"] = {
+        ["Theka the Martyr"] = "46",
         ["Antu'sul"] = "48",
         ["Witch Doctor Zum'rah"] = "46",
+        ["Nekrum Gutchewer"] = "45",
         ["Shadowpriest Sezz'ziz"] = "47",
+        ["Sergeant Bly"] = "45",
+        ["Hydromancer Velratha"] = "46",
         ["Gahz'rilla"] = "46",
         ["Zerillis"] = "45",
         ["Sandarr Dunereaver"] = "45",
@@ -74,14 +119,20 @@ FDJ.BOSS_LEVELS = {
         ["Chief Ukorz Sandscalp"] = "48",
     },
     ["Sunken Temple"] = {
+        -- altarbosses (2.0.24): Wowhead Forever levels (the group itself shows
+        -- none, 2.0.25).
+        ["Gasher"] = "51",
+        ["Loro"] = "51",
+        ["Zolo"] = "51",
+        ["Hukku"] = "52",
+        ["Mijan"] = "52",
+        ["Zul'Lor"] = "52",
         ["Atal'alarion"] = "50",
-        ["Dreamscythe"] = "53",
-        ["Weaver"] = "51",
+        ["Dreamscythe & Weaver"] = "51-53",
         ["Avatar of Hakkar"] = "55",
         ["Jammal'an the Prophet"] = "54",
         ["Ogom the Wretched"] = "53",
-        ["Morphaz"] = "52",
-        ["Hazzas"] = "53",
+        ["Morphaz & Hazzas"] = "52-53",
         ["Shade of Eranikus"] = "55",
     },
     ["Scholomance"] = {
@@ -98,6 +149,8 @@ FDJ.BOSS_LEVELS = {
         ["Lord Alexei Barov"] = "60",
         ["Lady Illucia Barov"] = "60",
         ["Darkmaster Gandling"] = "61",
+        ["Death Knight Darkreaver"] = "62", -- darkreaver (2.0.8): Wowhead Forever, elite
+        ["Kormok"] = "60", -- kormok (2.0.8): Wowhead Forever, elite
     },
     ["Maraudon"] = {
         ["Noxxion"] = "48",
@@ -111,6 +164,7 @@ FDJ.BOSS_LEVELS = {
         ["Princess Theradras"] = "51",
     },
     ["Dire Maul: East"] = {
+        ["Pusillin"] = "57",
         ["Zevrim Thornhoof"] = "57",
         ["Hydrospawn"] = "57",
         ["Lethtendris"] = "57",
@@ -139,7 +193,9 @@ FDJ.BOSS_LEVELS = {
         ["Hearthsinger Forresten"] = "57",
         ["The Unforgiven"] = "57",
         ["Timmy the Cruel"] = "58",
+        ["Malor the Zealous"] = "60",
         ["Postmaster Malown"] = "60",
+        ["Ezra Grimm"] = "61", -- ezragrimm (2.0.8): Wowhead Forever
         ["Cannon Master Willey"] = "60",
         ["Archivist Galford"] = "60",
         ["Balnazzar"] = "62",
@@ -173,6 +229,7 @@ FDJ.BOSS_LEVELS = {
         ["Hurley Blackbreath"] = "55",
         ["Phalanx"] = "55",
         ["Ribbly Screwspigot"] = "53",
+        ["Theldren"] = "60",
         ["Plugger Spazzring"] = "55",
         ["Ambassador Flamelash"] = "57",
         ["Panzor the Invincible"] = "57",
@@ -181,7 +238,7 @@ FDJ.BOSS_LEVELS = {
         ["Princess Moira Bronzebeard"] = "58",
         ["Emperor Dagran Thaurissan"] = "59",
     },
-    ["Blackrock Depths"] = {
+    ["Upper Blackrock Spire"] = {
         ["Pyroguard Emberseer"] = "60",
         ["Solakar Flamewreath"] = "60",
         ["Jed Runewatcher"] = "59",
@@ -192,13 +249,13 @@ FDJ.BOSS_LEVELS = {
         ["Lord Valthalak"] = "62",
         ["General Drakkisath"] = "62",
     },
-    ["Blackrock Depths"] = {
-        ["Spirestone Butcher"] = "59",
-        ["Spirestone Battle Lord"] = "59",
-        ["Spirestone Lord Magus"] = "59",
-        ["Highlord Omokk"] = "62",
-        ["Shadow Hunter Vosh'gajin"] = "60",
-        ["War Master Voone"] = "60",
+    ["Lower Blackrock Spire"] = {
+        ["Spirestone Butcher"] = "57",
+        ["Spirestone Battle Lord"] = "58",
+        ["Spirestone Lord Magus"] = "58",
+        ["Highlord Omokk"] = "59",
+        ["Shadow Hunter Vosh'gajin"] = "58",
+        ["War Master Voone"] = "59",
         ["Mother Smolderweb"] = "59",
         ["Crystal Fang"] = "60",
         ["Urok Doomhowl"] = "60",
@@ -207,7 +264,7 @@ FDJ.BOSS_LEVELS = {
         ["Halycon"] = "59",
         ["Gizrul the Slavener"] = "60",
         ["Ghok Bashguud"] = "59",
-        ["Overlord Wyrmthalak"] = "63",
+        ["Overlord Wyrmthalak"] = "60",
     },
     ["Razorfen Downs"] = {
         ["Tuten'kash"] = "40",
@@ -373,6 +430,7 @@ FDJ.STATIC_DISPLAY_IDS = {
     [260322] = 144209,  -- Saltspine
     [260325] = 144210,  -- Shadetooth
     [260326] = 144224,  -- Relic Guardian
+    [260808] = 9010,    -- Highland Horror (quest target, Wowhead Forever)
 
     -- City of Dalaran
     [247126] = 145787,  -- Atrexis the Grave Knight
@@ -488,6 +546,7 @@ FDJ.STATIC_DISPLAY_IDS = {
 
     -- Dire Maul: East
     [11490] = 11335,  -- Zevrim Thornhoof
+    [14354] = 7552,   -- Pusillin
     [13280] = 5489,   -- Hydrospawn
     [14327] = 14378,  -- Lethtendris
     [11492] = 14416,  -- Alzzin the Wildshaper
@@ -515,6 +574,7 @@ FDJ.STATIC_DISPLAY_IDS = {
     [10558] = 10482,  -- Hearthsinger Forresten
     [10516] = 10771,  -- The Unforgiven
     [10808] = 571,    -- Timmy the Cruel
+    [11032] = 10458,  -- Malor the Zealous
     [11143] = 10669,  -- Postmaster Malown
     [10997] = 10674,  -- Cannon Master Willey
     [10811] = 10544,  -- Archivist Galford
@@ -530,6 +590,13 @@ FDJ.STATIC_DISPLAY_IDS = {
     [10440] = 10729,  -- Baron Rivendare
 
     -- Sunken Temple
+    -- altarbosses (2.0.24): the six troll guardians (Wowhead Forever display IDs).
+    [5713] = 6698,   -- Gasher
+    [5715] = 6702,   -- Hukku
+    [5714] = 6700,   -- Loro
+    [5717] = 6707,   -- Mijan
+    [5712] = 6699,   -- Zolo
+    [5716] = 6701,   -- Zul'Lor
     [8580] = 7873,   -- Atal'alarion
     [5721] = 7553,   -- Dreamscythe
     [5720] = 6375,   -- Weaver
@@ -554,6 +621,9 @@ FDJ.STATIC_DISPLAY_IDS = {
     [10504] = 11072,  -- Lord Alexei Barov
     [10502] = 11835,  -- Lady Illucia Barov
     [1853] = 11070,  -- Darkmaster Gandling
+    [14516] = 14591,  -- Death Knight Darkreaver (darkreaver 2.0.8: Wowhead Forever NPC page)
+    [16118] = 16020,  -- Kormok (kormok 2.0.8: Wowhead Forever NPC page)
+    [11058] = 10475,  -- Ezra Grimm (ezragrimm 2.0.8: Wowhead Forever NPC page)
 
     -- Maraudon
     [13282] = 11172,  -- Noxxion
@@ -576,16 +646,94 @@ FDJ.STATIC_DISPLAY_IDS = {
     [2748] = 5988,  -- Archaedas
 
     -- Zul'Farrak
+    [7272] = 6696,  -- Theka the Martyr
     [8127] = 7353,  -- Antu'sul
     [7271] = 6434,  -- Witch Doctor Zum'rah
+    [7796] = 6690,  -- Nekrum Gutchewer
     [7275] = 6441,  -- Shadowpriest Sezz'ziz
+    [7604] = 6433,  -- Sergeant Bly (Wowhead Forever model)
+    [7795] = 6685,  -- Hydromancer Velratha
     [7273] = 7271,  -- Gahz'rilla
     [10082] = 9293,  -- Zerillis
     [10080] = 9291,  -- Sandarr Dunereaver
     [10081] = 9292,  -- Dustwraith
     [7797] = 6687,  -- Ruuzlu
     [7267] = 6439,  -- Chief Ukorz Sandscalp
+
+    -- 1.9.4: the Forever dungeons added since, so their portraits are drawn
+    -- at login with the rest instead of waiting for the game to know the
+    -- creature (question marks until then). Wowhead Forever NPC pages' model.
+    -- The Drowned City
+    [258905] = 144475,  -- Zul'Alai
+    [258924] = 144487,  -- Var'Taka
+    [260042] = 142144,  -- Captain Dreadrise
+    [270885] = 142245,  -- Deathless Marrow (the client's "Staging Area" copy)
+    [270887] = 129945,  -- Primeval Elemental (the client's "Staging Area" copy)
+    [264177] = 144023,  -- Gill
+    [264172] = 144022,  -- Umbra
+    [260468] = 142457,  -- "Pyromancer" Braxton
+    [260274] = 142322,  -- Min'loth the Serpent
+    -- Krol'dok Stronghold
+    [258966] = 141217,  -- Slavecrusher Grox
+    [258972] = 141219,  -- Twilight Commander Zarmok
+    [259281] = 141443,  -- War Handler Ashka
+    [258964] = 141215,  -- Nar'gurk
+    [264773] = 14424,   -- Bossman Toof
+    [258968] = 141218,  -- Overlord Mugg
+    [262716] = 17273,   -- Kroog (rare)
+    [268423] = 145448,  -- Zalfan Moonshadow (quest target, Wowhead Forever; zalfanpin)
+    [259256] = 144671,  -- Tunk (quest target; tunkpin; the look M's game gave him, 20 Nov 2026)
+    -- Alcaz Prison
+    [255391] = 7914,    -- Overseer Wrex
+    [255997] = 4973,    -- Tidemistress Ca'zass
+    [257016] = 2317,    -- Katerina the Cleaner
+    [256236] = 140092,  -- The Questioner
+    [255702] = 6374,    -- Blazeroar
+    -- Shaper's Terrace
+    [253201] = 142989,  -- Titanosaur
+    [261813] = 144511,  -- Venomridge
+    [261812] = 144514,  -- Thunderhoof
+    [262127] = 144515,  -- Direhorn Matriarch
+    [262081] = 143063,  -- Bolt
+    [272561] = 147098,  -- Vitrix
+    [261809] = 143832,  -- Nanaya
+    [253218] = 143040,  -- Izha'Rel
+    [261811] = 143039,  -- Tor'Rel
+    -- Blackmaw Hold
+    [247195] = 140708,  -- Withermaw
+    [247206] = 130432,  -- Impaan the Imprisoner
+    [247209] = 130440,  -- Elder Shaman Bloodmane
+    [247198] = 130427,  -- Bonesnout the Unbroken
+    [247234] = 130447,  -- Varrox Bleakhoof
+    [247207] = 130436,  -- Blackmaw Behemoth
+    [247231] = 131644,  -- Unbound Spirit
+    [269104] = 12235,   -- Moontouched Wanderer
+    [269111] = 145808,  -- Gortek the Apprentice
+    -- bakelooks (2.0.9): the five bosses that were known by NPC ID only:
+    -- their looks as the game gave them on M's client (15 Nov 2026; Obsidian
+    -- Sentinel's and Theldren's are AzerothCore's too). Each has its bundled
+    -- picture, so nothing is asked of the game for them any more.
+    [7023] = 5285,      -- Obsidian Sentinel (Uldaman)
+    [16101] = 16018,    -- Jarien (jariensothos 2.0.9: https://octowow.st/db/?npc=16101)
+    [16102] = 16003,    -- Sothos (https://octowow.st/db/?npc=16102)
+    [16080] = 15997,    -- Mor Grayhoof (morgrayhoof 2.0.9: https://octowow.st/db/?npc=16080)
+    [16097] = 16000,    -- Isalien (isalien 2.1.1: Wowhead Forever NPC 16097, model 16000)
+    [10263] = 5047,     -- Burning Felguard (lbrsaudit 2.0.9: https://octowow.st/db/?npc=10263)
+    [16059] = 15981,    -- Theldren (Blackrock Depths)
+    [250034] = 2424,    -- Tunnelweb Matriarch (Blackmaw Hold)
+    [269151] = 6829,    -- Sabella No-Eyes (Blackmaw Hold; sabella 2.1.2: Wowhead Forever NPC 269151, model 6829)
+    [261974] = 143035,  -- Cinder (Shaper's Terrace)
+    [262297] = 143122,  -- Snowtalon (Shaper's Terrace)
 }
+
+-- 1.9.4: Primeval Elemental (The Drowned City) has no NPC ID of its own yet:
+-- its picture from the client's "Staging Area" copy, like Deathless Marrow.
+do
+    local drowned = FDJ.DB and FDJ.DB["The Drowned City"]
+    for _, boss in ipairs((drowned and drowned.bosses) or {}) do
+        if boss.name == "Primeval Elemental" and not boss.npcID and not boss.portraitNpcID then boss.portraitNpcID = 270887 end
+    end
+end
 
 -- Trash mobs named as the source of a trash drop: name -> creature display ID
 -- (Wowhead Forever NPC pages). Used to draw their portraits on the loot row.
@@ -614,9 +762,218 @@ FDJ.TRASH_MOB_DISPLAY_IDS = {
     ["Dark Caster"] = 7555, -- npc 255072
     ["Fallen Mage"] = 9783, -- npc 255066
     ["Kirin Tor Necromancer"] = 145809, -- npc 269134
+    ["Fragmented Sentry"] = 130102, -- npc 246664
     -- Scarlet Monastery
     ["Scarlet Defender"] = 2462, -- npc 4298
     ["Scarlet Myrmidon"] = 2514, -- npc 4295
     ["Scarlet Champion"] = 2460, -- npc 4302
     ["Scarlet Centurion"] = 2499, -- npc 4301
+    -- The Drowned City
+    ["Risen Sentry"] = 145398, -- npc 258792
+    ["Champion of the Deep"] = 145404, -- npc 258797
+    ["Brinescale Sorceress"] = 4975, -- npc 258804
+    ["Makrura Snapper"] = 2426, -- npc 258897
+    -- Krol'dok Stronghold
+    ["Twilight Grunt"] = 140001, -- npc 258042
+    ["Twilight Lieutenant"] = 143142, -- npc 258104
+    ["Redridge Prisoner"] = 487, -- npc 257900
+    -- Alcaz Prison
+    ["Alcaz Chaplain"] = 138722, -- npc 255262
+    ["Alcaz Jailer"] = 138843, -- npc 255377 and 271784
+    ["Strashaz Soldier"] = 4764, -- npc 255995
+    ["Slavering Hound"] = 6195, -- npc 255267
+    ["Defias Truthfinder"] = 144356, -- npc 255271
+    -- sttrash (2.0.28): Sunken Temple
+    ["Spawn of Hakkar"] = 4065, -- npc 5708
+    ["Murk Worm"] = 7549, -- npc 5226
+    -- (Atal'ai Witch Doctor: by NPC ID below, 2.0.29; Wowhead's display 56741
+    -- drew nothing in the game.)
+    -- brdrecipes / lbrsrecipes (2.0.7): the mobs that drop Blackrock Depths' and
+    -- Lower Blackrock Spire's trash recipes (display IDs: octowow.st Classic
+    -- database, https://octowow.st/db/?npc=<id>)
+    ["Weapon Technician"] = 8894, -- npc 8920
+    ["Doomforge Craftsman"] = 8803, -- npc 8897
+    ["Doomforge Arcanasmith"] = 8812, -- npc 8900
+    ["Ribbly's Crony"] = 9233, -- npc 10043
+    ["Hammered Patron"] = 8681, -- npc 9554
+    ["Bloodaxe Veteran"] = 9633, -- npc 9583
+    ["Firebrand Pyromancer"] = 9656, -- npc 9264
+    ["Firebrand Legionnaire"] = 9660, -- npc 9260
+    ["Spirestone Warlord"] = 11582, -- npc 9216
+    ["Spirestone Mystic"] = 11579, -- npc 9198
+    -- ubrsrecipes (2.0.7): Upper Blackrock Spire
+    ["Blackhand Elite"] = 9734, -- npc 10317
+    -- lootaudit (2.0.8, M 15 Nov 2026): the new loot rows' mobs, their
+    -- displays from Wowhead Forever's NPC pages
+    ["Goblin Shipbuilder"] = 7112, -- npc 3947
+    ["Razorfen Spearhide"] = 6078, -- npc 4438
+    ["Wildspawn Rogue"] = 2021, -- npc 11452
+    ["Wildspawn Betrayer"] = 10032, -- npc 11454
+    -- dmtrash (2.0.9, M 16 Nov 2026): Dire Maul trash, by their looks (octowow.st
+    -- Classic database, https://octowow.st/db/?npc=<id>; Phase Lasher also
+    -- classicdb.ch). Were by NPC ID first: the game's lookup gave several of
+    -- them another mob's look (a flower as a tree, trees as satyrs).
+    ["Warpwood Crusher"] = 12929, -- npc 13021
+    ["Warpwood Stomper"] = 6350, -- npc 11465
+    ["Wildspawn Satyr"] = 11345, -- npc 11451
+    ["Phase Lasher"] = 13109, -- npc 13196
+    ["Mana Remnant"] = 14272, -- npc 11483
+    ["Arcane Aberration"] = 14253, -- npc 11480
+    ["Residual Monstrosity"] = 14254, -- npc 11484
+    -- mobpics (2.0.9): a row shows no portraits at all while one of its mobs
+    -- is unknown (the Wand had Arcane Torrent, the Talisman a family name)
+    ["Arcane Torrent"] = 10315, -- npc 14399
+    ["Eldreth Spirit"] = 10751, -- npc 11472 (stands for all Eldreth spirits)
+    ["Ironbark Protector"] = 13489, -- npc 11459
+    ["Petrified Treant"] = 2078, -- npc 11458
+    ["Scarlet Soldier"] = 2522, -- npc 4286
+    ["Scarlet Gallant"] = 2463, -- npc 4287
+    ["Scarlet Beastmaster"] = 2497, -- npc 4288
+    ["Scarlet Guardsman"] = 2511, -- npc 4290
+    ["Scarlet Protector"] = 2476, -- npc 4292
+    ["Scarlet Chaplain"] = 2501, -- npc 4299
+    ["Scarlet Monk"] = 2603, -- npc 4540
+    ["Arcanist Doan"] = 5266, -- npc 6487
+    -- bakelooks (2.0.9): the mobs known by NPC ID only (TRASH_MOB_NPC_IDS,
+    -- below), now with their look, so the bundled picture shows at once and
+    -- nothing is asked of the game for them: the look the game itself gave
+    -- for the NPC on M's client (/dj bake, 15 Nov 2026); where the game gave
+    -- none, AzerothCore's creature_template_model (marked). Phantasm, Mana
+    -- Stalker and Mindless Horror are still found in the game.
+    ["Scarlet Diviner"] = 2507, -- npc 4291 (AzerothCore)
+    ["Atal'ai Witch Doctor"] = 6671, -- npc 5259
+    ["Spectral Citizen"] = 10484, -- npc 10384
+    ["Thuzadin Shadowcaster"] = 10632, -- npc 10398
+    ["Thuzadin Necromancer"] = 10542, -- npc 10400
+    ["Ghoul Ravener"] = 10626, -- npc 10406
+    ["Fleshflayer Ghoul"] = 414, -- npc 10407 (AzerothCore)
+    ["Rockwing Gargoyle"] = 7533, -- npc 10408
+    ["Rockwing Screecher"] = 11071, -- npc 10409
+    ["Crypt Crawler"] = 6841, -- npc 10412
+    ["Crypt Beast"] = 9758, -- npc 10413
+    ["Patchwork Horror"] = 1693, -- npc 10414 (AzerothCore)
+    ["Bile Spewer"] = 9760, -- npc 10416
+    ["Venom Belcher"] = 12819, -- npc 10417
+    ["Crimson Guardsman"] = 10495, -- npc 10418
+    ["Crimson Conjuror"] = 10490, -- npc 10419
+    ["Crimson Initiate"] = 10497, -- npc 10420
+    ["Crimson Defender"] = 10500, -- npc 10421
+    ["Crimson Sorcerer"] = 10504, -- npc 10422
+    ["Crimson Priest"] = 10509, -- npc 10423
+    ["Crimson Gallant"] = 10515, -- npc 10424
+    ["Crimson Battle Mage"] = 10530, -- npc 10425
+    ["Crimson Inquisitor"] = 10516, -- npc 10426
+    ["Wailing Banshee"] = 8782, -- npc 10464
+    ["Scholomance Adept"] = 11161, -- npc 10469
+    ["Scholomance Occultist"] = 11126, -- npc 10472
+    ["Scholomance Necromancer"] = 11155, -- npc 10477
+    ["Splintered Skeleton"] = 9788, -- npc 10478
+    ["Risen Warrior"] = 7847, -- npc 10486
+    ["Risen Protector"] = 11489, -- npc 10487
+    ["Risen Construct"] = 12074, -- npc 10488
+    ["Risen Bonewarder"] = 11397, -- npc 10491
+    ["Diseased Ghoul"] = 519, -- npc 10495
+    ["Spectral Researcher"] = 3942, -- npc 10499 (AzerothCore)
+    ["Spectral Teacher"] = 3942, -- npc 10500
+    ["Crimson Monk"] = 10534, -- npc 11043
+    ["Scholomance Handler"] = 11124, -- npc 11257
+    ["Scholomance Dark Summoner"] = 11177, -- npc 11582
+    ["Mana Echo"] = 14272, -- npc 246600
+    ["Arcane Elemental"] = 130208, -- npc 246888
+    ["Arcane Echo"] = 130218, -- npc 246992
+    ["Saturated Remnant"] = 130223, -- npc 247001
+    ["Seeking Remnant"] = 130224, -- npc 247003
+    ["Legashi Summoner"] = 2875, -- npc 247248
+    ["Fallen Warrior"] = 200, -- npc 255069
+    ["Skeletal Warder"] = 612, -- npc 255070
+    ["Blackmaw Druid"] = 3024, -- npc 258516
+    ["Krol'dok Brute"] = 1045, -- npc 258687
+    ["Marsh Crocolisk"] = 1035, -- npc 260796
+    ["Young Riptooth"] = 960, -- npc 260799
+    ["Thicket Lurker"] = 1337, -- npc 260800
+    ["Thicket Hunter"] = 11315, -- npc 260801
+    ["Thicket Matriarch"] = 1339, -- npc 260802
+    ["Highland Spider"] = 1088, -- npc 260803
+    ["Highland Lurker"] = 545, -- npc 260804
+    ["Highland Snapper"] = 7114, -- npc 260810
+    ["Marsh Skulker"] = 807, -- npc 274715
+}
+
+-- trashnpc (2.0.22): trash mobs whose look is not known yet, by NPC ID
+-- (Wowhead Forever and Icy Veins Forever NPC pages). Their portraits are
+-- found in the game as the bosses' are (a hidden model of the NPC tells its
+-- display), then drawn on the loot row like the ones above.
+FDJ.TRASH_MOB_NPC_IDS = {
+    -- Sunken Temple (2.0.29)
+    ["Atal'ai Witch Doctor"] = 5259,
+    -- City of Dalaran
+    ["Mana Echo"] = 246600,
+    ["Arcane Elemental"] = 246888,
+    ["Phantasm"] = 246990,
+    ["Arcane Echo"] = 246992,
+    ["Mana Stalker"] = 246993,
+    ["Saturated Remnant"] = 247001,
+    ["Seeking Remnant"] = 247003,
+    ["Mindless Horror"] = 255068,
+    ["Fallen Warrior"] = 255069,
+    ["Skeletal Warder"] = 255070,
+    -- Stratholme (strattrash, 2.0.6; Wowhead Forever / Icy Veins Forever NPC IDs;
+    -- Shrieking Banshee and Plague Ghoul: already drawn above, by their look)
+    ["Crimson Guardsman"] = 10418,
+    ["Crimson Conjuror"] = 10419,
+    ["Crimson Initiate"] = 10420,
+    ["Crimson Defender"] = 10421,
+    ["Crimson Sorcerer"] = 10422,
+    ["Crimson Priest"] = 10423,
+    ["Crimson Gallant"] = 10424,
+    ["Crimson Battle Mage"] = 10425,
+    ["Crimson Inquisitor"] = 10426,
+    ["Crimson Monk"] = 11043,
+    ["Rockwing Gargoyle"] = 10408,
+    ["Rockwing Screecher"] = 10409,
+    ["Wailing Banshee"] = 10464,
+    ["Ghoul Ravener"] = 10406,
+    ["Fleshflayer Ghoul"] = 10407,
+    ["Crypt Crawler"] = 10412,
+    ["Crypt Beast"] = 10413,
+    ["Thuzadin Necromancer"] = 10400,
+    ["Thuzadin Shadowcaster"] = 10398,
+    ["Bile Spewer"] = 10416,
+    ["Venom Belcher"] = 10417,
+    ["Patchwork Horror"] = 10414,
+    ["Spectral Citizen"] = 10384,
+    -- Blackmaw Hold (2.0.6; Wowhead Forever "Dropped by" NPC IDs)
+    ["Legashi Summoner"] = 247248,
+    ["Blackmaw Druid"] = 258516,
+    -- Scholomance (scholotrash, 2.0.6; Wowhead Forever / Icy Veins Forever NPC IDs)
+    ["Scholomance Adept"] = 10469,
+    ["Scholomance Necromancer"] = 10477,
+    ["Scholomance Occultist"] = 10472,
+    ["Scholomance Dark Summoner"] = 11582,
+    ["Scholomance Handler"] = 11257,
+    ["Diseased Ghoul"] = 10495,
+    ["Spectral Researcher"] = 10499,
+    ["Spectral Teacher"] = 10500,
+    ["Splintered Skeleton"] = 10478,
+    ["Risen Construct"] = 10488,
+    ["Risen Bonewarder"] = 10491,
+    ["Risen Warrior"] = 10486,
+    ["Risen Protector"] = 10487,
+    -- Excavation Site: Wetlands (2.0.30; the client's npc table)
+    ["Highland Lurker"] = 260804,
+    ["Marsh Crocolisk"] = 260796,
+    ["Highland Spider"] = 260803,
+    ["Thicket Hunter"] = 260801,
+    ["Marsh Skulker"] = 274715,
+    ["Thicket Matriarch"] = 260802,
+    ["Thicket Lurker"] = 260800,
+    ["Young Riptooth"] = 260799,
+    ["Highland Snapper"] = 260810,
+    -- lootaudit2 (2.0.8): their looks found in the game by NPC ID (Wowhead
+    -- Forever was asking for a human check, so no display IDs this time)
+    ["Krol'dok Brute"] = 258687,
+    -- lootaudit3 (2.0.9): Alcaz Prison, the Enchantresses' Spire (Wowhead Forever npc)
+    ["Strashaz Enchantress"] = 255373,
+
+    ["Scarlet Diviner"] = 4291,
 }

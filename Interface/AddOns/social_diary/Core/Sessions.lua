@@ -1,0 +1,766 @@
+-- Together sessions (SES-1 to SES-5).
+--
+-- A session is continuous time with one or more diary entries. There is at
+-- most one open session at a time, per the user's logged-in character, and
+-- every diary entry the user is with joins it as a participant -- so several
+-- entries in one group share one session (SES-6) without extra machinery.
+-- Each participant keeps their own first/last/seconds, so a profile can still
+-- say how long *they* were there when the session ran on without them.
+--
+-- SES-2 lifecycle, as built:
+--
+--   opens    when a diary entry is in the user's group, or on an interaction
+--            that needs the two of them in the same place (trade, /say,
+--            /yell). A whisper can come from anywhere, so it never opens one;
+--            it only becomes a highlight of a session that is already open.
+--   stays    while they are grouped, or seen nearby (target, focus, mouseover,
+--            nameplates). Seen nearby with no session open is not a
+--            together session at all, but "seen around" (SES-9, below).
+--   closes   once every participant has been apart for the gap (20 minutes by
+--            default). The end time is the last moment together, not the
+--            moment the gap ran out.
+--
+-- Logout does not close a session outright, because /reload fires the same
+-- event and SES-3 wants a reload to change nothing. Instead the open session
+-- stays open on disk and Resume settles it at the next login: continued if the
+-- gap has not run out on the same character, closed at the last moment
+-- together otherwise. A real logout therefore closes with the right end time,
+-- just one login later.
+--
+-- SES-5: interactions during a session are stamped with its id rather than
+-- copied into it (Interactions.Add asks Note). The rows already live under the
+-- participant's GUID and diary rows are never pruned, so the stamp is enough
+-- for the journal to show them inside the session instead of beside it.
+
+local addonName, ns = ...
+
+local Sessions = {}
+ns.Sessions = Sessions
+
+local MAX_ZONES = 40
+local MAX_QUESTS = 200
+-- Near: a participant the client is drawing (UnitIsVisible on their unit,
+-- read in Capture/) at two pulses this close apart was near for the time
+-- between. A flight taken seconds apart or a cave does not break a stretch;
+-- a trip across the map does. At most MAX_NEAR stretches per participant.
+local NEAR_GAP = 5 * 60
+local MAX_NEAR = 50
+local MAX_RARES = 100
+local MAX_DEATHS = 100
+
+-- Interactions that put both players in the same place open a session
+-- (their kind's `opens`, Core/Rows.lua); anything else only joins one that
+-- is already open. The session's own skeleton (`structural`) is stamped
+-- with the session id like any other row, but not shown as highlights.
+local Rows = ns.Rows
+
+--------------------------------------------------------------------------
+-- Reading
+--------------------------------------------------------------------------
+
+-- SES-2: this long apart closes a session. Once a setting; one value for
+-- everyone now, as it was too hard to explain to be worth choosing.
+local GAP = 20 * 60
+
+local function Gap()
+    return GAP
+end
+
+Sessions.Gap = Gap
+
+-- The open session, if it belongs to the character that is logged in now.
+function Sessions.Current()
+    local id = ns.db.meta.openSession
+    local session = id and ns.db.sessions[id]
+    if not session or session.endedAt then return nil end
+    if session.me ~= ns.ownGUID then return nil end
+    return session
+end
+
+function Sessions.LastTogether(session)
+    local last = session.startedAt
+    for _, p in pairs(session.participants) do
+        if p.last > last then last = p.last end
+    end
+    return last
+end
+
+function Sessions.Duration(session)
+    return (session.endedAt or Sessions.LastTogether(session)) - session.startedAt
+end
+
+-- GUID -> session ids, in memory only. Derived from the participants, so it
+-- is never saved: a second saved copy of membership would drift. Built on
+-- first use, appended to as participants join, and dropped when something
+-- removes one. Keyed on the sessions table too, so a replaced database (a
+-- test, a future import) is never read through a stale index.
+local byGuid, byGuidSource
+
+local function ByGuid()
+    if byGuid and byGuidSource == ns.db.sessions then return byGuid end
+
+    byGuid, byGuidSource = {}, ns.db.sessions
+    for id, session in pairs(ns.db.sessions) do
+        for guid in pairs(session.participants) do
+            local list = ns.ListFor(byGuid, guid)
+            list[#list + 1] = id
+        end
+    end
+    return byGuid
+end
+
+local function Indexed(guid, id)
+    if not byGuid or byGuidSource ~= ns.db.sessions then return end
+    local list = ns.ListFor(byGuid, guid)
+    list[#list + 1] = id
+end
+
+-- Every session a character took part in, newest first.
+function Sessions.For(guid)
+    guid = ns.SafeGUID(guid)
+    local list = {}
+    if not guid then return list end
+
+    local ids = ByGuid()[guid] or {}
+    for i = 1, #ids do
+        local session = ns.db.sessions[ids[i]]
+        if session and session.participants[guid] then list[#list + 1] = session end
+    end
+    table.sort(list, function(a, b) return a.startedAt > b.startedAt end)
+    return list
+end
+
+-- Every session on record, newest first: /sd sessions without a name (Dev/).
+function Sessions.All()
+    local list = {}
+    for _, session in pairs(ns.db.sessions) do list[#list + 1] = session end
+    table.sort(list, function(a, b) return a.startedAt > b.startedAt end)
+    return list
+end
+
+-- Deaths in the session, the user's and every participant's together.
+function Sessions.DeathCount(session)
+    local deaths = 0
+    for _, n in pairs(session.deaths) do deaths = deaths + n end
+    return deaths
+end
+
+-- SES-5: what happened inside the session, oldest first.
+function Sessions.Highlights(session)
+    local list = {}
+    for guid in pairs(session.participants) do
+        local rows = ns.Interactions.For(guid)
+        if rows then
+            for i = 1, #rows do
+                local row = rows[i]
+                if row.session == session.id and not Rows.Get(row.type).structural then
+                    list[#list + 1] = row
+                end
+            end
+        end
+    end
+    table.sort(list, function(a, b) return a.time < b.time end)
+    return list
+end
+
+-- A participant still counts as present: not yet written off by the gap.
+local function Live(p)
+    return p and not p.done
+end
+
+--------------------------------------------------------------------------
+-- Near
+--------------------------------------------------------------------------
+--
+-- Grouped is together (SES-1) wherever each of them is, but a place is
+-- only theirs to share when they were actually near each other (6 Nov
+-- 2026, .claude/bugs.md: a friend grouped from across the map had the
+-- user's own road told as a journey made together, and the toast named
+-- where the user had been as where they had last met). So each participant
+-- keeps `near`, the stretches they were drawn by the client, as { { from,
+-- to }, ... } in time order, and `zones`, the user's zones while they
+-- were; a session only writes down a zone while somebody is near.
+-- Participants from before `near` was kept have neither and read as they
+-- always did: near throughout, the session's zones theirs.
+
+-- Returns whether `p` counts as near now: not once MAX_NEAR stretches are
+-- full. A participant from before `near` was kept was near throughout so
+-- far, so their first stretch starts when they did, with the session's
+-- zones so far (an open session carried across the update).
+local function MarkNear(session, p, now)
+    local list = p.near
+    if not list then
+        list = { { p.since or now, now } }
+        p.near = list
+        p.zones = {}
+        for i = 1, #session.zones do p.zones[i] = session.zones[i] end
+        return true
+    end
+    local last = list[#list]
+    if last and now - last[2] <= NEAR_GAP then
+        if now > last[2] then last[2] = now end
+        return true
+    elseif #list < MAX_NEAR then
+        list[#list + 1] = { now, now }
+        return true
+    end
+    return false
+end
+
+local function NearAt(p, now)
+    local list = p.near
+    if not list then return true end
+    local last = list[#list]
+    return last ~= nil and now - last[2] <= NEAR_GAP
+end
+
+-- Whether anyone still present is near the user at `now`.
+function Sessions.AnyNear(session, now)
+    now = now or ns.Now()
+    for _, p in pairs(session.participants) do
+        if Live(p) and NearAt(p, now) then return true end
+    end
+    return false
+end
+
+-- The stretches a participant was near the user, or with no participant
+-- everyone's, merged where they overlap, in time order. nil for a session
+-- from before `near` was kept, which counts as near throughout; an empty
+-- list for a participant who never was.
+function Sessions.NearStretches(session, p)
+    if p then return p.near end
+    local all
+    for _, other in pairs(session.participants) do
+        if other.near then
+            all = all or {}
+            for i = 1, #other.near do all[#all + 1] = other.near[i] end
+        end
+    end
+    if not all then return nil end
+    table.sort(all, function(a, b) return a[1] < b[1] end)
+    local list = {}
+    for _, s in ipairs(all) do
+        local last = list[#list]
+        if last and s[1] <= last[2] then
+            if s[2] > last[2] then last[2] = s[2] end
+        else
+            list[#list + 1] = { s[1], s[2] }
+        end
+    end
+    return list
+end
+
+--------------------------------------------------------------------------
+-- Writing
+--------------------------------------------------------------------------
+
+-- Each zone once: walking to and fro across a border (Stormwind City
+-- and the Deeprun Tram) is not another place (21 Oct, in the client).
+local function AddZone(list, zone)
+    if #list >= MAX_ZONES then return false end
+    for i = 1, #list do
+        if list[i] == zone then return false end
+    end
+    list[#list + 1] = zone
+    return true
+end
+
+-- The user's zone, written down for the session and for every
+-- participant near right now. Called while somebody is near.
+-- A battleground is no place the session was (ns.InBattleground): "questing
+-- with Tabi in Warsong Gulch and Orgrimmar", 8 Nov.
+local function TrackZone(session, now)
+    if ns.InBattleground() then return end
+    local zone = ns.Where().zone
+    if not zone then return end
+    local moved = AddZone(session.zones, zone)
+    for _, p in pairs(session.participants) do
+        if p.zones and Live(p) and NearAt(p, now) and AddZone(p.zones, zone) then moved = true end
+    end
+    -- The People index reads the zones ("met in"), and Sessions.Zone
+    -- gets here without going through Together's own check.
+    if moved then ns.Touch() end
+end
+
+-- A session record under the next id. `opts` may carry any of the record's
+-- fields -- source, startedAt (now), endedAt, participants, others, zones,
+-- deaths -- and /sd testdata's `test` mark. Without endedAt it is the open
+-- session (SES-1) and starts at the user's current level; with one it is
+-- written after the fact, when today's level would be wrong for it.
+function Sessions.New(opts)
+    local meta = ns.db.meta
+    local id = meta.nextSessionId or 1
+    meta.nextSessionId = id + 1
+
+    local session = {
+        id = id,
+        me = ns.ownGUID,
+        startedAt = ns.Now(),
+        participants = {},
+        others = 0,
+        zones = {},
+        deaths = {},
+    }
+    for key, value in pairs(opts or {}) do session[key] = value end
+    session.id = id
+
+    ns.db.sessions[id] = session
+    for guid in pairs(session.participants) do Indexed(guid, id) end
+    -- Written with its participants (/sd testdata): the People list counts it.
+    -- An empty one changes nothing until Together adds someone.
+    if next(session.participants) then ns.Touch() end
+
+    if not session.endedAt then
+        session.myLevelStart = session.myLevelStart or ns.Plain(UnitLevel("player"))
+        meta.openSession = id
+        ns.Debug("session %d opened (%s)", id, tostring(session.source))
+    end
+    return session
+end
+
+-- Closing drops the working flags, so a closed session holds only its record.
+function Sessions.Close(session, at)
+    if not session or session.endedAt then return end
+
+    session.endedAt = at or Sessions.LastTogether(session)
+    for _, p in pairs(session.participants) do
+        p.done, p.noCredit = nil, nil
+    end
+
+    if ns.db.meta.openSession == session.id then
+        ns.db.meta.openSession = nil
+    end
+
+    ns.Debug("session %d closed after %d min", session.id,
+        math.floor(Sessions.Duration(session) / 60))
+end
+
+-- The one way a diary entry becomes, or stays, present. `how` is "group" or
+-- "nearby"; `mayOpen` says whether this signal is allowed to start a session
+-- (SES-2 step 1) or only to keep one going (step 2); `near` whether the
+-- client is drawing them right now. Seen nearby is near by definition; a
+-- grouped member's caller says (Capture/), and left unsaid is not near.
+-- Inside an instance a grouped member is near regardless: a dungeon party
+-- is in one place, and its GUIDs may read as secret there, so the client
+-- cannot be asked whether it draws them (Capture/Group.lua).
+--
+-- Time between two signals counts as together as long as it is within the
+-- gap: that is what "stays open while together" means when the evidence
+-- arrives in pulses.
+function Sessions.Together(guid, how, mayOpen, near)
+    guid = ns.SafeGUID(guid)
+    if not guid or guid == ns.ownGUID or not ns.Diary.IsDiary(guid) then return nil end
+    if how == "nearby" then near = true end
+    if not near and ns.Instances and ns.Instances.Inside() then near = true end
+
+    local now = ns.Now()
+    local session = Sessions.Current()
+    if not session then
+        if not mayOpen then return nil end
+        session = Sessions.New({ startedAt = now, source = how })
+    end
+
+    if how == "group" then session.source = "group" end
+
+    local record = ns.Characters.Get(guid)
+    local level = record and record.level
+
+    local p = session.participants[guid]
+    local last, seconds, zones = p and p.last, p and p.seconds, #session.zones
+    if not p then
+        p = { since = now, last = now, seconds = 0, levelStart = level, near = {}, zones = {} }
+        session.participants[guid] = p
+        Indexed(guid, session.id)
+    elseif p.done or p.noCredit then
+        -- Back after the gap, or the first pulse after a login: the time in
+        -- between was not spent together.
+        p.done, p.noCredit = nil, nil
+        p.last = now
+    else
+        local elapsed = now - p.last
+        if elapsed > 0 and elapsed <= Gap() then
+            p.seconds = p.seconds + elapsed
+        end
+        p.last = now
+    end
+
+    p.levelEnd = level or p.levelEnd
+    session.myLevelEnd = ns.Plain(UnitLevel("player")) or session.myLevelEnd
+    if near and MarkNear(session, p, now) then TrackZone(session, now) end
+
+    -- What the People index reads of a session (AddSession): the
+    -- participant's since/last/seconds/levelStart, and the zones. Two pulses
+    -- in the same second change none of it.
+    if last == nil or p.last ~= last or p.seconds ~= seconds or #session.zones ~= zones then
+        ns.Touch()
+    end
+
+    return session
+end
+
+-- Called by Interactions.Add for every row it stores; returns the session id
+-- to stamp on the row, or nil. `live` is false for backfilled rows, which
+-- describe the past and must not open anything now.
+function Sessions.Note(guid, kind, live)
+    guid = ns.SafeGUID(guid)
+    if not guid or not ns.Diary.IsDiary(guid) then return nil end
+
+    if live and Rows.Get(kind).opens then
+        local session = Sessions.Together(guid, "nearby", true)
+        return session and session.id
+    end
+
+    local session = Sessions.Current()
+    if session and Live(session.participants[guid]) then return session.id end
+    return nil
+end
+
+-- The group as a whole: every diary entry in it is together with the user,
+-- and everyone else is counted (prd.md section 7: "other group members are
+-- counted"). `members` is a set of GUIDs; `near(guid)` says whether the
+-- client is drawing that member (Capture/ supplies it).
+function Sessions.Roster(members, near)
+    local others = 0
+    for guid in pairs(members) do
+        if not Sessions.Together(guid, "group", true, near and near(guid) or false) then
+            others = others + 1
+        end
+    end
+
+    local session = Sessions.Current()
+    if session and others > session.others then
+        session.others = others
+    end
+end
+
+--------------------------------------------------------------------------
+-- Lifecycle
+--------------------------------------------------------------------------
+
+-- SES-2 step 3, run on a timer. `grouped(guid)` and `nearby(guid)` are the
+-- two presence tests; Capture/ supplies them so this file stays free of unit
+-- tokens. `nearby` is also what makes a grouped member near: drawn by the
+-- client, through any token.
+function Sessions.Tick(grouped, nearby, now)
+    local session = Sessions.Current()
+    if not session then return end
+    now = now or ns.Now()
+
+    local gap = Gap()
+    local anyLive = false
+
+    for guid, p in pairs(session.participants) do
+        if grouped(guid) then
+            Sessions.Together(guid, "group", nil, nearby(guid))
+        elseif nearby(guid) then
+            Sessions.Together(guid, "nearby")
+        elseif not p.done and now - p.last > gap then
+            p.done = true
+            ns.Debug("session %d: %s apart for the gap", session.id,
+                ns.Characters.FullName(guid) or guid)
+        end
+        if not p.done then anyLive = true end
+    end
+
+    if not anyLive then Sessions.Close(session) end
+end
+
+-- SES-3, at login: settle a session left open by the last logout or reload.
+function Sessions.Resume(now)
+    local id = ns.db.meta.openSession
+    local session = id and ns.db.sessions[id]
+    if not session then
+        ns.db.meta.openSession = nil
+        return
+    end
+    now = now or ns.Now()
+
+    if session.endedAt or session.me ~= ns.ownGUID
+        or now - Sessions.LastTogether(session) > Gap() then
+        Sessions.Close(session)
+        ns.db.meta.openSession = nil
+        return
+    end
+
+    -- Same character, back within the gap: a reload or a short disconnect.
+    -- The session carries on, but the time offline is not together time.
+    for _, p in pairs(session.participants) do
+        p.noCredit = true
+    end
+    ns.Debug("session %d resumed", session.id)
+end
+
+--------------------------------------------------------------------------
+-- What happens inside a session (SES-4)
+--------------------------------------------------------------------------
+
+-- A zone reached is the session's only while somebody is near.
+function Sessions.Zone()
+    local session = Sessions.Current()
+    local now = ns.Now()
+    if session and Sessions.AnyNear(session, now) then TrackZone(session, now) end
+end
+
+-- Quests and kills count as together only for participants who are grouped
+-- right now: "quests completed together" is a group fact (INT-1's "quests
+-- turned in while grouped").
+local function EachGrouped(session, grouped, fn)
+    for guid, p in pairs(session.participants) do
+        if Live(p) and grouped(guid) then fn(guid, p) end
+    end
+end
+
+function Sessions.Quest(questID, grouped)
+    local session = Sessions.Current()
+    questID = ns.Plain(questID)
+    if not session or type(questID) ~= "number" then return 0 end
+
+    local n = 0
+    EachGrouped(session, grouped, function(_, p)
+        p.quests = p.quests or {}
+        if #p.quests < MAX_QUESTS then p.quests[#p.quests + 1] = questID end
+        n = n + 1
+    end)
+    return n
+end
+
+-- `rare` is { name, npcID, kind }, already plain.
+function Sessions.Rare(rare, grouped)
+    local session = Sessions.Current()
+    if not session or not rare then return 0 end
+
+    local n = 0
+    local now = ns.Now()
+    EachGrouped(session, grouped, function(_, p)
+        p.rares = p.rares or {}
+        if #p.rares < MAX_RARES then
+            p.rares[#p.rares + 1] = {
+                name = rare.name, npcID = rare.npcID, kind = rare.kind, time = now,
+            }
+        end
+        n = n + 1
+    end)
+    return n
+end
+
+-- SES-4: the user's level at the end of the open session, on a level-up.
+-- Together keeps it current too, but a level-up between two pulses would
+-- otherwise wait for the next one.
+function Sessions.MyLevel(level)
+    local session = Sessions.Current()
+    level = ns.Plain(level)
+    if not session or type(level) ~= "number" then return false end
+    session.myLevelEnd = level
+    return true
+end
+
+-- Deaths of the user or of a participant who is present. Keyed by GUID so a
+-- profile can say whose deaths they were.
+--
+-- Each death also gets a record in `session.deathLog` -- { guid, time, zone,
+-- subZone, killer } -- which the timeline shows as a line. `killer` is
+-- whatever the deaths' capture could tell at the moment of death; it may be
+-- nil, and the death recap can replace it later (SetKiller). Returns the
+-- record, or nil when the death did not count.
+function Sessions.Death(guid, killer)
+    local session = Sessions.Current()
+    guid = ns.SafeGUID(guid)
+    if not session or not guid then return nil end
+
+    if guid ~= ns.ownGUID then
+        if not Live(session.participants[guid]) then return false end
+    else
+        local anyLive = false
+        for _, p in pairs(session.participants) do
+            if Live(p) then anyLive = true break end
+        end
+        if not anyLive then return nil end
+    end
+
+    session.deaths[guid] = (session.deaths[guid] or 0) + 1
+
+    session.deathLog = session.deathLog or {}
+    if #session.deathLog >= MAX_DEATHS then return nil end
+    local where = ns.Where()
+    local death = { guid = guid, time = ns.Now(), zone = where.zone, subZone = where.subZone, killer = killer }
+    session.deathLog[#session.deathLog + 1] = death
+    ns.Touch()
+    return death
+end
+
+-- A better answer than the one the death was recorded with.
+function Sessions.SetKiller(death, killer)
+    if not death or not killer then return end
+    death.killer = killer
+    ns.Touch()
+end
+
+--------------------------------------------------------------------------
+-- Seen around (SES-9)
+--------------------------------------------------------------------------
+--
+-- A diary entry you keep running into without grouping. Not a together
+-- session: nothing was done together, so it never opens one, never counts as
+-- meeting them, and the journal shows it with less weight.
+--
+-- Built from the sighting pipeline's pulses, which come at most once a minute
+-- per character and stop in cities and instances (SIG-5, SIG-6). Pulses
+-- within the session gap of each other make one stretch. A stretch needs
+-- AROUND_MIN pulses to count as "repeatedly"; anything shorter was a glimpse,
+-- and is overwritten by the next stretch rather than kept forever.
+--
+-- Stored apart from db.sessions, as db.around[guid] = { stretch, ... }:
+-- { start, last, count, zones, me }. Kept permanently, like everything else about
+-- a diary entry.
+
+local AROUND_MIN = 3
+local AROUND_ZONES = 10
+Sessions.AROUND_MIN = AROUND_MIN
+
+function Sessions.Around(guid, now, zone)
+    guid = ns.SafeGUID(guid)
+    if not guid or guid == ns.ownGUID or not ns.Diary.IsDiary(guid) then return nil end
+
+    -- Already together: the open session is the record of this.
+    local session = Sessions.Current()
+    if session and Live(session.participants[guid]) then return nil end
+
+    now = now or ns.Now()
+    local list = ns.ListFor(ns.db.around, guid)
+
+    local stretch = list[#list]
+    -- One character's stretch, in a diary they share (DAT-1).
+    if stretch and stretch.me == ns.ownGUID and now - stretch.last <= Gap() then
+        stretch.last = math.max(stretch.last, now)
+        stretch.count = stretch.count + 1
+    else
+        if stretch and stretch.count < AROUND_MIN then list[#list] = nil end
+        stretch = { start = now, last = now, count = 1, zones = {}, me = ns.ownGUID }
+        list[#list + 1] = stretch
+    end
+
+    local zones = stretch.zones
+    if zone and zones[#zones] ~= zone and #zones < AROUND_ZONES then
+        zones[#zones + 1] = zone
+    end
+
+    -- No ns.Touch: nothing derived reads db.around. The journal's timeline
+    -- builds its seen-around lines fresh from it on every refresh.
+    return stretch
+end
+
+-- Every stretch on record, glimpses included, oldest first: SES-9's in-game
+-- check (/sd sightings around) wants to see what did not make the timeline.
+function Sessions.AroundAll(guid)
+    guid = ns.SafeGUID(guid)
+    local list = {}
+    for i, stretch in ipairs(guid and ns.db.around[guid] or {}) do list[i] = stretch end
+    return list
+end
+
+-- The stretches that count, newest first.
+function Sessions.AroundFor(guid)
+    guid = ns.SafeGUID(guid)
+    local list = {}
+    local stored = guid and ns.db.around[guid]
+    if not stored then return list end
+
+    for i = #stored, 1, -1 do
+        if stored[i].count >= AROUND_MIN then list[#list + 1] = stored[i] end
+    end
+    return list
+end
+
+-- `guid` leaves `session`, and a session left with nobody in it goes too.
+-- Whether it went.
+local function Leave(id, session, guid)
+    session.participants[guid] = nil
+    session.deaths[guid] = nil
+    local log = session.deathLog or {}
+    for i = #log, 1, -1 do
+        if log[i].guid == guid then table.remove(log, i) end
+    end
+
+    if next(session.participants) ~= nil then return false end
+    ns.db.sessions[id] = nil
+    if ns.db.meta.openSession == id then ns.db.meta.openSession = nil end
+    return true
+end
+
+-- At login, once the records have been pruned: someone removed from the
+-- diary with their history kept, whose record has since gone, leaves their
+-- sessions and stretches too, or those would show a bare GUID. A death they
+-- caused keeps its killer, as Characters.Prune leaves it.
+function Sessions.PruneLeftovers()
+    local function Gone(guid)
+        return ns.db.characters[guid] == nil and not ns.Diary.IsDiary(guid)
+    end
+
+    local changed = false
+    for id, session in pairs(ns.db.sessions) do
+        local leaving = {}
+        for guid in pairs(session.participants) do
+            if Gone(guid) then leaving[#leaving + 1] = guid end
+        end
+        for _, guid in ipairs(leaving) do
+            Leave(id, session, guid)
+            changed = true
+        end
+    end
+    for guid in pairs(ns.db.around) do
+        if Gone(guid) then
+            ns.db.around[guid] = nil
+            changed = true
+        end
+    end
+    if changed then
+        byGuid = nil
+        ns.Touch()
+    end
+end
+
+-- DIA-7's "delete everything": the person leaves every session, and a session
+-- left with nobody in it goes too. nil forgets everyone (PRV-3); checked
+-- before SafeGUID, which turns an unreadable GUID into nil as well.
+function Sessions.Forget(guid)
+    if guid == nil then
+        local dropped = ns.CountKeys(ns.db.sessions)
+        wipe(ns.db.sessions)
+        wipe(ns.db.around)
+        ns.db.meta.openSession = nil
+        byGuid = nil
+        ns.Touch()
+        return dropped
+    end
+
+    guid = ns.SafeGUID(guid)
+    if not guid then return 0 end
+
+    local dropped = 0
+    for id, session in pairs(ns.db.sessions) do
+        -- A forgotten player who killed somebody: the death stays, nameless.
+        for _, death in ipairs(session.deathLog or {}) do
+            if death.killer and death.killer.guid == guid then death.killer = nil end
+        end
+
+        if session.participants[guid] and Leave(id, session, guid) then dropped = dropped + 1 end
+    end
+    ns.db.around[guid] = nil
+    byGuid = nil
+    ns.Touch()
+    return dropped
+end
+ns.RegisterStore("sessions", Sessions.Forget)
+
+-- PLAYER_LOGOUT: credit the time up to now for everyone still grouped, so a
+-- real logout closes at the right moment when Resume settles it.
+function Sessions.Flush(grouped, near)
+    local session = Sessions.Current()
+    if not session then return end
+
+    for guid, p in pairs(session.participants) do
+        if Live(p) and grouped(guid) then
+            Sessions.Together(guid, "group", nil, near and near(guid) or false)
+        end
+    end
+end

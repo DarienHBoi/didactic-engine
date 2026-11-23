@@ -16,6 +16,9 @@ end
 
 function S.Tracker.close() cur = nil end
 
+-- Switched off in NectarKit: a trade in progress is forgotten.
+S.Mod.listen("trades", function(on) if not on then cur = nil end end)
+
 -- Call when the client reports the trade went through. Returns the ledger result, or nil when no trade was open.
 function S.Tracker.complete(db, now)
     if not cur then return nil end

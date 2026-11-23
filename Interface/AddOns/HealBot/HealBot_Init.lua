@@ -47,8 +47,11 @@ local function EnumerateTooltipLines_helper(pattern, ...)
     for i=1, select("#", ...) do
         region=select(i, ...)
         if region and region:GetObjectType() == "FontString" then
-            if region:GetText() then
-                if string.find(region:GetText(), pattern) then
+            local text = region:GetText()
+            -- local patch (Nectar): tooltip text can be a secret value on Forever; skip it instead of erroring
+            if text and not (issecretvalue and issecretvalue(text)) then
+                local ok, hit = pcall(string.find, text, pattern)
+                if ok and hit then
                     return true
                 end
             end
@@ -485,6 +488,11 @@ function HealBot_Init_Spells_addSpell(spellId, spellName, spellBookId, cRank)
             local rank=tonumber(string.match(cRank, "%d+")) or 0
             if HealBot_Ranks[spellName]<rank then HealBot_Ranks[spellName]=rank end
             if HealBot_Buff_Names[spellName] then
+                -- Keep base-name buff lookups, but resolve an explicit rank to
+                -- its own spell ID when saving/reloading a click assignment.
+                if HEALBOT_GAME_VERSION<3 and rank>0 then
+                    HealBot_Spell_Names[spellName.."("..cRank..")"]=spellId
+                end
                 if not HealBot_Buff_Ranks[spellName] then
                     HealBot_Buff_Ranks[spellName]={}
                     HealBot_Buff_Ranks[spellName][0]=1

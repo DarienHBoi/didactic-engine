@@ -50,10 +50,14 @@ FDJ.ContentLocales.koKR.dungeons = {
 }
 
 FDJ.ContentLocales.koKR.slotParts = {
+    -- isalien (2.1.1): relics (Wowhead Forever, the drop tables in this language)
+    ["Relic"] = "성물",
+    ["Libram"] = "고서",
+    ["Totem"] = "토템",
     ["Chest"] = "가슴", ["Leather"] = "가죽", ["Wrist"] = "손목", ["Cloth"] = "천",
     ["Back"] = "등", ["Waist"] = "허리", ["Mail"] = "사슬", ["Hands"] = "손",
     ["Feet"] = "발", ["Legs"] = "다리", ["Neck"] = "목", ["Finger"] = "손가락",
-    ["Trinket"] = "장신구", ["Bag"] = "가방", ["One-Hand"] = "한손", ["Main Hand"] = "주장비",
+    ["Trinket"] = "장신구", ["Bag"] = "가방", ["Quiver"] = "화살통", ["Ammo Pouch"] = "탄환 주머니", ["One-Hand"] = "한손", ["Main Hand"] = "주장비",
     ["Off Hand"] = "보조장비", ["Two-Hand"] = "양손", ["Dagger"] = "단검", ["Sword"] = "도검",
     ["Axe"] = "도끼", ["Mace"] = "둔기", ["Staff"] = "지팡이", ["Shield"] = "방패",
     ["Polearm"] = "장창", ["Ranged"] = "원거리", ["Wand"] = "마법봉", ["Thrown"] = "투척 무기",

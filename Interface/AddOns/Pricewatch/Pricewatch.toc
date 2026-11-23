@@ -1,0 +1,46 @@
+## Interface: 16001
+## Title: Pricewatch
+## Notes: Auction price history graphs for your crafts, with your listings, sales and a disenchant estimate.
+## Author: Nectar
+## Category: Nectar
+## Version: 0.1.0
+## OptionalDeps: ZugHistory, Auctionator, Salesman, NectarKit, ZugDAQ
+## SavedVariables: PricewatchDB
+
+Core.lua
+Modules.lua
+Money.lua
+Days.lua
+Store.lua
+Adapters.lua
+Disenchant.lua
+DELog.lua
+Loot.lua
+Cook.lua
+Recommend.lua
+Value.lua
+Deals.lua
+DealIndex.lua
+AHRows.lua
+LotScan.lua
+Workflow.lua
+Tip.lua
+Collector.lua
+Watch.lua
+Series.lua
+Verdict.lua
+Rate.lua
+Market.lua
+Rescan.lua
+Today.lua
+Best.lua
+Tiles.lua
+List.lua
+Graph.lua
+UI\Theme.lua
+UI\Graph.lua
+UI\Window.lua
+UI\Deals.lua
+UI\AHRows.lua
+UI\Workflow.lua
+Main.lua

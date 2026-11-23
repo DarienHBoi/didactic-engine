@@ -12,9 +12,15 @@ DATA.deDE = {
     dungeons = {
         ["Gnomeregan"] = { name = "Gnomeregan", location = "Dun Morogh", description = "Die verstrahlte unterirdische Stadt der Gnome, überrannt von Troggs und den Truppen von Robogenieur Thermaplugg." },
         ["Razorfen Kraul"] = { name = "Kral der Klingenhauer", location = "Brachland", description = "Ein weitläufiges Dornenlabyrinth, bewohnt von den Stacheleber des Krals der Klingenhauer." },
-        ["Scarlet Monastery: Graveyard"] = { name = "Scharlachrotes Kloster: Friedhof", location = "Tirisfal", description = "Der Friedhofsflügel des Scharlachroten Klosters, heimgesucht von ruhelosen Toten und scharlachroten Verteidigern." },
-        ["City of Dalaran"] = { name = "Stadt Dalaran", location = "Alteracgebirge", description = "Die wiederhergestellte Magierstadt Dalaran ist in WoW Forever ein neuer Dungeon für fünf Spieler. Betretet sie durch die Kanalisation und die Schattenseite und kämpft euch durch die Straßen bis zur Violetten Zitadelle." },
+        ["Scarlet Monastery: Graveyard"] = { name = "Scharlachrotes Kloster - Friedhof", location = "Tirisfal", description = "Der Friedhofsflügel des Scharlachroten Klosters, heimgesucht von ruhelosen Toten und scharlachroten Verteidigern." },
+        ["City of Dalaran"] = { name = "Dalaran", location = "Alteracgebirge", description = "Die wiederhergestellte Magierstadt Dalaran ist in WoW Forever ein neuer Dungeon für fünf Spieler. Betretet sie durch die Kanalisation und die Schattenseite und kämpft euch durch die Straßen bis zur Violetten Zitadelle." },
         ["Excavation Site: Wetlands"] = { name = "Ausgrabungsstätte: Sumpfland", location = "Sumpfland", description = "Eine in der Zeit gefangene Titanen-Ausgrabungsstätte oberhalb von Whelgars Ausgrabungsstätte, deren Titanenkonstrukte niemandem mehr gehorchen. Bereiche: Verlorene Marsch, Pirscherdickicht, Stätte des Wächters und Verlorene Grabungsstätte." },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "Die Versunkene Stadt" },
+        ["Krol'dok Stronghold"] = { name = "Feste Krol'dok" },
+        ["Alcaz Prison"] = { name = "Gefängnis von Alcaz" },
+        ["Blackmaw Hold"] = { name = "Die Schwarzschlundfeste" },
+        ["Shaper's Terrace"] = { name = "Die Terrasse des Formers" },
     },
     quests = {
         [2930001] = { name = "Weiße Lochkarte", objective = "Tötet Gegner im äußeren Bereich von Gnomeregan, bis eine weiße Lochkarte erbeutet wird.", pickup = "Höhlentiefplünderer, Höhlentiefeindringlinge, verstrahlte Eindringlinge und verwirrte Aussätzige außerhalb der Instanz", turnin = "Behaltet die Karte für Matrixlochkartograph 3005-A", description = "Zufälliger Fund; meist erhaltet ihr sie schon beim ersten Säubern des Außenbereichs." },
@@ -74,9 +80,15 @@ DATA.frFR = {
     dungeons = {
         ["Gnomeregan"] = { name = "Gnomeregan", location = "Dun Morogh", description = "La cité souterraine irradiée des gnomes, envahie par les troggs et les forces du mekgénieur Thermojoncteur." },
         ["Razorfen Kraul"] = { name = "Kraal de Tranchebauge", location = "Les Tarides", description = "Un vaste labyrinthe de ronces occupé par les huran du Kraal de Tranchebauge." },
-        ["Scarlet Monastery: Graveyard"] = { name = "Monastère écarlate : Cimetière", location = "Clairières de Tirisfal", description = "L'aile du cimetière du Monastère écarlate, hantée par des morts sans repos et des défenseurs écarlates." },
+        ["Scarlet Monastery: Graveyard"] = { name = "Monastère Écarlate - cimetière", location = "Clairières de Tirisfal", description = "L'aile du cimetière du Monastère écarlate, hantée par des morts sans repos et des défenseurs écarlates." },
         ["City of Dalaran"] = { name = "Cité de Dalaran", location = "Montagnes d'Alterac", description = "La cité des mages restaurée de Dalaran est devenue un nouveau donjon à cinq joueurs dans WoW Forever. Entrez par les égouts et les Entrailles, puis frayez-vous un chemin dans les rues jusqu'à la Citadelle pourpre." },
-        ["Excavation Site: Wetlands"] = { name = "Site de fouilles : Les Paluns", location = "Les Paluns", description = "Un site de fouilles titan figé dans le temps au-dessus du site de Whelgar, où des assemblages titans n'obéissent plus à personne. Zones : Marais perdu, Fourré des traqueurs, Site du gardien et Site de fouilles perdu." },
+        ["Excavation Site: Wetlands"] = { name = "Excavations : les Paluns", location = "Les Paluns", description = "Un site de fouilles titan figé dans le temps au-dessus du site de Whelgar, où des assemblages titans n'obéissent plus à personne. Zones : Marais perdu, Fourré des traqueurs, Site du gardien et Site de fouilles perdu." },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "La cité Submergée" },
+        ["Krol'dok Stronghold"] = { name = "Bastion Krol’dok" },
+        ["Alcaz Prison"] = { name = "Prison d’Alcaz" },
+        ["Blackmaw Hold"] = { name = "Repaire des Noiregueules" },
+        ["Shaper's Terrace"] = { name = "La terrasse du Façonneur" },
     },
     quests = {
         [2930001] = { name = "Carte perforée blanche", objective = "Tuez des monstres dans la zone extérieure de Gnomeregan jusqu'à obtenir une carte perforée blanche.", pickup = "Pillards des Cavernes, envahisseurs des Cavernes, envahisseurs irradiés et lépreux désorientés, hors de l'instance", turnin = "Gardez la carte pour la Matrice de perforation 3005-A", description = "Butin aléatoire ; on l'obtient en général dès le premier nettoyage de la zone extérieure." },
@@ -139,6 +151,12 @@ DATA.esES = {
         ["Scarlet Monastery: Graveyard"] = { name = "Monasterio Escarlata: Cementerio", location = "Claros de Tirisfal", description = "El ala del cementerio del Monasterio Escarlata, embrujada por muertos inquietos y defensores escarlata." },
         ["City of Dalaran"] = { name = "Ciudad de Dalaran", location = "Montañas de Alterac", description = "La restaurada ciudad de los magos, Dalaran, es una nueva mazmorra para cinco jugadores en WoW Forever. Entra por las cloacas y la Ciénaga, y abre paso por las calles hasta la Ciudadela Violeta." },
         ["Excavation Site: Wetlands"] = { name = "Excavación: Los Humedales", location = "Los Humedales", description = "Una excavación titánica atrapada en el tiempo sobre la Excavación de Whelgar, donde los ensamblajes titánicos ya no obedecen a nadie. Zonas: Marjal Perdido, Espesura del Acechador, Lugar del Guardián y Excavación Perdida." },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "La Ciudad Sumergida" },
+        ["Krol'dok Stronghold"] = { name = "Bastión Krol'dok" },
+        ["Alcaz Prison"] = { name = "Prisión de Alcaz" },
+        ["Blackmaw Hold"] = { name = "Bastión Faucenegra" },
+        ["Shaper's Terrace"] = { name = "El Bancal del Creador" },
     },
     quests = {
         [2930001] = { name = "Tarjeta perforada blanca", objective = "Mata enemigos en la zona exterior de Gnomeregan hasta que caiga una tarjeta perforada blanca.", pickup = "Saqueadores, invasores de las Profundidades, invasores irradiados y leprosos aturdidos, fuera de la instancia", turnin = "Guarda la tarjeta para la Perforadora matricial 3005-A", description = "Botín aleatorio; normalmente la consigues en la primera limpieza de la zona exterior." },
@@ -199,8 +217,8 @@ DATA.itIT = {
         ["Gnomeregan"] = { name = "Gnomeregan", location = "Dun Morogh", description = "La città sotterranea irradiata degli gnomi, invasa dai trogg e dalle forze del Meccagegnere Termospina." },
         ["Razorfen Kraul"] = { name = "Kraul di Lamaspina", location = "Savane", description = "Un vasto labirinto di rovi occupato dai cinghialidi del Kraul di Lamaspina." },
         ["Scarlet Monastery: Graveyard"] = { name = "Monastero Scarlatto: Cimitero", location = "Radure di Tirisfal", description = "L'ala del cimitero del Monastero Scarlatto, infestata da morti inquieti e difensori scarlatti." },
-        ["City of Dalaran"] = { name = "Città di Dalaran", location = "Montagne d'Alterac", description = "La restaurata città dei maghi di Dalaran è diventata una nuova spedizione per cinque giocatori in WoW Forever. Entra dalle fogne e dal Sottoventre, poi fatti strada per le vie fino alla Cittadella Violacea." },
-        ["Excavation Site: Wetlands"] = { name = "Sito di scavo: Paludi", location = "Paludi", description = "Un sito di scavo dei Titani intrappolato nel tempo sopra lo Scavo di Whelgar, dove i costrutti titanici non obbediscono più a nessuno. Aree: Palude Perduta, Boscaglia dei Predatori, Sito del Guardiano e Scavo Perduto." },
+        ["City of Dalaran"] = { name = "City of Dalaran", location = "Montagne d'Alterac", description = "La restaurata città dei maghi di Dalaran è diventata una nuova spedizione per cinque giocatori in WoW Forever. Entra dalle fogne e dal Sottoventre, poi fatti strada per le vie fino alla Cittadella Violacea." },
+        ["Excavation Site: Wetlands"] = { name = "Excavation Site: Wetlands", location = "Paludi", description = "Un sito di scavo dei Titani intrappolato nel tempo sopra lo Scavo di Whelgar, dove i costrutti titanici non obbediscono più a nessuno. Aree: Palude Perduta, Boscaglia dei Predatori, Sito del Guardiano e Scavo Perduto." },
     },
     quests = {
         [2930001] = { name = "Scheda perforata bianca", objective = "Uccidi nemici nell'area esterna di Gnomeregan finché non ottieni una scheda perforata bianca.", pickup = "Predoni e invasori delle Caverne, invasori irradiati e lebbrosi confusi, fuori dall'istanza", turnin = "Conserva la scheda per la Perforatrice a Matrice 3005-A", description = "Bottino casuale; di solito la ottieni già alla prima pulizia dell'area esterna." },
@@ -259,10 +277,16 @@ DATA.itIT = {
 DATA.ptBR = {
     dungeons = {
         ["Gnomeregan"] = { name = "Gnomeregan", location = "Dun Morogh", description = "A cidade subterrânea irradiada dos gnomos, tomada por troggs e pelas forças do Mekgenheiro Termaplugue." },
-        ["Razorfen Kraul"] = { name = "Urzal dos Mortos", location = "Sertões", description = "Um enorme labirinto de espinhos ocupado pelos javali do Urzal dos Mortos." },
-        ["Scarlet Monastery: Graveyard"] = { name = "Monastério Escarlate: Cemitério", location = "Clareiras de Tirisfal", description = "A ala do cemitério do Monastério Escarlate, assombrada por mortos inquietos e defensores escarlates." },
-        ["City of Dalaran"] = { name = "Cidade de Dalaran", location = "Montanhas de Alterac", description = "A restaurada cidade dos magos, Dalaran, tornou-se uma nova masmorra para cinco jogadores no WoW Forever. Entre pelos esgotos e pelo Ventre, depois abra caminho pelas ruas até a Cidadela Violeta." },
+        ["Razorfen Kraul"] = { name = "Urzal dos Tuscos", location = "Sertões", description = "Um enorme labirinto de espinhos ocupado pelos javali do Urzal dos Tuscos." },
+        ["Scarlet Monastery: Graveyard"] = { name = "Monastério Escarlate - Cemitério", location = "Clareiras de Tirisfal", description = "A ala do cemitério do Monastério Escarlate, assombrada por mortos inquietos e defensores escarlates." },
+        ["City of Dalaran"] = { name = "Dalaran", location = "Montanhas de Alterac", description = "A restaurada cidade dos magos, Dalaran, tornou-se uma nova masmorra para cinco jogadores no WoW Forever. Entre pelos esgotos e pelo Ventre, depois abra caminho pelas ruas até a Cidadela Violeta." },
         ["Excavation Site: Wetlands"] = { name = "Sítio de Escavação: Pantanal", location = "Pantanal", description = "Um sítio de escavação titânico preso no tempo acima da Escavação de Whelgar, onde os constructos titânicos não obedecem mais a ninguém. Áreas: Pântano Perdido, Mata dos Espreitadores, Local do Guardião e Escavação Perdida." },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "A Cidade Afogada" },
+        ["Krol'dok Stronghold"] = { name = "Fortaleza de Krol'Dok" },
+        ["Alcaz Prison"] = { name = "Prisão de Alcaz" },
+        ["Blackmaw Hold"] = { name = "Gruta Bocanera" },
+        ["Shaper's Terrace"] = { name = "O Terraço do Moldador" },
     },
     quests = {
         [2930001] = { name = "Cartão Perfurado Branco", objective = "Mate inimigos na área externa de Gnomeregan até cair um cartão perfurado branco.", pickup = "Saqueadores e invasores das Cavernas, invasores irradiados e leprosos atordoados, fora da instância", turnin = "Guarde o cartão para a Perfuradora Matricial 3005-A", description = "Saque aleatório; normalmente você o consegue na primeira limpeza da área externa." },
@@ -283,7 +307,7 @@ DATA.ptBR = {
         [2951] = { name = "A Brilhomática 5200!", objective = "Coloque um objeto encardido na Brilhomática 5200 com três moedas de prata para ligar a máquina." },
         [2945] = { name = "Anel Encardido", objective = "Descubra um jeito de limpar o anel encardido (use a Brilhomática 5200)." },
         [1221] = { name = "Tubérculos de Folha-azul", objective = "Use o caixote furado para invocar um rato fuçador e o bastão de comando para fazê-lo achar 6 tubérculos de folha-azul. Leve-os, com o bastão e o caixote, a Mebok Mizzyrix." },
-        [1144] = { name = "Willix, o Importador", objective = "Escolte Willix, o Importador, para fora do Urzal dos Mortos." },
+        [1144] = { name = "Willix, o Importador", objective = "Escolte Willix, o Importador, para fora do Urzal dos Tuscos." },
         [1142] = { name = "A Mortalidade Míngua", objective = "Encontre o pingente de Treshala e devolva-o a Treshala Fallowbrook em Darnassus." },
         [1101] = { name = "A Bruxa do Urzal", objective = "Leve o medalhão de Navalhaflanco a Falfindel Waywarder em Thalanaar." },
         [1102] = { name = "Um Destino Vingativo", objective = "Leve o coração de Navalhaflanco a Auld Pedralta em Penhasco do Trovão." },
@@ -304,7 +328,7 @@ DATA.ptBR = {
         ["inside Gnomeregan"] = "dentro de Gnomeregan",
         ["Ratchet"] = "Vila Catraca",
         ["The Barrens"] = "Sertões",
-        ["inside Razorfen Kraul"] = "dentro do Urzal dos Mortos",
+        ["inside Razorfen Kraul"] = "dentro do Urzal dos Tuscos",
         ["Darnassus"] = "Darnassus",
         ["Thalanaar"] = "Thalanaar",
         ["Feralas"] = "Feralas",
@@ -322,9 +346,15 @@ DATA.ruRU = {
     dungeons = {
         ["Gnomeregan"] = { name = "Гномреган", location = "Дун Морог", description = "Облучённый подземный город гномов, захваченный троггами и войсками анжинера Термоштепселя." },
         ["Razorfen Kraul"] = { name = "Лабиринты Иглошкурых", location = "Степи", description = "Огромный терновый лабиринт, занятый свинобразами Лабиринтов Иглошкурых." },
-        ["Scarlet Monastery: Graveyard"] = { name = "Монастырь Алого ордена: Кладбище", location = "Тирисфальские леса", description = "Кладбище Монастыря Алого ордена, где бродят неупокоенные мертвецы и защитники Алого ордена." },
-        ["City of Dalaran"] = { name = "Город Даларан", location = "Альтеракские горы", description = "Восстановленный город магов Даларан стал новым подземельем для пяти игроков в WoW Forever. Войдите через канализацию и Клоаку, затем пробейтесь по улицам к Аметистовой цитадели." },
+        ["Scarlet Monastery: Graveyard"] = { name = "Монастырь Алого ордена: кладбище", location = "Тирисфальские леса", description = "Кладбище Монастыря Алого ордена, где бродят неупокоенные мертвецы и защитники Алого ордена." },
+        ["City of Dalaran"] = { name = "Даларан", location = "Альтеракские горы", description = "Восстановленный город магов Даларан стал новым подземельем для пяти игроков в WoW Forever. Войдите через канализацию и Клоаку, затем пробейтесь по улицам к Аметистовой цитадели." },
         ["Excavation Site: Wetlands"] = { name = "Раскопки: Болотина", location = "Болотина", description = "Застывшие во времени раскопки титанов над раскопками Вельгара, где конструкты титанов больше никому не подчиняются. Области: Затерянная топь, Чаща охотников, Место стража и Затерянные раскопки." },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "Затонувший город" },
+        ["Krol'dok Stronghold"] = { name = "Крепость Крол'док" },
+        ["Alcaz Prison"] = { name = "Тюрьма Алькац" },
+        ["Blackmaw Hold"] = { name = "Крепость Черночревов" },
+        ["Shaper's Terrace"] = { name = "Терраса Создателя" },
     },
     quests = {
         [2930001] = { name = "Белая перфокарта", objective = "Убивайте противников во внешней части Гномрегана, пока не выпадет белая перфокарта.", pickup = "Грабители и захватчики глубин, облучённые захватчики и одурманенные прокажённые снаружи подземелья", turnin = "Сохраните карту для матричного перфоратора 3005-A", description = "Случайная добыча; обычно выпадает при первой зачистке внешней зоны." },
@@ -384,9 +414,15 @@ DATA.koKR = {
     dungeons = {
         ["Gnomeregan"] = { name = "놈리건", location = "던 모로", description = "방사능에 오염된 노움의 지하 도시로, 트로그와 텔마플러그의 병력에 점령당했습니다." },
         ["Razorfen Kraul"] = { name = "가시덩굴 우리", location = "불모의 땅", description = "가시덩굴 우리의 멧돼지인간이 차지한 거대한 가시 미로입니다." },
-        ["Scarlet Monastery: Graveyard"] = { name = "붉은십자군 수도원: 묘지", location = "티리스팔 숲", description = "안식을 얻지 못한 망자와 붉은십자군 수호병이 출몰하는 붉은십자군 수도원의 묘지 구역입니다." },
-        ["City of Dalaran"] = { name = "달라란 도시", location = "알터랙 산맥", description = "복원된 마법사의 도시 달라란이 WoW Forever의 새로운 5인 던전이 되었습니다. 하수도와 마법의 지하실을 통해 들어가 거리를 뚫고 보랏빛 성채까지 가세요." },
-        ["Excavation Site: Wetlands"] = { name = "발굴지: 저습지", location = "저습지", description = "웰가르 발굴지 위에 시간 속에 갇힌 티탄 발굴지로, 티탄 피조물이 더 이상 누구에게도 복종하지 않습니다. 구역: 잃어버린 늪, 추적자의 덤불, 수호자의 터, 잃어버린 발굴지." },
+        ["Scarlet Monastery: Graveyard"] = { name = "붉은십자군 수도원 - 묘지", location = "티리스팔 숲", description = "안식을 얻지 못한 망자와 붉은십자군 수호병이 출몰하는 붉은십자군 수도원의 묘지 구역입니다." },
+        ["City of Dalaran"] = { name = "달라란", location = "알터랙 산맥", description = "복원된 마법사의 도시 달라란이 WoW Forever의 새로운 5인 던전이 되었습니다. 하수도와 마법의 지하실을 통해 들어가 거리를 뚫고 보랏빛 성채까지 가세요." },
+        ["Excavation Site: Wetlands"] = { name = "발굴 현장: 저습지", location = "저습지", description = "웰가르 발굴지 위에 시간 속에 갇힌 티탄 발굴지로, 티탄 피조물이 더 이상 누구에게도 복종하지 않습니다. 구역: 잃어버린 늪, 추적자의 덤불, 수호자의 터, 잃어버린 발굴지." },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "가라앉은 도시" },
+        ["Krol'dok Stronghold"] = { name = "크롤도크 보루" },
+        ["Alcaz Prison"] = { name = "알카즈 감옥" },
+        ["Blackmaw Hold"] = { name = "검은아귀 요새" },
+        ["Shaper's Terrace"] = { name = "구체자의 정원" },
     },
     quests = {
         [2930001] = { name = "흰색 천공 카드", objective = "놈리건 외곽 지역의 적을 처치해 흰색 천공 카드를 얻으세요.", pickup = "인스턴스 밖의 동굴 약탈자, 동굴 침략자, 방사능 오염 침략자, 정신 나간 나병 노움", turnin = "카드를 매트릭스 천공기 3005-A용으로 보관하세요", description = "무작위 전리품입니다. 보통 외곽 지역을 처음 정리할 때 얻습니다." },
@@ -446,9 +482,15 @@ DATA.zhCN = {
     dungeons = {
         ["Gnomeregan"] = { name = "诺莫瑞根", location = "丹莫罗", description = "被辐射污染的侏儒地下城市，被穴居人和麦克尼尔·瑟玛普拉格的部队占领。" },
         ["Razorfen Kraul"] = { name = "剃刀沼泽", location = "贫瘠之地", description = "剃刀沼泽的野猪人盘踞的一座巨大荆棘迷宫。" },
-        ["Scarlet Monastery: Graveyard"] = { name = "血色修道院：墓地", location = "提瑞斯法林地", description = "血色修道院的墓地区，游荡着不得安息的亡者和血色十字军的守卫。" },
+        ["Scarlet Monastery: Graveyard"] = { name = "血色修道院 - 墓地", location = "提瑞斯法林地", description = "血色修道院的墓地区，游荡着不得安息的亡者和血色十字军的守卫。" },
         ["City of Dalaran"] = { name = "达拉然城", location = "奥特兰克山脉", description = "重建的法师之城达拉然成为了 WoW Forever 中新的五人地下城。从下水道和达拉然下水道进入，然后沿街道一路杀到紫罗兰城堡。" },
         ["Excavation Site: Wetlands"] = { name = "挖掘场：湿地", location = "湿地", description = "惠尔格挖掘场上方一处被困在时间中的泰坦挖掘场，那里的泰坦造物已不再服从任何人。区域：失落沼泽、潜伏者灌木林、守护者之地和失落挖掘场。" },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "沉没之城" },
+        ["Krol'dok Stronghold"] = { name = "克罗多克要塞" },
+        ["Alcaz Prison"] = { name = "奥卡兹监狱" },
+        ["Blackmaw Hold"] = { name = "黑喉要塞" },
+        ["Shaper's Terrace"] = { name = "塑造者之台" },
     },
     quests = {
         [2930001] = { name = "白色打孔卡", objective = "在诺莫瑞根外围区域击杀敌人，直到获得一张白色打孔卡。", pickup = "副本外的深洞掠夺者、深洞入侵者、受辐射的入侵者和昏乱的麻风侏儒", turnin = "保留这张卡，用于矩阵式打孔计算机3005-A", description = "随机掉落；通常第一次清理外围区域时就能拿到。" },
@@ -508,9 +550,15 @@ DATA.zhTW = {
     dungeons = {
         ["Gnomeregan"] = { name = "諾姆瑞根", location = "丹莫洛", description = "被輻射汙染的侏儒地城市，被穴居人和麥克尼爾·瑟瑪普拉格的部隊佔領。" },
         ["Razorfen Kraul"] = { name = "剃刀沼澤", location = "貧瘠之地", description = "剃刀沼澤的野豬人盤踞的一座巨大荊棘迷宮。" },
-        ["Scarlet Monastery: Graveyard"] = { name = "血色修道院：墓地", location = "提里斯法林地", description = "血色修道院的墓地區，遊蕩著不得安息的亡者和血色十字軍的守衛。" },
+        ["Scarlet Monastery: Graveyard"] = { name = "血色修道院 - 墓園", location = "提里斯法林地", description = "血色修道院的墓地區，遊蕩著不得安息的亡者和血色十字軍的守衛。" },
         ["City of Dalaran"] = { name = "達拉然城", location = "奧特蘭克山脈", description = "重建的法師之城達拉然成為了 WoW Forever 中新的五人地城。從下水道和達拉然下水道進入，然後沿街道一路殺到紫羅蘭城堡。" },
-        ["Excavation Site: Wetlands"] = { name = "挖掘場：濕地", location = "濕地", description = "惠爾格挖掘場上方一處被困在時間中的泰坦挖掘場，那裡的泰坦造物已不再服從任何人。區域：失落沼澤、潛伏者灌木林、守護者之地和失落挖掘場。" },
+        ["Excavation Site: Wetlands"] = { name = "挖掘場", location = "濕地", description = "惠爾格挖掘場上方一處被困在時間中的泰坦挖掘場，那裡的泰坦造物已不再服從任何人。區域：失落沼澤、潛伏者灌木林、守護者之地和失落挖掘場。" },
+        -- 2.0.4: the Forever dungeons added later (Wowhead Forever localized zone names)
+        ["The Drowned City"] = { name = "沉沒之城" },
+        ["Krol'dok Stronghold"] = { name = "克羅多克要塞" },
+        ["Alcaz Prison"] = { name = "奧卡茲監獄" },
+        ["Blackmaw Hold"] = { name = "黑喉要塞" },
+        ["Shaper's Terrace"] = { name = "塑造者殿堂" },
     },
     quests = {
         [2930001] = { name = "白色打孔卡", objective = "在諾姆瑞根外圍區域擊殺敵人，直到獲得一張白色打孔卡。", pickup = "副本外的深洞掠奪者、深洞入侵者、受輻射的入侵者和昏亂的麻風侏儒", turnin = "保留這張卡，用於矩陣式打孔計算機3005-A", description = "隨機掉落；通常第一次清理外圍區域時就能拿到。" },
@@ -625,7 +673,7 @@ EXC.frFR = {
     ["Heartwoven"] = "Cœur tressé",
     ["Lost Relic Carry"] = "Transport de relique perdue",
     ["Lost in the Thicket Things"] = "Perdu dans les fourrés",
-    ["Bring the Dragonmaw Dispatch to the Deathstalker Agent just outside Excavation Site: Wetlands."] = "Apportez la Dragonmaw Dispatch au Deathstalker Agent, juste à l'extérieur du site de fouilles : Les Paluns.",
+    ["Bring the Dragonmaw Dispatch to the Deathstalker Agent just outside Excavation Site: Wetlands."] = "Apportez la Dragonmaw Dispatch au Deathstalker Agent, juste à l'extérieur des Excavations : les Paluns.",
     ["The Deathstalker Agent waits at the new dig camp right outside the portal. He takes the Dragonmaw Dispatch off your hands; where the Dispatch drops has not been confirmed yet."] = "Le Deathstalker Agent attend au nouveau camp de fouilles, juste devant le portail. Il récupère la Dragonmaw Dispatch ; l'endroit où l'obtenir n'est pas encore confirmé.",
     ["Enter the Excavation Sites in the Wetlands and bring back 4 Thicket Raptor Meat."] = "Entrez dans les sites de fouilles des Paluns et rapportez 4 Thicket Raptor Meat.",
     ["Thicket Raptor Meat comes from the Thicket raptors (Thicket Lurker, Thicket Hunter, Thicket Matriarch) in Stalker's Thicket, the area of Shadetooth."] = "Thicket Raptor Meat provient des raptors du fourré (Thicket Lurker, Thicket Hunter, Thicket Matriarch) dans le Fourré des traqueurs, la zone de Shadetooth.",
@@ -645,9 +693,9 @@ EXC.frFR = {
     ["Menethil Harbor"] = "Havre-de-Menethil",
     ["Redridge Mountains"] = "Les Carmines",
     ["Wetlands"] = "Les Paluns",
-    ["inside Excavation Site: Wetlands"] = "dans le site de fouilles : Les Paluns",
-    ["just outside Excavation Site: Wetlands"] = "juste à l'extérieur du site de fouilles : Les Paluns",
-    ["outside Excavation Site: Wetlands"] = "à l'extérieur du site de fouilles : Les Paluns",
+    ["inside Excavation Site: Wetlands"] = "dans les Excavations : les Paluns",
+    ["just outside Excavation Site: Wetlands"] = "juste à l'extérieur des Excavations : les Paluns",
+    ["outside Excavation Site: Wetlands"] = "à l'extérieur des Excavations : les Paluns",
 }
 EXC.esES = {
     ["Open the Maw"] = "Abrir las Fauces",
@@ -795,7 +843,7 @@ EXC.koKR = {
     ["Heartwoven"] = "마음으로 엮다",
     ["Lost Relic Carry"] = "분실된 유물 운반",
     ["Lost in the Thicket Things"] = "덤불 속에서 길을 잃다",
-    ["Bring the Dragonmaw Dispatch to the Deathstalker Agent just outside Excavation Site: Wetlands."] = "발굴지: 저습지 바로 바깥에 있는 Deathstalker Agent에게 Dragonmaw Dispatch를 가져가세요.",
+    ["Bring the Dragonmaw Dispatch to the Deathstalker Agent just outside Excavation Site: Wetlands."] = "발굴 현장: 저습지 바로 바깥에 있는 Deathstalker Agent에게 Dragonmaw Dispatch를 가져가세요.",
     ["The Deathstalker Agent waits at the new dig camp right outside the portal. He takes the Dragonmaw Dispatch off your hands; where the Dispatch drops has not been confirmed yet."] = "Deathstalker Agent는 포털 바로 바깥의 새 발굴 야영지에 있습니다. Dragonmaw Dispatch를 받아 가며, 입수처는 아직 확인되지 않았습니다.",
     ["Enter the Excavation Sites in the Wetlands and bring back 4 Thicket Raptor Meat."] = "저습지의 발굴지에 들어가 Thicket Raptor Meat 4개를 가져오세요.",
     ["Thicket Raptor Meat comes from the Thicket raptors (Thicket Lurker, Thicket Hunter, Thicket Matriarch) in Stalker's Thicket, the area of Shadetooth."] = "Thicket Raptor Meat는 추적자의 덤불에 있는 덤불 랩터(Thicket Lurker, Thicket Hunter, Thicket Matriarch)에게서 얻습니다. Shadetooth가 있는 구역입니다.",
@@ -815,9 +863,9 @@ EXC.koKR = {
     ["Menethil Harbor"] = "메네실 항구",
     ["Redridge Mountains"] = "붉은마루 산맥",
     ["Wetlands"] = "저습지",
-    ["inside Excavation Site: Wetlands"] = "발굴지: 저습지 내부",
-    ["just outside Excavation Site: Wetlands"] = "발굴지: 저습지 바로 바깥",
-    ["outside Excavation Site: Wetlands"] = "발굴지: 저습지 바깥",
+    ["inside Excavation Site: Wetlands"] = "발굴 현장: 저습지 내부",
+    ["just outside Excavation Site: Wetlands"] = "발굴 현장: 저습지 바로 바깥",
+    ["outside Excavation Site: Wetlands"] = "발굴 현장: 저습지 바깥",
 }
 EXC.zhCN = {
     ["Open the Maw"] = "打开巨口",
@@ -863,7 +911,7 @@ EXC.zhTW = {
     ["Heartwoven"] = "心編",
     ["Lost Relic Carry"] = "遺失遺物運送",
     ["Lost in the Thicket Things"] = "迷失於灌叢",
-    ["Bring the Dragonmaw Dispatch to the Deathstalker Agent just outside Excavation Site: Wetlands."] = "把Dragonmaw Dispatch交給挖掘場：濕地外面的Deathstalker Agent。",
+    ["Bring the Dragonmaw Dispatch to the Deathstalker Agent just outside Excavation Site: Wetlands."] = "把Dragonmaw Dispatch交給挖掘場外面的Deathstalker Agent。",
     ["The Deathstalker Agent waits at the new dig camp right outside the portal. He takes the Dragonmaw Dispatch off your hands; where the Dispatch drops has not been confirmed yet."] = "Deathstalker Agent在傳送門外的新挖掘營地等候。他會接收Dragonmaw Dispatch；獲取方式尚未確認。",
     ["Enter the Excavation Sites in the Wetlands and bring back 4 Thicket Raptor Meat."] = "進入濕地的挖掘場，帶回4個Thicket Raptor Meat。",
     ["Thicket Raptor Meat comes from the Thicket raptors (Thicket Lurker, Thicket Hunter, Thicket Matriarch) in Stalker's Thicket, the area of Shadetooth."] = "Thicket Raptor Meat來自潛伏者灌木林（Shadetooth所在區域）的灌叢迅猛龍（Thicket Lurker、Thicket Hunter、Thicket Matriarch）。",
@@ -883,9 +931,9 @@ EXC.zhTW = {
     ["Menethil Harbor"] = "米奈希爾港",
     ["Redridge Mountains"] = "赤脊山",
     ["Wetlands"] = "濕地",
-    ["inside Excavation Site: Wetlands"] = "挖掘場：濕地內部",
-    ["just outside Excavation Site: Wetlands"] = "挖掘場：濕地正外方",
-    ["outside Excavation Site: Wetlands"] = "挖掘場：濕地外面",
+    ["inside Excavation Site: Wetlands"] = "挖掘場內部",
+    ["just outside Excavation Site: Wetlands"] = "挖掘場正外方",
+    ["outside Excavation Site: Wetlands"] = "挖掘場外面",
 }
 for lang, strings in pairs(EXC) do
     local target = FDJ.ContentLocales[lang] or {}
@@ -914,9 +962,9 @@ EXC2.deDE = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Meldet Daewyns Schicksal Dorin Songblade in Seenhain.",
     ["A Green Sample"] = "Eine grüne Probe",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "Besorgt eine Fel Infused Blossom aus dem zentralen Garten von Dalaran.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "Die Questdaten sind in der Beta aufgezeichnet; der Zugang zum Dungeon ist möglicherweise nicht verfügbar.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "Diese Quest wird in der Bibliothek erledigt, im Allianz-Portalbereich des Dalaran aus Wrath of the Lich King.",
     ["Power Overwhelming"] = "Überwältigende Macht",
-    ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Tötet Arcanic Enigma, das Manaelementar in der Stadt Dalaran, und kehrt zu High Sorcerer Andromath in Sturmwind zurück.",
+    ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Tötet Arcanic Enigma, das Manaelementar in Dalaran, und kehrt zu High Sorcerer Andromath in Sturmwind zurück.",
     ["Opportunistic Education"] = "Berechnende Bildung",
     ["Recover The Founding of Dalaran and deliver it to Rexxie Copperclutch."] = "Beschafft The Founding of Dalaran und liefert es bei Rexxie Copperclutch ab.",
     ["Source of Power"] = "Quelle der Macht",
@@ -950,7 +998,7 @@ EXC2.frFR = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Annoncez le sort de Daewyn à Dorin Songblade à Lakeshire.",
     ["A Green Sample"] = "Un échantillon vert",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "Récupérez une Fel Infused Blossom dans le jardin central de Dalaran.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "Les données de la quête sont enregistrées dans la bêta ; l'accès au donjon peut être indisponible.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "Cette quête se fait à la bibliothèque, dans la zone des portails de l'Alliance de la Dalaran de Wrath of the Lich King.",
     ["Power Overwhelming"] = "Pouvoir écrasant",
     ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Tuez Arcanic Enigma, l'élémentaire de mana de la Cité de Dalaran, et retournez voir High Sorcerer Andromath à Hurlevent.",
     ["Opportunistic Education"] = "Éducation opportuniste",
@@ -986,7 +1034,7 @@ EXC2.esES = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Informa a Dorin Songblade en Villa del Lago del destino de Daewyn.",
     ["A Green Sample"] = "Una muestra verde",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "Recupera una Fel Infused Blossom del jardín central de Dalaran.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "Los datos de la misión están registrados en la beta; es posible que no se pueda acceder a la mazmorra.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "Esta misión se hace en la biblioteca, en la zona de portales de la Alianza de la Dalaran de Wrath of the Lich King.",
     ["Power Overwhelming"] = "Poder abrumador",
     ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Mata a Arcanic Enigma, el elemental de maná de la Ciudad de Dalaran, y vuelve con High Sorcerer Andromath en Ventormenta.",
     ["Opportunistic Education"] = "Educación oportunista",
@@ -1022,7 +1070,7 @@ EXC2.itIT = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Riferisci la sorte di Daewyn a Dorin Songblade a Lakeshire.",
     ["A Green Sample"] = "Un campione verde",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "Recupera una Fel Infused Blossom dal giardino centrale di Dalaran.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "I dati della missione sono registrati nella beta; l'accesso alla spedizione potrebbe non essere disponibile.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "Questa missione si fa nella biblioteca, nell'area dei portali dell'Alleanza della Dalaran di Wrath of the Lich King.",
     ["Power Overwhelming"] = "Potere travolgente",
     ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Uccidi Arcanic Enigma, l'elementale di mana nella Città di Dalaran, e torna da High Sorcerer Andromath a Roccavento.",
     ["Opportunistic Education"] = "Istruzione opportunistica",
@@ -1058,9 +1106,9 @@ EXC2.ptBR = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Informe a Dorin Songblade em Lakeshire o destino de Daewyn.",
     ["A Green Sample"] = "Uma Amostra Verde",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "Recupere uma Fel Infused Blossom do jardim central de Dalaran.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "Os dados da missão estão registrados no beta; o acesso à masmorra pode estar indisponível.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "Esta missão é feita na biblioteca, na área de portais da Aliança da Dalaran de Wrath of the Lich King.",
     ["Power Overwhelming"] = "Poder Esmagador",
-    ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Mate Arcanic Enigma, o elemental de mana na Cidade de Dalaran, e volte a High Sorcerer Andromath em Ventobravo.",
+    ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Mate Arcanic Enigma, o elemental de mana em Dalaran, e volte a High Sorcerer Andromath em Ventobravo.",
     ["Opportunistic Education"] = "Educação Oportunista",
     ["Recover The Founding of Dalaran and deliver it to Rexxie Copperclutch."] = "Recupere The Founding of Dalaran e entregue a Rexxie Copperclutch.",
     ["Source of Power"] = "Fonte de Poder",
@@ -1094,7 +1142,7 @@ EXC2.ruRU = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Сообщите Dorin Songblade в Lakeshire о судьбе Daewyn.",
     ["A Green Sample"] = "Зелёный образец",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "Добудьте Fel Infused Blossom в центральном саду Даларана.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "Данные задания записаны в бете; доступ в подземелье может быть недоступен.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "Это задание выполняется в библиотеке, в зоне порталов Альянса в Даларане из Wrath of the Lich King.",
     ["Power Overwhelming"] = "Всесокрушающая сила",
     ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "Убейте Arcanic Enigma, элементаля маны в городе Даларан, и вернитесь к High Sorcerer Andromath в Штормград.",
     ["Opportunistic Education"] = "Выгодное образование",
@@ -1130,9 +1178,9 @@ EXC2.koKR = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "Daewyn의 운명을 호숫가 마을의 Dorin Songblade에게 알리세요.",
     ["A Green Sample"] = "녹색 표본",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "달라란 중앙 정원에서 Fel Infused Blossom을 구해 오세요.",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "퀘스트 정보는 베타에 기록되어 있으며, 던전에 입장하지 못할 수 있습니다.",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "이 퀘스트는 리치 왕의 분노 달라란의 얼라이언스 차원문 구역에 있는 도서관에서 진행합니다.",
     ["Power Overwhelming"] = "압도적인 힘",
-    ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "달라란 도시의 마나 정령 Arcanic Enigma를 처치하고 스톰윈드의 High Sorcerer Andromath에게 돌아가세요.",
+    ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "달라란의 마나 정령 Arcanic Enigma를 처치하고 스톰윈드의 High Sorcerer Andromath에게 돌아가세요.",
     ["Opportunistic Education"] = "기회주의적 교육",
     ["Recover The Founding of Dalaran and deliver it to Rexxie Copperclutch."] = "The Founding of Dalaran을 회수해 Rexxie Copperclutch에게 전달하세요.",
     ["Source of Power"] = "힘의 근원",
@@ -1166,7 +1214,7 @@ EXC2.zhCN = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "把Daewyn的下落告诉湖畔镇的Dorin Songblade。",
     ["A Green Sample"] = "绿色样本",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "从达拉然的中央花园取得一朵Fel Infused Blossom。",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "任务数据已记录在测试服中；副本可能暂时无法进入。",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "此任务在图书馆完成，位于巫妖王之怒达拉然的联盟传送门区域。",
     ["Power Overwhelming"] = "势不可挡的力量",
     ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "击杀达拉然城中的法力元素Arcanic Enigma，然后回到暴风城的High Sorcerer Andromath那里。",
     ["Opportunistic Education"] = "投机教育",
@@ -1202,7 +1250,7 @@ EXC2.zhTW = {
     ["Report Daewyn's fate to Dorin Songblade in Lakeshire."] = "把Daewyn的下落告訴湖畔鎮的Dorin Songblade。",
     ["A Green Sample"] = "綠色樣本",
     ["Retrieve a Fel Infused Blossom from Dalaran's central garden."] = "從達拉然的中央花園取得一朵Fel Infused Blossom。",
-    ["Quest data is recorded in the beta; dungeon access may be unavailable."] = "任務資料已記錄在測試服中；副本可能暫時無法進入。",
+    ["This quest is done at the library, in the Alliance portal area of Wrath of the Lich King's Dalaran."] = "此任務在圖書館完成，位於巫妖王之怒達拉然的聯盟傳送門區域。",
     ["Power Overwhelming"] = "勢不可擋的力量",
     ["Slay Arcanic Enigma, the Mana Elemental in the City of Dalaran, and return to High Sorcerer Andromath in Stormwind City."] = "擊殺達拉然城中的法力元素Arcanic Enigma，然後回到暴風城的High Sorcerer Andromath那裡。",
     ["Opportunistic Education"] = "投機教育",
@@ -1236,6 +1284,7 @@ end
 -- required and provided items). Whole-string translations.
 local ITEM_SOURCES = {}
 ITEM_SOURCES.deDE = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "Erbeutet von Satyrn und Wichteln in der Schwarzschlundfeste", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "Fallen gelassen von: Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "Fallen gelassen von: Dark Iron Spies in Dun Morogh",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Fallen gelassen von: Goblin Woodcarver, Die Todesminen",
@@ -1260,6 +1309,7 @@ ITEM_SOURCES.deDE = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "Belohnung der Quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Dunkelküste. Den verlangten Corrupted Kor Gem lassen Blackfathom Tide Priestesses und Oracles am Eingang der Tiefschwarzen Grotten sowie Blackfathom Sea Witches im Inneren fallen.",
 }
 ITEM_SOURCES.frFR = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "Ramassé sur les satyres et les diablotins du Repaire des Noiregueules", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "Butin de : Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "Butin de : Dark Iron Spies à Dun Morogh",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Butin de : Goblin Woodcarver, Les Mortemines",
@@ -1284,9 +1334,10 @@ ITEM_SOURCES.frFR = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "Récompense de la quête Seeking the Kor Gem : Thundris Windweaver, Auberdine, Sombrivage. La Corrupted Kor Gem demandée tombe sur les Blackfathom Tide Priestesses et Oracles à l'entrée des Profondeurs de Brassenoire et sur les Blackfathom Sea Witches à l'intérieur.",
 }
 ITEM_SOURCES.esES = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "Se despoja de sátiros y diablillos en el Bastión Faucenegra", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "Lo suelta: Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "Lo suelta: Dark Iron Spies en Dun Morogh",
-    ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Lo suelta: Goblin Woodcarver, Minas de la Muerte",
+    ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Lo suelta: Goblin Woodcarver, Las Minas de la Muerte",
     ["Dropped by: Mutanus the Devourer"] = "Lo suelta: Mutanus el Devorador",
     ["Dropped by: Relic Guardian"] = "Lo suelta: Relic Guardian",
     ["Dropped by: The Baron"] = "Lo suelta: The Baron",
@@ -1308,6 +1359,7 @@ ITEM_SOURCES.esES = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "Recompensa de la misión Seeking the Kor Gem: Thundris Windweaver, Auberdine, Costa Oscura. La Corrupted Kor Gem que pide la sueltan las Blackfathom Tide Priestesses y Oracles en la entrada de las Cavernas de Brazanegra y las Blackfathom Sea Witches en el interior.",
 }
 ITEM_SOURCES.itIT = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "Saccheggiato da satiri e folletti a Blackmaw Hold", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "Bottino di: Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "Bottino di: Dark Iron Spies a Dun Morogh",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Bottino di: Goblin Woodcarver, Miniere della Morte",
@@ -1332,6 +1384,7 @@ ITEM_SOURCES.itIT = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "Ricompensa della missione Seeking the Kor Gem: Thundris Windweaver, Auberdine, Rivafosca. La Corrupted Kor Gem richiesta è bottino di Blackfathom Tide Priestess e Oracle all'ingresso degli Abissi di Fondocupo e di Blackfathom Sea Witch all'interno.",
 }
 ITEM_SOURCES.ptBR = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "Saqueado de sátiros e diabretes na Gruta Bocanera", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "Saqueado de: Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "Saqueado de: Dark Iron Spies em Dun Morogh",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Saqueado de: Goblin Woodcarver, Minas Mortas",
@@ -1356,6 +1409,7 @@ ITEM_SOURCES.ptBR = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "Recompensa da missão Seeking the Kor Gem: Thundris Windweaver, Auberdine, Costa Negra. A Corrupted Kor Gem pedida cai de Blackfathom Tide Priestesses e Oracles na entrada das Profundezas Negras e de Blackfathom Sea Witches lá dentro.",
 }
 ITEM_SOURCES.ruRU = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "Добывается с сатиров и бесов в Крепости Черночревов", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "Добывается с: Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "Добывается с: Dark Iron Spies в Дун Мороге",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "Добывается с: Goblin Woodcarver, Мертвые копи",
@@ -1380,6 +1434,7 @@ ITEM_SOURCES.ruRU = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "Награда за задание Seeking the Kor Gem: Thundris Windweaver, Аубердин, Темные берега. Нужный Corrupted Kor Gem падает с Blackfathom Tide Priestess и Oracle у входа в Непроглядную Пучину и с Blackfathom Sea Witch внутри.",
 }
 ITEM_SOURCES.koKR = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "검은아귀 요새의 사티로스와 임프에게서 획득", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "드롭: Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "드롭: 던 모로의 Dark Iron Spies",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "드롭: Goblin Woodcarver, 죽음의 폐광",
@@ -1404,6 +1459,7 @@ ITEM_SOURCES.koKR = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "퀘스트 Seeking the Kor Gem 보상: Thundris Windweaver, 아우버다인, 어둠의 해안. 필요한 Corrupted Kor Gem은 검은심연 나락 입구의 Blackfathom Tide Priestess와 Oracle, 내부의 Blackfathom Sea Witch가 드롭합니다.",
 }
 ITEM_SOURCES.zhCN = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "从黑喉要塞的萨特和小鬼身上拾取", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "掉落自：Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "掉落自：丹莫罗的Dark Iron Spies",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "掉落自：Goblin Woodcarver，死亡矿井",
@@ -1428,6 +1484,7 @@ ITEM_SOURCES.zhCN = {
     ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "任务Seeking the Kor Gem的奖励：Thundris Windweaver，奥伯丁，黑海岸。所需的Corrupted Kor Gem由黑暗深渊入口处的Blackfathom Tide Priestess和Oracle以及副本内的Blackfathom Sea Witch掉落。",
 }
 ITEM_SOURCES.zhTW = {
+    ["Looted from satyrs and imps in Blackmaw Hold"] = "從黑喉要塞的薩特和小鬼身上拾取", -- 2.0.38
     ["Dropped by: Dark Iron Agents"] = "掉落自：Dark Iron Agents",
     ["Dropped by: Dark Iron Spies in Dun Morogh"] = "掉落自：丹莫洛的Dark Iron Spies",
     ["Dropped by: Goblin Woodcarver, The Deadmines"] = "掉落自：Goblin Woodcarver，死亡礦坑",
@@ -1435,7 +1492,7 @@ ITEM_SOURCES.zhTW = {
     ["Dropped by: Relic Guardian"] = "掉落自：Relic Guardian",
     ["Dropped by: The Baron"] = "掉落自：The Baron",
     ["Dropped by: undead enemies inside Ruins of Lordaeron"] = "掉落自：羅德隆廢墟內的不死敵人",
-    ["Drops from Blackfathom Tide Priestess in the entrance tunnels leading to Blackfathom Deeps."] = "由通往黑暗深淵的入口通道中的Blackfathom Tide Priestess掉落。",
+    ["Drops from Blackfathom Tide Priestess in the entrance tunnels leading to Blackfathom Deeps."] = "由通往黑澗深淵的入口通道中的Blackfathom Tide Priestess掉落。",
     ["Drops from Charlga Razorflank in Razorfen Kraul"] = "由剃刀沼澤的卡爾加·刺肋掉落",
     ["Found in a Pitted Iron Chest underwater in the Pool of Ask'ar, in the northern alcove just past Ghamoo-ra's turtle room."] = "在阿斯卡之池水下的Pitted Iron Chest中，位於加摩拉烏龜房間後面的北側凹室。",
     ["Found in the graveyard inside Ruins of Lordaeron"] = "位於羅德隆廢墟內的墓地",
@@ -1449,7 +1506,7 @@ ITEM_SOURCES.zhTW = {
     ["Random drop from mobs outside the Gnomeregan instance"] = "諾姆瑞根副本外的怪物隨機掉落",
     ["Reported random spawn inside Ruins of Lordaeron; check towers, side rooms and the Bjork area"] = "據回報在羅德隆廢墟內隨機出現；請檢查塔樓、側室和比約克區域",
     ["Reward from the quest Bailor's Ore Shipment: Bailor Stonehand, Thelsamar, Loch Modan"] = "任務Bailor's Ore Shipment的獎勵：Bailor Stonehand，塞爾薩瑪，洛克莫丹",
-    ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "任務Seeking the Kor Gem的獎勵：Thundris Windweaver，奧伯丁，黑海岸。所需的Corrupted Kor Gem由黑暗深淵入口處的Blackfathom Tide Priestess和Oracle以及副本內的Blackfathom Sea Witch掉落。",
+    ["Reward from the quest Seeking the Kor Gem: Thundris Windweaver, Auberdine, Darkshore. The Corrupted Kor Gem he asks for drops from Blackfathom Tide Priestesses and Oracles at the Blackfathom Deeps entrance and from Blackfathom Sea Witches inside."] = "任務Seeking the Kor Gem的獎勵：Thundris Windweaver，奧伯丁，黑海岸。所需的Corrupted Kor Gem由黑澗深淵入口處的Blackfathom Tide Priestess和Oracle以及副本內的Blackfathom Sea Witch掉落。",
 }
 for lang, strings in pairs(ITEM_SOURCES) do
     local target = FDJ.ContentLocales[lang] or {}
@@ -1564,28 +1621,42 @@ local UNHOLY = {
     zhCN = { "把大使玛尔金的头颅交给幽暗城的瓦里玛萨斯。", "此任务在剃刀高地外部区域完成。" },
     zhTW = { "把大使瑪爾金的頭顱交給幽暗城的瓦里瑪薩斯。", "此任務在剃刀高地外部區域完成。" },
 }
+-- unholywarn (2.0.8): Razorfen Downs' disclaimer for it, "This quest is done
+-- OUTSIDE Razorfen Downs, do it before entering the dungeon."
+local UNHOLY_WARN = {
+    deDE = "Diese Quest wird AUSSERHALB der Hügel der Klingenhauer erledigt. Erledige sie, bevor du den Dungeon betrittst.",
+    frFR = "Cette quête se fait À L’EXTÉRIEUR de Souilles de Tranchebauge : faites-la avant d’entrer dans le donjon.",
+    esES = "Esta misión se hace FUERA de Zahúrda Rajacieno: hazla antes de entrar en la mazmorra.",
+    itIT = "Questa missione si fa FUORI da Razorfen Downs: falla prima di entrare nella spedizione.",
+    ptBR = "Esta missão é feita FORA de Urzal dos Mortos: faça-a antes de entrar na masmorra.",
+    ruRU = "Это задание выполняется СНАРУЖИ Курганов Иглошкурых: выполните его до входа в подземелье.",
+    koKR = "이 퀘스트는 가시덩굴 구릉 바깥에서 진행합니다. 던전에 들어가기 전에 완료하세요.",
+    zhCN = "此任务在剃刀高地外部完成，请在进入地下城之前完成。",
+    zhTW = "此任務在剃刀高地外部完成，請在進入地城之前完成。",
+}
 for lang, data in pairs(UNHOLY) do
     local content = FDJ.ContentLocales[lang]
     if content then
         content.quests = content.quests or {}
         content.places = content.places or {}
         local part1 = content.quests[6522]
-        content.quests[6521] = { name = part1 and part1.name, objective = data[1] }
+        content.quests[6521] = { name = part1 and part1.name, objective = data[1], warning = UNHOLY_WARN[lang] }
         content.places["This quest is completed in the area OUTSIDE Razorfen Downs."] = data[2]
+        content.places["This quest is done OUTSIDE Razorfen Downs, do it before entering the dungeon."] = UNHOLY_WARN[lang]
     end
 end
 
 -- Scarlet Monastery: Library: name per language; location reused from the Graveyard.
 local LIBRARY_NAMES = {
-    deDE = "Scharlachrotes Kloster: Bibliothek",
-    frFR = "Monastère écarlate : Bibliothèque",
+    deDE = "Scharlachrotes Kloster - Bibliothek",
+    frFR = "Monastère Écarlate - bibliothèque",
     esES = "Monasterio Escarlata: Biblioteca",
     itIT = "Monastero Scarlatto: Biblioteca",
-    ptBR = "Monastério Escarlate: Biblioteca",
-    ruRU = "Монастырь Алого ордена: Библиотека",
-    koKR = "붉은십자군 수도원: 도서관",
-    zhCN = "血色修道院：图书馆",
-    zhTW = "血色修道院：圖書館",
+    ptBR = "Monastério Escarlate - Biblioteca",
+    ruRU = "Монастырь Алого ордена: библиотека",
+    koKR = "붉은십자군 수도원 - 도서관",
+    zhCN = "血色修道院 - 图书馆",
+    zhTW = "血色修道院 - 圖書館",
 }
 for lang, name in pairs(LIBRARY_NAMES) do
     local content = FDJ.ContentLocales[lang]
@@ -2084,6 +2155,12 @@ for lang, data in pairs(HIGHLAND_CHAIN_150) do
             content.quests[id] = target
             for field, value in pairs(data[id]) do target[field] = value end
         end
+        -- 2.0.38: The Greenwarden is no longer a required step (a breadcrumb):
+        -- Tramping Paws is the first, Fire Taboo the second.
+        if data[463] and data[276] and data[463].description and data[276].description then
+            content.quests[277].description = data[276].description
+            content.quests[276].description = data[463].description
+        end
         content.places["Start The Greenwarden here"] = data.map[1]
         content.places["Continue with Tramping Paws here"] = data.map[2]
         content.places["Continue with Fire Taboo here"] = data.map[3]
@@ -2120,6 +2197,50 @@ for lang, data in pairs(HIGHLAND_HIDES_PREREQ_150) do
     end
 end
 
+
+-- In Search of Thaelrid breadcrumb warning (1.7.4): %s is Blackfathom
+-- Villainy's title in the client's language.
+do
+    local TEMPLATE_EN = "Warning: if not completed before accepting %s, this quest becomes unavailable."
+    local TEMPLATES = {
+        deDE = "Achtung: Wird diese Quest nicht vor der Annahme von %s abgeschlossen, ist sie danach nicht mehr verfügbar.",
+        frFR = "Attention : si cette quête n'est pas rendue avant d'accepter %s, elle devient indisponible.",
+        esES = "Atención: si no completas esta misión antes de aceptar %s, dejará de estar disponible.",
+        itIT = "Attenzione: se questa missione non viene completata prima di accettare %s, non sarà più disponibile.",
+        ptBR = "Atenção: se esta missão não for concluída antes de aceitar %s, ela ficará indisponível.",
+        ruRU = "Внимание: если не сдать это задание до того, как взять «%s», оно станет недоступным.",
+        koKR = "경고: %s 퀘스트를 받기 전에 이 퀘스트를 완료하지 않으면 더 이상 완료할 수 없습니다.",
+        zhCN = "警告：如果在接取%s之前没有完成此任务，此任务将无法再完成。",
+        zhTW = "警告：如果在接取%s之前沒有完成此任務，此任務將無法再完成。",
+    }
+    for lang, template in pairs(TEMPLATES) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            content.places[TEMPLATE_EN] = template
+        end
+    end
+    -- Blackfathom Villainy's side: %s is In Search of Thaelrid's title.
+    local BV_EN = "Warning: Accept after completing %s, or you will lose that quest."
+    local BV = {
+        deDE = "Achtung: Erst annehmen, nachdem %s abgeschlossen ist, sonst verlierst du diese Quest.",
+        frFR = "Attention : acceptez-la après avoir rendu %s, sinon vous perdrez cette quête.",
+        esES = "Atención: acéptala después de completar %s o perderás esa misión.",
+        itIT = "Attenzione: accettala dopo aver completato %s, altrimenti perderai quella missione.",
+        ptBR = "Atenção: aceite depois de concluir %s, ou você perderá essa missão.",
+        ruRU = "Внимание: берите это задание только после сдачи «%s», иначе то задание будет потеряно.",
+        koKR = "경고: %s 퀘스트를 완료한 뒤에 받으세요. 그렇지 않으면 그 퀘스트를 잃게 됩니다.",
+        zhCN = "警告：请在完成%s之后再接取，否则会失去那个任务。",
+        zhTW = "警告：請在完成%s之後再接取，否則會失去那個任務。",
+    }
+    for lang, template in pairs(BV) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            content.places[BV_EN] = template
+        end
+    end
+end
 
 -- Rig Wars pickup-order warning (1.5.2).
 local RIG_WARS_WARNING_EN = "Accept Rig Wars before Chief Engineer Scooty. If Rig Wars disappears, abandon Chief Engineer Scooty and it will reappear."
@@ -2230,9 +2351,9 @@ local BARON_AQUANIS_6922 = {
         name = "阿奎尼斯男爵",
         objective = "把奇怪的水球交給梣谷佐拉姆加前哨站的耶努薩克雷。",
         warning = "拾取'廢墟之間'任務的深淵之核後，阿奎尼斯男爵會出現。",
-        pickup = "奇怪的水球，由黑暗深淵中的阿奎尼斯男爵掉落",
+        pickup = "奇怪的水球，由黑澗深淵中的阿奎尼斯男爵掉落",
         turnin = "耶努薩克雷，佐拉姆加前哨站，梣谷",
-        source = "由黑暗深淵中的阿奎尼斯男爵掉落。",
+        source = "由黑澗深淵中的阿奎尼斯男爵掉落。",
     },
 }
 
@@ -2409,20 +2530,20 @@ FDJ.ContentLocales.zhTW.quests[96984] = { name = "擾亂之心", objective = "�
 -- the dungeon names.
 local NEW_WINGS = {
   deDE = {
-    dungeons = { "Scharlachrotes Kloster: Waffenkammer", "Scharlachrotes Kloster: Kathedrale", "Hügel von Razorfen" },
+    dungeons = { "Scharlachrotes Kloster - Waffenkammer", "Scharlachrotes Kloster - Kathedrale", "Hügel der Klingenhauer" },
     npc = { ["Herod"] = "Herod", ["High Inquisitor Fairbanks"] = "Hochinquisitor Fairbanks", ["Scarlet Commander Mograine"] = "Scharlachroter Kommandant Mograine", ["High Inquisitor Whitemane"] = "Hochinquisitor Whitemane", ["Tuten'kash"] = "Tuten'kash", ["Mordresh Fire Eye"] = "Mordresh Feuerauge", ["Glutton"] = "Nimmersatt", ["Ragglesnout"] = "Struppmähne", ["Plaguemaw the Rotting"] = "Plaguemaw der Faulende", ["Amnennar the Coldbringer"] = "Amnennar der Kältebringer", ["Varimathras"] = "Varimathras", ["Raleigh the Devout"] = "Raleigh der Andächtige", ["Andrew Brownell"] = "Andrew Brownell", ["Belnistrasz"] = "Belnistrasz", ["Archbishop Benedictus"] = "Erzbischof Benedictus", ["Myriam Moonsinger"] = "Myriam Moonsinger" },
     quests = {
       [1048] = { name = "In das Scharlachrote Kloster", objective = "Tötet Hochinquisitor Whitemane, den Scharlachroten Kommandant Mograine, Herod, den Scharlachroten Helden sowie den Hundemeister Loksey und meldet Euch dann wieder bei Varimathras in Undercity.", pickup = "Varimathras, Unterstadt", turnin = "Varimathras, Unterstadt" },
       [1053] = { name = "Im Namen des Lichts", objective = "Tötet Hochinquisitor Whitemane, den Scharlachroten Kommandant Mograine, Herod, den Scharlachroten Helden sowie den Hundemeister Loksey und meldet Euch dann wieder bei Raleigh dem Andächtigen in Southshore.", pickup = "Raleigh der Andächtige, Süderstade", turnin = "Raleigh der Andächtige, Süderstade" },
       [3341] = { name = "Das Ende bringen", objective = "Andrew Brownell will, dass Ihr Amnennar den Kältebringer tötet und ihm dessen Schädel bringt.", pickup = "Andrew Brownell, Unterstadt", turnin = "Andrew Brownell, Unterstadt" },
       [3636] = { name = "Das Licht bringen", objective = "Erzbischof Benedictus will, dass Ihr Amnennar den Kältebringer in den Hügeln von Razorfen tötet.", pickup = "Erzbischof Benedictus, Sturmwind", turnin = "Erzbischof Benedictus, Sturmwind" },
-      [3523] = { name = "Geißel der Niederungen", objective = "Wenn Ihr Belnistrasz helfen wollt, sprecht noch einmal mit ihm und übergebt ihm den Schwurstein, den er Euch gab.", pickup = "Belnistrasz, Hügel von Razorfen", turnin = "Belnistrasz, Hügel von Razorfen" },
-      [3525] = { name = "Ausschalten des Götzen", objective = "Begleitet Belnistrasz zum Götzen der Stacheleber in den Hügeln von Razorfen. Beschützt Belnistrasz, während er das Ritual durchführt, um den Götzen auszuschalten.", pickup = "Belnistrasz, Hügel von Razorfen" },
-      [6626] = { name = "Ein Hort des Bösen", objective = "Tötet 8 Schlachtwachen von Razorfen, 8 Dornenwirker von Razorfen und 8 Kultistinnen der Totenköpfe und kehrt dann zu Myriam Moonsinger nahe dem Eingang zu den Hügeln von Razorfen zurück.", pickup = "Myriam Moonsinger, Eingang der Hügel von Razorfen", turnin = "Myriam Moonsinger, Eingang der Hügel von Razorfen" },
+      [3523] = { name = "Geißel der Niederungen", objective = "Wenn Ihr Belnistrasz helfen wollt, sprecht noch einmal mit ihm und übergebt ihm den Schwurstein, den er Euch gab.", pickup = "Belnistrasz, Hügel der Klingenhauer", turnin = "Belnistrasz, Hügel der Klingenhauer" },
+      [3525] = { name = "Ausschalten des Götzen", objective = "Begleitet Belnistrasz zum Götzen der Stacheleber in den Hügeln von Razorfen. Beschützt Belnistrasz, während er das Ritual durchführt, um den Götzen auszuschalten.", pickup = "Belnistrasz, Hügel der Klingenhauer" },
+      [6626] = { name = "Ein Hort des Bösen", objective = "Tötet 8 Schlachtwachen von Razorfen, 8 Dornenwirker von Razorfen und 8 Kultistinnen der Totenköpfe und kehrt dann zu Myriam Moonsinger nahe dem Eingang zu den Hügeln von Razorfen zurück.", pickup = "Myriam Moonsinger, Eingang der Hügel der Klingenhauer", turnin = "Myriam Moonsinger, Eingang der Hügel der Klingenhauer" },
     },
   },
   frFR = {
-    dungeons = { "Monastère écarlate : Armurerie", "Monastère écarlate : Cathédrale", "Souilles de Tranchebauge" },
+    dungeons = { "Monastère Écarlate - armurerie", "Monastère Écarlate - cathédrale", "Souilles de Tranchebauge" },
     npc = { ["Herod"] = "Herod", ["High Inquisitor Fairbanks"] = "Grand Inquisiteur Fairbanks", ["Scarlet Commander Mograine"] = "Commandant écarlate Mograine", ["High Inquisitor Whitemane"] = "Grand Inquisiteur Whitemane", ["Tuten'kash"] = "Tuten'kash", ["Mordresh Fire Eye"] = "Mordresh Oeil-de-feu", ["Glutton"] = "Glouton", ["Ragglesnout"] = "Groinfendu", ["Plaguemaw the Rotting"] = "Pestegueule le Pourrissant", ["Amnennar the Coldbringer"] = "Amnennar le Porte-froid", ["Varimathras"] = "Varimathras", ["Raleigh the Devout"] = "Raleigh le Dévot", ["Andrew Brownell"] = "Andrew Brownell", ["Belnistrasz"] = "Belnistrasz", ["Archbishop Benedictus"] = "Archevêque Benedictus", ["Myriam Moonsinger"] = "Myriam Moonsinger" },
     quests = {
       [1048] = { name = "Au monastère écarlate", objective = "Tuer le grand inquisiteur Whitemane, le commandant Mograine de la Croisade, le champion Herod et le maître-chien Loksey, et retourner faire son rapport à Varimathras à Undercity.", pickup = "Varimathras, Fossoyeuse", turnin = "Varimathras, Fossoyeuse" },
@@ -2451,7 +2572,7 @@ local NEW_WINGS = {
     dungeons = { "Monastero Scarlatto: Armeria", "Monastero Scarlatto: Cattedrale", "Razorfen Downs" },
   },
   ptBR = {
-    dungeons = { "Monastério Escarlate: Arsenal", "Monastério Escarlate: Catedral", "Urzal dos Mortos" },
+    dungeons = { "Monastério Escarlate - Armaria", "Monastério Escarlate - Catedral", "Urzal dos Mortos" },
     npc = { ["Herod"] = "Herodes", ["High Inquisitor Fairbanks"] = "Alto-inquisidor Fairbanks", ["Scarlet Commander Mograine"] = "Comandante Escarlate Mograine", ["High Inquisitor Whitemane"] = "Alta-inquisidora Cristalba", ["Tuten'kash"] = "Tutan'kash", ["Mordresh Fire Eye"] = "Mordresh Olho-de-Fogo", ["Glutton"] = "Glutão", ["Ragglesnout"] = "Trombarrão", ["Plaguemaw the Rotting"] = "Pragorja, o Podre", ["Amnennar the Coldbringer"] = "Amnennar, o Frigífero", ["Varimathras"] = "Varimatras", ["Raleigh the Devout"] = "Raul, o Devotado", ["Andrew Brownell"] = "André Rosado", ["Belnistrasz"] = "Belnistrasz", ["Archbishop Benedictus"] = "Arcebispo Benedictus", ["Myriam Moonsinger"] = "Mírian Lunacanto" },
     quests = {
       [1048] = { name = "Adentrando o Monastério Escarlate", objective = "Mate a Alta-inquisidora Cristalba, o Comandante Escarlate Mograine, Herodes, o Campeão Escarlate e o Mestre de Matilha Lobato, depois volte a falar com Varimatras na Cidade Baixa.", pickup = "Varimatras, Cidade Baixa", turnin = "Varimatras, Cidade Baixa" },
@@ -2464,7 +2585,7 @@ local NEW_WINGS = {
     },
   },
   ruRU = {
-    dungeons = { "Монастырь Алого ордена: Оружейная", "Монастырь Алого ордена: Собор", "Курганы Иглошкурых" },
+    dungeons = { "Монастырь Алого ордена: оружейная", "Монастырь Алого ордена: собор", "Курганы Иглошкурых" },
     npc = { ["Herod"] = "Герод", ["High Inquisitor Fairbanks"] = "Верховный инквизитор Фэйрбанкс", ["Scarlet Commander Mograine"] = "Командир Могрейн из Алого ордена", ["High Inquisitor Whitemane"] = "Верховный инквизитор Вайтмейн", ["Tuten'kash"] = "Тутен'каш", ["Mordresh Fire Eye"] = "Мордреш Огненный Глаз", ["Glutton"] = "Обжора", ["Ragglesnout"] = "Круглорыл", ["Plaguemaw the Rotting"] = "Чумобрюх Гнилой", ["Amnennar the Coldbringer"] = "Амненнар Хладовей", ["Varimathras"] = "Вариматрас", ["Raleigh the Devout"] = "Ролей Благочестивый", ["Andrew Brownell"] = "Эндрю Браунелл", ["Belnistrasz"] = "Белнистраз", ["Archbishop Benedictus"] = "Архиепископ Бенедикт", ["Myriam Moonsinger"] = "Мириам Лунная Певица" },
     quests = {
       [1048] = { name = "В монастырь Алого ордена", objective = "Убейте Верховного инквизитора Вайтмейн, командира Могрейна из Алого ордена, воителя Герода из Алого ордена и псаря Локси. Затем возвращайтесь к Вариматрасу в Подгород.", pickup = "Вариматрас, Подгород", turnin = "Вариматрас, Подгород" },
@@ -2477,7 +2598,7 @@ local NEW_WINGS = {
     },
   },
   koKR = {
-    dungeons = { "붉은십자군 수도원: 무기고", "붉은십자군 수도원: 대성당", "가시덩굴 구릉" },
+    dungeons = { "붉은십자군 수도원 - 무기고", "붉은십자군 수도원 - 대성당", "가시덩굴 구릉" },
     npc = { ["Herod"] = "헤로드", ["High Inquisitor Fairbanks"] = "종교재판관 페어뱅크스", ["Scarlet Commander Mograine"] = "붉은십자군 사령관 모그레인", ["High Inquisitor Whitemane"] = "종교재판관 화이트메인", ["Tuten'kash"] = "투텐카쉬", ["Mordresh Fire Eye"] = "불꽃눈 모드레쉬", ["Glutton"] = "게걸먹보", ["Ragglesnout"] = "너덜주둥이", ["Plaguemaw the Rotting"] = "썩어가는 역병아귀", ["Amnennar the Coldbringer"] = "혹한의 암네나르", ["Varimathras"] = "바리마트라스", ["Raleigh the Devout"] = "경건한 신자 랄레이", ["Andrew Brownell"] = "앤드류 브로넬", ["Belnistrasz"] = "벨리스트라즈", ["Archbishop Benedictus"] = "대주교 베네딕투스", ["Myriam Moonsinger"] = "미리암 문싱어" },
     quests = {
       [1048] = { name = "붉은십자군 수도원으로", objective = "종교재판관 화이트메인, 붉은십자군 사령관 모그레인, 붉은십자군 용사 헤로드와 사냥개조련사 록시를 처치한 후 언더시티에 있는 바리마트라스에게 돌아가 보고해야 합니다.", pickup = "바리마트라스, 언더시티", turnin = "바리마트라스, 언더시티" },
@@ -2490,7 +2611,7 @@ local NEW_WINGS = {
     },
   },
   zhCN = {
-    dungeons = { "血色修道院：军械库", "血色修道院：大教堂", "剃刀高地" },
+    dungeons = { "血色修道院 - 军械库", "血色修道院 - 教堂", "剃刀高地" },
     npc = { ["Herod"] = "赫洛德", ["High Inquisitor Fairbanks"] = "大检察官法尔班克斯", ["Scarlet Commander Mograine"] = "血色十字军指挥官莫格莱尼", ["High Inquisitor Whitemane"] = "大检察官怀特迈恩", ["Tuten'kash"] = "图特卡什", ["Mordresh Fire Eye"] = "火眼莫德雷斯", ["Glutton"] = "暴食者", ["Ragglesnout"] = "拉戈斯诺特", ["Plaguemaw the Rotting"] = "腐烂的普雷莫尔", ["Amnennar the Coldbringer"] = "寒冰之王亚门纳尔", ["Varimathras"] = "瓦里玛萨斯", ["Raleigh the Devout"] = "虔诚的莱雷恩", ["Andrew Brownell"] = "安德鲁·布隆奈尔", ["Belnistrasz"] = "奔尼斯特拉兹", ["Archbishop Benedictus"] = "大主教本尼迪塔斯", ["Myriam Moonsinger"] = "麦雷姆·月歌" },
     quests = {
       [1048] = { name = "深入血色修道院", objective = "杀掉大检察官怀特迈恩、血色十字军指挥官莫格莱尼、血色十字军勇士赫洛德和驯犬者洛克希，然后向幽暗城的瓦里玛萨斯回报。", pickup = "瓦里玛萨斯，幽暗城", turnin = "瓦里玛萨斯，幽暗城" },
@@ -2503,7 +2624,7 @@ local NEW_WINGS = {
     },
   },
   zhTW = {
-    dungeons = { "血色修道院：軍械庫", "血色修道院：大教堂", "剃刀高地" },
+    dungeons = { "血色修道院 - 軍械庫", "血色修道院 - 教堂", "剃刀高地" },
     npc = { ["Herod"] = "赫洛德", ["High Inquisitor Fairbanks"] = "大檢察官法爾班克斯", ["Scarlet Commander Mograine"] = "血色十字軍指揮官莫格萊尼", ["High Inquisitor Whitemane"] = "大檢察官懷特邁恩", ["Tuten'kash"] = "圖特卡什", ["Mordresh Fire Eye"] = "火眼莫德雷斯", ["Glutton"] = "暴食者", ["Ragglesnout"] = "拉戈斯諾特", ["Plaguemaw the Rotting"] = "腐爛的普雷莫爾", ["Amnennar the Coldbringer"] = "寒冰之王亞門納爾", ["Varimathras"] = "瓦里瑪薩斯", ["Raleigh the Devout"] = "虔誠的萊雷恩", ["Andrew Brownell"] = "安德魯·布隆奈爾", ["Belnistrasz"] = "奔尼斯特拉茲", ["Archbishop Benedictus"] = "大主教本尼迪塔斯", ["Myriam Moonsinger"] = "麥雷姆·月歌" },
     quests = {
       [1048] = { name = "深入血色修道院", objective = "殺掉大檢察官懷特邁恩、血色十字軍指揮官莫格萊尼、血色十字軍勇士赫洛德和馴犬者洛克希，然後向幽暗城的瓦里瑪薩斯回報。", pickup = "瓦里瑪薩斯，幽暗城", turnin = "瓦里瑪薩斯，幽暗城" },
@@ -2586,7 +2707,7 @@ local ULD_ZF = {
     },
   },
   frFR = {
-    dungeons = { "Uldaman", "Zul'Farrak", "Terres ingrates", "Tanaris" },
+    dungeons = { "Uldaman", "Zul’Farrak", "Terres ingrates", "Tanaris" },
     bosses = { ["Archaedas"] = "Archaedas", ["Grimlok"] = "Grimlok", ["Revelosh"] = "Revelosh", ["Ancient Stone Keeper"] = "Ancien Gardien des pierres", ["Ironaya"] = "Ironaya", ["Chief Ukorz Sandscalp"] = "Chef Ukorz Scalpessable", ["Witch Doctor Zum'rah"] = "Sorcier-docteur Zum'rah", ["Gahz'rilla"] = "Gahz'rilla", ["Shadowpriest Sezz'ziz"] = "Prêtre des ombres Sezz'ziz", ["Galgann Firehammer"] = "Galgann Firehammer", ["Ruuzlu"] = "Ruuzlu", ["Antu'sul"] = "Antu'sul", ["Sandarr Dunereaver"] = "Sandarr Ravadune", ["Dustwraith"] = "Ame en peine poudreuse", ["Zerillis"] = "Zerillis", ["The Lost Dwarves"] = "Les nains perdus" },
     quests = {
       [17] = { name = "Rechercher les composants à Uldaman", objective = "Apporter 12 Champignons magenta à Ghak Healtouch à Thelsamar." },
@@ -2860,7 +2981,7 @@ end
 -- quest texts from the Wowhead Forever tooltips (none published for Italian yet).
 local STSM = {
   deDE = {
-    dungeons = { "Versunkener Tempel", "Scholomance", "Maraudon", "Sümpfe des Elends", "Westliche Pestländer", "Desolace" },
+    dungeons = { "Der Tempel von Atal'Hakkar", "Scholomance", "Maraudon", "Sümpfe des Elends", "Westliche Pestländer", "Desolace" },
     bosses = { ["Darkmaster Gandling"] = "Dunkelmeister Gandling", ["Shade of Eranikus"] = "Eranikus' Schemen", ["Jammal'an the Prophet"] = "Jammal'an der Prophet", ["Ogom the Wretched"] = "Ogom der Elende", ["Morphaz"] = "Morphaz", ["Weaver"] = "Wirker", ["Dreamscythe"] = "Traumsense", ["Hazzas"] = "Hazzas", ["Avatar of Hakkar"] = "Avatar von Hakkar", ["Atal'alarion"] = "Atal'alarion", ["Vectus"] = "Vectus", ["Marduk Blackpool"] = "Marduk Blackpool", ["Lady Illucia Barov"] = "Lady Illucia Barov", ["Jandice Barov"] = "Jandice Barov", ["Lord Alexei Barov"] = "Lord Alexei Barov", ["Instructor Malicia"] = "Instrukteurin Malicia", ["Kirtonos the Herald"] = "Kirtonos der Herold", ["The Ravenian"] = "Der Ravenier", ["Ras Frostwhisper"] = "Ras Frostraunen", ["Lorekeeper Polkelt"] = "Hüter des Wissens Polkelt", ["Doctor Theolen Krastinov"] = "Doktor Theolen Krastinov", ["Rattlegore"] = "Blutrippe", ["Princess Theradras"] = "Prinzessin Theradras", ["Landslide"] = "Erdrutsch", ["Celebras the Cursed"] = "Celebras der Verfluchte", ["Lord Vyletongue"] = "Lord Schlangenzunge", ["Meshlok the Harvester"] = "Meshlok der Ernter", ["Razorlash"] = "Schlingwurzler", ["Noxxion"] = "Noxxion", ["Rotgrip"] = "Faulschnapper", ["Tinkerer Gizlock"] = "Tüftler Gizlock" },
     quests = {
       [1445] = { name = "Der Tempel von Atal'Hakkar", objective = "Sammelt 20 Fetische von Hakkar und bringt sie zu Fel'Zerul in Stonard." },
@@ -2893,7 +3014,7 @@ local STSM = {
     },
   },
   frFR = {
-    dungeons = { "Temple englouti", "Scholomance", "Maraudon", "Marais des Chagrins", "Maleterres de l'Ouest", "Désolace" },
+    dungeons = { "Le temple d'Atal'Hakkar", "Scholomance", "Maraudon", "Marais des Chagrins", "Maleterres de l'Ouest", "Désolace" },
     bosses = { ["Darkmaster Gandling"] = "Sombre Maître Gandling", ["Shade of Eranikus"] = "Ombre d'Eranikus", ["Jammal'an the Prophet"] = "Jammal'an le prophète", ["Ogom the Wretched"] = "Ogom le Misérable", ["Morphaz"] = "Morphaz", ["Weaver"] = "Tisserand", ["Dreamscythe"] = "Fauche-rêve", ["Hazzas"] = "Hazzas", ["Avatar of Hakkar"] = "Avatar d'Hakkar", ["Atal'alarion"] = "Atal'alarion", ["Vectus"] = "Vectus", ["Marduk Blackpool"] = "Marduk Noirétang", ["Lady Illucia Barov"] = "Dame Illucia Barov", ["Jandice Barov"] = "Jandice Barov", ["Lord Alexei Barov"] = "Seigneur Alexei Barov", ["Instructor Malicia"] = "Instructeur Malicia", ["Kirtonos the Herald"] = "Kirtonos le Héraut", ["The Ravenian"] = "Le Voracien", ["Ras Frostwhisper"] = "Ras Murmegivre", ["Lorekeeper Polkelt"] = "Gardien du savoir Polkelt", ["Doctor Theolen Krastinov"] = "Docteur Theolen Krastinov", ["Rattlegore"] = "Cliquettripes", ["Princess Theradras"] = "Princesse Theradras", ["Landslide"] = "Glissement de terrain", ["Celebras the Cursed"] = "Celebras le Maudit", ["Lord Vyletongue"] = "Seigneur Vylelangue", ["Meshlok the Harvester"] = "Meshlok le Moissonneur", ["Razorlash"] = "Tranchefouet", ["Noxxion"] = "Noxxion", ["Rotgrip"] = "Grippe-charogne", ["Tinkerer Gizlock"] = "Artisan Gizlock" },
     quests = {
       [1445] = { name = "Le temple d'Atal'Hakkar", objective = "Rassembler 20 Fétiches d'Hakkar et les apporter à Fel’Zerul à Stonard." },
@@ -2926,7 +3047,7 @@ local STSM = {
     },
   },
   esES = {
-    dungeons = { "Templo Sumergido", "Scholomance", "Maraudon", "Pantano de las Penas", "Tierras de la Peste del Oeste", "Desolace" },
+    dungeons = { "El Templo de Atal'Hakkar", "Scholomance", "Maraudon", "Pantano de las Penas", "Tierras de la Peste del Oeste", "Desolace" },
     bosses = { ["Darkmaster Gandling"] = "Maestro oscuro Gandling", ["Shade of Eranikus"] = "Sombra de Eranikus", ["Jammal'an the Prophet"] = "Jammal'an el Profeta", ["Ogom the Wretched"] = "Ogom el Desdichado", ["Morphaz"] = "Morphaz", ["Weaver"] = "Sastrón", ["Dreamscythe"] = "Guadañasueños", ["Hazzas"] = "Hazzas", ["Avatar of Hakkar"] = "Avatar de Hakkar", ["Atal'alarion"] = "Atal'alarion", ["Vectus"] = "Vectus", ["Marduk Blackpool"] = "Marduz Pozonegro", ["Lady Illucia Barov"] = "Lady Illucia Barov", ["Jandice Barov"] = "Jandice Barov", ["Lord Alexei Barov"] = "Lord Alexei Barov", ["Instructor Malicia"] = "Instructor Malicia", ["Kirtonos the Herald"] = "Kirtonos el Heraldo", ["The Ravenian"] = "El Devorador", ["Ras Frostwhisper"] = "Ras Levescarcha", ["Lorekeeper Polkelt"] = "Tradicionalista Polkelt", ["Doctor Theolen Krastinov"] = "Doctor Theolen Krastinov", ["Rattlegore"] = "Traquesangre", ["Princess Theradras"] = "Princesa Theradras", ["Landslide"] = "Derrumblo", ["Celebras the Cursed"] = "Celebras el Maldito", ["Lord Vyletongue"] = "Lord Lenguavil", ["Meshlok the Harvester"] = "Meshlok el Cosechador", ["Razorlash"] = "Latisable", ["Noxxion"] = "Noxxion", ["Rotgrip"] = "Escamapodrida", ["Tinkerer Gizlock"] = "Manitas Gizlock" },
     quests = {
       [1445] = { name = "El Templo de Atal'Hakkar", objective = "Reúne 20 fetiches de Hakkar y llévaselos a Fel'Zerul en Rocal." },
@@ -2962,7 +3083,7 @@ local STSM = {
     dungeons = { "Tempio Sommerso", "Scholomance", "Maraudon", false, false, false },
   },
   ptBR = {
-    dungeons = { "Templo Submerso", "Scolomântia", "Maraudon", "Pântano das Mágoas", "Terras Pestilentas Ocidentais", "Desolação" },
+    dungeons = { "Templo de Atal'Hakkar", "Scolomântia", "Maraudon", "Pântano das Mágoas", "Terras Pestilentas Ocidentais", "Desolação" },
     bosses = { ["Darkmaster Gandling"] = "Umbromestre Gandling", ["Shade of Eranikus"] = "Vulto de Erânicos", ["Jammal'an the Prophet"] = "Jammal'an, o Profeta", ["Ogom the Wretched"] = "Ogom, o Patife", ["Morphaz"] = "Morphaz", ["Weaver"] = "Tecelão", ["Dreamscythe"] = "Darquimeros", ["Hazzas"] = "Hazzas", ["Avatar of Hakkar"] = "Avatar de Hakkar", ["Atal'alarion"] = "Atal'alarion", ["Vectus"] = "Vectus", ["Marduk Blackpool"] = "Marduque Lagonero", ["Lady Illucia Barov"] = "Lady Ilúcia Barov", ["Jandice Barov"] = "Janice Barov", ["Lord Alexei Barov"] = "Lorde Alexei Barov", ["Instructor Malicia"] = "Instrutora Malícia", ["Kirtonos the Herald"] = "Kirtonos, o Arauto", ["The Ravenian"] = "O Corvino", ["Ras Frostwhisper"] = "Ras Friomúrmuro", ["Lorekeeper Polkelt"] = "Erudito Pulquério", ["Doctor Theolen Krastinov"] = "Doutor Theolen Krastinov", ["Rattlegore"] = "Ossorrange", ["Princess Theradras"] = "Princesa Theradras", ["Landslide"] = "Soterrador", ["Celebras the Cursed"] = "Celebras, o Amaldiçoado", ["Lord Vyletongue"] = "Lorde Torpelíngua", ["Meshlok the Harvester"] = "Meshloc, o Ceifador", ["Razorlash"] = "Azorrague", ["Noxxion"] = "Tóxxico", ["Rotgrip"] = "Putrigarra", ["Tinkerer Gizlock"] = "Engenhoqueiro Bugitranca" },
     quests = {
       [1445] = { name = "O templo de Atal'Hakkar", objective = "Obtenha 20 Fetiches de Hakkar e leve-os para Vil'Zerul em Pedregal." },
@@ -2995,7 +3116,7 @@ local STSM = {
     },
   },
   ruRU = {
-    dungeons = { "Затонувший храм", "Некроситет", "Мародон", "Болото Печали", "Западные Чумные земли", "Пустоши" },
+    dungeons = { "Храм Атал'Хаккар", "Некроситет", "Мародон", "Болото Печали", "Западные Чумные земли", "Пустоши" },
     bosses = { ["Darkmaster Gandling"] = "Темный магистр Гандлинг", ["Shade of Eranikus"] = "Тень Эраникуса", ["Jammal'an the Prophet"] = "Джаммал'ан Пророк", ["Ogom the Wretched"] = "Огом Презренный", ["Morphaz"] = "Морфаз", ["Weaver"] = "Ткачик", ["Dreamscythe"] = "Жнец Снов", ["Hazzas"] = "Хаззас", ["Avatar of Hakkar"] = "Аватара Хаккара", ["Atal'alarion"] = "Атал'аларион", ["Vectus"] = "Вектус", ["Marduk Blackpool"] = "Мардук Блэкпул", ["Lady Illucia Barov"] = "Леди Иллюсия Баров", ["Jandice Barov"] = "Джандис Баров", ["Lord Alexei Barov"] = "Лорд Алексей Баров", ["Instructor Malicia"] = "Инструктор Коварница", ["Kirtonos the Herald"] = "Киртонос Глашатай", ["The Ravenian"] = "Равениан", ["Ras Frostwhisper"] = "Рас Снегошепот", ["Lorekeeper Polkelt"] = "Сказитель Полкелт", ["Doctor Theolen Krastinov"] = "Доктор Теолен Крастинов", ["Rattlegore"] = "Громоклин", ["Princess Theradras"] = "Принцесса Терадрас", ["Landslide"] = "Сель", ["Celebras the Cursed"] = "Селебрас Проклятый", ["Lord Vyletongue"] = "Лорд Злоязыкий", ["Meshlok the Harvester"] = "Мешлок Жнец", ["Razorlash"] = "Бритвохлест", ["Noxxion"] = "Ноксион", ["Rotgrip"] = "Гнилопасть", ["Tinkerer Gizlock"] = "Ремонтник Гизлок" },
     quests = {
       [1445] = { name = "Храм Атал'Хаккара", objective = "Соберите 20 фетишей Хаккара и принесите их Фел'зерулу в Каменор." },
@@ -3028,7 +3149,7 @@ local STSM = {
     },
   },
   koKR = {
-    dungeons = { "가라앉은 사원", "스칼로맨스", "마라우돈", "슬픔의 늪", "서부 역병지대", "잊혀진 땅" },
+    dungeons = { "아탈학카르 신전", "스칼로맨스", "마라우돈", "슬픔의 늪", "서부 역병지대", "잊혀진 땅" },
     bosses = { ["Darkmaster Gandling"] = "암흑스승 간들링", ["Shade of Eranikus"] = "에라니쿠스의 사령", ["Jammal'an the Prophet"] = "예언자 잠말란", ["Ogom the Wretched"] = "비운의 오그옴", ["Morphaz"] = "몰파즈", ["Weaver"] = "위버", ["Dreamscythe"] = "드림사이드", ["Hazzas"] = "하자스", ["Avatar of Hakkar"] = "학카르의 화신", ["Atal'alarion"] = "아탈알라리온", ["Vectus"] = "벡투스", ["Marduk Blackpool"] = "마르두크 블랙풀", ["Lady Illucia Barov"] = "여군주 일루시아 바로브", ["Jandice Barov"] = "잔다이스 바로브", ["Lord Alexei Barov"] = "군주 알렉세이 바로브", ["Instructor Malicia"] = "조교 말리시아", ["Kirtonos the Herald"] = "사자 키르토노스", ["The Ravenian"] = "라베니안", ["Ras Frostwhisper"] = "라스 프로스트위스퍼", ["Lorekeeper Polkelt"] = "현자 폴켈트", ["Doctor Theolen Krastinov"] = "학자 테올렌 크라스티노브", ["Rattlegore"] = "들창어금니", ["Princess Theradras"] = "공주 테라드라스", ["Landslide"] = "산사태", ["Celebras the Cursed"] = "저주받은 셀레브라스", ["Lord Vyletongue"] = "군주 바일텅", ["Meshlok the Harvester"] = "정원사 메슬로크", ["Razorlash"] = "칼날채찍", ["Noxxion"] = "녹시온", ["Rotgrip"] = "썩은아귀", ["Tinkerer Gizlock"] = "땜장이 기즐록" },
     quests = {
       [1445] = { name = "아탈학카르 신전", objective = "스토나드에 있는 펠제룰에게 학카르의 우상 20개를 가져가야 합니다." },
@@ -3061,7 +3182,7 @@ local STSM = {
     },
   },
   zhCN = {
-    dungeons = { "沉没的神庙", "通灵学院", "玛拉顿", "悲伤沼泽", "西瘟疫之地", "凄凉之地" },
+    dungeons = { "阿塔哈卡神庙", "通灵学院", "玛拉顿", "悲伤沼泽", "西瘟疫之地", "凄凉之地" },
     bosses = { ["Darkmaster Gandling"] = "黑暗院长加丁", ["Shade of Eranikus"] = "伊兰尼库斯的阴影", ["Jammal'an the Prophet"] = "预言者迦玛兰", ["Ogom the Wretched"] = "可悲的奥戈姆", ["Morphaz"] = "摩弗拉斯", ["Weaver"] = "德拉维沃尔", ["Dreamscythe"] = "德姆塞卡尔", ["Hazzas"] = "哈扎斯", ["Avatar of Hakkar"] = "哈卡的化身", ["Atal'alarion"] = "阿塔拉利恩", ["Vectus"] = "维克图斯", ["Marduk Blackpool"] = "马杜克·布莱克波尔", ["Lady Illucia Barov"] = "伊露希亚·巴罗夫", ["Jandice Barov"] = "詹迪斯·巴罗夫", ["Lord Alexei Barov"] = "阿雷克斯·巴罗夫", ["Instructor Malicia"] = "讲师玛丽希亚", ["Kirtonos the Herald"] = "传令官基尔图诺斯", ["The Ravenian"] = "拉文尼亚", ["Ras Frostwhisper"] = "莱斯·霜语", ["Lorekeeper Polkelt"] = "博学者普克尔特", ["Doctor Theolen Krastinov"] = "瑟尔林·卡斯迪诺夫教授", ["Rattlegore"] = "血骨傀儡", ["Princess Theradras"] = "瑟莱德丝公主", ["Landslide"] = "兰斯利德", ["Celebras the Cursed"] = "被诅咒的塞雷布拉斯", ["Lord Vyletongue"] = "维利塔恩", ["Meshlok the Harvester"] = "收割者麦什洛克", ["Razorlash"] = "锐刺鞭笞者", ["Noxxion"] = "诺克赛恩", ["Rotgrip"] = "洛特格里普", ["Tinkerer Gizlock"] = "工匠吉兹洛克" },
     quests = {
       [1445] = { name = "阿塔哈卡神庙", objective = "收集20个哈卡神像，把它们带给斯通纳德的费泽鲁尔。" },
@@ -3094,7 +3215,7 @@ local STSM = {
     },
   },
   zhTW = {
-    dungeons = { "沉沒的神廟", "通靈學院", "瑪拉頓", "悲傷沼澤", "西瘟疫之地", "淒涼之地" },
+    dungeons = { "阿塔哈卡神廟", "通靈學院", "瑪拉頓", "悲傷沼澤", "西瘟疫之地", "淒涼之地" },
     bosses = { ["Darkmaster Gandling"] = "黑暗院長加丁", ["Shade of Eranikus"] = "伊蘭尼庫斯的陰影", ["Jammal'an the Prophet"] = "預言者迦瑪蘭", ["Ogom the Wretched"] = "可悲的奧戈姆", ["Morphaz"] = "摩弗拉斯", ["Weaver"] = "德拉維沃爾", ["Dreamscythe"] = "德姆塞卡爾", ["Hazzas"] = "哈扎斯", ["Avatar of Hakkar"] = "哈卡的化身", ["Atal'alarion"] = "阿塔拉利恩", ["Vectus"] = "維克圖斯", ["Marduk Blackpool"] = "馬杜克·布萊克波爾", ["Lady Illucia Barov"] = "伊露希亞·巴羅夫", ["Jandice Barov"] = "詹迪斯·巴羅夫", ["Lord Alexei Barov"] = "阿雷克斯·巴羅夫", ["Instructor Malicia"] = "講師瑪麗希亞", ["Kirtonos the Herald"] = "傳令官基爾圖諾斯", ["The Ravenian"] = "拉文尼亞", ["Ras Frostwhisper"] = "萊斯·霜語", ["Lorekeeper Polkelt"] = "博學者普克爾特", ["Doctor Theolen Krastinov"] = "瑟爾林·卡斯迪諾夫教授", ["Rattlegore"] = "血骨傀儡", ["Princess Theradras"] = "瑟萊德絲公主", ["Landslide"] = "蘭斯利德", ["Celebras the Cursed"] = "被詛咒的塞雷布拉斯", ["Lord Vyletongue"] = "維利塔恩", ["Meshlok the Harvester"] = "收割者麥什洛克", ["Razorlash"] = "銳刺鞭笞者", ["Noxxion"] = "諾克賽恩", ["Rotgrip"] = "洛特格里普", ["Tinkerer Gizlock"] = "工匠吉茲洛克" },
     quests = {
       [1445] = { name = "阿塔哈卡神廟", objective = "收集20個哈卡神像，把它們帶給斯通納德的費澤魯爾。" },
@@ -3149,11 +3270,20 @@ for lang, data in pairs(STSM) do
     end
 end
 
+-- Combined Sunken Temple encounters reuse the existing localized NPC names.
+for _, content in pairs(FDJ.ContentLocales) do
+    local bosses = content.bosses
+    if bosses then
+        bosses["Morphaz & Hazzas"] = (bosses["Morphaz"] or "Morphaz") .. " & " .. (bosses["Hazzas"] or "Hazzas")
+        bosses["Dreamscythe & Weaver"] = (bosses["Dreamscythe"] or "Dreamscythe") .. " & " .. (bosses["Weaver"] or "Weaver")
+    end
+end
+
 -- Dire Maul (East, West, North) and Stratholme (Living, Undead), added 1.6.5:
 -- official names and quest texts from the Wowhead Forever tooltips.
 local DMST = {
   deDE = {
-    dungeons = { "Düsterbruch: Ost", "Düsterbruch: West", "Düsterbruch: Nord", "Stratholme: Lebend", "Stratholme: Untot", "Feralas", "Östliche Pestländer" },
+    dungeons = { "Düsterbruch - Ost", "Düsterbruch - West", "Düsterbruch - Nord", "Stratholme - Haupttor", "Stratholme - Dienstboteneingang", "Feralas", "Östliche Pestländer" },
     bosses = { ["Skul"] = "Skul", ["Magistrate Barthilas"] = "Magistrat Barthilas", ["Baroness Anastari"] = "Baroness Anastari", ["Nerub'enkan"] = "Nerub'enkan", ["Maleki the Pallid"] = "Maleki der Leichenblasse", ["Ramstein the Gorger"] = "Ramstein der Verschlinger", ["Baron Rivendare"] = "Baron Rivendare", ["The Unforgiven"] = "Der Unverziehene", ["Hearthsinger Forresten"] = "Herdsinger Forresten", ["Timmy the Cruel"] = "Timmy der Grausame", ["Stonespine"] = "Steinbuckel", ["Archivist Galford"] = "Archivar Galford", ["Balnazzar"] = "Balnazzar", ["Cannon Master Willey"] = "Kanonenmeister Willey", ["Postmaster Malown"] = "Postmeister Malown", ["Tsu'zee"] = "Tsu'zee", ["Prince Tortheldrin"] = "Prinz Tortheldrin", ["Magister Kalendris"] = "Magister Kalendris", ["Illyanna Ravenoak"] = "Illyanna Rabeneiche", ["Tendris Warpwood"] = "Tendris Wucherborke", ["Zevrim Thornhoof"] = "Zevrim Dornhuf", ["Alzzin the Wildshaper"] = "Alzzin der Wildformer", ["Immol'thar"] = "Immol'thar", ["King Gordok"] = "König Gordok", ["Hydrospawn"] = "Hydrobrut", ["Guard Fengus"] = "Wache Fengus", ["Stomper Kreeg"] = "Stampfer Kreeg", ["Guard Slip'kik"] = "Wache Slip'kik", ["Cho'Rush the Observer"] = "Cho'Rush der Beobachter", ["Captain Kromcrush"] = "Captain Kromcrush", ["Guard Mol'dar"] = "Wache Mol'dar", ["Lethtendris"] = "Lethtendris", ["Lord Hel'nurath"] = "Lord Hel'nurath" },
     quests = {
       [5122] = { name = "Das Medaillon des Glaubens" },
@@ -3182,7 +3312,7 @@ local DMST = {
     },
   },
   frFR = {
-    dungeons = { "Hache-tripes : Est", "Hache-tripes : Ouest", "Hache-tripes : Nord", "Stratholme : Vivants", "Stratholme : Morts-vivants", "Feralas", "Maleterres de l'Est" },
+    dungeons = { "Haches-Tripes - Est", "Haches-Tripes - Ouest", "Haches-Tripes - Nord", "Stratholme - Grande porte", "Stratholme - Entrée de service", "Feralas", "Maleterres de l'Est" },
     bosses = { ["Skul"] = "Krân", ["Magistrate Barthilas"] = "Magistrat Barthilas", ["Baroness Anastari"] = "Baronne Anastari", ["Nerub'enkan"] = "Nerub'enkan", ["Maleki the Pallid"] = "Maleki le Blafard", ["Ramstein the Gorger"] = "Ramstein Grandgosier", ["Baron Rivendare"] = "Baron Rivendare", ["The Unforgiven"] = "Le Condamné", ["Hearthsinger Forresten"] = "Hearthsinger Forresten", ["Timmy the Cruel"] = "Timmy le Cruel", ["Stonespine"] = "Echine-de-pierre", ["Archivist Galford"] = "Archiviste Galford", ["Balnazzar"] = "Balnazzar", ["Cannon Master Willey"] = "Maître canonnier Willey", ["Postmaster Malown"] = "Postier Malown", ["Tsu'zee"] = "Tsu'zee", ["Prince Tortheldrin"] = "Prince Tortheldrin", ["Magister Kalendris"] = "Magistère Kalendris", ["Illyanna Ravenoak"] = "Illyanna Ravenoak", ["Tendris Warpwood"] = "Tendris Crochebois", ["Zevrim Thornhoof"] = "Zevrim Thornhoof", ["Alzzin the Wildshaper"] = "Alzzin le Modeleur", ["Immol'thar"] = "Immol'thar", ["King Gordok"] = "Roi Gordok", ["Hydrospawn"] = "Hydrogénos", ["Guard Fengus"] = "Garde Fengus", ["Stomper Kreeg"] = "Kreeg le Marteleur", ["Guard Slip'kik"] = "Garde Slip'kik", ["Cho'Rush the Observer"] = "Cho'Rush l'Observateur", ["Captain Kromcrush"] = "Capitaine Kromcrush", ["Guard Mol'dar"] = "Garde Mol'dar", ["Lethtendris"] = "Lethtendris", ["Lord Hel'nurath"] = "Seigneur Hel'nurath" },
     quests = {
       [5122] = { name = "Le médaillon de foi" },
@@ -3211,7 +3341,7 @@ local DMST = {
     },
   },
   esES = {
-    dungeons = { "La Masacre: Este", "La Masacre: Oeste", "La Masacre: Norte", "Stratholme: Vivos", "Stratholme: No-muertos", "Feralas", "Tierras de la Peste del Este" },
+    dungeons = { "La Masacre: Este", "La Masacre: Oeste", "La Masacre: Norte", "Stratholme: Entrada Principal", "Stratholme: Entrada de Servicio", "Feralas", "Tierras de la Peste del Este" },
     bosses = { ["Skul"] = "Skul", ["Magistrate Barthilas"] = "Magistrado Barthilas", ["Baroness Anastari"] = "Baronesa Anastari", ["Nerub'enkan"] = "Nerub'enkan", ["Maleki the Pallid"] = "Maleki el Pálido", ["Ramstein the Gorger"] = "Ramstein el Empachador", ["Baron Rivendare"] = "Barón Osahendido", ["The Unforgiven"] = "El imperdonable", ["Hearthsinger Forresten"] = "Escupezones Foreste", ["Timmy the Cruel"] = "Timmy el Cruel", ["Stonespine"] = "Pidrespina", ["Archivist Galford"] = "Archivista Galford", ["Balnazzar"] = "Balnazzar", ["Cannon Master Willey"] = "Maestro cañonero Willey", ["Postmaster Malown"] = "Jefe de correos Gassol", ["Tsu'zee"] = "Tsu'zee", ["Prince Tortheldrin"] = "Príncipe Tortheldrin", ["Magister Kalendris"] = "Magister Kalendris", ["Illyanna Ravenoak"] = "Illyanna Roblecuervo", ["Tendris Warpwood"] = "Tendris Madeguerra", ["Zevrim Thornhoof"] = "Zevrim Pezuñahendida", ["Alzzin the Wildshaper"] = "Alzzin el Formaferal", ["Immol'thar"] = "Immol'thar", ["King Gordok"] = "Rey Gordok", ["Hydrospawn"] = "Hidromilecio", ["Guard Fengus"] = "Guardia Fengus", ["Stomper Kreeg"] = "Vapuleador Kreeg", ["Guard Slip'kik"] = "Guardia Slip'kik", ["Cho'Rush the Observer"] = "Cho'Rush el Observador", ["Captain Kromcrush"] = "Capitán Kromcrush", ["Guard Mol'dar"] = "Guardia Mol'dar", ["Lethtendris"] = "Lethtendris", ["Lord Hel'nurath"] = "Lord Hel'nurath" },
     quests = {
       [5122] = { name = "El medallón de Fe" },
@@ -3243,7 +3373,7 @@ local DMST = {
     dungeons = { "Dire Maul: Est", "Dire Maul: Ovest", "Dire Maul: Nord", "Stratholme: Vivi", "Stratholme: Non Morti", false, false },
   },
   ptBR = {
-    dungeons = { "Gládio Cruel: Leste", "Gládio Cruel: Oeste", "Gládio Cruel: Norte", "Stratholme: Vivos", "Stratholme: Mortos-vivos", "Feralas", "Terras Pestilentas Orientais" },
+    dungeons = { "Gládio Cruel – Leste", "Gládio Cruel – Oeste", "Gládio Cruel – Norte", "Stratholme – Portão Principal", "Stratholme – Entrada de Serviço", "Feralas", "Terras Pestilentas Orientais" },
     bosses = { ["Skul"] = "Kranio", ["Magistrate Barthilas"] = "Magistrado Barthilas", ["Baroness Anastari"] = "Baronesa Anastari", ["Nerub'enkan"] = "Nerub'enkan", ["Maleki the Pallid"] = "Malaki, o Pálido", ["Ramstein the Gorger"] = "Ramstein, o Devorador", ["Baron Rivendare"] = "Barão Rivendare", ["The Unforgiven"] = "O Imperdoável", ["Hearthsinger Forresten"] = "Cantalar Forresten", ["Timmy the Cruel"] = "Tico, o Cruel", ["Stonespine"] = "Petrespáduas", ["Archivist Galford"] = "Arquivista Galford", ["Balnazzar"] = "Balnazzar", ["Cannon Master Willey"] = "Mestre de Canhões Gualter", ["Postmaster Malown"] = "Chefe do Correio Malown", ["Tsu'zee"] = "Tsu'zee", ["Prince Tortheldrin"] = "Príncipe Tortheldrin", ["Magister Kalendris"] = "Magíster Kalendris", ["Illyanna Ravenoak"] = "Illyanna Corvalho", ["Tendris Warpwood"] = "Gavíneo Lenhatorta", ["Zevrim Thornhoof"] = "Zevrim Cascardo", ["Alzzin the Wildshaper"] = "Azzin, o Selvamorfo", ["Immol'thar"] = "Immol'thar", ["King Gordok"] = "Rei Gordok", ["Hydrospawn"] = "Rebentágua", ["Guard Fengus"] = "Guarda Fengus", ["Stomper Kreeg"] = "Pisoteador Kreeg", ["Guard Slip'kik"] = "Guarda Kishutt", ["Cho'Rush the Observer"] = "Ez'Magg, o Observador", ["Captain Kromcrush"] = "Capitão Kebrapaw", ["Guard Mol'dar"] = "Guarda Mol'dar", ["Lethtendris"] = "Letendris", ["Lord Hel'nurath"] = "Lorde Hel'nurath" },
     quests = {
       [5122] = { name = "O Medalhão da Fé" },
@@ -3272,7 +3402,7 @@ local DMST = {
     },
   },
   ruRU = {
-    dungeons = { "Забытый Город: Восток", "Забытый Город: Запад", "Забытый Город: Север", "Стратхольм: Живые", "Стратхольм: Нежить", "Фералас", "Восточные Чумные земли" },
+    dungeons = { "Забытый город: восток", "Забытый город: запад", "Забытый город: север", "Стратхольм – Главные врата", "Стратхольм – Черный ход", "Фералас", "Восточные Чумные земли" },
     bosses = { ["Skul"] = "Череп", ["Magistrate Barthilas"] = "Мировой судья Бартилас", ["Baroness Anastari"] = "Баронесса Анастари", ["Nerub'enkan"] = "Неруб'энкан", ["Maleki the Pallid"] = "Малекай Бледный", ["Ramstein the Gorger"] = "Рамштайн Ненасытный", ["Baron Rivendare"] = "Барон Ривендер", ["The Unforgiven"] = "Непрощенный", ["Hearthsinger Forresten"] = "Певчий Форрестен", ["Timmy the Cruel"] = "Тайлер", ["Stonespine"] = "Каменный Гребень", ["Archivist Galford"] = "Архивариус Галфорд", ["Balnazzar"] = "Балназзар", ["Cannon Master Willey"] = "Мастер-канонир Вилли", ["Postmaster Malown"] = "Почтальон Мэлоун", ["Tsu'zee"] = "Цу'зи", ["Prince Tortheldrin"] = "Принц Тортелдрин", ["Magister Kalendris"] = "Магистр Календрис", ["Illyanna Ravenoak"] = "Иллиана Воронья Ольха", ["Tendris Warpwood"] = "Тендрис Криводрев", ["Zevrim Thornhoof"] = "Зеврим Терновое Копыто", ["Alzzin the Wildshaper"] = "Алззин Перевертень", ["Immol'thar"] = "Бессмер'тер", ["King Gordok"] = "Король Гордок", ["Hydrospawn"] = "Гидротварь", ["Guard Fengus"] = "Стражник Фенгус", ["Stomper Kreeg"] = "Топотун Криг", ["Guard Slip'kik"] = "Стражник Слип'кик", ["Cho'Rush the Observer"] = "Чо'Раш Наблюдатель", ["Captain Kromcrush"] = "Капитан Давигром", ["Guard Mol'dar"] = "Стражник Мол'дар", ["Lethtendris"] = "Лефтендрис", ["Lord Hel'nurath"] = "Лорд Хел'нурат" },
     quests = {
       [5122] = { name = "Медальон Веры" },
@@ -3301,7 +3431,7 @@ local DMST = {
     },
   },
   koKR = {
-    dungeons = { "혈투의 전장: 동쪽", "혈투의 전장: 서쪽", "혈투의 전장: 북쪽", "스트라솔름: 정문", "스트라솔름: 언데드", "페랄라스", "동부 역병지대" },
+    dungeons = { "혈투의 전장 - 동쪽", "혈투의 전장 - 서쪽", "혈투의 전장 - 북쪽", "스트라솔름 - 정문", "스트라솔름 - 공무용 입구", "페랄라스", "동부 역병지대" },
     bosses = { ["Skul"] = "스컬", ["Magistrate Barthilas"] = "집정관 발실라스", ["Baroness Anastari"] = "남작부인 아나스타리", ["Nerub'enkan"] = "네룹엔칸", ["Maleki the Pallid"] = "냉혈한 말레키", ["Ramstein the Gorger"] = "먹보 람스타인", ["Baron Rivendare"] = "남작 리븐데어", ["The Unforgiven"] = "용서받지 못한 자", ["Hearthsinger Forresten"] = "하스싱어 포레스턴", ["Timmy the Cruel"] = "잔혹한 티미", ["Stonespine"] = "뾰족바위", ["Archivist Galford"] = "기록관 갈포드", ["Balnazzar"] = "발나자르", ["Cannon Master Willey"] = "포병대장 윌리", ["Postmaster Malown"] = "우체국장 말로운", ["Tsu'zee"] = "츄지", ["Prince Tortheldrin"] = "왕자 토르텔드린", ["Magister Kalendris"] = "마술사 칼렌드리스", ["Illyanna Ravenoak"] = "일샨나 레이븐오크", ["Tendris Warpwood"] = "굽이나무 텐드리스", ["Zevrim Thornhoof"] = "제브림 쏜후프", ["Alzzin the Wildshaper"] = "칼날바람 알진", ["Immol'thar"] = "이몰타르", ["King Gordok"] = "왕 고르독", ["Hydrospawn"] = "히드로스폰", ["Guard Fengus"] = "경비병 펜구스", ["Stomper Kreeg"] = "천둥발 크리그", ["Guard Slip'kik"] = "경비병 슬립킥", ["Cho'Rush the Observer"] = "정찰병 초루쉬", ["Captain Kromcrush"] = "대장 크롬크러쉬", ["Guard Mol'dar"] = "경비병 몰다르", ["Lethtendris"] = "레스텐드리스", ["Lord Hel'nurath"] = "군주 헬누라스" },
     quests = {
       [5122] = { name = "신념의 메달" },
@@ -3330,7 +3460,7 @@ local DMST = {
     },
   },
   zhCN = {
-    dungeons = { "厄运之槌：东", "厄运之槌：西", "厄运之槌：北", "斯坦索姆：血色区", "斯坦索姆：亡灵区", "菲拉斯", "东瘟疫之地" },
+    dungeons = { "厄运之槌 - 东", "厄运之槌 - 西", "厄运之槌 - 北", "斯坦索姆 - 正门", "斯坦索姆 - 仆从入口", "菲拉斯", "东瘟疫之地" },
     bosses = { ["Skul"] = "斯库尔", ["Magistrate Barthilas"] = "巴瑟拉斯镇长", ["Baroness Anastari"] = "安娜丝塔丽男爵夫人", ["Nerub'enkan"] = "奈鲁布恩坎", ["Maleki the Pallid"] = "苍白的玛勒基", ["Ramstein the Gorger"] = "吞咽者拉姆斯登", ["Baron Rivendare"] = "瑞文戴尔男爵", ["The Unforgiven"] = "不可宽恕者", ["Hearthsinger Forresten"] = "弗雷斯特恩", ["Timmy the Cruel"] = "悲惨的提米", ["Stonespine"] = "石脊", ["Archivist Galford"] = "档案管理员加尔福特", ["Balnazzar"] = "巴纳扎尔", ["Cannon Master Willey"] = "炮手威利", ["Postmaster Malown"] = "邮差马龙", ["Tsu'zee"] = "苏斯", ["Prince Tortheldrin"] = "托塞德林王子", ["Magister Kalendris"] = "卡雷迪斯镇长", ["Illyanna Ravenoak"] = "伊琳娜·暗木", ["Tendris Warpwood"] = "特迪斯·扭木", ["Zevrim Thornhoof"] = "瑟雷姆·刺蹄", ["Alzzin the Wildshaper"] = "奥兹恩", ["Immol'thar"] = "伊莫塔尔", ["King Gordok"] = "戈多克大王", ["Hydrospawn"] = "海多斯博恩", ["Guard Fengus"] = "卫兵芬古斯", ["Stomper Kreeg"] = "践踏者克雷格", ["Guard Slip'kik"] = "卫兵斯里基克", ["Cho'Rush the Observer"] = "观察者克鲁什", ["Captain Kromcrush"] = "克罗卡斯", ["Guard Mol'dar"] = "卫兵摩尔达", ["Lethtendris"] = "蕾瑟塔蒂丝", ["Lord Hel'nurath"] = "赫尔努拉斯" },
     quests = {
       [5122] = { name = "信仰奖章" },
@@ -3359,7 +3489,7 @@ local DMST = {
     },
   },
   zhTW = {
-    dungeons = { "厄運之槌：東", "厄運之槌：西", "厄運之槌：北", "斯坦索姆：血色區", "斯坦索姆：亡靈區", "菲拉斯", "東瘟疫之地" },
+    dungeons = { "厄運之槌 - 東方", "厄運之槌 - 西方", "厄運之槌 - 北方", "斯坦索姆 - 主門", "斯坦索姆 - 僕從入口", "菲拉斯", "東瘟疫之地" },
     bosses = { ["Skul"] = "斯庫爾", ["Magistrate Barthilas"] = "巴瑟拉斯鎮長", ["Baroness Anastari"] = "安娜絲塔麗男爵夫人", ["Nerub'enkan"] = "奈魯布恩坎", ["Maleki the Pallid"] = "蒼白的瑪勒基", ["Ramstein the Gorger"] = "吞嚥者拉姆斯登", ["Baron Rivendare"] = "瑞文戴爾男爵", ["The Unforgiven"] = "不可寬恕者", ["Hearthsinger Forresten"] = "弗雷斯特恩", ["Timmy the Cruel"] = "悲慘的提米", ["Stonespine"] = "石脊", ["Archivist Galford"] = "檔案管理員加爾福特", ["Balnazzar"] = "巴納扎爾", ["Cannon Master Willey"] = "炮手威利", ["Postmaster Malown"] = "郵差馬龍", ["Tsu'zee"] = "蘇斯", ["Prince Tortheldrin"] = "託塞德林王子", ["Magister Kalendris"] = "卡雷迪斯鎮長", ["Illyanna Ravenoak"] = "伊琳娜·暗木", ["Tendris Warpwood"] = "特迪斯·扭木", ["Zevrim Thornhoof"] = "瑟雷姆·刺蹄", ["Alzzin the Wildshaper"] = "奧茲恩", ["Immol'thar"] = "伊莫塔爾", ["King Gordok"] = "戈多克大王", ["Hydrospawn"] = "海多斯博恩", ["Guard Fengus"] = "衛兵芬古斯", ["Stomper Kreeg"] = "踐踏者克雷格", ["Guard Slip'kik"] = "衛兵斯里基克", ["Cho'Rush the Observer"] = "觀察者克魯什", ["Captain Kromcrush"] = "克羅卡斯", ["Guard Mol'dar"] = "衛兵摩爾達", ["Lethtendris"] = "蕾瑟塔蒂絲", ["Lord Hel'nurath"] = "赫爾努拉斯" },
     quests = {
       [5122] = { name = "信仰獎章" },
@@ -3413,7 +3543,7 @@ end
 -- Blackrock Depths
 local BRD_LOC = {
   deDE = {
-    dungeon = "Blackrocktiefen", location = "Blackrock",
+    dungeon = "Schwarzfelstiefen", location = "Blackrock",
     bosses = { ["High Interrogator Gerstahn"] = "Verhörmeisterin Gerstahn", ["Lord Roccor"] = "Lord Roccor", ["Houndmaster Grebmar"] = "Hundemeister Grebmar", ["Gorosh the Dervish"] = "Gorosh der Derwisch", ["Grizzle"] = "Grizzle", ["Eviscerator"] = "Ausweider", ["Ok'thor the Breaker"] = "Ok'thor der Zerstörer", ["Anub'shiah"] = "Anub'shiah", ["Hedrum the Creeper"] = "Hedrum der Krabbler", ["Pyromancer Loregrain"] = "Pyromant Weiskorn", ["Fineous Darkvire"] = "Fineous Darkvire", ["Warder Stilgiss"] = "Wärter Stilgiss", ["Lord Incendius"] = "Lord Incendius", ["Bael'Gar"] = "Bael'Gar", ["General Angerforge"] = "General Zornesschmied", ["Golem Lord Argelmach"] = "Golemlord Argelmach", ["Hurley Blackbreath"] = "Hurley Pestatem", ["Phalanx"] = "Phalanx", ["Ribbly Screwspigot"] = "Ribbly Screwspigot", ["Plugger Spazzring"] = "Plugger Spazzring", ["Ambassador Flamelash"] = "Botschafter Flammenschlag", ["Panzor the Invincible"] = "Panzor der Unbesiegbare", ["The Seven"] = "Die Sieben", ["Magmus"] = "Magmus", ["Princess Moira Bronzebeard"] = "Prinzessin Moira Bronzebeard", ["Emperor Dagran Thaurissan"] = "Imperator Dagran Thaurissan" },
     quests = {
       [3802] = { name = "Dunkeleisenerbe", objective = "Erschlagt Fineous Darkvire und bergt den großen Hammer Ironfel. Bringt Ironfel zum Schrein von Thaurissan und legt ihn auf die Statue von Franclorn Forgewright." },
@@ -3442,7 +3572,7 @@ local BRD_LOC = {
     },
   },
   frFR = {
-    dungeon = "Profondeurs de Blackrock", location = "Mont Blackrock",
+    dungeon = "Profondeurs de Rochenoire", location = "Mont Blackrock",
     bosses = { ["High Interrogator Gerstahn"] = "Grand Interrogateur Gerstahn", ["Lord Roccor"] = "Seigneur Roccor", ["Houndmaster Grebmar"] = "Maître-chien Grebmar", ["Gorosh the Dervish"] = "Gorosh le Derviche", ["Grizzle"] = "Grison", ["Eviscerator"] = "Eviscérateur", ["Ok'thor the Breaker"] = "Ok'thor le Briseur", ["Anub'shiah"] = "Anub'shiah", ["Hedrum the Creeper"] = "Hedrum le Rampant", ["Pyromancer Loregrain"] = "Pyromancien Loregrain", ["Fineous Darkvire"] = "Fineous Darkvire", ["Warder Stilgiss"] = "Gardien Stilgiss", ["Lord Incendius"] = "Seigneur Incendius", ["Bael'Gar"] = "Bael'Gar", ["General Angerforge"] = "Général Forgehargne", ["Golem Lord Argelmach"] = "Seigneur golem Argelmach", ["Hurley Blackbreath"] = "Hurley Blackbreath", ["Phalanx"] = "Phalange", ["Ribbly Screwspigot"] = "Ribbly Screwspigot", ["Plugger Spazzring"] = "Plugger Spazzring", ["Ambassador Flamelash"] = "Ambassadeur Cinglefouet", ["Panzor the Invincible"] = "Panzor l'Invincible", ["The Seven"] = "Les Sept", ["Magmus"] = "Magmus", ["Princess Moira Bronzebeard"] = "Princesse Moira Bronzebeard", ["Emperor Dagran Thaurissan"] = "Empereur Dagran Thaurissan" },
     quests = {
       [3802] = { name = "Héritage Sombrefer", objective = "Tuer Fineous Darkvire et récupérer le grand marteau, Souillefer. Apporter Souillefer au sanctuaire de Thaurissan et le placer sur la statue de Franclorn Forgewright." },
@@ -3671,7 +3801,7 @@ end
 -- Upper Blackrock Spire
 local UBRS_LOC = {
   deDE = {
-    dungeon = "Obere Blackrockspitze", location = "Blackrock",
+    dungeon = "Obere Schwarzfelsspitze", location = "Blackrock",
     bosses = { ["Pyroguard Emberseer"] = "Feuerwache Glutseher", ["Solakar Flamewreath"] = "Solakar Feuerkrone", ["Jed Runewatcher"] = "Jed Runenblick", ["Goraluk Anvilcrack"] = "Goraluk Hammerbruch", ["Gyth"] = "Gyth", ["Warchief Rend Blackhand"] = "Kriegshäuptling Rend Blackhand", ["The Beast"] = "Die Bestie", ["Lord Valthalak"] = "Lord Valthalak", ["General Drakkisath"] = "General Drakkisath" },
     quests = {
       [4734] = { name = "Ei-Frosten", objective = "Benutzt den Prototyp des Eiszilloskops an einem Ei im Horst." },
@@ -3687,7 +3817,7 @@ local UBRS_LOC = {
     },
   },
   frFR = {
-    dungeon = "Pic Blackrock supérieur", location = "Mont Blackrock",
+    dungeon = "Sommet du pic Rochenoire", location = "Mont Blackrock",
     bosses = { ["Pyroguard Emberseer"] = "Pyrogarde Prophète ardent", ["Solakar Flamewreath"] = "Solakar Voluteflamme", ["Jed Runewatcher"] = "Jed Runewatcher", ["Goraluk Anvilcrack"] = "Goraluk Anvilcrack", ["Gyth"] = "Gyth", ["Warchief Rend Blackhand"] = "Chef de guerre Rend Blackhand", ["The Beast"] = "La Bête", ["Lord Valthalak"] = "Seigneur Valthalak", ["General Drakkisath"] = "Général Drakkisath" },
     quests = {
       [4734] = { name = "Un oeuf congelé", objective = "Utiliser le Prototype d'Oeufilloscope sur un oeuf dans la Colonie." },
@@ -3739,7 +3869,7 @@ local UBRS_LOC = {
     },
   },
   ruRU = {
-    dungeon = "Вершина Черной горы (верх)", location = "Черная гора",
+    dungeon = "Верхняя часть пика Черной горы", location = "Черная гора",
     bosses = { ["Pyroguard Emberseer"] = "Пиростраж Созерцатель Углей", ["Solakar Flamewreath"] = "Солакарский огнечервь", ["Jed Runewatcher"] = "Джед Руновед", ["Goraluk Anvilcrack"] = "Горалук Треснувшая Наковальня", ["Gyth"] = "Гит", ["Warchief Rend Blackhand"] = "Вождь Ренд Чернорук", ["The Beast"] = "Зверь", ["Lord Valthalak"] = "Лорд Вальтхалак", ["General Drakkisath"] = "Генерал Драккисат" },
     quests = {
       [4734] = { name = "Заморозка яйца", objective = "Испытайте прототип яйцехладоскопа на одном из яиц в Гнездовье." },
@@ -3825,7 +3955,7 @@ end
 -- Lower Blackrock Spire
 local LBRS_LOC = {
   deDE = {
-    dungeon = "Untere Blackrockspitze", location = "Blackrock",
+    dungeon = "Untere Schwarzfelsspitze", location = "Blackrock",
     bosses = { ["Spirestone Butcher"] = "Metzger der Felsspitzoger", ["Highlord Omokk"] = "Hochlord Omokk", ["Shadow Hunter Vosh'gajin"] = "Schattenjägerin Vosh'gajin", ["War Master Voone"] = "Kriegsmeister Voone", ["Mother Smolderweb"] = "Mutter Glimmernetz", ["Crystal Fang"] = "Kristallfangzahn", ["Urok Doomhowl"] = "Urok Schreckensbote", ["Bannok Grimaxe"] = "Bannok Grimmaxt", ["Quartermaster Zigris"] = "Rüstmeister Zigris", ["Halycon"] = "Halycon", ["Gizrul the Slavener"] = "Gizrul der Geifernde", ["Ghok Bashguud"] = "Ghok Haudrauf", ["Overlord Wyrmthalak"] = "Oberanführer Wyrmthalak" },
     quests = {
       [4701] = { name = "Stellt sie ab", objective = "Begebt Euch zur Blackrockspitze und vernichtet die Quelle der Bedrohung durch die Worgs. Als Ihr Helendis verlasst, ruft er Euch noch einen Namen hinterher: Halycon. Darauf beziehen sich die Orcs im Zusammenhang mit den Worgs." },
@@ -3840,7 +3970,7 @@ local LBRS_LOC = {
     },
   },
   frFR = {
-    dungeon = "Pic Blackrock inférieur", location = "Mont Blackrock",
+    dungeon = "Bas du pic Rochenoire", location = "Mont Blackrock",
     bosses = { ["Spirestone Butcher"] = "Boucher Pierre-du-pic", ["Highlord Omokk"] = "Généralissime Omokk", ["Shadow Hunter Vosh'gajin"] = "Chasseresse des ombres Vosh'gajin", ["War Master Voone"] = "Maître de guerre Voone", ["Mother Smolderweb"] = "Matriarche Couveuse", ["Crystal Fang"] = "Croc cristallin", ["Urok Doomhowl"] = "Urok Hurleruine", ["Bannok Grimaxe"] = "Bannok Grimaxe", ["Quartermaster Zigris"] = "Intendant Zigris", ["Halycon"] = "Halycon", ["Gizrul the Slavener"] = "Gizrul l'esclavagiste", ["Ghok Bashguud"] = "Ghok Bashguud", ["Overlord Wyrmthalak"] = "Seigneur Wyrmthalak" },
     quests = {
       [4701] = { name = "Abattez-la", objective = "Allez au Pic Blackrock et anéantir la menace worg à sa source. Tandis que vous quittiez Helendis, il a crié un nom : Halycon. C'est ce que disent les orcs en parlant des worgs." },
@@ -3889,7 +4019,7 @@ local LBRS_LOC = {
     },
   },
   ruRU = {
-    dungeon = "Вершина Черной горы (низ)", location = "Черная гора",
+    dungeon = "Нижняя часть пика Черной горы", location = "Черная гора",
     bosses = { ["Spirestone Butcher"] = "Мясник из клана Черной Вершины", ["Highlord Omokk"] = "Вождь Омокк", ["Shadow Hunter Vosh'gajin"] = "Темная охотница Вос'гаджин", ["War Master Voone"] = "Воевода Вун", ["Mother Smolderweb"] = "Мать Дымная Паутина", ["Crystal Fang"] = "Хрустальный Клык", ["Urok Doomhowl"] = "Аррок Смертный Вопль", ["Bannok Grimaxe"] = "Баннок Люторез", ["Quartermaster Zigris"] = "Интендант Зигрис", ["Halycon"] = "Халикон", ["Gizrul the Slavener"] = "Гизрул Поработитель", ["Ghok Bashguud"] = "Гок Крепкобив", ["Overlord Wyrmthalak"] = "Властитель Змейталак" },
     quests = {
       [4701] = { name = "Устранение опасности", objective = "Отправьтесь на пик Черной горы и уничтожьте источник опасности. Хелендис кричит вам вслед одно имя: Халикон. Именно его упоминали орки в связи с воргами." },
@@ -6380,3 +6510,1524 @@ for lang, data in pairs(REARGUARD) do
     end
 end
 -- END rearguard
+
+-- BEGIN palawarn
+-- Paladin class quests (The Test of Righteousness, Old Fire-Eye): "a step in
+-- this dungeon" disclaimer on each dungeon's page.
+local PALA_WARNINGS = {
+    ["This is a chain quest with a step in The Deadmines"] = {
+        deDE = "Dies ist eine Questreihe mit einem Schritt in den Todesminen",
+        frFR = "C’est une suite de quêtes avec une étape aux Mortemines",
+        esES = "Es una cadena de misiones con un paso en las Minas de la Muerte",
+        itIT = "È una catena di missioni con una tappa nelle Miniere della Morte",
+        ptBR = "É uma cadeia de missões com uma etapa nas Minas Mortas",
+        ruRU = "Это цепочка заданий с этапом в Мертвых копях",
+        koKR = "죽음의 폐광에서 진행하는 단계가 있는 연계 퀘스트입니다",
+        zhCN = "这是一个系列任务，其中一步在死亡矿井",
+        zhTW = "這是一個系列任務，其中一步在死亡礦坑",
+    },
+    ["This is a chain quest with a step in Blackfathom Deeps"] = {
+        deDE = "Dies ist eine Questreihe mit einem Schritt in der Tiefschwarzen Grotte",
+        frFR = "C’est une suite de quêtes avec une étape dans les Profondeurs de Brassenoire",
+        esES = "Es una cadena de misiones con un paso en las Cavernas de Brazanegra",
+        itIT = "È una catena di missioni con una tappa negli Abissi di Fondocupo",
+        ptBR = "É uma cadeia de missões com uma etapa nas Profundezas Negras",
+        ruRU = "Это цепочка заданий с этапом в Непроглядной Пучине",
+        koKR = "검은심연 나락에서 진행하는 단계가 있는 연계 퀘스트입니다",
+        zhCN = "这是一个系列任务，其中一步在黑暗深渊",
+        zhTW = "這是一個系列任務，其中一步在黑澗深淵",
+    },
+    ["This is a chain quest with a step in Shadowfang Keep"] = {
+        deDE = "Dies ist eine Questreihe mit einem Schritt in Burg Schattenfang",
+        frFR = "C’est une suite de quêtes avec une étape au Donjon d’Ombrecroc",
+        esES = "Es una cadena de misiones con un paso en el Castillo de Colmillo Oscuro",
+        itIT = "È una catena di missioni con una tappa nel Forte di Zannascura",
+        ptBR = "É uma cadeia de missões com uma etapa na Bastilha da Presa Negra",
+        ruRU = "Это цепочка заданий с этапом в Крепости Темного Клыка",
+        koKR = "그림자송곳니 성채에서 진행하는 단계가 있는 연계 퀘스트입니다",
+        zhCN = "这是一个系列任务，其中一步在影牙城堡",
+        zhTW = "這是一個系列任務，其中一步在影牙城堡",
+    },
+}
+for english, byLang in pairs(PALA_WARNINGS) do
+    for lang, text in pairs(byLang) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            content.places[english] = text
+        end
+    end
+end
+-- END palawarn
+
+-- BEGIN turninplaces
+-- Places in the quest tracker's turn-in pins (Data/QuestMaps.lua, TURNIN_SPOTS).
+local TURNIN_PLACES = {
+    ["Valley of Heroes"] = {
+        deDE = "Tal der Helden",
+        frFR = "Vallée des Héros",
+        esES = "Valle de los Héroes",
+        itIT = "Valle degli Eroi",
+        ptBR = "Vale dos Heróis",
+        ruRU = "Аллея Героев",
+        koKR = "영웅의 계곡",
+        zhCN = "英雄谷",
+        zhTW = "英雄谷",
+    },
+    ["Stormwind Keep"] = {
+        deDE = "Burg Sturmwind",
+        frFR = "Donjon de Hurlevent",
+        esES = "Castillo de Ventormenta",
+        itIT = "Fortezza di Roccavento",
+        ptBR = "Bastilha de Ventobravo",
+        ruRU = "Крепость Штормграда",
+        koKR = "스톰윈드 왕궁",
+        zhCN = "暴风城要塞",
+        zhTW = "暴風城要塞",
+    },
+    ["Cathedral Square"] = {
+        deDE = "Kathedralenplatz",
+        frFR = "Place de la Cathédrale",
+        esES = "Plaza de la Catedral",
+        itIT = "Piazza della Cattedrale",
+        ptBR = "Praça da Catedral",
+        ruRU = "Соборная площадь",
+        koKR = "대성당 광장",
+        zhCN = "教堂广场",
+        zhTW = "教堂廣場",
+    },
+    ["Magic Quarter"] = {
+        deDE = "Magieviertel",
+        frFR = "Quartier de la Magie",
+        esES = "Barrio de la Magia",
+        itIT = "Quartiere della Magia",
+        ptBR = "Bairro da Magia",
+        ruRU = "Квартал Магов",
+        koKR = "마법 지구",
+        zhCN = "魔法区",
+        zhTW = "魔法區",
+    },
+}
+for english, byLang in pairs(TURNIN_PLACES) do
+    for lang, text in pairs(byLang) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            if content.places[english] == nil then content.places[english] = text end
+        end
+    end
+end
+-- END turninplaces
+
+-- BEGIN objectivenames
+-- Quest objective names (the items, creatures and objects the journal's quests
+-- ask for) in the game's other languages, so the quest tracker and quest pages
+-- can show "12/20 Deviate Hide" in the journal's language when it is not the
+-- game's. Generated from the Forever client's tables (quest
+-- objectives and their names in each language). English name -> one name per language
+-- in FDJ.OBJECTIVE_NAME_LOCALES order (false: not known).
+FDJ.OBJECTIVE_NAME_LOCALES = { "deDE", "esES", "frFR", "koKR", "ptBR", "ruRU", "zhCN", "zhTW" }
+FDJ.OBJECTIVE_NAMES = {
+    ["99-Year-Old Port"] = { "99 Jahre alter Portwein", "Puerto con 99 años de antigüedad", "Porto vieux de 99 ans", "99년 숙성된 포트 와인", "Xerez de 99 Anos", "Портвейн 99-летней выдержки", "99年波尔多陈酿", "99年波爾多陳釀" },
+    ["A Crumpled Up Note"] = { "Eine zusammengeknüllte Notiz", "Una nota arrugada", "Une note chiffonnée", "꼬깃꼬깃한 쪽지", "Bilhete Amassado", "Измятая записка", "弄皱的便笺", "弄皺的便箋" },
+    ["A Mysterious Message"] = { "Eine mysteriöse Nachricht", "Un mensaje misterioso", "Un message mystérieux", "수수께끼의 전갈", "Uma Mensagem Misteriosa", "Таинственное послание", "神秘的信件", "神秘的信件" },
+    ["Abominable Head"] = { "Monströser Kopf", "Cabeza abominable", "Tête abominable", "흉측한 머리", "Cabeça Abominável", "Чудовищная голова", "憎恶头颅", "可憎頭顱" },
+    ["Altered Snapjaw Shell"] = { "Veränderte Schnappkieferschale", "Caparazón de quijaforte alterado", "Carapace de Gueule d'acier altérée", "변형된 무쇠턱거북 등껍질", "Casco Alterado de Mordelisca", "Измененный панцирь хрустогрыза", "变异的钳嘴龟壳", "變異的鉗嘴龜殼" },
+    ["Ambassador Infernus' Bracer"] = { "Botschafter Infernus' Armschienen", "Brazal del Embajador Infernus", "Bracelets de l'ambassadeur Infernus", "사자 인페르누스의 족쇄", "Braçadeira do Embaixador Infernus", "Наруч посла Инфернуса", "因弗努斯大使的护腕", "因弗努斯大使的護腕" },
+    ["Ambassador Malcin's Head"] = { "Kopf von Botschafter Malcin", "Cabeza del Embajador Malcin", "Tête de l'Ambassadeur Malcin", "사절 말킨의 머리카락", "Cabeça do Embaixador Malcin", "Голова посланника Малкина", "玛克林大使的头颅", "瑪克林大使的頭顱" },
+    ["Amber Voodoo Feather"] = { "Gelbe Voodoofeder", "Pluma vudú ámbar", "Plume vaudou ambre", "황색 부두 깃털", "Pena Vodu Âmbar", "Янтарное перо вуду", "琥珀巫毒羽毛", "琥珀巫毒羽毛" },
+    ["Amnennar the Coldbringer"] = { "Amnennar der Kältebringer", "Amnennar el Gélido", "Amnennar le Porte-froid", "혹한의 암네나르", "Amnennar, o Frigífero", "Амненнар Хладовей", "寒冰之王亚门纳尔", "寒冰之王亞門納爾" },
+    ["Amulet of Union"] = { "Amulett der Vereinigung", "Amuleto de Unidad", "Amulette d'union", "결속의 아뮬렛", "Amuleto da União", "Амулет Соединения", "联合坠饰", "聯合墜飾" },
+    ["An Unsent Letter"] = { "Ein nie abgeschickter Brief", "Una carta sin enviar", "Une lettre qui n'a pas été envoyée.", "부치지 않은 편지", "Carta Não Enviada", "Неотосланное письмо", "未寄出的信", "未寄出的信" },
+    ["An'Alleum Power Stone"] = { "An'Alleum-Kraftstein", "Piedra de energía An'Alleum", "Pierre de puissance An'Alleum", "안알레움 마법석", "Pedra de Energia de An'Alleum", "Камень могущества Ан'Аллеума", "安纳洛姆能量石", "安納洛姆能量石" },
+    ["Ancient Egg"] = { "Uraltes Ei", "Huevo antiguo", "Oeuf antique", "고대의 알", "Ovo Velho", "Древнее яйцо", "远古之卵", "遠古之卵" },
+    ["Ancient Gurubashi Idol"] = { "Uralter Götze der Gurubashi", "Antiguo ídolo Gurubashi", "Idole antique des Gurubashi", "고대 구루바시 우상", "Ídolo Gurubashi Ancestral", "Идол древней империи Гурубаши", "上古古拉巴什神像", "遠古古拉巴什塑像" },
+    ["Anvilrage Footman"] = { "Fußsoldat der Zorneshämmer", "Lacayo de Yunque Colérico", "Fantassin Ragenclume", "성난모루단 보병", "Soldado Raso Furiadastra", "Пехотинец из клана Ярости Горна", "铁怒步兵", "鐵怒步兵" },
+    ["Anvilrage Guardsman"] = { "Gardist der Zorneshämmer", "Custodio de Yunque Colérico", "Garde Ragenclume", "성난모루단 보초", "Guarda Furiadastra", "Охранник из клана Ярости Горна", "铁怒卫士", "鐵怒衛士" },
+    ["Anvilrage Medic"] = { "Sanitäter der Zorneshämmer", "Médico de Yunque Colérico", "Médecin Ragenclume", "성난모루단 간호병", "Socorrista Furiadastra", "Медик из клана Ярости Горна", "铁怒医师", "鐵怒醫師" },
+    ["Anvilrage Officer"] = { "Offizier der Zorneshämmer", "Oficial de Yunque Colérico", "Officier Ragenclume", "성난모루단 장교", "Oficial Furiadastra", "Офицер из клана Ярости Горна", "铁怒军官", "鐵怒軍官" },
+    ["Anvilrage Soldier"] = { "Soldat der Zorneshämmer", "Soldado de Yunque Colérico", "Soldat Ragenclume", "성난모루단 병사", "Soldado Furiadastra", "Солдат из клана Ярости Горна", "铁怒士兵", "鐵怒士兵" },
+    ["Anvilrage Warden"] = { "Aufseher der Zorneshämmer", "Alcaide de Yunque Colérico", "Gardien Ragenclume", "성난모루단 교도관", "Carcereiro Furiadastra", "Надсмотрщик из клана Ярости Горна", "铁怒狱卒", "鐵怒獄卒" },
+    ["Arcane Mote"] = { "Arkanpartikel", "Mota Arcana", "Granule arcanique", "비전 티끌", "Partícula Arcana", "Частица чар", "奥术微粒", "秘法微粒" },
+    ["Arcane Shard"] = { "Arkaner Splitter", "Fragmento Arcano", "Fragment d'arcane", "신비의 결정", "Estilhaço Arcano", "Кристалл тайной магии", "奥术碎片", "秘法碎片" },
+    ["Arcanic Enigma"] = { "Arkanes Mysterium", "Enigma Arcano", false, false, false, false, false, false },
+    ["Arcanite Bar"] = { "Arkanitbarren", "Lingote de arcanita", "Barre d'arcanite", "아케이나이트 주괴", "Barra de Arcanita", "Арканитовый слиток", "奥金锭", "奧金錠" },
+    ["Arcanite Barding"] = { "Arkanitpferdegeschirr", "Gualdrapa de arcanita", "Caparaçon en arcanite", "아케이나이트 마갑", "Barda de Arcanita", "Арканитовый чепрак", "奥金马铠", "奧金馬鎧" },
+    ["Archivist Galford"] = { "Archivar Galford", "Archivista Galford", "Archiviste Galford", "기록관 갈포드", "Arquivista Galford", "Архивариус Галфорд", "档案管理员加尔福特", "檔案管理員加爾福特" },
+    ["Arthas' Tears"] = { "Arthas' Tränen", "Lágrimas de Arthas", "Larmes d'Arthas", "아서스의 눈물", "Lágrimas-de-arthas", "Слезы Артаса", "阿尔萨斯之泪", "阿薩斯之淚" },
+    ["Atal'ai Artifact"] = { "Artefakt der Atal'ai", "Artefacto Atal'ai", "Artefact atal'ai", "아탈라이 유물", "Artefato Atal'ai", "Артефакт Атал'ай", "阿塔莱神器", "阿塔萊神器" },
+    ["Atal'ai Haze"] = { "Dunst der Atal'ai", "Calima Atal'ai", "Brume atal'ai", "아탈라이 아지랑이", "Bruma de Atal'ai", "Туман Атал'ай", "阿塔莱之雾", "阿塔萊之霧" },
+    ["Atal'ai Stone Circle"] = { "Steinkreis der Atal'ai", "Círculo de Piedras Atal'ai", "Cercle de pierres atal'ai", "아탈라이 돌무리", "Círculo de Pedra Atal'ai", "Круглый камень Атал'ай", "阿塔莱石环", "阿塔萊石環" },
+    ["Atal'ai Tablet"] = { "Schrifttafel der Atal'ai", "Tablilla Atal'ai", "Tablette atal'ai", "아탈라이 서판", "Tabuleta Atal'ai", "Табличка Атал'ай", "阿塔莱石板", "阿塔萊石板" },
+    ["Atal'ai Tablet Fragment"] = { "Schrifttafelfragment der Atal'ai", "Fragmento de tablilla Atal'ai", "Fragment de tablette atal'ai", "아탈라이 서판 조각", "Fragmento de Tabuleta Atal'ai", "Фрагмент таблички Атал'ай", "阿塔莱石板碎片", "阿塔萊石板碎片" },
+    ["Atrexis the Grave Knight"] = { "Atrexis der Grabritter", "Atrexis el Caballero de la Tumba", "Atrexis le Chevalier de la tombe", "무덤 기사 아트렉시스", "Atrexis, o Cavaleiro da Sepultura", "Атрексий Могильный Рыцарь", false, "『墓地騎士』亞崔希斯" },
+    ["Awbee's Scale"] = { "Awbees Schuppe", "Escama de Awbee", "Ecaille d'Awbee", "아우비의 비늘", "Escama do Awbee", "Чешуя Ауби", "奥比的鳞片", "奧比的鱗片" },
+    ["Azerothian Diamond"] = { "Azerothianischer Diamant", "Diamante de Azeroth", "Diamant d'Azeroth", "아제로스 다이아몬드", "Diamante Azerotiano", "Азеротский алмаз", "艾泽拉斯钻石", "艾澤拉斯鑽石" },
+    ["Azure Key"] = { "Azurblauer Schlüssel", "Llave azur", "Clé azur", "하늘색 열쇠", "Chave Lazúli", "Лазурный ключ", "碧蓝钥匙", "碧藍鑰匙" },
+    ["Bazzalan"] = { false, false, false, "바잘란", false, "Баззалан", "巴扎兰", "巴札蘭" },
+    ["Beginnings of the Undead Threat"] = { "Anfänge der Bedrohung durch die Untoten", "Comienzos de la amenaza de los no-muertos", "Naissance de la menace des morts-vivants", "언데드 위협의 기원", "Início da Ameaça dos Mortos-vivos", "\"Истоки угрозы нежити\"", "亡灵的起源", "不死族的起源" },
+    ["Belnistrasz's Oathstone"] = { "Belnistraszs Schwurstein", "Piedra de juramento de Belnistrasz", "Pierre de voeu de Belnistrasz", "벨리스트라즈의 서약의 돌", "Pedra do Juramento de Belnistrasz", "Камень Клятвы Белнистраза", "奔尼斯特拉兹的誓言石", "貝尼斯特拉茲的誓言石" },
+    ["Berard's Journal"] = { "Berards Tagebuch", "Diario de Berard", "Journal de Berard", "베랄드의 일지", "Diário de Berardo", "Записи Берарда", "伯纳德的日记", "伯納德的日記" },
+    ["Bijou's Belongings"] = { "Bijous Habseligkeiten", "Pertenencias de Bijou", "Affaires de Bijou", "비쥬의 소지품", "Pertences de Biju", "Вещи Блестяшки", "比修的装置", "比修的裝置" },
+    ["Bijou's Information"] = { "Bijous Informationen", "Información de Bijou", "Renseignements de Bijou", "비쥬의 정보", "Informações de Biju", "Информация Блестяшки", "比修的情报", "比修的情報" },
+    ["Black Broodling"] = { "Schwarzer Brutling", "Cachorrillo negro", "Rejeton noir", "검은 새끼용", "Filhote Negro", "Детеныш черного дракона", "黑色小龙", "黑色小龍" },
+    ["Black Dragonscale"] = { "Schwarze Drachenschuppe", "Escamas de dragón negro", "Ecaille de dragon noir", "검은용 비늘", "Escama de Dragão Negro", "Шкура черного дракона", "黑龙鳞片", "黑龍鱗片" },
+    ["Black Dragonspawn"] = { "Schwarze Großdrachenbrut", "Dragauro negro", "Draconide noir", "검은용혈족", "Dragomorfo Negro", "Черный драконид", "黑色龙人", "黑色龍人" },
+    ["Black Dragonspawn Eye"] = { "Schwarzes Drachenbrutauge", "Ojo de dragauro negro", "Oeil de draconide noir", "검은 용혈족의 눈동자", "Olho de Dragomorfo Preto", "Глаз черного драконида", "黑色龙兽的眼球", "黑色龍人的眼球" },
+    ["Black Drake"] = { "Schwarzdrache", "Draco negro", "Drake noir", "검은 비룡", "Draco Negro", "Черный дракон", "黑色幼龙", "黑色幼龍" },
+    ["Black Wyrmkin"] = { "Schwarzwyrmkin", "Vermis negro", "Wyrmide noir", "검은고룡족", "Draconoide Negro", "Черная драконида", "火鳞龙人", "火鱗龍人" },
+    ["Bleeding Horror"] = { "Blutender Schrecken", "Horror sangrante", "Horreur sanguinolente", "피투성이 좀비", "Horror Sangrento", "Кровоточащий ужас", "可怕的血僵尸", "可怕的血殭屍" },
+    ["Blessed Arcanite Barding"] = { "Gesegnetes Arkanitpferdegeschirr", "Gualdrapa de arcanita bendita", "Caparaçon en arcanite béni", "축복받은 아케이나이트 마갑", "Barda de Arcanita Abençoada", "Благословенный арканитовый чепрак", "被祝福的奥金马铠", "受祝福的奧金馬鎧" },
+    ["Blood of Heroes"] = { "Blut von Helden", "Sangre de héroes", "Sang des héros", "영웅의 피", "Sangue dos Heróis", "Кровь героев", "英雄之血", "英雄之血" },
+    ["Blood of Morphaz"] = { "Morphaz' Blut", "Sangre de Morphaz", "Sang de Morphaz", "몰파즈의 피", "Sangue de Morphaz", "Кровь Морфаза", "摩弗拉斯之血", "摩弗拉斯之血" },
+    ["Blood of the Black Dragon Champion"] = { "Blut des schwarzen Großdrachen-Helden", "Sangre de dragón Negro Campeón", "Sang du Champion des dragons noirs", "검은용 용사의 피", "Sangue do Campeão dos Dragões Negros", "Кровь могучего черного дракона", "黑龙勇士之血", "黑龍勇士之血" },
+    ["Blood-Stained Letter"] = { "Blutbefleckter Brief", "Carta manchada de sangre", "Lettre tachée de sang", "피로 얼룩진 편지", "Carta Manchada de Sangue", "Запятнанное кровью письмо", "染血的信", "染血信件" },
+    ["Bloodcap"] = { "Blutkappenpilz", "Champiñón de sangre", "Chapeau de sang", "붉은갓버섯", "Cogumelo Vermelho", "Кровошляпочник", "血帽", "血帽" },
+    ["Bloodied Insignia"] = { "Blutverschmiertes Insigne", "Insignia ensangrentada", "Insigne ensanglanté", "피투성이 휘장", "Insígnia Ensanguentada", "Окровавленный знак отличия", "血污徽章", "染血徽記" },
+    ["Bloodpetal"] = { "Blutblüte", "Pétalo de sangre", "Pétale-de-sang", "붉은꽃잎", "Pétala Sangrenta", "Кровоцвет", "血瓣花", "血瓣花" },
+    ["Bloodpetal Flayer"] = { "Blutblütenschinder", "Despellejador pétalo de sangre", "Ecorcheur Pétale-de-sang", "칼날가시 붉은꽃잎덩굴손", "Esfoladora Pétala Sangrenta", "Кровоцвет-живодер", "血瓣花掠夺者", "血瓣花掠奪者" },
+    ["Bloodpetal Lasher"] = { "Blutblütenpeitscher", "Latigador pétalo de sangre", "Flagellant Pétale-de-sang", "채찍줄기 붉은꽃잎덩굴손", "Açoitadeira Pétala Sangrenta", "Кровоцвет-хлыстун", "血瓣花鞭笞者", "血瓣花鞭笞者" },
+    ["Bloodpetal Thresher"] = { "Blutblütendrescher", "Trillador pétalo de sangre", "Batteur Pétale-de-sang", "덩이줄기 붉은꽃잎덩굴손", "Látega Pétala Sangrenta", "Кровоцвет-крепкозуб", "血瓣花猛击者", "血瓣花猛擊者" },
+    ["Bloodpetal Trapper"] = { "Blutblütenfalle", "Trampero pétalo de sangre", "Trappeur Pétale-de-sang", "질긴뿌리 붉은꽃잎덩굴손", "Laçadora Pétala Sangrenta", "Кровоцвет-зверолов", "血瓣花捕兽者", "血瓣花捕獸者" },
+    ["Bloodshot Spider Eye"] = { "Blutunterlaufenes Spinnenauge", "Ojo de araña tiro de sangre", "Oeil d'araignée injecté de sang", "핏발 선 거미 눈", "Olho Injetado de Aranha", "Воспаленный паучий глаз", "充血的蜘蛛眼", "充血的蜘蛛眼" },
+    ["Bloodstone Marble"] = { "Blutsteinmarmor", "Canica de Petrosangre", "Pierre de sang marbrée", "단단한 혈석", "Bola de Gude de Pedra-sangrenta", "Шаровидный Кровавый камень", "血石弹球", "血石彈球" },
+    ["Bloodstone Oval"] = { "Blutsteinoval", "Óvalo de Petrosangre", "Pierre de sang ovale", "타원형 혈석", "Oval de Pedra-sangrenta", "Овальный Кровавый камень", "血色卵石", "血色卵石" },
+    ["Bloodstone Shard"] = { "Blutsteinsplitter", "Fragmento de Petrosangre", "Eclat de pierre de sang", "조각난 혈석", "Lasca de Pedra-sangrenta", "Осколок Кровавого камня", "血石碎片", "血石碎片" },
+    ["Bloodstone Wedge"] = { "Blutsteinkeil", "Cuña de Petrosangre", "Coeur de pierre de sang", "쐐기형 혈석", "Cunha de Pedra-sangrenta", "Клинообразный Кровавый камень", "血石之楔", "血石之楔" },
+    ["Bloodvenom Essence"] = { "Blutgiftessenz", "Esencia de veneno de sangre", "Essence de Vénéneuse", "피멍울 정수", "Essência de Peçonha", "Экстракт Ядовитой Крови", "血毒精华", "血毒精華" },
+    ["Blue Voodoo Feather"] = { "Blaue Voodoofeder", "Pluma de vudú azul", "Plume vaudou bleue", "청색 부두 깃털", "Pena Vodu Azul", "Синее вудуистское перо", "蓝色巫毒羽毛", "藍色巫毒羽毛" },
+    ["Blueleaf Tuber"] = { "Blaulaubknolle", "Tubérculo hojazul", "Racines de Feuillebleue", "청엽수 줄기", "Tubérculo Folhazul", "Корень синелиста", "蓝叶薯", "藍葉薯" },
+    ["Bolt of Runecloth"] = { "Runenstoffballen", "Madeja de paño rúnico", "Rouleau d'étoffe runique", "룬무늬 두루마리", "Peça de Runatrama", "Рулон рунной ткани", "符文布卷", "符文布卷" },
+    ["Bolvar's Decree"] = { "Bolvars Erlass", "Decreto de Bolvar", "Décret de Bolvar", "볼바르의 명령서", "Decreto de Bolvar", "Указ Болвара", "伯瓦尔的命令", "伯瓦爾的命令" },
+    ["Book of Incantations"] = { "Buch der Zauberformeln", "Libro sobre Conjuros", "Livre des Incantations", "마법서", "Livro de Encantamentos", "Книга магических формул", "咒术之书", "咒術之書" },
+    ["Borelgore"] = { "Blutschlinger", false, "Creusechair", "피고름구더기", "Brocassangre", "Мерзкослиз", "淤血虫", "淤血蟲" },
+    ["Brilliant Gold Ring"] = { "Blitzender Goldring", "Anillo de oro luminoso", "Anneau d'or brillant", "반짝이는 금반지", "Anel de Ouro Brilhante", "Сверкающее золотое кольцо", "闪亮的金戒指", "閃亮的金戒指" },
+    ["Brinescale Trident"] = { "Laugenschuppendreizack", "Tridente Escamasalada", "Trident d’écaille-de-mer", "소금비늘 삼지창", "Tridente Escamoura", "Солоноводный трезубец", "盐鳞三叉戟", "海鱗三叉戟" },
+    ["Broodling Essence"] = { "Brutlingessenz", "Esencia de cría", "Essence de Rejeton", "새끼용의 정수", "Essência da Reprodução", "Сущность детеныша дракона", "雏龙精华", "雛龍精華" },
+    ["Bubbling Fissure"] = { "Blubbernder Felsspalt", "Fisura burbujeante", "Fissure bouillonnante", "거품이 나오는 균열", "Rachadura Borbulhante", "Бурлящая расщелина", "冒泡的裂隙", "冒泡的裂隙" },
+    ["Bundle of Atal'ai Artifacts"] = { "Artefaktbündel der Atal'ai", "Fardo de artefactos de Atal'ai", "Artefacts atal'ai", "아탈라이 유물 자루", "Saco de Artefatos Atal'ai", "Сверток с артефактами Атал'ай", "一捆阿塔莱神器", "一捆阿塔萊神器" },
+    ["Bundle of Blacksmithing Materials"] = { "Bündel Schmiedematerialien", "Fardo de materiales de herrería", "Tas de matériaux de forge", "대장기술 재료 묶음", "Feixe de Materiais de Ferraria", "Сверток материалов для кузнечного дела", "一捆锻造材料", "一捆鍛造材料" },
+    ["Buzzard Gizzard"] = { "Bussardmuskelmagen", "Molleja de águila ratonera", "Gésier de busard", "대머리수리 모래주머니", "Moela de Urubu", "Второй желудок канюка", "秃鹫的胃囊", "禿鷲的胃囊" },
+    ["Caged Worg Pup"] = { "Gefangener Worgwelpe", "Joven lupo encerrado", "Jeune worg en cage", "사로잡은 새끼 검은늑대", "Filhote de Worg Enjaulado", "Щенок ворга в клетке", "笼中的座狼幼崽", "籠中的小座狼" },
+    ["Carved Stone Urn"] = { "Verzierte Steinurne", "Urna de piedra grabada", "Urne de pierre gravée", "돌조각 단지", "Urna de Pedra com Gravuras", "Резная каменная урна", "雕纹石罐", "雕紋石罐" },
+    ["Case of Blood"] = { "Behälter mit Blut", "Caja de sangre", "Caisse de sang", "피가 담긴 상자", "Caixote de Sangue", "Ларец Крови", "血箱", "血箱" },
+    ["Celebrian Diamond"] = { "Celebriandiamant", "Diamante de Celebras", "Diamant de Celebras", "셀레브리안 다이아몬드", "Diamante de Celebras", "Келебрийский бриллиант", "塞雷布拉斯钻石", "塞雷布拉斯鑽石" },
+    ["Celebrian Rod"] = { "Celebriangriff", "Vara de Celebras", "Bâtonnet de Celebras", "셀레브리안 마법봉", "Bastão de Celebras", "Келебрийский жезл", "塞雷布拉斯魔棒", "塞雷布拉斯魔棒" },
+    ["Charger's Redeemed Soul"] = { "Erlöste Seele des Streitrosses", "Alma redimida de cargador", "Âme rachetée du destrier", "구원된 군마의 영혼", "Alma Redimida do Corcel", "Спасенная душа рыцарского коня", "赎罪的战马之魂", "戰騎的救贖之魂" },
+    ["Coagulated Rot"] = { "Geronnene Fäulnis", "Putrefacción coagulada", "Pourriture coagulée", "응고된 부패물", "Putrefação Coagulada", "Сгущенная гниль", "凝固腐质", "凝固腐質" },
+    ["Codex of Defense"] = { "Kodex der Verteidigung", "Códice de Defensa", "Le codex de défense", "방어의 고서", "Códice de Defesa", "Кодекс Защиты", "防御宝典", "防禦寶典" },
+    ["Collected Dragon Egg"] = { "Eingesammeltes Großdrachen-Ei", "Huevo de dragón recogido", "Oeuf de dragon collecté", "수집한 용의 알", "Ovo de Dragão Recolhido", "Коллекционное яйцо дракона", "收集到的龙蛋", "收集到的龍蛋" },
+    ["Collectronic Module"] = { "Kollektronisches Modul", "Módulo colectrónico", "Module collectronique", "수집전자 모듈", "Módulo Colectrônico", "Устройство-коллекционер", "电动采集模块", "電動採集模組" },
+    ["Commander Gor'shak"] = { "Kommandant Gor'shak", "Comandante Gor'shak", "Commandant Gor'shak", "사령관 고르샤크", "Comandante Gor'shak", "Командир Гор'шак", "指挥官哥沙克", "指揮官哥沙克" },
+    ["Compendium of the Fallen"] = { "Kompendium der Gefallenen", "Compendio de los Caídos", "Compendium des Déchus", "타락의 개요", "Compêndio dos Caídos", "\"Компендиум павших\"", "堕落者纲要", "墮落者綱要" },
+    ["Core Fragment"] = { "Kernfragment", "Fragmento del Núcleo", "Fragment du Magma", "핵 조각", "Fragmento de Núcleo", "Осколок из Огненных Недр", "熔火碎片", "熔火碎片" },
+    ["Corrupted Brain Stem"] = { "Verderbter Hirnstamm", "Bulbo raquídeo corrupto", "Souche de cerveau corrompu", "변이된 뇌간", "Tronco Encefálico Corrompido", "Оскверненный ствол мозга", "堕落者的脑干", "墮落者的腦幹" },
+    ["Cracked Sentry Core"] = { "Gesprungener Wächterkern", "Núcleo de centinela agrietado", "Noyau de sentinelle fissuré", "금이 간 파수꾼 핵", "Núcleo de Sentinela Rachado", "Треснувший сердечник часового", "开裂的哨兵核心", "碎裂的哨兵核心" },
+    ["Crag Coyote Fang"] = { "Klippenkojotenfangzahn", "Colmillo de coyote de risco", "Croc de coyote des rochers", "바위산코요테 송곳니", "Presa de Coiote do Rochedo", "Клык скального койота", "峭壁山狗的牙齿", "峭壁山狗的牙齒" },
+    ["Crate With Holes"] = { "Kiste mit Löchern", "Cajón con agujeros", "Caisse percée", "구멍 난 상자", "Caixote com Furos", "Ящик с отверстиями", "开孔的箱子", "開孔的箱子" },
+    ["Crest of Lordaeron"] = { "Wappen von Lordaeron", "Blasón de Lordaeron", "Écu de Lordaeron", "로데론의 문장", "Escudo de Lordaeron", "Герб Лордерона", "洛丹伦纹章", "羅德隆紋章" },
+    ["Crude Flint"] = { "Kunstloser Feuerstein", "Sílex rudimentario", "Silex brut", "조잡한 부싯돌", "Pederneira Grotesca", "Необработанный кремень", "粗制打火石", "粗製打火石" },
+    ["Crystal Restore"] = { "Kristallflicker", "Restaurar cristal", "Cristal de restauration", "회복의 수정", "Restauração de Cristal", "Кристалл восстановления", "恢复水晶", "恢復水晶" },
+    ["Dalaran Summoner"] = { "Beschwörer von Dalaran", "Invocador Dalaran", "Invocateur de Dalaran", "달라란 소환사", "Evocador de Dalaran", "Даларанский призыватель", "达拉然召唤师", "達拉然召喚師" },
+    ["Damp Note"] = { "Feuchte Notiz", "Nota mojada", "Note humide", "축축한 쪽지", "Bilhete Úmido", "Отсыревшая записка", "潮湿的便笺", "潮濕的便箋" },
+    ["Dark Iron Ale Mug"] = { "Dunkeleisenbierbecher", "Jarra de cerveza tradicional Hierro Negro", "Chope de bière sombrefer", "검은무쇠 에일 맥주잔", "Caneca de Cerveja Ferro Negro", "Кружка эля Черного Железа", "黑铁酒杯", "黑鐵酒杯" },
+    ["Dark Iron Demolitionist"] = { "Demolierer der Dunkeleisenzwerge", "Demoledor Hierro Negro", "Démolisseur Sombrefer", "검은무쇠단 폭파병", "Demolidor Ferro Negro", "Подрывник из клана Черного Железа", "黑铁爆破手", "黑鐵爆破手" },
+    ["Dark Iron Dwarf"] = { "Dunkeleisenzwerg", "Enano Hierro Negro", "Nain Sombrefer", "검은무쇠단 드워프", "Anão Ferro Negro", "Дворф из клана Черного Железа", "黑铁矮人", "黑鐵矮人" },
+    ["Dark Iron Fanny Pack"] = { "Dunkeleisengürteltasche", "Talega extraña Hierro Negro", "Sacoche sombrefer", "검은무쇠 벨트주머니", "Pochete Ferro Negro", "Поясная сумка дворфов Черного Железа", "黑铁挎包", "黑鐵挎包" },
+    ["Dark Iron Map"] = { "Dunkeleisenkarte", "Mapa Hierro Negro", "Carte sombrefer", "검은무쇠 지도", "Mapa Ferro Negro", "Карта клана Черного Железа", "黑铁地图", "黑鐵地圖" },
+    ["Dark Iron Ore"] = { "Dunkeleisenerz", "Hierro Negro", "Minerai de sombrefer", "검은무쇠 광석", "Minério de Ferro Negro", "Руда черного железа", "黑铁矿石", "黑鐵礦石" },
+    ["Dark Iron Saboteur"] = { "Saboteur der Dunkeleisenzwerge", "Saboteador Hierro Negro", "Saboteur Sombrefer", "검은무쇠단 투사", "Sabotador Ferro Negro", "Саботажник из клана Черного Железа", "黑铁破坏者", "黑鐵破壞者" },
+    ["Dark Iron Tunneler"] = { "Tunnelgräber der Dunkeleisenzwerge", "Tunelador Hierro Negro", "Tunnelier Sombrefer", "검은무쇠단 채굴꾼", "Escavador Ferro Negro", "Проходчик из клана Черного Железа", "黑铁隧道工", "黑鐵隧道工" },
+    ["Darkreaver's Head"] = { "Schattensichels Kopf", "Cabeza de Atracoscuro", "Tête de Ravassombre", "다크리버의 머리카락", "Cabeça de Noctilatrus", "Голова Темного Терзателя", "达克雷尔的徽记", "達克雷爾的頭顱" },
+    ["Darkstone Tablet"] = { "Darkstone-Schrifttafel", "Tablilla Rocanegra", "Tablette de Darkstone", "다크스톤 서판", "Tabuleta de Pedranegra", "Табличка Темного Камня", "黑暗石板", "黑暗石板" },
+    ["Death's Head Cultist"] = { "Kultistin der Totenköpfe", "Fiel Caramuerte", "Sectateur de la Tête de Mort", "죽음의 머리교 신도", "Sectário da Cabeça da Morte", "Сектантка из племени Мертвой Головы", "亡首教徒", "亡首教徒" },
+    ["Defias Convict"] = { "Eingekerkerter Defias", "Presidiario Defias", "Détenu défias", "데피아즈단 무기징역수", "Condenado Défias", "Каторжник из Братства Справедливости", "迪菲亚罪犯", "迪菲亞罪犯" },
+    ["Defias Insurgent"] = { "Aufrührer der Defias", "Insurgente Defias", "Insurgé défias", "데피아즈단 반역자", "Insurgente Défias", "Мятежник из Братства Справедливости", "迪菲亚叛军", "迪菲亞叛軍" },
+    ["Defias Prisoner"] = { "Gefangener Defias", "Prisionero Defias", "Prisonnier défias", "데피아즈단 복역수", "Prisioneiro Défias", "Узник из Братства Справедливости", "迪菲亚囚徒", "迪菲亞囚犯" },
+    ["Demon of the Orb"] = { "Dämon der Kugel", "Demonio del orbe", "Démon de l'Orbe", "보주의 악마", "Demônio do Orbe", "Демон сферы", "宝珠之魔", "寶珠之魔" },
+    ["Dentrium Power Stone"] = { "Dentrium-Kraftstein", "Piedra de energía de dentrio", "Pierre de puissance Dentrium", "덴트리움 마법석", "Pedra de Energia de Dêntrio", "Дентриевый камень Силы", "德提亚姆能量石", "德提亞姆能量石" },
+    ["Deviate Dreadfang"] = { "Deviatschreckensfang", "Colminferno descarriado", "Croc-d'effroi déviant", "돌연변이 송곳니천둥매", "Presátera Anormal", "Загадочный страхозуб", "变异尖牙风蛇", "變異尖牙風蛇" },
+    ["Deviate Hide"] = { "Deviatbalg", "Pellejo descarriado", "Peau de déviant", "돌연변이 통가죽", "Pelego Anormal", "Искаженная шкура", "变异皮革", "變異皮革" },
+    ["Deviate Ravager"] = { "Deviatverheerer", "Devastador descarriado", "Ravageur déviant", "돌연변이 약탈자랩터", "Assolador Anormal", "Загадочный опустошитель", "变异破坏者", "變異破壞者" },
+    ["Deviate Shambler"] = { "Deviatschlurfer", "Arrastrado descarriado", "Glacial déviant", "돌연변이 늪괴물", "Trôpego Anormal", "Загадочный шаркун", "变异蹒跚者", "變異蹣跚者" },
+    ["Deviate Viper"] = { "Deviatviper", "Víbora descarriada", "Vipère déviante", "돌연변이 독사", "Víbora Anormal", "Загадочная гадюка", "剧毒飞蛇", "劇毒飛蛇" },
+    ["Devilsaur"] = { "Teufelssaurier", "Devilsaurio", "Diablosaure", "데빌사우루스", "Demossauro", "Девизавр", "魔暴龙", "魔暴龍" },
+    ["Divino-matic Rod"] = { "Wünschel-mato-Rute", "Vara Divinomática", "Bâtonnet divino-matic", "자동 탐사막대", "Bastão Divinomático", "Изыскательский стержень", "探水棒", "探水棒" },
+    ["Doctor Theolen Krastinov"] = { "Doktor Theolen Krastinov", false, "Docteur Theolen Krastinov", "학자 테올렌 크라스티노브", "Doutor Theolen Krastinov", "Доктор Теолен Крастинов", "瑟尔林·卡斯迪诺夫教授", "瑟爾林·卡斯迪諾夫教授" },
+    ["Doomrigger's Clasp"] = { "Doomriggers Schnalle", "Broche de Equipasino", "Fermoir de Doomrigger", "파멸의 기념물", "Broche do Finitudo", "Пряжка Роковой оснастки", "末日扣环", "末日扣環" },
+    ["Draco-Incarcinatrix 900"] = { false, false, false, "새끼용 속박장치 900", "Draco-incarcinatrix 900", "Драко-инкарцинатор 900", "龙灵采集器900型", "龍靈採集器900型" },
+    ["Dragonmaw Dispatch"] = { "Dragonmaw-Bericht", "Informe Faucedraco", "Couperet gueule-de-dragon", "용아귀부족 급송문서", "Despacho dos Presa do Dragão", "Послание Драконьей Пасти", "龙喉急件", "龍喉抹殺" },
+    ["Dragonmaw Saboteur"] = { false, false, false, false, false, false, false, false },
+    ["Dragonmaw Warder"] = { false, false, false, false, false, false, false, false },
+    ["Dull Drakefire Amulet"] = { "Glanzloses Drachenfeueramulett", "Amuleto de Pirodraco apagado", "Amulette drakefeu terne", "흐릿한 비룡불꽃 아뮬렛", "Amuleto da Chama Dracônica Fraco", "Амулет Угасающего пламени дракона", "黯淡的龙火护符", "黯淡的龍火護符" },
+    ["Durgen Dirgehammer's Head"] = { "Durgen Dirgehammers Kopf", "Cabeza de Durgen Martillo Funesto", "Tête de Durgen Mornemartel", "드루겐 더지해머의 머리카락", "Cabeça de Durgen Martelúgubre", "Голова Даргена Сокрушающий Молот", "杜根·挽锤的徽记", "杜爾根‧戴格哈默的頭顱" },
+    ["Dwarven Heirloom"] = { "Zwergisches Erbstück", "Reliquia enana", "Héritage nain", "드워프 가보", "Herança Enânica", "Дворфийская реликвия", "矮人的篝火", "矮人傳家寶" },
+    ["Elemental Air"] = { "Elementarluft", "Elemental de aire", "Air élémentaire", "바람의 원소", "Ar Elemental", "Первородный воздух", "元素空气", "元素空氣" },
+    ["Elemental Earth"] = { "Elementarerde", "Elemental de tierra", "Terre élémentaire", "대지의 원소", "Terra Elemental", "Первородная земля", "元素之土", "元素之土" },
+    ["Elemental Fire"] = { "Elementarfeuer", "Elemental de Fuego", "Feu élémentaire", "불의 원소", "Fogo Elemental", "Первородный огонь", "元素火焰", "元素火焰" },
+    ["Elemental Shard Sample"] = { "Elementarsplitterprobe", "Muestra de fragmento elemental", "Echantillon de Fragment d'élémentaire", "원소 파편 견본", "Amostra de Estilhaço Elemental", "Образец осколка элементаля", "元素碎片样本", "元素碎片樣本" },
+    ["Elemental Slave"] = { "Elementarsklave", "Esclavo elemental", "Elémentaire asservi", "노예 바위 정령", "Escravo Elemental", "Порабощенный элементаль", "元素奴仆", "元素奴僕" },
+    ["Elemental Water"] = { "Elementarwasser", "Elemental de agua", "Eau élémentaire", "물의 원소", "Água Elemental", "Первородная вода", "元素之水", "元素之水" },
+    ["Elixir of Shadow Power"] = { "Elixier der Schattenmacht", "Elixir de poder de las Sombras", "Elixir de Puissance de l'ombre", "암흑 강화의 비약", "Elixir de Poder Sombrio", "Эликсир силы тьмы", "暗影之力药剂", "暗影之力藥劑" },
+    ["Emperor Dagran Thaurissan"] = { "Imperator Dagran Thaurissan", "Emperador Dagran Thaurissan", "Empereur Dagran Thaurissan", "제왕 다그란 타우릿산", "Imperador Dagran Thaurissan", "Император Дагран Тауриссан", "达格兰·索瑞森大帝", "達格蘭·索瑞森大帝" },
+    ["Encased Fiery Essence"] = { "Eingeschlossene feurige Essenz", "Esencia ígnea encerrada", "Essence féerique enchâssée", "담겨진 불의 정수", "Essência Abrasadora Aprisionada", "Пойманная сущность огня", "包起来的烈焰精华", "包起來的烈焰精華" },
+    ["Enchanted Coral"] = { "Verzauberte Koralle", "Coral encantado", "Corail enchanté", "마력 깃든 산호", "Coral Encantado", "Заколдованный коралл", "魔化珊瑚", "魔化珊瑚" },
+    ["Enchanted Silver Ingot"] = { "Verzauberter Silberbarren", "Lingote de plata encantado", "Lingot d’argent enchanté", "마력 깃든 은 주괴", "Lingote de Prata Encantada", "Слиток зачарованного серебра", "附魔银锭", "附魔銀錠" },
+    ["Enchanted Thorium Bar"] = { "Verzauberter Thoriumbarren", "Lingote de torio encantado", "Barre de thorium enchanté", "마력 깃든 토륨 주괴", "Barra de Tório Encantado", "Зачарованный ториевый слиток", "魔化瑟银锭", "附魔瑟銀錠" },
+    ["Encoded Fragment"] = { "Verschlüsseltes Fragment", "Fragmento codificado", "Fragment codé", "암호화 된 페이지", "Fragmento Codificado", "Зашифрованный фрагмент", "密文碎片", "密碼信碎片" },
+    ["Enraged Apparition"] = { "Wütende Erscheinung", "Aparición enfurecida", "Apparition enragée", "분노한 원혼", "Aparição Enfurecida", "Разъяренная тень", "被激怒的幽灵", "狂怒的亡魂" },
+    ["Enriched Manna Biscuit"] = { "Angereicherter Manakeks", "Galleta de maná enriquecido", "Biscuit enrichi en manne", "맛 좋은 만나빵", "Biscoito de Maná Enriquecido", "Витаминизированное печенье из манны", "可口的魔法点心", "可口的魔法點心" },
+    ["Essence of Eranikus"] = { "Essenz des Eranikus", "Esencia de Eranikus", "Essence d'Eranikus", "에라니쿠스의 정수", "Essência de Erânicos", "Сущность Эраникуса", "伊兰尼库斯精华", "伊蘭尼庫斯精華" },
+    ["Essence of the Elements"] = { "Essenz der Elemente", "Esencia de los elementos", "Essence des éléments", "원소의 정수", "Essência dos Elementos", "Суть Стихий", "元素精华", "元素精華" },
+    ["Essential Artificial"] = { "Grundlegendes Artifix", "Esencia artificial", "Cerveau mécanique", "필수 인공장치", "Artifício Essencial", "Важнейший артефакт", "基础模组", "基礎模組" },
+    ["Exorcism Censer"] = { "Weihrauchschwenker", "Incensario de exorcismo", "Encensoir d'exorcisme", "퇴마 향로", "Incensório de Exorcismo", "Курильница экзорцизма", "驱魔香炉", "驅魔香爐" },
+    ["Extra-Destructive Explosives"] = { "Besonders zerstörerische Sprengladungen", "Explosivos extradestructivos", "Explosifs de destruction ultime", "강력 파괴 폭발물", "Explosivos Extradestrutivos", "Особо разрушительная взрывчатка", "强效炸药", "威力驚人的爆裂物" },
+    ["Faldrim Anvilmar"] = { false, "Faldrim Yunquemar", "Faldrim Courbenclume", "팔드림 앤빌마", "Faldrim Sidermar", "Фалдрим Старая Наковальня", "法德林·安威玛尔", false },
+    ["Fathom Core"] = { "Tiefenkern", "Núcleo de las profundidades", "Noyau de la Brasse", "심연의 핵", "Núcleo das Profundezas", "Глубинный сердечник", "深渊之核", "深淵之核" },
+    ["Fel Infused Blossom"] = { "Teufelserfüllte Blüte", "Flor imbuida de vileza", "Floraison gangrimprégnée", "지옥 마력이 주입된 꽃", "Flor Infusa em Vileza", "Пропитанный Скверной цветок", "注入邪能的花朵", "魔化灌注之花" },
+    ["Felcloth"] = { "Teufelsstoff", "Tela de inferi", "Gangrétoffe", "지옥 옷감", "Tecido Vil", "Ткань Скверны", "恶魔布", "惡魔布" },
+    ["Felnok's Package"] = { "Felnoks Paket", "Talega de Felnok", "Paquet de Felnok", "펠노크의 소포", "Pacote do Felnok", "Ящик Фелнока", "菲诺克的包裹", "菲諾克的包裹" },
+    ["Fen Creeper"] = { "Moorkrabbler", "Trepador del cubil", "Rampant des tourbières", "수렁이끼괴물", "Rastejante do Pântano", "Трясинный ползун", "沼泽爬行者", "沼澤爬行者" },
+    ["Fetish of Hakkar"] = { "Fetisch von Hakkar", "Fetiche de Hakkar", "Fétiche d'Hakkar", "학카르의 우상", "Fetiche de Hakkar", "Фетиш Хаккара", "哈卡神像", "哈卡神像" },
+    ["Fifth Mosh'aru Tablet"] = { "Fünfte Mosh'aru-Schrifttafel", "Quinta tablilla Mosh'aru", "Cinquième tablette Mosh'aru", "다섯번째 모쉬아루 서판", "Quinta Tabuleta Mosh'Aru", "Пятая табличка Мошару", "第五块摩沙鲁石板", "第五塊摩沙魯石板" },
+    ["Filled Cerulean Vial"] = { "Gefüllte himmelblaue Phiole", "Vial cerúlea llena", "Fiole céruléenne remplie", "가득 찬 감청석 약병", "Ampola Cerúlea Cheia", "Полный церуленовый фиал", "装满水的天蓝水瓶", "裝滿水的天藍水瓶" },
+    ["Filled Egg of Hakkar"] = { "Gefülltes Ei von Hakkar", "Huevo de Hakkar relleno", "Oeuf d'Hakkar rempli", "충만한 학카르의 알", "Ovo de Hakkar Cheio", "Заполненное яйцо Хаккара", "装满的哈卡之卵", "裝滿的哈卡之卵" },
+    ["First Mosh'aru Tablet"] = { "Erste Mosh'aru-Schrifttafel", "Primera tablilla Mosh'aru", "Première tablette Mosh'aru", "첫번째 모쉬아루 서판", "Primeira Tabuleta Mosh'Aru", "Первая табличка Мошару", "第一块摩沙鲁石板", "第一塊摩沙魯石板" },
+    ["First Relic Fragment"] = { "Erstes Reliktfragment", "Primer fragmento de reliquia", "Fragment de la première relique", "첫번째 유물 조각", "Primeiro Fragmento de Relíquia", "Первый фрагмент реликвии", "第一块遗物碎片", "第一塊聖物碎片" },
+    ["First Witherbark Cage"] = { "Erster Käfig der Witherbark", "Primera jaula Secacorteza", "Première cage Witherbark", "첫번째 마른나무껍질부족 우리", "Primeira Jaula Cascasseca", "Первая клетка Сухокожих", "第一只枯木牢笼", "第一個枯木牢籠" },
+    ["Forged Seal of Ascension"] = { "Geschmiedetes Siegel des Aufstiegs", "Sello de ascensión forjado", "Sceau d'ascension forgé", "벼려진 승천의 인장", "Selo Forjado da Ascensão", "Закаленная печать Вознесения", "铸造好的晋升印章", "鑄造好的晉升印章" },
+    ["Fourth Mosh'aru Tablet"] = { "Vierte Mosh'aru-Schrifttafel", "Cuarta tablilla Mosh'aru", "Quatrième Tablette Mosh'aru", "네번째 모쉬아루 서판", "Quarta Tabuleta Mosh'Aru", "Четвертая табличка Мошару", "第四块摩沙鲁石板", "第四塊摩沙魯石板" },
+    ["Fourth Relic Fragment"] = { "Viertes Reliktfragment", "Cuarto fragmento de la reliquia", "Fragment de la quatrième relique", "네번째 유물 조각", "Quarto Fragmento de Relíquia", "Четвертый фрагмент реликвии", "第四块遗物碎片", "第四塊聖物碎片" },
+    ["Fractured Elemental Shard"] = { "Gerissener Elementarsplitter", "Fragmento elemental fracturado", "Fragment d'élémentaire fracturé", "부서진 원소 파편", "Estilhaço Elemental Fraturado", "Треснувший осколок элементаля", "断裂的元素碎片", "斷裂的元素碎片" },
+    ["Fragment of the Dragon's Eye"] = { "Fragment des Großdrachen-Auges", "Fragmento de Ojo de dragón", "Fragment de l'Oeil de dragon", "용의눈 조각", "Fragmento do Olho do Dragão", "Фрагмент амулета Око Дракона", "龙眼碎片", "龍眼碎片" },
+    ["Fragments of Rok'Alim"] = { "Fragmente von Rok'Alim", "Fragmentos de Rok'Alim", "Fragments de Rok'Alim", "로크알림의 파편", "Fragmentos de Rok'Alim", "Фрагменты Рок'Алима", "罗卡里姆的碎片", "羅卡里姆的碎片" },
+    ["Frayed Abomination Stitching"] = { "Ausgefranste Monstrositätenstickerei", "Punto de abominación deshilachado", "Couture d'Abomination effilochée", "닳아해진 누더기골렘 조각", "Sutura de Abominação Puída", "Истлевшая шовная нить поганища", "磨损的憎恶缝合线", "磨損的憎惡縫合線" },
+    ["Frenzied Plaguehound"] = { "Rasender Seuchenhund", "Can de la Peste demenciado", "Chien pestiféré frénétique", "광포한 역병사냥개", "Cão Pestilento Frenético", "Бесноватый чумной пес", "狂怒的瘟疫犬", "狂怒的瘟疫犬" },
+    ["Frost Shock and You"] = { "Frostschock und Du", "El choque de Escarcha y tú", "Le Horion de givre et vous", "냉기 충격과 주술", "O Choque Gélido e Você", "\"Ледяной шок и вы\"", "你与冰霜震击", "你與冰霜震擊" },
+    ["Frozen Eggs"] = { "Gefrorene Eier", "Huevos congelados", "Oeufs congelés", "얼어붙은 알", "Ovos Congelados", "Охлажденные яйца", "冰冻的龙蛋", "冰凍的龍蛋" },
+    ["Full Leaden Collection Phial"] = { "Volle bleierne Sammelphiole", "Ampolla de plomo llena", "Flasque plombée lourde remplie", "가득 찬 가연채집병", "Coletor de Chumbo Cheio", "Наполненный свинцовый коллекционный фиал", "装满的铅瓶", "裝滿的鉛瓶" },
+    ["Gahz'rilla's Electrified Scale"] = { "Gahz'rillas elektrisierte Schuppe", "Escama electrificada de Gahz'rilla", "Ecaille électrique de Gahz'rilla", "가즈릴라의 전기 비늘", "Escama Eletrificada de Gahz'rilla", "Искрящая чешуя Газ'риллы", "加兹瑞拉的鳞片", "加茲瑞拉的鱗片" },
+    ["Garona: A Study on Stealth and Treachery"] = { "Garona: Eine Studie über Heimlichkeit und Verrat", "Garona: Un Estudio sobre el Sigilo y la Traición.", "Garona : une étude en discrétion et en trahison", "가로나: 은신과 기만에 대한 연구", "Garona: Um Estudo sobre Furtividade e Traição", "Гарона: Исследование скрытности и предательства", "迦罗娜：潜行与诡计研究", "迦羅娜：潛行與詭計研究" },
+    ["Garrett Family Treasure"] = { "Familienschatz der Garretts", "Tesoro de la familia Garrett", "Trésor de la famille Garrett", "가레트가의 보물", "Tesouro da Família Garreta", "Фамильное сокровище Гарретта", "加勒特的家族宝藏", "加勒特的家族寶藏" },
+    ["Gauntlet of Gordok Might"] = { "Stulpen der Gordokmacht", "Guante del Poderío de Gordok", "Gantelet de puissance gordok", "권력의 고르독 건틀릿", "Manoplas do Poder de Gordok", "Латная рукавица мощи Гордока", "戈多克力量护手", "戈多克力量護手" },
+    ["Gem of Anacondra"] = { "Edelstein von Anacondra", "Gema de Anacondra", "Gemme d'Anacondra", "아나콘드라의 보석", "Gema de Sucurina", "Самоцвет Анакондры", "安娜科德拉宝石", "安娜科德拉寶石" },
+    ["Gem of Cobrahn"] = { "Edelstein von Kobrahn", "Gema de Cobrah", "Gemme de Cobrahn", "코브란의 보석", "Gema de Cobrahn", "Самоцвет Кобрана", "考布莱恩宝石", "考布萊恩寶石" },
+    ["Gem of Pythas"] = { "Edelstein von Pythas", "Gema de Pythas", "Gemme de Pythas", "피타스의 보석", "Gema de Pítias", "Самоцвет Питонаса", "皮萨斯宝石", "皮薩斯寶石" },
+    ["Gem of Serpentis"] = { "Edelstein von Serpentis", "Gema de Serpentis", "Gemme de Serpentis", "서펜티스의 보석", "Gema de Serpentis", "Самоцвет Серпентиса", "瑟芬迪斯宝石", "瑟芬迪斯寶石" },
+    ["Gemstone of Bloodaxe"] = { "Edelstein der Blutäxte", "Gema de Hacha de Sangre", "Gemme de Bloodaxe", "도끼부대 보석", "Gema de Machado Sangrento", "Самоцвет Кровавого Топора", "血斧宝钻", "血斧寶鑽" },
+    ["Gemstone of Smolderthorn"] = { "Edelstein der Gluthauer", "Gema de Espina Ahumada", "Gemme de Smolderthorn", "가시불꽃부족 보석", "Gema de Espinho Fúmeo", "Самоцвет Тлеющего Терновника", "燃棘宝钻", "燃棘寶鑽" },
+    ["Gemstone of Spirestone"] = { "Edelstein der Felsspitzoger", "Gema de Cumbrerroca", "Gemme de Pierre-du-pic", "뾰족바위일족 보석", "Gema de Agulhapétrea", "Самоцвет Черной Вершины", "尖石宝钻", "尖石寶鑽" },
+    ["General Angerforge"] = { "General Zornesschmied", "General Forjira", "Général Forgehargne", "사령관 앵거포지", "General Forjaversa", "Генерал Кузня Гнева", "安格弗将军", "安格弗將軍" },
+    ["General Drakkisath"] = { false, false, "Général Drakkisath", "사령관 드라키사스", false, "Генерал Драккисат", "达基萨斯将军", "達基薩斯將軍" },
+    ["General Drakkisath's Command"] = { "General Drakkisaths Befehl", "Orden del general Drakkisath", "Ordres du général Drakkisath", "사령관 드라키사스의 명령서", "Comando do General Drakkisath", "Распоряжения генерала Драккисата", "达基萨斯将军的命令", "達基薩斯將軍的命令" },
+    ["Giant Silver Vein"] = { "Riesensilbervene", "Veta gigante de plata", "Veine d'argent de géant", "거대한 은 광석", "Veio de Prata Gigante", "Огромный серебряный слиток", "巨型银矿", "巨型銀礦" },
+    ["Glittering Dust"] = { "Glitzernder Staub", "Polvo relumbrante", "Poussière lumineuse", "반짝이는 가루", "Pó Reluzente", "Сияющая пыль", "闪光尘埃", "閃光粉末" },
+    ["Glowing Hunk of the Beast's Flesh"] = { "Leuchtendes Fleisch der Bestie", "Trozo resplandeciente de carne de la Bestia", "Morceau de chair de la Bête luminescent", "작열하는 괴수의 살덩이", "Naco Brilhante de Carne da Besta", "Светящийся кусок мяса животного", "比斯巨兽的发光肉块", "比斯巨獸的發光肉塊" },
+    ["Gnoam Sprecklesprocket"] = { "Gnoam-Sprecklesprocket", "Dentrituradora goblin", "Indicateur Gnoam", "노암 톱니구동장치", "Engrenotreco Gnomo", "Зубчатый спрек-механизм гномов", "小型高能发动机", "小型高能發動機" },
+    ["Gold Bar"] = { "Goldbarren", "Lingote de oro", "Barre d'or", "금괴", "Barra de Ouro", "Золотой слиток", "金锭", "金錠" },
+    ["Gordok Shackle Key"] = { "Gordokfesselschlüssel", "Llave de los grilletes de Gordok", "Clé des menottes gordok", "고르독 족쇄 열쇠", "Chave dos Grilhões dos Gordok", "Ключ от оков клана Гордок", "戈多克镣铐钥匙", "戈多克鐐銬鑰匙" },
+    ["Gorishi Sting"] = { "Gorishistachel", "Aguijón Gorishi", "Dard de Gorishi", "고리쉬 독침", "Ferrão de Gorishi", "Жало Гориши", "格里什钉刺", "格里什毒刺" },
+    ["Green Voodoo Feather"] = { "Grüne Voodoofeder", "Pluma de vudú verde", "Plume vaudou verte", "녹색 부두 깃털", "Pena Vodu Verde", "Зеленое вудуистское перо", "绿色巫毒羽毛", "綠色巫毒羽毛" },
+    ["Grenka's Claw"] = { "Grenkas Klaue", "Garra de Grenka", "Griffes de Grenka", "그렌카의 발톱", "Garra da Grenka", "Коготь Гренки", "格林卡的爪子", "格林卡的爪子" },
+    ["Grime-Encrusted Object"] = { "Schmutzverkrustetes Objekt", "Objeto con mugre incrustada", "Objet sali", "꼬질꼬질한 물건", "Objeto Encardido", "Предмет, покрытый грязью", "脏兮兮的东西", "髒兮兮的東西" },
+    ["Grimm's Premium Tobacco"] = { "Grimms Toller Tabak", "Tabaco de calidad de Grimm", "Tabac de Grimm", "그림의 최고급 담배", "Tabaco da Lata do Carranca", "Отличный табак Гримма", "格里姆的优质香烟", "格里姆的特級煙草" },
+    ["Grimtotem Satchel"] = { "Grimmtotemranzen", "Cartera de Tótem Siniestro", "Sacoche du Totem sinistre", "그림토템 가방", "Algibeira do Temível Totem", "Сумка Маура Зловещего Тотема", "恐怖图腾背包", "恐怖圖騰背包" },
+    ["Grimy Key"] = { "Schmutziger Schlüssel", "Llave pringosa", "Clé crasseuse", "때 묻은 열쇠", "Chave Suja", "Запачканный ключ", "肮脏的钥匙", "污穢鑰匙" },
+    ["Grizzled Bear Heart"] = { "Herz eines ergrauten Bären", "Corazón de grisoso", "Coeur de vieil ours", "불곰 심장", "Coração de Urso Cinzento", "Сердце медведя", "灰熊的心脏", "灰熊的心臟" },
+    ["Groddoc Liver"] = { "Groddoc-Leber", "Hígado Groddoc", "Foie de Groddoc", "그로독 고릴라 간", "Fígado de Groddoc", "Печень гроддока", "格罗多克猩猩的肝脏", "格羅多克猩猩的肝臟" },
+    ["Gromsblood"] = { "Gromsblut", "Gromsanguina", "Gromsang", "그롬의 피", "Sangue-de-grom", "Кровь Грома", "格罗姆之血", "格羅姆之血" },
+    ["Halycon"] = { false, false, false, "할리콘", false, "Халикон", "哈雷肯", "哈雷肯" },
+    ["Hammertoe's Amulet"] = { "Hammertoes Amulett", "Amuleto de Piemartillo", "Amulette de Hammertoe", "해머토의 아뮬렛", "Amuleto do Pé-de-malho", "Амулет Молотопалого", "铁趾的护符", "鐵趾的護符" },
+    ["Hand of Dextren Ward"] = { "Hand von Dextren Ward", "Mano de Dextren Tutor", "Main de Dextren Ward", "덱스트렌 워드의 장갑", "Mão de Flávio Lúcio", "Рука Декстрена Варда", "迪克斯特·瓦德的手掌", "迪克斯特·瓦德的手掌" },
+    ["Hardened Tumor"] = { "Verhärteter Tumor", "Tumor endurecido", "Tumeur durcie", "굳어진 종양", "Tumor Endurecido", "Твердая опухоль", "硬瘤", "硬瘤" },
+    ["Harnessing Shadows"] = { "Schatten einspannen", "Sombras acechadoras", "Contrôler les ombres", "지배의 그림자", "Sombras Agrilhoantes", "Укрощая тени", "束缚之影", "束縛之影" },
+    ["Head of Argelmach"] = { "Argelmachs Kopf", "Cabeza de Argelmach", "Tête d'Argelmach", "아젤마크의 머리카락", "Cabeça de Argelmach", "Голова Аргелмаха", "阿格曼奇的头颅", "阿格曼奇的頭顱" },
+    ["Head of Arugal"] = { "Arugals Kopf", "Cabeza de Arugal", "Tête d'Arugal", "아루갈의 머리카락", "Cabeça de Arugal", "Голова Аругала", "阿鲁高的头颅", "阿魯高的頭顱" },
+    ["Head of Balnazzar"] = { "Kopf von Balnazzar", "Cabeza de Balnazzar", "Tête de Balnazzar", "발나자르의 혼", "Cabeça do Balnazzar", "Голова Бальназара", "巴纳扎尔的头颅", "巴納札爾的頭顱" },
+    ["Head of Baron Rivendare"] = { "Kopf von Baron Rivendare", "Cabeza de Barón Osahendido", "Tête du baron Rivendare", "남작 리븐데어의 혼", "Cabeça do Barão Rivendare", "Голова Барона Ривендера", "瑞文戴尔男爵的头颅", "瑞文戴爾男爵的頭顱" },
+    ["Head of Bazil Thredd"] = { "Kopf von Bazil Thredd", "Cabeza de Bazil Thredd", "Tête de Bazil Thredd", "바질 스레드의 머리카락", "Cabeça de Basílio Taborda", "Голова Базиля Тредда", "巴基尔·斯瑞德的头颅", "巴基爾·斯瑞德的頭顱" },
+    ["Head of Deepfury"] = { "Deepfurys Kopf", "Cabeza de Furiahonda", "Tête de Deepfury", "딥퓨리의 머리카락", "Cabeça de Fundafúria", "Голова Гневливого", "卡姆·深怒的头颅", "卡姆·深怒的頭顱" },
+    ["Head of Jammal'an"] = { "Jammal'ans Kopf", "Cabeza de Jammal'an", "Tête de Jammal'an", "잠말란의 머리카락", "Cabeça de Jammal'an", "Голова Джаммалана", "加玛兰的头颅", "迦瑪蘭的頭顱" },
+    ["Head of Kelris"] = { "Kelris Kopf", "Cabeza de Kelris", "Tête de Kelris", "켈리스의 머리카락", "Cabeça de Kelris", "Голова Келриса", "克尔里斯的头颅", "克爾里斯的頭顱" },
+    ["Head of Ramstein the Gorger"] = { "Kopf von Ramstein dem Verschlinger", "Cabeza de Ramstein el Glotón", "Tête de Ramstein Grandgosier", "먹보 람스타인의 머리카락", "Cabeça de Ramstein, o Devorador", "Голова Рамштайна Ненасытного", "吞咽者拉姆斯登的头颅", "吞嚥者拉姆斯登的頭顱" },
+    ["Head of Rend Blackhand"] = { "Rend Schwarzfausts Kopf", "Cabeza de Rend Puño Negro", "Tête de Rend Blackhand", "렌드 블랙핸드의 머리카락", "Cabeça do Laceral Mão Negra", "Голова Ренда Чернорука", "雷德·黑手的头颅", "雷德·黑手的頭顱" },
+    ["Head of Targorr"] = { "Targorrs Kopf", "Cabeza de Targorr", "Tête de Targorr", "타고르의 머리카락", "Cabeça de Targorr", "Голова Таргорра", "塔格尔的头颅", "塔高爾的頭顱" },
+    ["Head of VanCleef"] = { "Van Cleefs Kopf", "Cabeza de VanCleef", "Tête de VanCleef", "밴클리프의 가면", "Cabeça do VanCleef", "Голова ван Клифа", "范克里夫的头颅", "范克里夫的頭顱" },
+    ["Head of the Baron"] = { "Kopf des Barons", "Cabeza del barón", "Tête du Baron", "남작의 머리카락", "Cabeça do Barão", "Голова барона", "男爵的徽记", "男爵的頭" },
+    ["Healthy Courser Gland"] = { "Gesunde Rennerdrüse", "Glándula de corcel sano", "Glande de coursier en bonne santé", "건강한 순록의 분비샘", "Glândula de Ginete Saudável", "Железа здорового бегового оленя", "健康的野鹿腺体", "健康的野鹿腺體" },
+    ["Heart of Zeal"] = { "Herz des Eifers", "Corazón de Zeal", "Coeur zélé", "열정의 증거", "Coração do Fanatismo", "Сердце Доблести", "狂热之心", "狂熱之心" },
+    ["Helboar"] = { "Hölleneber", "Jabinferno", "Sanglier infernal", "지옥멧돼지", "Javiltusco", "Зловепрь", "地狱野猪", "地獄野豬" },
+    ["Helendis Riverhorn's Letter"] = { "Helendis Riverhorns Brief", "Carta de Helendis Rivacuerno", "Lettre d'Helendis Riverhorn", "헬렌디스 리버혼의 편지", "Carta de Helendis Flumicórnio", "Письмо Хелендиса Речного Мыса", "赫林迪斯·河角的信", "赫林迪斯·河角的信" },
+    ["Herod"] = { false, false, false, "헤로드", "Herodes", "Герод", "赫洛德", "赫洛德" },
+    ["High Inquisitor Whitemane"] = { "Hochinquisitor Whitemane", "Alta Inquisidora Melenablanca", "Grand Inquisiteur Whitemane", "종교재판관 화이트메인", "Alta-inquisidora Cristalba", "Верховный инквизитор Вайтмейн", "大检察官怀特迈恩", "大檢察官懷特邁恩" },
+    ["High Potency Radioactive Fallout"] = { "Hochwirksame radioaktive Ablagerung", "Restos radiactivos de gran potencia", "Matière radioactive à haut potentiel", "고농축 방사성 폐기물", "Resíduo Radioativo de Alta Potência", "Высокомощные радиоактивные осадки", "高强度辐射尘", "高強度輻射塵" },
+    ["Highlord Omokk"] = { "Hochlord Omokk", "Alto Señor Omokk", "Généralissime Omokk", "대군주 오모크", "Grão-lorde Omokk", "Вождь Омокк", "欧莫克大王", "歐莫克大王" },
+    ["Highly Toxic Strain"] = { "Hochgiftiger Erreger", "Cepa muy tóxica", "Souche hautement toxique", "고독성 변종", "Cepa Altamente Tóxica", "Крайне токсичный штамм", "剧毒的毒株", "劇毒菌株" },
+    ["Holy Bologna: What the Light Won't Tell You"] = { "Heiliger Fleischklops: Was das Licht Dir nicht erzählt", "Sagrada Bologna: lo que la Luz nunca te dirá", "Sainte Bolognaise : Ce que la lumière ne vous dit pas", "성스러운 볼로냐: 빛이 알려주지 않는 것들", "Caçarolas: O Que a Luz Não lhe Contará", "Святая Болонья: О чем не говорит свет", "光明不会告诉你的事情", "光明不會告訴你的事情" },
+    ["Horn of Xelthos"] = { "Horn von Xelthos", "Cuerno de Xelthos", "Corne de Xelthos", "젤토스의 뿔", "Trompa de Xelthos", "Рог Кселтоса", "谢尔索斯号角", "澤索司號角" },
+    ["Horrible Rootcore"] = { "Abscheulicher Wurzelkern", "Núcleo raigal horrible", "Cœur-racine horrible", "끔찍한 뿌리핵", "Núcleo-de-raiz Horrível", "Ужасающий сердцекорень", "可怕的根核", "恐怖根核" },
+    ["Houndmaster Loksey"] = { "Hundemeister Loksey", "Domador de jaurías Loksey", "Maître-chien Loksey", "사냥개조련사 록시", "Mestre de Matilha Lobato", "Псарь Локси", "驯犬者洛克希", "馴犬者洛克希" },
+    ["Human Head of Ras Frostwhisper"] = { "Menschlicher Kopf von Ras Frostraunen", "Cabeza humana de Ras Levescarcha", "Tête humaine de Ras Murmegivre", "사람이 된 라스 프로스트위스퍼의 머리카락", "Cabeça Humana de Ras Friomúrmuro", "Человеческая голова Раса Ледяного Шепота", "莱斯·霜语的头颅", "萊斯·霜語的頭顱" },
+    ["Hydrospawn Essence"] = { "Hydrobrutessenz", "Esencia de Hidromilecio", "Essence d'Hydrogénos", "히드로스폰의 정수", "Essência de Rebentágua", "Сущность Гидротвари", "海多斯博恩精华", "海多斯博恩精華" },
+    ["Ichor of Undeath"] = { "Sekret des Untodes", "Icor de no-muerto", "Ichor de non-mort", "불사의 영액", "Linfa de Morte-viva", "Лимфа нежити", "亡灵腐液", "亡靈腐液" },
+    ["Immol'thar"] = { false, false, false, "이몰타르", false, "Бессмер'тер", "伊莫塔尔", "伊莫塔爾" },
+    ["Imp in a Jar"] = { "Wichtel im Glas", "Diablillo en una jarra", "Diablotin en bouteille", "단지 안에 든 임프", "Diabrete numa Jarra", "Бес в бутылке", "瓶中的小鬼", "瓶中的小鬼" },
+    ["Important Blackrock Documents"] = { "Wichtige Blackrockdokumente", "Importantes documentos de Roca Negra", "Importants documents de Rochenoire", "중요한 검은바위 문서", "Documentos Importantes dos Rocha Negra", "Важные бумаги Черной горы", "重要的黑石文件", "重要的黑石文件" },
+    ["Incantation of Celebras"] = { "Zauberformel von Celebras", "Conjuro de Celebras", "Incantation de Celebras", "세나리우스의 주문", false, "Заклинание Келебраса", "塞雷布拉斯的咒语", "塞雷布拉斯的咒語" },
+    ["Incantations from the Nether"] = { "Zauberformeln aus dem Nether", "Encantamientos desde el infierno", "Incantations du Néant", "황천의 마법서", "Encantamentos do Éter", "Магическая формула Пустоты", "扭曲虚空的魔法", "扭曲虛空的魔法" },
+    ["Inert Scourgestone"] = { "Gereinigter Geißelstein", "Piedra de la Plaga inerte", "Pierre du Fléau inerte", "마력을 잃은 스컬지석", "Pedra do Flagelo Inerte", "Бездействующий камень Плети", "惰性天灾石", "惰性天災石" },
+    ["Infernal Orb"] = { "Höllenkugel", "Orbe infernal", "Orbe infernal", "지옥의 보주", "Orbe Infernal", "Сфера подземного огня", "地狱火宝珠", "地獄火寶珠" },
+    ["Intact Elemental Core"] = { "Intakter Elementarkern", "Núcleo elemental intacto", "Noyau d'élémentaire intact", "온전한 원소핵", "Núcleo de Elemental Intacto", "Невредимое ядро элементаля", "完整的元素核心", "完整的元素核心" },
+    ["Intact Limbs"] = { "Intakte Gliedmaßen", "Extremidades intactas", "Membres intacts", "온전한 사지", "Membros Intactos", "Сохранившиеся конечности", "完好的肢体", "完好的肢體" },
+    ["Intact Raptor Horn"] = { "Intaktes Raptorhorn", "Cuerno de raptor intacto", "Corne de raptor intacte", "온전한 랩터 뿔", "Chifre Intacto de Raptor", "Невредимый рог ящера", "完整的迅猛龙角", "完整的迅猛龍角" },
+    ["Ironfel"] = { false, "Ferrovil", "Souillefer", "무쇠지옥", "Ferrovil", "Железный Друг", "铁胆之锤", "鐵膽之錘" },
+    ["Ironfur Liver"] = { "Eisenfellleber", "Hígado de Cueracero", "Foie de Ferpoil", "무쇠곰 간", "Fígado de Veloférreo", "Печень железномеха", "铁鬃熊的肝脏", "鐵鬃熊的肝臟" },
+    ["J'eevee"] = { false, false, false, "지비", "Jivil", "Д'жииви", "耶维尔", "耶維爾" },
+    ["Jansen Stead Water Sample"] = { "Wasserprobe von Jansens Hof", "Muestra de agua de la Finca de Jansen", "Échantillon d’eau de la ferme des Jansen", "얀센 농장 물 표본", "Amostra de Água do Sítio dos Jansen", "Проба воды из Владений Янсена", "贾森农场水样", "傑生農場水樣" },
+    ["Jergosh the Invoker"] = { "Jergosh der Herbeirufer", "Jergosh el Conjurador", "Jergosh l'Invocateur", "기원사 제로쉬", "Jergosh, o Invocador", "Жергош Призыватель Духов", "祈求者耶戈什", "祈求者耶戈什" },
+    ["Jordan's Refined Ore Shipment"] = { "Jordans aufbereitete Erzlieferung", "Envío de mineral refinado de Jordan", "Cargaison de minerai raffiné de Jordan", "조던의 제련된 광석 상자", "Carregamento de Minério Refinado do Jardel", "Партия очищенной руды Джордана", "乔丹的精炼矿石", "喬丹的精煉礦石" },
+    ["Jordan's Smithing Hammer"] = { "Jordans Schmiedehammer", "Martillo de herrería de Jordan", "Marteau de forge de Jordan", "조던의 대장장이 망치", "Martelo de Ferreiro de Jardel", "Дробящий молот Джордана", "乔丹的铁锤", "喬丹的鐵錘" },
+    ["Keepsake of Remembrance"] = { "Andenken der Erinnerung", "Recuerdo de Evocación", "Livre du souvenir", "추억의 유품", "Livro de Recordações", "Книга Воспоминаний", "巫妖生前的遗物", "巫妖生前的遺物" },
+    ["Kharan Mighthammer"] = { false, "Kharan Martillazo", false, "카란 마이트해머", "Kharan Feromalho", "Каран Могучий Молот", "卡兰·巨锤", "卡蘭·巨錘" },
+    ["Kirtonos the Herald"] = { "Kirtonos der Herold", "Kirtonos el Heraldo", "Kirtonos le Héraut", "사자 키르토노스", "Kirtonos, o Arauto", "Киртонос Глашатай", "传令官基尔图诺斯", "傳令官基爾圖諾斯" },
+    ["Kobold Digger"] = { "Koboldbuddler", "Cavador kóbold", "Terrassier kobold", "코볼트 채굴꾼", "Escavador Kobold", "Кобольд-землекоп", "狗头人掘地工", "狗頭人掘地工" },
+    ["Krastinov's Bag of Horrors"] = { "Krastinovs Tasche der Schrecken", "Bolsa de Horrores de Krastinov", "Sac des horreurs de Krastinov", "소름끼치는 크라스티노브의 가방", "Saco de Horrores de Krastinov", "Мешок ужасов Крастинова", "卡斯迪诺夫的恐惧之袋", "卡斯迪諾夫的恐怖袋" },
+    ["Kraul Guano"] = { "Kral-Guano", false, "Guano du kraal", "가시덩굴 조분석", "Guano de Morcego", "Гуано летучей мыши Лабиринтов", "沼泽蝙蝠的粪便", "沼澤蝙蝠的糞便" },
+    ["Krom Stoutarm's Treasure"] = { "Krom Stoutarms Schatz", "Tesoro de Krom Brazorrecio", "Trésor de Krom Stoutarm", "크롬 스타우트암의 보물", "Tesouro do Krom Braçoforte", "Сокровище Крома Крепкорука", "克罗姆·粗臂的宝藏", "克羅姆·粗臂的寶藏" },
+    ["Lady Katrana Prestor"] = { false, false, "Dame Katrana Prestor", "여군주 카트라나 프레스톨", false, "Леди Катрана Престор", "女伯爵卡特拉娜·普瑞斯托", "女伯爵卡特拉娜·普瑞斯托" },
+    ["Lake Creeper Moss"] = { "Seekrabblermoos", "Moho de Trepador del Lago", "Mousse de Rampant du lac", "호수늪지이끼", "Musgo de Rastejante do Lago", "Мох озерного ползуна", "湖岸爬行者苔藓", "湖岸爬行者苔蘚" },
+    ["Lake Skulker Moss"] = { "Seeschleichermoos", "Moho de Vigilante del Lago", "Mousse de Furtif du lac", "호수덤불이끼", "Musgo de Sorrateiro do Lago", "Мох озерного тихохода", "湖岸潜藏者苔藓", "湖岸潛藏者苔蘚" },
+    ["Large Brilliant Shard"] = { "Großer glänzender Splitter", "Fragmento luminoso grande", "Grand éclat brillant", "눈부신 큰 결정", "Estilhaço Brilhante Grande", "Большой сверкающий осколок", "大块魔光碎片", "大塊魔光碎片" },
+    ["Large Soran'ruk Fragment"] = { "Großes Soran'ruk-Fragment", "Fragmento de Soran'ruk grande", "Grand fragment de Soran'ruk", "큰 소랜루크 조각", "Fragmento Grande de Soran'ruk", "Большой фрагмент Соран'рука", "索兰鲁克宝珠的大碎片", "索蘭魯克寶珠的大碎片" },
+    ["Legacy of the Aspects"] = { "Vermächtnis der Aspekte", "Legado de los Aspectos", "Héritage des Aspects", "고대의 유산", "Legado dos Aspectos", "Наследие Аспектов", "巨龙的遗产", "巨龍的遺產" },
+    ["Lethtendris's Web"] = { "Lethtendris' Netz", "Tela de araña de Lethtendris", "Filet de Lethtendris", "레스텐드리스의 그물", "Teia de Letendris", "Сеть Лефтендрис", "蕾瑟塔蒂丝的网", "蕾瑟塔蒂絲的網" },
+    ["Letter of Commendation"] = { "Vorstellungsschreiben", "Carta de recomendación", "Lettre de recommandation", "추천서", "Carta de Comenda", "Рекомендательное письмо", "表扬信", "表揚信" },
+    ["Libram of Focus"] = { "Buchband des Fokus", "Tratado sobre Enfoque", "Libram de focalisation", "집중의 성서", "Incunábulo de Concentração", "Манускрипт Средоточия", "专注圣典", "專注聖典" },
+    ["Libram of Protection"] = { "Buchband des Schutzes", "Tratado sobre Protección", "Libram de protection", "보호의 성서", "Incunábulo de Proteção", "Манускрипт защиты", "防护圣典", "防護聖典" },
+    ["Libram of Rapidity"] = { "Buchband der Schnelligkeit", "Tratado sobre Rapidez", "Libram de rapidité", "신속의 성서", "Incunábulo de Rapidez", "Манускрипт Скорости", "急速圣典", "急速聖典" },
+    ["Lieutenant's Insignia"] = { "Insignien des Lieutenants", "Insignia de Teniente", "Insigne de lieutenant", "부관의 휘장", "Insígnia do Tenente", "Лейтенантский знак отличия", "军官的徽章", "軍官的徽章" },
+    ["Lonebrow's Journal"] = { "Lonebrows Tagebuch", "Diario de Soliceja", "Journal de Lonebrow", "론브로우의 일지", "Diário do Monocelha", "Дневник Хмурня", "亨里格·独眉的日记", "亨里格·獨眉的日記" },
+    ["Longshore Murloc Gill"] = { "Murlockiemen von Longshore", "Branquia de múrloc de Playa Larga", "Branchie de Murloc de Longrivage", "기나긴 해안 멀록 아가미", "Barbatana de Murloc da Praia Grande", "Жабры мурлока с Бескрайнего берега", "长岸鱼人鳃", "長灘魚人鰓" },
+    ["Lord Incendius"] = { false, false, "Seigneur Incendius", "불의군주 인센디우스", "Lorde Incendius", "Лорд Опалитель", "伊森迪奥斯", "伊森迪奧斯" },
+    ["Lore Keeper of Norgannon"] = { "Bewahrer der Lehren von Norgannon", "Tradicionalista de Norgannon", "Gardien du savoir de Norgannon", "노르간논 지식의파수꾼", "Guardião do Folclore de Norgannon", "Хранитель знаний Норганнона", "诺甘农的看门人", "諾甘農的看門人" },
+    ["Lorgalis Manuscript"] = { "Lorgalis-Manuskript", "Manuscrito de Lorgalis", "Manuscrit de Lorgalis", "로르갈리스 초본", "Manuscrito de Lorgalis", "Манускрипт Лоргалиса", "洛迦里斯手稿", "洛迦里斯手稿" },
+    ["Lorgus Jett"] = { false, false, false, "로구스 제트", false, "Лоргус Джетт", "洛古斯·杰特", "洛古斯·傑特" },
+    ["Lost Thunderbrew Recipe"] = { "Verlorenes Donnerbräurezept", "Receta de Cebatruenos perdida", "Recette perdue de la Thunderbrew", "잃어버린 썬더브루 제조법", "Receita Perdida de Cervaforte", "Украденный рецепт громоварского", "遗失的雷酒秘方", "遺失的雷酒秘方" },
+    ["Lumina Windsinger"] = { false, false, "Lumina Chantelevent", false, false, false, "卢米娜·风歌", "露蜜娜‧風詠" },
+    ["Magenta Fungus Cap"] = { "Magenta Funguskappe", "Seta magenta", "Champignon magenta", "자홍버섯", "Campânula de Fungo Magenta", "Гриб-малиновик", "紫色蘑菇", "紫色蘑菇" },
+    ["Mana Echo"] = { false, false, false, false, false, false, false, false },
+    ["Manna-Enriched Horse Feed"] = { "Mit Manna angereichertes Pferdefutter", "Alimento paca caballos con maná enriquecido", "Fourrage enrichi en manne", "맛좋은 만나 사료", "Ração de Cavalo Enriquecida com Maná", "Обогащенный манной лошадиный корм", "魔法粮草", "魔法糧草" },
+    ["Marshal Windsor's Lost Information"] = { "Marshal Windsors verlorene Informationen", "Información perdida del alguacil Windsor", "Les informations égarées du maréchal Windsor", "치안대장 윈저의 잃어버린 정보", "Informações Perdidas do Marechal Vilasboas", "Утерянная информация маршала Виндзора", "温德索尔元帅遗失的情报", "溫德索爾元帥遺失的情報" },
+    ["Medallion of Faith"] = { "Medaillon des Glaubens", "Medallón de Fe", "Médaillon de foi", "신념의 메달", "Medalhão da Fé", "Медальон Веры", "信仰奖章", "信仰獎章" },
+    ["Mekgineer Thermaplugg"] = { "Robogenieur Thermaplugg", "Mekigeniero Termochufe", "Mekgénieur Thermaplugg", "멕기니어 텔마플러그", "Mecangenheiro Termaplugue", "Мекжинер Термоштепсель", "机械师瑟玛普拉格", "麥克尼爾·瑟瑪普拉格" },
+    ["Miners' Union Card"] = { "Gewerkschaftsausweis eines Minenarbeiters", "Tarjeta de sindicato de minero", "Carte du syndicat des mineurs", "광부 조합의 명함", "Carteira do Sindicato dos Mineradores", "Карточка Союза шахтеров", "矿业工会会员卡", "礦業工會會員卡" },
+    ["Miniature Platinum Discs"] = { "Miniaturplatinscheiben", "Discos de platino en miniatura", "Disques de platine miniature", "소형 백금 원반", "Discos de Platina Miniatura", "Миниатюрные платиновые диски", "迷你白金圆盘", "迷你白金圓盤" },
+    ["Minion's Scourgestone"] = { "Geißelstein des Dieners", "Piedra de la Plaga de esbirro", "Pierre du Fléau des serviteurs", "앞잡이의 스컬지석", "Pedra do Flagelo do Lacaio", "Камень приспешника Плети", "爪牙的天灾石", "爪牙的天譴石" },
+    ["Molsen Farm Water Sample"] = { "Wasserprobe von Molsens Hof", "Muestra de agua de la Granja de Molsen", "Échantillon d’eau de la ferme des Molsen", "몰센 농장 물 표본", "Amostra de Água da Fazenda dos Peçanha", "Проба воды с фермы Мольсена", "莫尔森农场水样", "摩爾森農場水樣" },
+    ["Monstrous Plaguebat"] = { "Monströse Seuchenfledermaus", "murcípeste monstruoso", "Chauve-souris pestiférée monstrueuse", "기괴한 역병박쥐", "Quiróprago Monstruoso", "Чудовищный чумной нетопырь", "巨型瘟疫蝙蝠", "巨型瘟疫蝙蝠" },
+    ["Moonsilver Blade"] = { "Mondsilberklinge", "Hoja de plata lunar", "Lame de sélénargent", "달빛은 칼날", "Lâmina de Prataluna", "Клинок лунного света", "月银之刃", "月銀刃" },
+    ["Moss Agate"] = { "Moosachat", "Ágata musgosa", "Agate mousse", "태마노", "Ágata Musgosa", "Моховой агат", "苔藓玛瑙", "綠瑪瑙" },
+    ["Mosshide Gnoll"] = { "Gnoll der Moosfelle", "Gnoll Pellejomusgo", "Gnoll Poil-moussu", "이끼가죽 놀", "Gnoll Pelemusgo", "Гнолл из стаи Мохошкуров", "藓皮豺狼人", "蘚皮豺狼人" },
+    ["Mosshide Mongrel"] = { "Bastard der Moosfelle", "Bastardo Pellejomusgo", "Bâtard Poil-moussu", "이끼가죽일족 싸움꾼", "Mestiço Pelemusgo", "Полукровка из стаи Мохошкуров", "混血藓皮豺狼人", "混血蘚皮豺狼人" },
+    ["Murdaloc"] = { false, false, false, "멀달록", false, "Мурдалок", "莫达洛克", "莫達洛克" },
+    ["Mythology of the Titans"] = { "Mythologie der Titanen", "Mitología de los titanes", "Mythologie des Titans", "티탄 신화", "Mitologia dos Titãs", "\"Мифология Титанов\"", "泰坦神话", "泰坦神話" },
+    ["Nagmara's Filled Vial"] = { "Nagmaras gefüllte Phiole", "Vial de Nagmara lleno", "Fiole de Nagmara remplie", "가득 찬 나그마라의 약병", "Ampola da Nagmara Cheia", "Наполненный сосуд Нагмары", "装满水的娜玛拉之瓶", "裝滿水的娜瑪拉之瓶" },
+    ["Neeru Fireblade"] = { false, "Neeru Hojafuego", false, "네루 파이어블레이드", "Neeru Cortafogo", "Нииру Огненный Клинок", "尼尔鲁·火刃", "尼爾魯·火刃" },
+    ["Nekrum's Medallion"] = { "Nekrums Medaillon", "Medallón de Nekrum", "Médaillon de Nekrum", "네크룸의 메달", "Medalhão de Nekrum", "Медальон Некруса", "耐克鲁姆的徽章", "耐克魯姆的徽章" },
+    ["Nostro's Compendium of Dragon Slaying"] = { "Nostros Kompendium des Drachentötens", "Compendio de matar dragones de Nostro", "Le guide de Nostro du tueur de dragons", "노스트로의 용사냥 개론", "Compêndio do Abate de Dragões de Nostro", "Справочник Ностро по истреблению драконов", "诺斯特罗的屠龙技术纲要", "諾斯卓的屠龍技術綱要" },
+    ["Noxious Plaguebat"] = { "Giftige Seuchenfledermaus", "murcipeste tóxico", "Chauve-souris pestiférée nuisible", "맹독 역병박쥐", "Quiróprago Nóxio", "Пагубный нетопырь", "毒性瘟疫蝙蝠", "毒性瘟疫蝙蝠" },
+    ["Noxxious Scion"] = { "Noxxious-Spross", "Vástago tóxico", "Engeance de Noxxious", "녹시온의 후예", "Rebento Tóxxico", "Ядовитая лоза", "诺克赛恩幼体", "諾克賽恩幼體" },
+    ["Obsidian Power Source"] = { "Obsidiankraftquelle", "Fuente de poder obsidiano", "Source d'énergie en obsidienne", "흑요석 마력원천", "Fonte de Energia de Obsidiana", "Обсидиановый источник силы", "黑曜石能量源", "黑曜石能量源" },
+    ["Of Love and Family"] = { "Von Liebe und Familie", "Del amor y la familia", "De l'amour et de la famille", "가족과 사랑", "Do Amor e da Família", "О любви и семье", "爱与家庭", "愛與家庭" },
+    ["Ogre Tannin"] = { "Ogergerbemittel", "Tanino ogro", "Tanin ogre", "오우거 타닌", "Tanino Ôgrico", "Огрская дубильная кислота", "食人魔鞣酸", "巨魔鞣酸" },
+    ["Old Fire-Eye"] = { "Feuerauge der Alte", false, "Vieil Oeil-de-feu", false, false, "Старый Огнеглаз", false, "老火眼" },
+    ["Ott"] = { false, false, false, false, false, false, false, false },
+    ["Ott's Masterwork"] = { "Otts Meisterwerk", "Obra maestra de Ott", "Chef-d’œuvre d’Ott", "오트의 걸작", "Obra-prima de Ott", "Искусная работа Отта", "奥特的杰作", "奧特的傑作" },
+    ["Overlord Wyrmthalak"] = { "Oberanführer Wyrmthalak", "Señor Supremo Vermiothalak", "Seigneur Wyrmthalak", "대군주 웜타라크", "Lorde Supremo Wyrmthalak", "Властитель Змейталак", "维姆萨拉克", "維姆薩拉克" },
+    ["Overmaster Pyron"] = { "Übermeister Pyron", "Gran Maestro Pyron", "Grand seigneur Pyron", "멸망의 파이론", "Mestre Supremo Piro", "Подчинитель Пирон", "征服者派隆", "征服者派隆" },
+    ["Patch of Duskwing's Fur"] = { "Fellflicken von Dämmerschwinge", "Parche de pelaje de alatardecer", "Touffe de fourrure de Crépuscaile", "그늘날개 모피 조각", "Tufo de Pele de Quiroscuro", "Полоска меха тенекрыла", "暗翼蝠的毛皮", "暗翼蝠的毛皮" },
+    ["Pathstrider"] = { "Pfadschreiter", "Zancamino", "Eclaireur", "길잡이", "Trilheiro", "Разведчица дорог", "巡路者", "巡路者" },
+    ["Perfect Courser Antler"] = { "Perfektes Rennergeweih", "Cuernos perfectos", "Ramure de coursier parfaite", "완전한 순록 뿔", "Galhada Perfeita de Ginete", "Великолепный рог бегового оленя", "完美的鹿角", "完美的鹿角" },
+    ["Plaguebat"] = { "Seuchenfledermaus", "Murcipeste", "Chauve-souris pestiférée", "역병박쥐", "Quiróprago", "Чумной нетопырь", "瘟疫蝙蝠", "瘟疫蝙蝠" },
+    ["Plagued Flesh Sample"] = { "Verseuchte Fleischprobe", "Muestra de carne con peste", "Echantillon de chair pestiférée", "역병걸린 살덩어리 견본", "Amostra de Carne Infectada", "Образец чумной плоти", "瘟疫肉块", "瘟疫肉塊" },
+    ["Plagued Hatchling"] = { "Verseuchtes Jungtier", "Trampedor infestado", "Jeune pestiféré", "역병 걸린 작은 새끼용", "Filhote Pestilento", "Зачумленный детеныш дракона", "瘟疫龙崽", "瘟疫幼龍" },
+    ["Plaguehound"] = { "Seuchenhund", "Can de la Peste", "Chien pestiféré", "역병사냥개", "Cão Pestilento", "Чумной пес", "瘟疫犬", "瘟疫犬" },
+    ["Plaguehound Runt"] = { "Kleiner Seuchenhund", "Cachorro de can de la Peste", "Chien pestiféré chétif", "새끼 역병사냥개", "Cão Pestilento Miúdo", "Карликовый чумной пес", "瘟疫幼犬", "瘟疫幼犬" },
+    ["Prince Tortheldrin"] = { "Prinz Tortheldrin", "Príncipe Tortheldrin", false, "왕자 토르텔드린", "Príncipe Tortheldrin", "Принц Тортелдрин", "托塞德林王子", "托塞德林王子" },
+    ["Princess Theradras"] = { "Prinzessin Theradras", "Princesa Theradras", "Princesse Theradras", "공주 테라드라스", "Princesa Theradras", "Принцесса Терадрас", "瑟莱德丝公主", "瑟萊德絲公主" },
+    ["Prismatic Punch Card"] = { "Prismalochkarte", "Tarjeta perforada prismática", "Carte perforée prismatique", "오색 천공 카드", "Cartão Perfurado Prismático", "Призматическая перфокарта", "彩色穿孔卡片", "彩色穿孔卡片" },
+    ["Pristine Black Diamond"] = { "Makelloser schwarzer Diamant", "Diamante negro prístino", "Diamant noir parfait", "온전한 검은 다이아몬드", "Diamante Preto Límpido", "Нетронутый черный алмаз", "原始黑钻石", "原始黑鑽石" },
+    ["Purified Kor Gem"] = { "Geläuterter Kor-Edelstein", "Gema kor purificada", "Gemme de Kor purifiée", "정화된 코르석", "Gema de Kor Purificada", "Очищенный самоцвет Кора", "净化过的科尔宝石", "淨化過的科爾寶石" },
+    ["Putrid Vine"] = { "Fäulnisranke", "Viña podrida", "Liane putride", "썩은 덩굴", "Trepadeira Pútrida", "Гнилая лоза", "腐烂藤蔓", "腐爛的藤蔓" },
+    ["Quel'Thalas Registry"] = { "Quel'Thalas-Registratur", "Registro de Quel'Thalas", "Registre de Quel'Thalas", "쿠엘탈라스 기록부", "Arquivos de Quel'Thalas", "Реестр Кель'Таласа", "奎尔萨拉斯名册", "奎爾薩拉斯名冊" },
+    ["Ragefire Shaman"] = { "Ragefire-Schamane", "Chamán Furia Ardiente", "Chaman Ragefeu", "성난불길일족 주술사", "Xamã Iraflama", "Шаман Огненной пропасти", "怒焰萨满祭司", "怒焰薩滿" },
+    ["Ragefire Trogg"] = { "Ragefire-Trogg", "Trogg Furia Ardiente", "Trogg Ragefeu", "성난불길 트로그", "Trogg Iraflama", "Трогг Огненной пропасти", "怒焰穴居人", "怒焰穴居人" },
+    ["Ragged John"] = { "Struppiger John", "John Andrajoso", "John le Loqueteux", "털보 존", "João Roto", "Джон-Оборванец", "狼狈不堪的约翰", "狼狽不堪的約翰" },
+    ["Raging Beast's Blood"] = { "Blut tobender Bestien", "Sangre de bestia enfurecida", "Sang de bêtes enragées", "흉포한 올빼미야수의 피", "Sangue de Fera em Fúria", "Кровь яростного зверя", "狂暴野兽的血", "狂暴野獸的血" },
+    ["Ranger"] = { "Waldläufer", "Especialista", "Forestier", "순찰자", "Patrulheiro", "Cледопыт", "游侠", "遊俠" },
+    ["Rath'mael"] = { false, false, false, "라스마엘", false, "Рат'маэль", "拉斯玛尔", false },
+    ["Razorfen Battleguard"] = { "Schlachtwache von Razorfen", "Guardia de batalla de Rajacieno", "Garde de guerre de Tranchebauge", "가시덩굴일족 전투호위병", "Guerreiro do Urzal", "Боевой страж племени Иглошкурых", "剃刀沼泽护卫者", "剃刀沼澤護衛者" },
+    ["Razorfen Thornweaver"] = { "Dornenwirker von Razorfen", "Tejespina Rajacieno", "Tisseur d'épines de Tranchebauge", "가시덩굴일족 가시마술사", "Tecespinho do Urzal", "Терноплет из племени Иглошкурых", "剃刀沼泽织棘者", "剃刀沼澤織棘者" },
+    ["Razorflank's Heart"] = { "Razorflanks Herz", "Corazón de Filonavaja", "Coeur de Trancheflanc", "차를가의 심장", "Coração da Talhaflanco", "Сердце Чарлги Остробок", "卡尔加·刺肋的心脏", "卡爾加·刺肋的心臟" },
+    ["Razorflank's Medallion"] = { "Razorflanks Medaillon", "Medallón de Filonavaja", "Médaillon de Trancheflanc", "차를가의 메달", "Medalhão da Talhaflanco", "Медальон Чарлги Остробок", "卡尔加·刺肋的徽章", "卡爾加·刺肋的徽章" },
+    ["Red Leather Bandana"] = { "Rotes Lederkopftuch", "Pañuelo de cuero rojo", "Masque en cuir rouge", "붉은 가죽 복면", "Bandana Vermelha de Couro", "Красная кожаная бандана", "红色皮质面罩", "紅色皮質面罩" },
+    ["Red Silk Bandana"] = { "Rotes Seidenkopftuch", "Pañuelo de seda rojo", "Masque rouge en soie", "붉은 비단 복면", "Bandana de Seda Vermelha", "Красная шелковая бандана", "红色丝质面罩", "紅色絲質面罩" },
+    ["Red Wool Bandana"] = { "Rotes Wollkopftuch", "Pañuelo de lana roja", "Foulard en laine rouge", "붉은 양모 복면", "Bandana Vermelha de Lã", "Красная шерстяная бандана", "红色毛纺面罩", "紅色毛紡面罩" },
+    ["Reed-woven Heart"] = { "Schilfgeflochtenes Herz", "Corazón tejido con juncos", "Cœur en roseaux", "갈대로 엮은 심장", "Coração de Junco Trançado", "Сплетенное из тростника сердце", "芦苇编织的心", "蘆葦編織之心" },
+    ["Reliquary of Purity"] = { "Reliquiar der Reinheit", "Relicario de Pureza", "Reliquaire de pureté", "정화의 성물함", "Relicário da Pureza", "Реликварий Чистоты", "净化之匣", "淨化之匣" },
+    ["Remains of Eva Sarkhoff"] = { "Überreste von Eva Sarkhoff", "Remains de Eva Sarkhdef", "Cadavre d'Eva Sarkhoff", "에바 사크호프의 유해", "Restos Mortais de Eva Sarkhoff", "Останки Ева Саркофф", "艾瓦·萨克霍夫的遗体", "艾瓦·薩克霍夫的遺體" },
+    ["Remains of Lucien Sarkhoff"] = { "Überreste von Lucien Sarkhoff", "Remains de Lucien Sarkhdef", "Cadavre de Lucien Sarkhoff", "루시엔 사크호프의 유해", "Restos Mortais de Lucien Sarkhoff", "Останки Люсьена Саркофф", "卢森·萨克霍夫的遗体", "盧森·薩克霍夫的遺體" },
+    ["Remote Detonator Kit"] = { "Fernzünderset", "Equipo de detonador a distancia", "Kit de détonateur à distance", "원격 기폭장치 도구", "Kit de Detonador Remoto", "Дистанционный детонатор (комплект)", "远程引爆器工具包", "遙控炸彈工具組" },
+    ["Restless Soul"] = { "Ruhelose Seele", "Alma inquieta", "Ame sans repos", "잠 못드는 영혼", "Alma Inquieta", "Неупокоенная душа", "永不安息的灵魂", "永不安息的靈魂" },
+    ["Rexxar's Testament"] = { "Rexxars Testament", "Testamento de Rexxar", "Testament de Rexxar", "렉사르의 유서", "Testamento de Rexxar", "Письмо Рексара", "雷克萨的证明", "雷克薩的證明" },
+    ["Ribbly's Head"] = { "Ribblys Kopf", "Cabeza de Ribbly", "Tête de Ribbly", "리블리의 머리카락", "Cabeça do Ribas", "Голова Риббли", "雷布里的头颅", "雷布里的頭顱" },
+    ["Rig Blueprints"] = { "Maschinenblaupausen", "Planos de torre", "Plan de plateforme", "장치 설계도", "Projeto de Mecatraje", "Чертежи буровой установки", "钻探设备蓝图", "鑽探設備藍圖" },
+    ["Riptear's Heart"] = { "Reißers Herz", "Corazón de Rasgallanto", "Cœur de Fendécorche", "너덜토막의 심장", "Coração de Talharretalha", "Сердце Рвиреза", "撕裂者的心脏", "撕裂者的心臟" },
+    ["Riverpaw Miner"] = { "Minenarbeiter der Flusspfoten", "Minero Zarparrío", "Mineur Rivepatte", "갈퀴발일족 광부", "Minerador Pata Molhada", "Шахтер из стаи Речной Лапы", "河爪矿工", "河爪礦工" },
+    ["Robo-mechanical Guts"] = { "Robomechanische Gedärme", "Entrañas robomecánicas", "Entrailles mécaniques de robot", "기계장치 부속품", "Tripas Mecanobóticas", "Механические внутренности робота", "机械内胆", "機械內膽" },
+    ["Roc Gizzard"] = { "Muskelmagen eines Roc", "Mollejas de Roc", "Gésier de Roc", "로크 모래주머니", "Moela de Roca", "Потроха руха", "大鹏的砂囊", "大鵬的砂囊" },
+    ["Rock Elemental Shard"] = { "Felselementarsplitter", "Fragmento de roca elemental", "Fragment d'élémentaire de roche", "바위 정령 파편", "Estilhaço de Elemental da Rocha", "Осколок каменного элементаля", "石元素的碎片", "石元素的碎片" },
+    ["Rohan's Exorcism Censer"] = { "Rohans Weihrauchschwenker", "Incensario de exorcismo de Rohan", "Encensoir d'exorcisme de Rohan", "로한의 퇴마 향로", "Incensório de Exorcismo de Rohan", "Курильница экзорцизма Рогана", "洛汉的驱魔香炉", "洛漢的驅魔香爐" },
+    ["Rookery Egg"] = { "Krähenhorstei", "Huevo de El Grajero", "Œuf de la colonie", "부화장 알", "Ovo de Viveiro", "Яйцо из Гнездовья", "龙卵", "龍蛋" },
+    ["Rotting Wood"] = { "Faules Holz", "Madera putrefacta", "Bois pourri", "썩은 나무", "Madeira Podre", "Гнилая деревяшка", "腐烂的木头", "腐爛的木頭" },
+    ["Rough Dynamite"] = { "Raues Dynamit", "Dinamita férrea", "Dynamite basique", "천연 다이너마이트", "Dinamite Grosseira", "Грубый динамит", "劣质炸药", "粗製炸藥" },
+    ["Royal Historian Archesonus"] = { "Königliche Historikerin Archesonus", "Historiador Real Archesonus", "Historienne royale Archesonus", "왕실사학자 아케소누스", "Historiadora Real Arquefilis", "Королевский историк Аркессон", "皇家历史学家阿克瑟努斯", "皇家歷史學家阿克瑟努斯" },
+    ["Rugged Leather"] = { "Unverwüstliches Leder", "Cuero basto", "Cuir robuste", "튼튼한 가죽", "Couro Rústico", "Грубая кожа", "硬甲皮", "硬甲皮" },
+    ["Rune Thread"] = { "Runenfaden", "Hilo rúnico", "Fil runique", "룬문자 실타래", "Fio Rúnico", "Руническая нить", "符文线", "符文線" },
+    ["Runecloth"] = { "Runenstoff", "Paño rúnico", "Etoffe runique", "룬무늬 옷감", "Runatrama", "Рунная ткань", "符文布", "符文布" },
+    ["Sacred Highborne Writings"] = { "Hochheilige Schriften der Hochgeborenen", "Escrituras sacras del Altonato", "Textes sacrés des Bien-nés", "귀족의 성서", "Escritos Sagrados dos Altaneiros", "Священные письмена высокорожденных", "神圣的上层精灵笔迹", "神聖的精靈貴族筆跡" },
+    ["Sapphire of Aku'Mai"] = { "Saphir von Aku'Mai", "Zafiro de Aku'Mai", "Saphir d'Aku'Mai", "아쿠마이의 사파이어", "Safira de Aku'Mai", "Сапфир Аку'май", "阿库麦尔蓝宝石", "阿庫麥爾藍寶石" },
+    ["Saturated Remnant"] = { false, false, false, false, false, false, false, false },
+    ["Scarlet Archive"] = { "Scharlachrotes Archiv", "Archivo Escarlata", "Archives écarlates", "붉은십자군 기록", "Arquivo Escarlate", "Архив Алых", "血色十字军档案", "血色十字軍檔案" },
+    ["Scarlet Commander Mograine"] = { "Scharlachroter Kommandant Mograine", "Comandante Escarlata Mograine", "Commandant écarlate Mograine", "붉은십자군 사령관 모그레인", "Comandante Escarlate Mograine", "Командир Могрейн из Алого ордена", "血色十字军指挥官莫格莱尼", "血色十字軍指揮官莫格萊尼" },
+    ["Scooty"] = { false, "Pedrito", false, "스쿠티", false, "Скути", "斯库提", "斯庫提" },
+    ["Scourge Data"] = { "Geißeldaten", "Datos de la Plaga", "Donnée du Fléau", "스컬지 자료", "Dados do Flagelo", "Сведения о Плети", "天灾军团档案", "天譴軍團檔案" },
+    ["Screecher Spirit"] = { "Kreischergeist", "Espíritu estridador", "Esprit d'Hurleur", "계곡천둥매의 영혼", "Espírito Guinchador", "Дух крикуна", "尖啸者的灵魂", "尖嘯者的靈魂" },
+    ["Sealed Azure Bag"] = { "Versiegelte azurblaue Tasche", "Bolsa azur sellada", "Sac azur scellé", "봉인된 하늘색 자루", "Saco Lazúli Lacrado", "Запечатанная лазурная сумка", "密封的蓝袋子", "密封的藍袋子" },
+    ["Sealed Note to Advisor Belgrum"] = { "Versiegelte Notiz an Berater Belgrum", "Nota lacrada para el consejero Belgrum", "Note scellée au Conseiller Belgrum", "조언자 벨그룸에게 보내는 봉인된 쪽지", "Bilhete Lacrado para o Conselheiro Belgrum", "Запечатанная записка советнику Белграму", "给顾问贝尔格拉姆的密信", "給顧問貝爾格拉姆的密信" },
+    ["Sealed Reliquary of Purity"] = { "Versiegeltes Reliquiar der Reinheit", "Relicario de Pureza sellado", "Reliquaire de pureté scellé", "봉인된 정화의 성물함", "Relicário da Pureza Selado", "Запечатанный реликварий Чистоты", "封印的净化之匣", "封印的淨化之匣" },
+    ["Second Mosh'aru Tablet"] = { "Zweite Mosh'aru-Schrifttafel", "Segunda tablilla Mosh'aru", "Deuxième tablette Mosh'Aru", "두번째 모쉬아루 서판", "Segunda Tabuleta Mosh'Aru", "Вторая табличка Мошару", "第二块摩沙鲁石板", "第二塊摩沙魯石板" },
+    ["Second Relic Fragment"] = { "Zweites Reliktfragment", "Segundo fragmento de reliquia", "Fragment de la deuxième relique", "두번째 유물 조각", "Segundo Fragmento de Relíquia", "Второй фрагмент реликвии", "第二块遗物碎片", "第二塊聖物碎片" },
+    ["Second Witherbark Cage"] = { "Zweiter Käfig der Witherbark", "Segunda jaula Secacorteza", "Deuxième cage Witherbark", "두번째 마른나무껍질부족 우리", "Segunda Jaula Cascasseca", "Вторая клетка Сухокожих", "第二只枯木牢笼", "第二個枯木牢籠" },
+    ["Seed of Life"] = { "Samenkorn des Lebens", "Semilla de vida", "Graine de vie", "생명의 씨앗", "Semente da Vida", "Семя Жизни", "生命之种", "生命之種" },
+    ["Seeking Remnant"] = { false, false, false, false, false, false, false, false },
+    ["Serpentbloom"] = { "Schlangenflaum", "Reptilia", "Fleur de serpent", "불뱀꽃", "Ofídea", "Змеецвет", "毒蛇花", "毒蛇花" },
+    ["Shadowshard Fragment"] = { "Schattensplitter", "Trozo de fragmento oscuro", "Fragment Ombréclat", "음영석 조각", "Fragmento de Lascanegra", "Фрагмент осколка сумрака", "暗影残片", "暗影殘片" },
+    ["Shadowsworn Adept"] = { "Adept der Schattenanbeter", "Adepto Sombraída", "Adepte lige d'ombre", "어둠의혈맹 숙련사제", "Adepto Devoto da Sombra", "Адепт Культа Приверженцев Тени", "魔誓专家", "魔誓專家" },
+    ["Shadowsworn Cultist"] = { "Kultist der Schattenanbeter", "Fiel Sombraída", "Sectateur lige d'ombre", "어둠의혈맹 이교도", "Sectário Devoto da Sombra", "Сектант Культа Приверженцев Тени", "魔誓祭司", "魔誓祭司" },
+    ["Shadowsworn Thug"] = { "Rohling der Schattenanbeter", "Matón Sombraída", "Nervi lige d'ombre", "어둠의혈맹 암살단원", "Capanga Devoto da Sombra", "Лиходей Культа Приверженцев Тени", "魔誓暴徒", "魔誓暴徒" },
+    ["Sharpbeak's Feather"] = { "Scharfschnabels Feder", "Pluma de Picoafilado", "Plume de Bec-tranchant", "뾰족부리의 깃털", "Pena de Bicoafiado", "Перо Остроклюва", "沙普比克的羽毛", "沙普比克的羽毛" },
+    ["Shattered Necklace"] = { "Zerrissene Halskette", "Collar destrozado", "Collier brisé", "부서진 목걸이", "Colar Estilhaçado", "Поврежденное ожерелье", "破碎的项链", "破碎的項鏈" },
+    ["Shattered Necklace Power Source"] = { "Zerrissene Halskette-Kraftquelle", "Fuente de poder del collar destrozado", "Source d'énergie du collier brisé", "부서진 목걸이의 마력원천", "Fonte de Força do Colar Estilhaçado", "Источник Силы поврежденного ожерелья", "破碎项链的能量源", "破碎項鏈的能量源" },
+    ["Shattered Necklace Ruby"] = { "Zerrissene Halskette-Rubin", "Rubí del collar destrozado", "Rubis de collier brisé", "부서진 목걸이의 루비", "Rubi do Colar Estilhaçado", "Рубин поврежденного ожерелья", "破碎项链上的红宝石", "破碎項鏈上的紅寶石" },
+    ["Shattered Necklace Sapphire"] = { "Zerrissene Halskette-Saphir", "Zafiro del collar destrozado", "Saphir de collier brisé", "부서진 목걸이의 사파이어", "Safira do Colar Estilhaçado", "Сапфир поврежденного ожерелья", "破碎项链上的蓝宝石", "破碎項鏈上的藍寶石" },
+    ["Shattered Necklace Topaz"] = { "Zerrissene Halskette-Topas", "Topacio del collar destrozado", "Topaze de collier brisé", "부서진 목걸이의 토파즈", "Topázio do Colar Estilhaçado", "Топаз поврежденного ожерелья", "破碎项链上的黄宝石", "破碎項鏈上的黃寶石" },
+    ["Shaw's Report"] = { "Shaws Bericht", "Informe de Shaw", "Rapport de Shaw", "쇼의 보고서", "Relatório do Shaw", "Донесение Шоу", "肖尔的报告", "肖爾的報告" },
+    ["Silver Bar"] = { "Silberbarren", "Lingote de plata", "Barre d'argent", "은괴", "Barra de Prata", "Серебряный слиток", "银锭", "銀錠" },
+    ["Sixth Mosh'aru Tablet"] = { "Sechste Mosh'aru-Schrifttafel", "Sexta tablilla Mosh'aru", "Sixième tablette Mosh'aru", "여섯번째 모쉬아루 서판", "Sexta Tabuleta Mosh'Aru", "Шестая табличка Мошару", "第六块摩沙鲁石板", "第六塊摩沙魯石板" },
+    ["Skeletal Remains of Telmius Dreamseeker"] = { "Die sterblichen Überreste von Telmius Dreamseeker", "Restos de Telmius Buscasueños", "Squelette de Telmius Cherche-Rêve", "텔미우스 드림시커의 유해", "Restos Descarnados de Kariel Winthalus", "Останки Тельмия Сновидца", "泰尔米乌斯·探梦者的骸骨", "泰謬斯·尋夢者的骨骸" },
+    ["Skin of Shadow"] = { "Schattenhaut", "Piel de las Sombras", "Peau des ombres", "어둠의 허물", "Pele de Sombra", "Шкура Тени", "暗影之皮", "暗影之皮" },
+    ["Skittering Blood"] = { "Huschendes Blut", "Sangre de celerácnida", "Sang du Grouillement", "땅거미 점액", "Sangue de Pateante", "Летящая кровь", "粘稠的血液", "粘稠的血液" },
+    ["Skull of the Coldbringer"] = { "Schädel des Kältebringers", "Cráneo del Gélido", "Crâne du Porte-froid", "혹한의 해골", "Crânio do Frigífero", "Череп Холодоноса", "寒冰之王的颅骨", "寒冰之王的顱骨" },
+    ["Slab of Carrion Worm Meat"] = { "Scheibe Aaswurmfleisch", "Trozo de carne de gusano carroñero", "Chair de Ver putride", "청소부구더기 고기덩어리", "Naco de Carne de Verme Carniceiro", "Кусок мяса червя-трупоеда", "食腐虫肉块", "食腐蟲肉塊" },
+    ["Small Scroll"] = { "Kleine Rolle", "Pergamino pequeño", "Petit parchemin", "작은 두루마리", "Pergaminho Pequeno", "Маленький свиток", "小卷轴", "小卷軸" },
+    ["Snufflenose Command Stick"] = { "Schnüffelnasenleitstecken", "Vara de mando de Husmeador", "Bâton de commandement de Sniffetarin", "땅다람쥐 지휘봉", "Bastão de Adestramento do Fungafuça", "Палочка-погонялочка для шмыгуносов", "地鼠指挥棒", "地鼠指揮棒" },
+    ["Snufflenose Owner's Manual"] = { "Schnüffelnasenbesitzeranleitung", "Manual de propietario del Husmeador", "Manuel d'utilisateur de Sniffetarin", "땅다람쥐 설명서", "Manual de Proprietário do Fungafuça", "Справочник владельца Шмыгуноса", "地鼠训练手册", "地鼠訓練手冊" },
+    ["Solomon's Plea to Bolvar"] = { "Solomons Hilfegesuch an Bolvar", "Petición a Bolvar de Solomon", "Demande d'aide de Solomon à Bolvar", "볼바르에게 보내는 솔로몬의 탄원서", "Apelo de Salomão a Bolvar", "Обращение Соломона к Болвару", "所罗门写给伯瓦尔的求援信", "所羅門寫給伯瓦爾的求援信" },
+    ["Soran'ruk Fragment"] = { "Soran'ruk-Fragment", "Fragmento Soran'ruk", "Fragment de Soran'ruk", "소랜루크 조각", "Fragmento de Soran'ruk", "Фрагмент Соран'рука", "索兰鲁克宝珠的碎片", "索蘭魯克寶珠的碎片" },
+    ["Soul Stained Pike"] = { "Seelenbefleckte Pike", "Pica manchada de alma", "Pique tachée d'âme", "영혼이 깃든 창", "Pique Manchado de Almas", "Окрашенная душой пика", "穿魂长矛", "穿魂長矛" },
+    ["Soulbound Keepsake"] = { "Seelengebund. Andenken", "Memorias del Vínculo del Alma", "Souvenir lié", "영혼이 씌인 유품", "Lembrança Vinculada", "Книга души", "禁锢灵魂的遗物", "禁錮靈魂的遺物" },
+    ["Spells of Shadow"] = { "Schattenzauber", "Hechizos de las Sombras", "Sorts des Ombres", "어둠의 주문서", "Feitiços da Sombra", "Заклинания Тьмы", "暗影法术研究", "暗影法術研究" },
+    ["Spire Spider Egg"] = { "Spitzenspinnenei", "Huevo de araña de la cumbre", "Oeuf d'araignée du pic", "첨탑 거미알", "Ovo de Aranha do Pináculo", "Яйцо скального паука", "尖塔蜘蛛卵", "尖塔蜘蛛卵" },
+    ["Star Ruby"] = { "Sternrubin", "Rubí estrella", "Rubis étoilé", "별루비", "Rubi-estrela", "Звездный рубин", "星光红宝石", "紅寶石" },
+    ["Stone Circle"] = { "Steinkreis", "Círculo de Piedras", "Cercle de pierres", "돌무리", "Círculo de Pedra", "Круглый камень", "石环", "石環" },
+    ["Stonevault Bonesnapper"] = { "Knochenknacker der Steingrufttroggs", "Partehuesos Grutacanto", "Briseur d’os Cavepierre", "바위동굴일족 뼈다귀싸움꾼", "Quebraossos da Abóbada de Pedra", "Костегрыз из племени Каменного Свода", "石窟断骨者", "石窟斷骨者" },
+    ["Strange Water Globe"] = { "Seltsame Wasserkugel", "Globo de agua extraño", "Globe d'eau étrange", "이상한 물구슬", "Globo d'Água Estranho", "Странная водяная сфера", "奇怪的水球", "奇怪的水球" },
+    ["Stratholme Holy Water"] = { "Weihwasser von Stratholme", "Agua bendita de Stratholme", "Eau sacrée de Stratholme", "스트라솔름 성수", "Água Benta de Stratholme", "Святая вода Стратхольма", "斯坦索姆圣水", "斯坦索姆聖水" },
+    ["Sulfuron Ingot"] = { "Sulfuronblock", "Lingote de sulfuron", "Lingot de sulfuron", "설퍼론 주괴", "Lingote de Sulfuron", "Сульфуронский слиток", "萨弗隆铁锭", "薩弗隆鐵錠" },
+    ["Suspicious Industrial Supplies"] = { "Verdächtige Industriebedarfsvorräte", "Suministros industriales sospechosos", "Fournitures d’ingénierie suspectes", "수상한 공업용 보급품", "Suprimentos Industriais Suspeitos", "Подозрительные промышленные припасы", "可疑的工业补给品", "可疑的工業補給品" },
+    ["Symbol of Lost Honor"] = { "Symbol der verlorenen Ehre", "Símbolo de Honor perdido", "Symbole de l’honneur perdu", "실추된 명예의 상징", "Símbolo da Honra Perdida", "Символ утраченной чести", "失落荣耀的象征", "失落榮耀的象徵" },
+    ["Tablet Shard"] = { "Schrifttafelsplitter", "Fragmento de tablilla", "Eclat de tablette", "서판 조각", "Estilhaço de Tabuleta", "Обломок таблички", "石板碎片", "石板碎片" },
+    ["Tablet of Kurniya"] = { "Schrifttafel von Kurniya", "Tablilla de Kurniya", "Tablette de Kurniya", "쿠르니야의 서판", "Tabuleta de Kurniya", "Табличка Каринья", "库尔尼亚石板", "庫爾尼亞石板" },
+    ["Tablet of Ryun'eh"] = { "Schrifttafel von Ryun'eh", "Tablilla de Ryun'eh", "Tablette de Ryun'eh", "류네의 서판", "Tabuleta de Ryun'eh", "Табличка Рьюн'эха", "雷乌纳石板", "雷烏納石板" },
+    ["Tablet of Will"] = { "Schrifttafel des Willens", "Tablilla de Voluntad", "Tablette de volonté", "결의의 서판", "Tabuleta da Vontade", "Табличка Воли", "意志石板", "意志石板" },
+    ["Taelan's Hammer"] = { "Taelans Hammer", "Martillo de Taelan", "Marteau de Taelan", "탤런의 망치", "Martelo de Taelan", "Молот Таэлана", "泰兰之锤", "泰蘭之錘" },
+    ["Taragaman the Hungerer's Heart"] = { "Herz von Taragaman dem Hungerleider", "Corazón de Taragaman el Hambriento", "Coeur de Taragaman l'Affameur", "타라가만의 심장", "Coração de Taragaman, o Famélico", "Сердце Тарагамана Ненасытного", "塔拉加曼的心脏", "塔拉加曼的心臟" },
+    ["Techbot's Memory Core"] = { "Techbots Speicherkern", "Memoria de Tecnobot", "Mémoire de Techbot", "첨단로봇의 기억회로", "Núcleo de Memória do Tecnobô", "Ядро памяти техбота", "尖端机器人的存储器核心", "尖端機器人的記憶體核心" },
+    ["Terrordale Spirit"] = { "Schreckenstalgeist", "Espíritu del Valle del Terror", "Esprit de Val-Terreur", "테러데일 영혼", "Espírito da Várzea do Medo", "Дух долины Ужаса", "恐惧谷的灵魂", "恐懼谷的靈魂" },
+    ["Thaurissan Relic"] = { "Thauris-Relikt", "Reliquia Thaurissan", "Relique de Thaurissan", "타우릿산 유물", "Relíquia Thaurissana", "Мощи Тауриссана", "索瑞森遗物", "索瑞森聖物" },
+    ["The Arcanist's Cookbook"] = { "Das Arkanistenkochbuch", "El libro de cocina del arcanista", "Les recettes de l’arcaniste", "신비술사의 요리책", "Livro de Receitas do Arcanista", "Поваренная книга чародея", "奥法师的食谱", "秘法師的食譜" },
+    ["The Book of Ur"] = { "Das Buch von Ur", "El libro de Ur", "Le Livre d'Ur", "우르의 책", "O Livro de Ur", "Книга Ура", "乌尔之书", "烏爾之書" },
+    ["The Deed to Brill"] = { "Die Besitzurkunde für Brill", "Las escrituras de Rémol", "Titre de propriété de Brill", "브릴 증서", "A Escritura de Montalvo", "Документы на Брилл", "布瑞尔地契", "布瑞爾地契" },
+    ["The Deed to Caer Darrow"] = { "Die Besitzurkunde für Caer Darrow", "Las escrituras de Castel Darrow", "Titre de propriété de Caer Darrow", "카엘 다로우 증서", "A Escritura de Castro das Flechas", "Документы на Каэр Дарроу", "凯尔达隆地契", "凱爾達隆地契" },
+    ["The Deed to Southshore"] = { "Die Besitzurkunde für Southshore", "Las escrituras de Costasur", "Titre de propriété d’Austrivage", "사우스쇼어 증서", "A Escritura de Costa Sul", "Документы на Южнобережье", "南海镇地契", "南海鎮地契" },
+    ["The Deed to Tarren Mill"] = { "Die Besitzurkunde für Tarrens Mühle", "Las escrituras de Molino Tarren", "Titre de propriété de Moulin-de-Tarren", "타렌 밀농장 증서", "A Escritura da Serraria Tarren", "Документы на Мельницу Таррен", "塔伦米尔地契", "塔倫米爾地契" },
+    ["The Emerald Dream"] = { "Der Smaragdgrüne Traum", "El Sueño Esmeralda", "Le Rêve d'Emeraude", "에메랄드의 꿈", "Sonho Esmeralda", "Изумрудный Сон", "翡翠梦境", "翡翠夢境" },
+    ["The First Tablet of I'lalai"] = { "Die erste Schrifttafel von I'lalai", "La primera tablilla de I'lalai", "La première tablette d’I’lalai", "이랄라이의 첫 번째 서판", "Primeira Tabuleta de I'lalai", "Первая табличка И'лалая", "伊拉莱第一石板", "伊拉萊的第一個石板" },
+    ["The Founding of Dalaran"] = { "Die Gründung von Dalaran", "La fundación de Dalaran", "La fondation de Dalaran", "달라란 건국사", "A Fundação de Dalaran", "Основание Даларана", "达拉然的建立", "達拉然的建立" },
+    ["The Fourth Tablet of I'lalai"] = { "Die vierte Schrifttafel von I'lalai", "La cuarta tablilla de I'lalai", "La quatrième tablette d’I’lalai", "이랄라이의 네 번째 서판", "Quarta Tabuleta de I'lalai", "Четвертая табличка И'лалая", "伊拉莱第四石板", "伊拉萊的第四個石板" },
+    ["The Greatest Race of Hunters"] = { "Das größte Volk von Jägern", "La mejor raza de cazadores", "La plus grande race de chasseurs", "사냥꾼의 위대한 혈통", "A Grande Corrida dos Caçadores", "Величайшая гонка охотников", "最伟大的猎手", "最偉大的獵手" },
+    ["The Heart of the Mountain"] = { "Das Herz des Berges", "El corazón de la montaña", "Le Coeur de la montagne", "산의 정수", "O Coração da Montanha", "Сердце Горы", "山脉之心", "山脈之心" },
+    ["The Light and How to Swing It"] = { "Vom Licht und wie man es schwingt", "La Luz y cómo alterarla", "La lumière et comment l'altérer", "빛과 정의에 관하여", "A Luz e Como Ativá-la", "Свет и как его раскачать", "圣光之力", "聖光之力" },
+    ["The Lost Magic of the Runemasters"] = { "Die verlorene Magie der Runenmeister", "La magia perdida de los maestros de runas", "La Magie perdue des maîtres des runes", "잃어버린 룬술사의 마법", "A Magia Perdida dos Mestres de Runas", "Утерянная магия мастеров рун", "符文大师的失落魔法", "符文大師的失傳魔法" },
+    ["The Second Tablet of I'lalai"] = { "Die zweite Schrifttafel von I'lalai", "La segunda tablilla de I'lalai", "La deuxième tablette d’I’lalai", "이랄라이의 두 번째 서판", "Segunda Tabuleta de I'lalai", "Вторая табличка И'лалая", "伊拉莱第二石板", "伊拉萊的第二個石板" },
+    ["The Skull of Axtroz"] = { "Der Schädel des Axtroz", "El cráneo de Axtroz", "Le crâne d'Axtroz", "악트로즈의 해골", "Crânio de Axtroz", "Череп Акстроза", "埃克托兹的颅骨", "埃克托茲的顱骨" },
+    ["The Skull of Chronalis"] = { "Der Schädel des Chronalis", "El cráneo de Chronalis", "Le crâne de Chronalis", "크로날리스의 해골", "Crânio de Chronalis", "Череп Хроналиса", "克鲁纳里斯的颅骨", "克魯納里斯的顱骨" },
+    ["The Skull of Scryer"] = { "Der Schädel des Wahrsagers", "El cráneo de Sccentenor", "Le crâne de Clairvoyant", "감시자의 해골", "Crânio de Áugure", "Череп Провидца", "斯克利尔的颅骨", "斯克利爾的顱骨" },
+    ["The Skull of Somnus"] = { "Der Schädel des Somnus", "El cráneo de Somnus", "Le crâne de Somnus", "솜누스의 해골", "Crânio de Somnus", "Череп Сомнуса", "索姆努斯的颅骨", "索姆努斯的顱骨" },
+    ["The Third Tablet of I'lalai"] = { "Die dritte Schrifttafel von I'lalai", "La tercera tablilla de I'lalai", "La troisième tablette d’I’lalai", "이랄라이의 세 번째 서판", "Terceira Tabuleta de I'lalai", "Третья табличка И'лалая", "伊拉莱第三石板", "伊拉萊的第三個石板" },
+    ["The Third Troll Legend"] = { "Die dritte Troll-Legende", "La tercera leyenda trol", "La troisième légende des trolls", "트롤의 전설 3부", "A Terceira Lenda Troll", "Третье предание троллей", "巨魔传说第三章", "食人妖傳說第三章" },
+    ["The Traitor's Heart"] = { "Das Herz des Verräters", "El corazón del traidor", "Le Coeur du traître", "배신의 증거", "O Coração do Traidor", "Сердце предателя", "叛徒之心", "叛徒之心" },
+    ["Theradric Crystal Carving"] = { "Theradrische Kristallschnitzerei", "Tallas de cristal terádrico", "Gravure de cristal théradrique", "트라드릭 수정 조각상", "Entalhe de Cristal Terádrico", "Терадрический хрустальный орнамент", "瑟莱德丝水晶雕像", "瑟萊德絲水晶雕像" },
+    ["Thermaplugg's Safe Combination"] = { "Thermapluggs Safekombination", "Combinación de la caja fuerte de Termochufe", "Combinaison du coffre de Thermaplugg", "텔마플러그의 금고 암호", "Combinação do Cofre do Termaplugue", "Код от сейфа Термоштепселя", "瑟玛普拉格的保险箱密码", "機電師的保險箱密碼" },
+    ["Thick Black Claw"] = { "Dicke schwarze Klaue", "Garra negra gruesa", "Griffe noire épaisse", "두꺼운 검은 발톱", "Garra Preta Maciça", "Толстый черный коготь", "厚实的黑爪", "厚實的黑爪" },
+    ["Thicket Raptor Hide"] = { "Dickichtraptorbalg", "Pellejo de raptor de la espesura", "Peau de raptor des fourrés", "덤불 랩터 가죽", "Pelego de Raptor", "Шкура чащобного ящера", "灌木丛迅猛龙皮", "灌木迅猛龍皮" },
+    ["Thicket Raptor Meat"] = { "Dickichtraptorfleisch", "Carne de raptor de la espesura", "Viande de raptor des fourrés", "덤불 랩터 고기", "Carne de Raptor do Matagal", "Мясо чащобного ящера", "灌木丛迅猛龙肉", "灌木迅猛龍肉" },
+    ["Third Mosh'aru Tablet"] = { "Dritte Mosh'aru-Schrifttafel", "Tercera tablilla Mosh'aru", "Troisième Tablette Mosh'aru", "세번째 모쉬아루 서판", "Terceira Tabuleta Mosh'Aru", "Третья табличка Мошару", "第三块摩沙鲁石板", "第三塊摩沙魯石板" },
+    ["Third Relic Fragment"] = { "Drittes Reliktfragment", "Tercer fragmento de reliquia", "Fragment de la troisième relique", "세번째 유물 조각", "Terceiro Fragmento de Relíquia", "Третий фрагмент реликвии", "第三块遗物碎片", "第三塊聖物碎片" },
+    ["Third Witherbark Cage"] = { "Dritter Käfig der Witherbark", "Tercera jaula Secacorteza", "Troisième cage Witherbark", "세번째 마른나무껍질부족 우리", "Terceira Jaula Cascasseca", "Третья клетка Сухокожих", "第三只枯木牢笼", "第三只枯木牢籠" },
+    ["Thistlenettle's Badge"] = { "Thistlenettles Abzeichen", "Tarjeta de Ortigacardo", "Plaque de Crispechardon", "시슬네틀의 배지", "Distintivo de Cardurtiga", "Амулет Чертополоха", "希斯耐特的徽章", "希斯耐特的徽章" },
+    ["Thorium Brotherhood Contract"] = { "Vertrag der Thoriumbruderschaft", "Contrato de la Hermandad del Torio", "Contrat de la Confrérie du Thorium", "토륨 대장조합 계약서", "Contrato da Irmandade do Tório", "Контракт братства Тория", "瑟银兄弟会契约", "瑟銀兄弟會契約" },
+    ["Thorium Shackles"] = { "Thoriumfesseln", "Grilletes de torio", "Chaînes en thorium", "토륨 족쇄", "Grilhões de Tório", "Ториевые оковы", "瑟银镣铐", "瑟銀鐐銬" },
+    ["Tiara of the Deep"] = { "Tiara der Tiefen", "Tiara de las profundidades", "Tiare des abysses", "심연의 티아라", "Tiara das Profundezas", "Тиара Глубин", "深渊皇冠", "深淵皇冠" },
+    ["Tinkee's Letter"] = { "Tinkees Brief", "Carta de Tinkee", "Lettre de Tinkee", "팅키의 편지", "Carta de Vera", "Письмо Тинки", "丁奇的信", "丁奇的信" },
+    ["Tirion Fordring"] = { false, "Tirión Vadín", false, "티리온 폴드링", false, "Тирион Фордринг", "提里奥·弗丁", "提里奧·弗丁" },
+    ["Titan Relic"] = { "Relikt der Titanen", "Reliquia titánica", "Relique des Titans", "티탄의 유물", "Relíquia Titânica", "Реликвия титанов", "泰坦圣物", "泰坦聖物" },
+    ["Tooth of Morphaz"] = { "Morphaz' Zahn", "Diente de Morphaz", "Dent de Morphaz", "몰파즈의 이빨", "Dente de Morphaz", "Зуб Морфаза", "摩弗拉斯之牙", "摩弗拉斯之牙" },
+    ["Tormented Soul"] = { "Gepeinigte Seele", "Alma atormentada", "Ame tourmentée", "고통받는 영혼", "Alma Atormentada", "Замученная душа", "被折磨的幽魂", "痛苦的靈魂" },
+    ["Treaty of Understanding"] = { "Abkommen des Einvernehmens", "Tratado de entendimiento", "Traité d’entente", "이해의 조약", "Tratado de Entendimento", "Соглашение о взаимопонимании", "谅解条约", "諒解條約" },
+    ["Treshala's Pendant"] = { "Treshalas Anhänger", "Colgante de Treshala", "Pendentif de Treshala", "트레샬라의 펜던트", "Pingente de Treshala", "Подвеска Трешалы", "塔莎拉的坠饰", "塔莎拉的墜飾" },
+    ["Trevan's Weapon Notes"] = { "Trevans Waffennotizen", "Apuntes sobre armas de Trevan", "Notes sur les armes de Trevan", "트레반의 무기 기록", "Anotações de Trevan sobre Armas", "Заметки Тревана об оружии", "特雷凡的武器笔记", "崔凡的武器材料單" },
+    ["Troll Temper"] = { "Trollaushärter", "Temple trol", "Agent durcissant troll", "트롤 경화제", "Têmpera de Troll", "Троллье месиво", "巨魔调和剂", "食人妖調和劑" },
+    ["Truesilver Bar"] = { "Echtsilberbarren", "Lingote de veraplata", "Barre de vrai-argent", "진은 주괴", "Barra de Veraprata", "Слиток истинного серебра", "真银锭", "真銀錠" },
+    ["Twilight Pendant"] = { "Twilightanhänger", "Colgante del Crepúsculo", "Pendentif du crépuscule", "황혼의 펜던트", "Pingente do Crepúsculo", "Подвеска Сумерек", "暮光坠饰", "暮光墜飾" },
+    ["Unadorned Seal of Ascension"] = { "Unverziertes Siegel des Aufstiegs", "Lacre de ascensión sin adornar", "Sceau d'ascension non décoré", "가공하지 않은 승천의 인장", "Selo da Ascensão sem Adorno", "Простая печать Вознесения", "原始晋升印章", "原始晉升印章" },
+    ["Uncracked Chillwind Horn"] = { "Unbeschädigtes Horn einer Eiswindschimäre", "Cuerno de quimera Orvallo", "Corne intacte de Noroît", "온전한 서리바람 키메라의 뿔", "Chifre Inteiriço de Quimera Ventogelante", "Безупречный рог стылодыха", "完整的冰风奇美拉角", "完整的冰風奇美拉角" },
+    ["Uncracked Scarab Shell"] = { "Unbeschädigte Skarabäusschale", "Caparazón de escarabajo sin rajar", "Carapace de scarabée intacte", "온전한 왕쇠똥구리 껍질", "Couraça de Escaravelho Fechada", "Нерасколотый панцирь скарабея", "完整的圣甲虫壳", "完整的聖甲蟲殼" },
+    ["Undamaged Venom Sac"] = { "Unbeschädigter Giftbeutel", "Glándula de veneno no dañada", "Glande à venin intacte", "온전한 독주머니", "Vesícula de Peçonha Intacta", "Неповрежденная ядовитая железа", "完好无损的毒囊", "完好無損的毒囊" },
+    ["Undead Ravager"] = { "Untoter Verheerer", "Devastador no-muerto", "Ravageur mort-vivant", "언데드 약탈자", "Assolador Morto-vivo", "Опустошитель-отрекшийся", "亡灵劫掠者", "亡靈劫掠者" },
+    ["Unforged Rune Covered Breastplate"] = { "Ungeschmiedete runenbedeckte Brustplatte", "Peto cubierto de runas sin forjar", "Plastron couvert de runes inachevé", "벼려지지 않은 룬문자 흉갑", "Peitoral Rúnico de Metal Bruto", "Заготовка рунической кирасы", "未铸造的符文覆饰胸甲", "未鑄造的符文覆飾胸甲" },
+    ["Unloaded Zapper"] = { "Ungeladener Schrumpfer", "Irradior sin cargar", "Baguette déchargée", "충전 안 된 구제장치", "Fulminadora Descarregada", "Разряженный громобой", "空除草器", "空除草器" },
+    ["Untranslated Journal"] = { "Nicht übersetztes Tagebuch", "Diario sin traducir", "Journal non traduit", "번역되지 않은 일지", "Diário Não Traduzido", "Непереведенные записи", "未翻译的日记", "未翻譯的日記" },
+    ["Vectus"] = { false, false, false, "벡투스", false, "Вектус", "维克图斯", "維克圖斯" },
+    ["Venom Bottle"] = { "Giftflasche", "Botella de veneno", "Bouteille de venin", "독병", "Garrafa de Peçonha", "Флакон с ядом", "毒液瓶", "毒液瓶" },
+    ["Vial of Dire Water"] = { "Phiole mit Düsterwasser", "Vial de agua nefasta", "Fiole d'eau redoutable", "혈투의 웅덩이 물병", "Ampola de Água Hedionda", "Фиал пугающей воды", "恐怖之水", "恐怖之水" },
+    ["Vorrel's Wedding Ring"] = { "Vorrels Ehering", "Alianza de Vorrel", "Anneau de mariage de Vorrel", "보렐의 결혼반지", "Aliança de Casamento de Vorrel", "Обручальное кольцо Воррела", "沃瑞尔的结婚戒指", "沃瑞爾的結婚戒指" },
+    ["Wailing Essence"] = { "Klageessenz", "Esencia de lamentos", "Essence de lamentation", "통곡의 정수", "Essência Ululante", "Воющая субстанция", "哀嚎香精", "哀嚎香精" },
+    ["Wandering Spirit"] = { "Wandernder Geist", "Espíritu deambulante", "Esprit vagabond", "떠도는 영혼", "Espírito Errante", "Странствующий дух", "游荡的幽灵", "遊蕩的幽靈" },
+    ["War Master Voone"] = { "Kriegsmeister Voone", "Maestro de guerra Voone", "Maître de guerre Voone", "대장군 부네", "Senhor da Guerra Voone", "Воевода Вун", "指挥官沃恩", "指揮官沃恩" },
+    ["Warosh's Mojo"] = { "Waroshs Mojo", "Mojo de Warosh", "Mojo de Warosh", "와로쉬의 모조", "Mojo do Warosh", "Амулет Вароша", "瓦罗什的魔精", "瓦羅什的魔精油" },
+    ["Wavethrasher Scales"] = { "Wellenhauerschuppen", "Escamas de vándalo marino", "Ecailles de vandale des flots", "폭풍히드라 비늘", "Escamas de Fura-ondas", "Чешуя волношлепа", "碎浪多头怪的鳞片", "碎浪多頭怪的鱗片" },
+    ["Well Water Sample Kit"] = { "Set für Brunnenwasserproben", "Equipo de muestras de agua de pozo", "Échantillon d’eau du puits", "우물물 표본 채취 도구", "Kit de Amostras de Água de Poço", "Набор для взятия образцов колодезной воды", "井水采样工具包", "井水取樣工具組" },
+    ["Whitestone Oak Lumber"] = { "Weißsteineichenholz", "Madera de roble de Piedrablanca", "Bois de chêne de blanchepierre", "흰돌참나무 재목", "Madeira de Carvalho de Pedralva", "Древесина белокаменного дуба", "白石橡木", "白石橡木" },
+    ["Wiley's Note"] = { "Wileys Nachricht", "Nota de Wiley", "Note de Wiley", "와일리의 쪽지", "Bilhete do Wiley", "Записка Вилли", "威利的便笺", "威利的便箋" },
+    ["Woodsman"] = { "Waldmann", "Leñantro", "Bûcheron", "수렵꾼", "Mateiro", "Лесник", "护林者", "護林者" },
+    ["Xorothian Dreadsteed"] = { "Xorothianisches Schreckensross", "Corcel de la Muerte Xorothiano", "Destrier de l'effroi xorothien", "소로시안 공포마", "Corcel Medonho Zorotiano", "Ксоротианский конь погибели", "克索诺斯恐惧战马", "克索諾斯恐懼戰馬" },
+    ["Xorothian Stardust"] = { "Xorothianischer Sternenstaub", "Polvo estelar xorotiano", "Poussière d'étoile xorothienne", "소로시안 별가루", "Poeira Estelar Zorotiana", "Зоротианская звездная пыль", "克索诺斯星尘", "克索諾斯星塵" },
+    ["Yeh'kinya's Bramble"] = { "Yeh'kinyas Dornbusch", "Zarza de Yeh'kinya", "Ronce de Yeh'kinya", "예킨야의 나뭇가지", "Morácea de Yeh'Kinya", "Колючка Йе'кинья", "叶基亚的树枝", "葉基亞的樹枝" },
+    ["Young Crocolisk Skin"] = { "Haut eines jungen Krokilisken", "Piel de crocolisco joven", "Peau de jeune crocilisque", "새끼 악어 가죽", "Pele de Crocolisco Jovem", "Шкура молодого кроколиска", "小鳄鱼皮", "小鱷魚皮" },
+    ["Ysida Harmon"] = { false, false, false, "이시다 하몬", false, "Исида Хармон", "伊思达·哈尔蒙", "亞希達·哈莫" },
+    ["[DNT] Kill Credit: Finale"] = { false, false, false, false, false, false, false, false },
+    ["[DNT] Kill Credit: Place Explosives"] = { false, false, false, false, false, false, false, false },
+}
+-- END objectivenames
+
+-- greenglow (2.0.10): The Only Cure is More Green Glow's warning.
+do
+    local GREEN_GLOW_WARNING = {
+        deDE = "Es kann mehrere Versuche dauern: Benutze die Phiole so lange an einem lebenden Schleim, bis es klappt.",
+        frFR = "Il faudra peut-être plusieurs essais : continuez à l’utiliser sur un limon vivant jusqu’à ce que ça marche.",
+        esES = "Puede requerir varios intentos: sigue usándolo en un moco vivo hasta que funcione.",
+        esMX = "Puede requerir varios intentos: sigue usándolo en un moco vivo hasta que funcione.",
+        itIT = "Potrebbero servire diversi tentativi: continua a usarla su una melma viva finché non funziona.",
+        ptBR = "Pode levar várias tentativas: continue usando-o em um limo vivo até funcionar.",
+        ruRU = "Может понадобиться несколько попыток: применяйте его на живом слизне, пока не получится.",
+        koKR = "여러 번 시도해야 할 수 있습니다. 성공할 때까지 살아 있는 수액괴물에게 계속 사용하세요.",
+        zhCN = "可能需要尝试多次：对活着的软泥怪持续使用，直到成功为止。",
+        zhTW = "可能需要嘗試多次：對活著的軟泥怪持續使用，直到成功為止。",
+    }
+    for lang, text in pairs(GREEN_GLOW_WARNING) do
+        local content = FDJ.ContentLocales and FDJ.ContentLocales[lang]
+        if content then
+            content.quests = content.quests or {}
+            content.quests[2962] = content.quests[2962] or {}
+            if content.quests[2962].warning == nil then content.quests[2962].warning = text end
+        end
+    end
+end
+
+-- captainhorde (2.0.11): the Lordaeron Captain's description.
+do
+    local CAPTAIN = {
+        deDE = "Seltener Spawn. Der Allianz freundlich gesinnt: Nur die Horde kann ihn töten.",
+        frFR = "Apparition rare. Amical envers l’Alliance : seule la Horde peut le tuer.",
+        esES = "Aparición rara. Amistoso con la Alianza: solo la Horda puede matarlo.",
+        esMX = "Aparición rara. Amistoso con la Alianza: solo la Horda puede matarlo.",
+        itIT = "Spawn raro. Amichevole verso l’Alleanza: solo l’Orda può ucciderlo.",
+        ptBR = "Aparecimento raro. Amigável à Aliança: só a Horda pode matá-lo.",
+        ruRU = "Редкий противник. Дружелюбен к Альянсу: убить его может только Орда.",
+        koKR = "희귀 출현. 얼라이언스에게 우호적이라 호드만 처치할 수 있습니다.",
+        zhCN = "稀有刷新。对联盟友好：只有部落能击杀他。",
+        zhTW = "稀有出現。對聯盟友好：只有部落能擊殺他。",
+    }
+    for lang, text in pairs(CAPTAIN) do
+        local content = FDJ.ContentLocales and FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            content.places["Rare spawn. Friendly to the Alliance: only the Horde can kill him."] = text
+        end
+    end
+end
+
+-- dalaranvias (2.0.12): the arrow's lines on the way round Dalaran.
+do
+    local WEST = "Round Dalaran's west wall, along the lake"
+    local NORTH = "Round Dalaran's north side, along the lake shore"
+    local LINES = {
+        deDE = { "Um Dalarans Westmauer herum, am See entlang", "Um Dalarans Nordseite herum, am Seeufer entlang" },
+        frFR = { "Contournez le mur ouest de Dalaran, le long du lac", "Contournez Dalaran par le nord, le long de la rive du lac" },
+        esES = { "Rodea la muralla oeste de Dalaran, junto al lago", "Rodea Dalaran por el norte, por la orilla del lago" },
+        esMX = { "Rodea la muralla oeste de Dalaran, junto al lago", "Rodea Dalaran por el norte, por la orilla del lago" },
+        itIT = { "Aggira le mura ovest di Dalaran, lungo il lago", "Aggira Dalaran da nord, lungo la riva del lago" },
+        ptBR = { "Contorne a muralha oeste de Dalaran, ao longo do lago", "Contorne Dalaran pelo norte, pela margem do lago" },
+        ruRU = { "В обход западной стены Даларана, вдоль озера", "В обход Даларана с севера, вдоль берега озера" },
+        koKR = { "달라란 서쪽 성벽을 돌아 호수를 따라가세요", "달라란 북쪽을 돌아 호숫가를 따라가세요" },
+        zhCN = { "沿湖绕过达拉然的西墙", "沿湖岸从北侧绕过达拉然" },
+        zhTW = { "沿湖繞過達拉然的西牆", "沿湖岸從北側繞過達拉然" },
+    }
+    for lang, pair in pairs(LINES) do
+        local content = FDJ.ContentLocales and FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            content.places[WEST], content.places[NORTH] = pair[1], pair[2]
+        end
+    end
+end
+
+
+-- liftgate (2.0.28): the arrow's lines at the Great Lift.
+do
+    local UP = "Take the Great Lift up to the Barrens"
+    local DOWN = "Take the Great Lift down to Thousand Needles"
+    local LINES = {
+        deDE = { "Nimm den Großen Aufzug hinauf ins Brachland", "Nimm den Großen Aufzug hinunter nach Tausend Nadeln" },
+        frFR = { "Prenez le Grand Élévateur pour monter aux Tarides", "Prenez le Grand Élévateur pour descendre à Mille pointes" },
+        esES = { "Toma el Gran Elevador para subir a Los Baldíos", "Toma el Gran Elevador para bajar a Las Mil Agujas" },
+        esMX = { "Toma el Gran Elevador para subir a Los Baldíos", "Toma el Gran Elevador para bajar a Las Mil Agujas" },
+        itIT = { "Prendi il Grande Ascensore per salire alle Savane", "Prendi il Grande Ascensore per scendere a Millepicchi" },
+        ptBR = { "Pegue o Grande Elevador para subir aos Sertões", "Pegue o Grande Elevador para descer a Mil Agulhas" },
+        ruRU = { "Поднимитесь на Великом подъемнике в Степи", "Спуститесь на Великом подъемнике в Тысячу Игл" },
+        koKR = { "거대한 승강기를 타고 불모의 땅으로 올라가세요", "거대한 승강기를 타고 버섯구름 봉우리로 내려가세요" },
+        zhCN = { "乘坐升降梯上到贫瘠之地", "乘坐升降梯下到千针石林" },
+        zhTW = { "搭乘升降梯上到貧瘠之地", "搭乘升降梯下到千針石林" },
+    }
+    for lang, pair in pairs(LINES) do
+        local content = FDJ.ContentLocales and FDJ.ContentLocales[lang]
+        if content then
+            content.places = content.places or {}
+            content.places[UP], content.places[DOWN] = pair[1], pair[2]
+        end
+    end
+end
+
+-- Blueleaf Tubers (1221), 2.0.50: the reminder to take the three quest
+-- items from beside Mebok Mizzyrix. Item names as each client names them
+-- (Wowhead's localized item pages 5880, 6684, 5897). Italian has no
+-- translation of these items (the quest left the game before Italian came),
+-- and Traditional Chinese could not be read yet: both keep the English names.
+for lang, warning in pairs({
+    deDE = "Bevor du hineingehst, nimm die Kiste mit Löchern, den Schnüffelnasenleitstecken und die Schnüffelnasenbesitzeranleitung mit. Sie liegen direkt neben dem Questgeber Mebok Mizzyrix in Ratschet.",
+    frFR = "Avant d'entrer, prenez la Caisse percée, le Bâton de commandement de Sniffetarin et le Manuel d'utilisateur de Sniffetarin. Ils se trouvent juste à côté du donneur de quête, Mebok Mizzyrix, à Cabestan.",
+    esES = "Antes de entrar, coge el Cajón con agujeros, la Vara de mando de Husmeador y el Manual de propietario del Husmeador. Están justo al lado de quien da la misión, Mebok Mizzyrix, en Trinquete.",
+    itIT = "Prima di entrare, prendi questi tre oggetti: Crate with Holes, Snufflenose Command Stick e Snufflenose Owner's Manual. Si trovano proprio accanto a chi assegna la missione, Mebok Mizzyrix, a Porto Paranco.",
+    ptBR = "Antes de entrar, pegue o Caixote com Furos, o Bastão de Adestramento do Fungafuça e o Manual de Proprietário do Fungafuça. Eles ficam bem ao lado de quem dá a missão, Mebok Mizzyrix, em Vila Catraca.",
+    ruRU = "Перед входом возьмите три предмета: «Ящик с отверстиями», «Палочка-погонялочка для шмыгуносов» и «Справочник владельца Шмыгуноса». Они лежат рядом с тем, кто выдает задание, в Кабестане.",
+    koKR = "들어가기 전에 구멍 난 상자, 땅다람쥐 지휘봉, 땅다람쥐 설명서를 챙기세요. 톱니항에서 퀘스트를 주는 NPC 바로 옆에 있습니다.",
+    zhCN = "进去之前，先拿上开孔的箱子、地鼠指挥棒和地鼠训练手册。它们就在棘齿城的任务发布者旁边。",
+    zhTW = "進去之前，先拿上 Crate with Holes、Snufflenose Command Stick 和 Snufflenose Owner's Manual。它們就在棘齒城的任務發布者旁邊。",
+}) do
+    local content = FDJ.ContentLocales and FDJ.ContentLocales[lang]
+    if content and content.quests then
+        content.quests[1221] = content.quests[1221] or {}
+        content.quests[1221].warning = warning
+    end
+end
+
+-- altarbosses (2.0.24): the Sunken Temple's group entry for its six troll
+-- guardians. The trolls keep their English names.
+do
+    local ALTAR = {
+        deDE = "Altarbosse", frFR = "Boss de l'autel", esES = "Jefes del altar", esMX = "Jefes del altar",
+        itIT = "Boss dell'altare", ptBR = "Chefes do altar", ruRU = "Боссы алтаря",
+        koKR = "제단 우두머리", zhCN = "祭坛首领", zhTW = "祭壇首領",
+    }
+    for lang, text in pairs(ALTAR) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.bosses = content.bosses or {}
+            if content.bosses["Altar Bosses"] == nil then content.bosses["Altar Bosses"] = text end
+        end
+    end
+end
+
+-- rfdstep (2.0.32): the two Maraudon disclaimers of Razorfen Downs'
+-- Agamaggan's Blood chain, in every language (dungeon names as the journal
+-- shows them). 93404: the chain's Rot and Regret step; 93604: the quest.
+do
+    local WARN = {
+        deDE = { "Ja, dieser Schritt ist in MARAUDON. Er wird benötigt, um diese Quest für den Hügel der Klingenhauer freizuschalten.",
+                 "WARNUNG: Diese Questreihe hat einen Schritt in Maraudon" },
+        frFR = { "Oui, cette étape se fait à MARAUDON. Elle est nécessaire pour débloquer cette quête des Souilles de Tranchebauge.",
+                 "ATTENTION : cette suite de quêtes a une étape à Maraudon" },
+        esES = { "Sí, este paso es en MARAUDON. Es necesario para desbloquear esta misión de Zahúrda Rajacieno.",
+                 "ADVERTENCIA: esta cadena de misiones tiene un paso en Maraudon" },
+        esMX = { "Sí, este paso es en MARAUDON. Es necesario para desbloquear esta misión de Zahúrda Rajacieno.",
+                 "ADVERTENCIA: esta cadena de misiones tiene un paso en Maraudon" },
+        itIT = { "Sì, questa tappa è a MARAUDON. Serve per sbloccare questa missione di Razorfen Downs.",
+                 "ATTENZIONE: questa catena ha una tappa a Maraudon" },
+        ptBR = { "Sim, esta etapa é em MARAUDON. Ela é necessária para liberar esta missão do Urzal dos Mortos.",
+                 "AVISO: esta sequência de missões tem uma etapa em Maraudon" },
+        ruRU = { "Да, этот этап проходит в МАРОДОНЕ. Он нужен, чтобы открыть это задание в Курганах Иглошкурых.",
+                 "ВНИМАНИЕ: в этой цепочке есть этап в Мародоне" },
+        koKR = { "네, 이 단계는 마라우돈에서 진행합니다. 이 가시덩굴 구릉 퀘스트를 열려면 필요합니다.",
+                 "경고: 이 연계 퀘스트에는 마라우돈 단계가 있습니다" },
+        zhCN = { "没错，这一步在玛拉顿。完成它才能解锁这个剃刀高地任务。",
+                 "警告：此任务链有一步在玛拉顿" },
+        zhTW = { "沒錯，這一步在瑪拉頓。完成它才能解鎖這個剃刀高地任務。",
+                 "警告：此任務鏈有一步在瑪拉頓" },
+    }
+    for lang, text in pairs(WARN) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.quests = content.quests or {}
+            content.quests[93404] = content.quests[93404] or {}
+            content.quests[93604] = content.quests[93604] or {}
+            if content.quests[93404].warning == nil then content.quests[93404].warning = text[1] end
+            if content.quests[93604].warning == nil then content.quests[93604].warning = text[2] end
+        end
+    end
+end
+
+-- blackmawaudit (2.0.36, 2.0.37, 2.0.39, 2.0.41): the Blackmaw Hold quest texts changed or
+-- added (givers, hand-ins, notes, the Blackmaw Reclamation chain), in every
+-- language. NPC, quest and item names stay English; places as the clients
+-- name them where known.
+do
+    local T = {
+        TIMEAR_P = {
+            deDE = "Archmage Timear, Dalaran (15.4, 74.0)",
+            frFR = "Archmage Timear, Dalaran (15.4, 74.0)",
+            esES = "Archmage Timear, Dalaran (15.4, 74.0)",
+            esMX = "Archmage Timear, Dalaran (15.4, 74.0)",
+            itIT = "Archmage Timear, Dalaran (15.4, 74.0)",
+            ptBR = "Archmage Timear, Dalaran (15.4, 74.0)",
+            ruRU = "Archmage Timear, Даларан (15.4, 74.0)",
+            koKR = "Archmage Timear, 달라란 (15.4, 74.0)",
+            zhCN = "Archmage Timear，达拉然 (15.4, 74.0)",
+            zhTW = "Archmage Timear，達拉然 (15.4, 74.0)",
+        },
+        MULN = {
+            deDE = "Muln Earthfury, Mulgore (33.4, 22.5)",
+            frFR = "Muln Earthfury, Mulgore (33.4, 22.5)",
+            esES = "Muln Earthfury, Mulgore (33.4, 22.5)",
+            esMX = "Muln Earthfury, Mulgore (33.4, 22.5)",
+            itIT = "Muln Earthfury, Mulgore (33.4, 22.5)",
+            ptBR = "Muln Earthfury, Mulgore (33.4, 22.5)",
+            ruRU = "Muln Earthfury, Мулгор (33.4, 22.5)",
+            koKR = "Muln Earthfury, 멀고어 (33.4, 22.5)",
+            zhCN = "Muln Earthfury，莫高雷 (33.4, 22.5)",
+            zhTW = "Muln Earthfury，莫高雷 (33.4, 22.5)",
+        },
+        TRUESONG = {
+            deDE = "Commander Truesong, Azshara (11.8, 78.3)",
+            frFR = "Commander Truesong, Azshara (11.8, 78.3)",
+            esES = "Commander Truesong, Azshara (11.8, 78.3)",
+            esMX = "Commander Truesong, Azshara (11.8, 78.3)",
+            itIT = "Commander Truesong, Azshara (11.8, 78.3)",
+            ptBR = "Commander Truesong, Azshara (11.8, 78.3)",
+            ruRU = "Commander Truesong, Азшара (11.8, 78.3)",
+            koKR = "Commander Truesong, 아즈샤라 (11.8, 78.3)",
+            zhCN = "Commander Truesong，艾萨拉 (11.8, 78.3)",
+            zhTW = "Commander Truesong，艾薩拉 (11.8, 78.3)",
+        },
+        OGTINC = {
+            deDE = "Ogtinc, Azshara (42.4, 42.7)",
+            frFR = "Ogtinc, Azshara (42.4, 42.7)",
+            esES = "Ogtinc, Azshara (42.4, 42.7)",
+            esMX = "Ogtinc, Azshara (42.4, 42.7)",
+            itIT = "Ogtinc, Azshara (42.4, 42.7)",
+            ptBR = "Ogtinc, Azshara (42.4, 42.7)",
+            ruRU = "Ogtinc, Азшара (42.4, 42.7)",
+            koKR = "Ogtinc, 아즈샤라 (42.4, 42.7)",
+            zhCN = "Ogtinc，艾萨拉 (42.4, 42.7)",
+            zhTW = "Ogtinc，艾薩拉 (42.4, 42.7)",
+        },
+        RAGEROAR = {
+            deDE = "Gatekeeper Rageroar, Ursolan, Azshara (42.4, 20.2)",
+            frFR = "Gatekeeper Rageroar, Ursolan, Azshara (42.4, 20.2)",
+            esES = "Gatekeeper Rageroar, Ursolan, Azshara (42.4, 20.2)",
+            esMX = "Gatekeeper Rageroar, Ursolan, Azshara (42.4, 20.2)",
+            itIT = "Gatekeeper Rageroar, Ursolan, Azshara (42.4, 20.2)",
+            ptBR = "Gatekeeper Rageroar, Ursolan, Azshara (42.4, 20.2)",
+            ruRU = "Gatekeeper Rageroar, Ursolan, Азшара (42.4, 20.2)",
+            koKR = "Gatekeeper Rageroar, Ursolan, 아즈샤라 (42.4, 20.2)",
+            zhCN = "Gatekeeper Rageroar，Ursolan，艾萨拉 (42.4, 20.2)",
+            zhTW = "Gatekeeper Rageroar，Ursolan，艾薩拉 (42.4, 20.2)",
+        },
+        NOK = {
+            deDE = "Lorekeeper Nok, Ursolan, Azshara (41.4, 20.0)",
+            frFR = "Lorekeeper Nok, Ursolan, Azshara (41.4, 20.0)",
+            esES = "Lorekeeper Nok, Ursolan, Azshara (41.4, 20.0)",
+            esMX = "Lorekeeper Nok, Ursolan, Azshara (41.4, 20.0)",
+            itIT = "Lorekeeper Nok, Ursolan, Azshara (41.4, 20.0)",
+            ptBR = "Lorekeeper Nok, Ursolan, Azshara (41.4, 20.0)",
+            ruRU = "Lorekeeper Nok, Ursolan, Азшара (41.4, 20.0)",
+            koKR = "Lorekeeper Nok, Ursolan, 아즈샤라 (41.4, 20.0)",
+            zhCN = "Lorekeeper Nok，Ursolan，艾萨拉 (41.4, 20.0)",
+            zhTW = "Lorekeeper Nok，Ursolan，艾薩拉 (41.4, 20.0)",
+        },
+        UNELE = {
+            deDE = "Unele, Ursolan, Azshara (43.4, 17.4)",
+            frFR = "Unele, Ursolan, Azshara (43.4, 17.4)",
+            esES = "Unele, Ursolan, Azshara (43.4, 17.4)",
+            esMX = "Unele, Ursolan, Azshara (43.4, 17.4)",
+            itIT = "Unele, Ursolan, Azshara (43.4, 17.4)",
+            ptBR = "Unele, Ursolan, Azshara (43.4, 17.4)",
+            ruRU = "Unele, Ursolan, Азшара (43.4, 17.4)",
+            koKR = "Unele, Ursolan, 아즈샤라 (43.4, 17.4)",
+            zhCN = "Unele，Ursolan，艾萨拉 (43.4, 17.4)",
+            zhTW = "Unele，Ursolan，艾薩拉 (43.4, 17.4)",
+        },
+        EKKAL = {
+            deDE = "Ekkal, Ruinen von Eldarath, Azshara (42.0, 38.9)",
+            frFR = "Ekkal, Ruines d'Eldarath, Azshara (42.0, 38.9)",
+            esES = "Ekkal, Ruinas de Eldarath, Azshara (42.0, 38.9)",
+            esMX = "Ekkal, Ruinas de Eldarath, Azshara (42.0, 38.9)",
+            itIT = "Ekkal, Rovine di Eldarath, Azshara (42.0, 38.9)",
+            ptBR = "Ekkal, Ruínas de Eldarath, Azshara (42.0, 38.9)",
+            ruRU = "Ekkal, Руины Эльдарата, Азшара (42.0, 38.9)",
+            koKR = "Ekkal, 엘다라스 폐허, 아즈샤라 (42.0, 38.9)",
+            zhCN = "Ekkal，埃达拉斯废墟，艾萨拉 (42.0, 38.9)",
+            zhTW = "Ekkal，埃達拉斯廢墟，艾薩拉 (42.0, 38.9)",
+        },
+        KORSA = {
+            deDE = "Korsa, vor Legashi Stronghold, Azshara (63.0, 23.3)",
+            frFR = "Korsa, devant Legashi Stronghold, Azshara (63.0, 23.3)",
+            esES = "Korsa, a las afueras de Legashi Stronghold, Azshara (63.0, 23.3)",
+            esMX = "Korsa, a las afueras de Legashi Stronghold, Azshara (63.0, 23.3)",
+            itIT = "Korsa, fuori da Legashi Stronghold, Azshara (63.0, 23.3)",
+            ptBR = "Korsa, do lado de fora de Legashi Stronghold, Azshara (63.0, 23.3)",
+            ruRU = "Korsa, у Legashi Stronghold, Азшара (63.0, 23.3)",
+            koKR = "Korsa, Legashi Stronghold 밖, 아즈샤라 (63.0, 23.3)",
+            zhCN = "Korsa，Legashi Stronghold外，艾萨拉 (63.0, 23.3)",
+            zhTW = "Korsa，Legashi Stronghold外，艾薩拉 (63.0, 23.3)",
+        },
+        GRAAL_P = {
+            deDE = "Graal, in einem Käfig in Legashi Stronghold, Azshara (65.9, 14.4)",
+            frFR = "Graal, en cage dans Legashi Stronghold, Azshara (65.9, 14.4)",
+            esES = "Graal, enjaulado en Legashi Stronghold, Azshara (65.9, 14.4)",
+            esMX = "Graal, enjaulado en Legashi Stronghold, Azshara (65.9, 14.4)",
+            itIT = "Graal, in gabbia a Legashi Stronghold, Azshara (65.9, 14.4)",
+            ptBR = "Graal, preso numa jaula em Legashi Stronghold, Azshara (65.9, 14.4)",
+            ruRU = "Graal, в клетке в Legashi Stronghold, Азшара (65.9, 14.4)",
+            koKR = "Graal, Legashi Stronghold의 우리, 아즈샤라 (65.9, 14.4)",
+            zhCN = "Graal，被关在Legashi Stronghold的笼子里，艾萨拉 (65.9, 14.4)",
+            zhTW = "Graal，被關在Legashi Stronghold的籠子裡，艾薩拉 (65.9, 14.4)",
+        },
+        GORN = {
+            deDE = "Gorn One Eye, Holzschlundfeste",
+            frFR = "Gorn One Eye, Repaire des Grumegueules",
+            esES = "Gorn One Eye, Bastión Fauces de Madera",
+            esMX = "Gorn One Eye, Bastión Fauces de Madera",
+            itIT = "Gorn One Eye, Timbermaw Hold",
+            ptBR = "Gorn One Eye, Timbermaw Hold",
+            ruRU = "Gorn One Eye, Крепость Древобрюхов",
+            koKR = "Gorn One Eye, 나무구렁 요새",
+            zhCN = "Gorn One Eye，木喉要塞",
+            zhTW = "Gorn One Eye，木喉要塞",
+        },
+        RECLAIM_N = {
+            deDE = "Varrox Bleakhoof, der letzte Boss, hat den Kopf. Folgt auf die Questreihe 'Blackmaw Counter-Offensive'. Laut Spielern braucht man dafür den Ruf 'Freundlich' bei der Holzschlundfeste.",
+            frFR = "Varrox Bleakhoof, le dernier boss, a la tête. Vient après la suite de quêtes « Blackmaw Counter-Offensive ». D'après les joueurs, il faut être Amical avec le Repaire des Grumegueules.",
+            esES = "Varrox Bleakhoof, el último jefe, tiene la cabeza. Va después de la cadena 'Blackmaw Counter-Offensive'. Según los jugadores, necesita reputación Amistoso con el Bastión Fauces de Madera.",
+            esMX = "Varrox Bleakhoof, el último jefe, tiene la cabeza. Va después de la cadena 'Blackmaw Counter-Offensive'. Según los jugadores, necesita reputación Amistoso con el Bastión Fauces de Madera.",
+            itIT = "Varrox Bleakhoof, l'ultimo boss, ha la testa. Viene dopo la catena 'Blackmaw Counter-Offensive'. Secondo i giocatori serve la reputazione Amichevole con Timbermaw Hold.",
+            ptBR = "Varrox Bleakhoof, o último chefe, tem a cabeça. Vem depois da sequência 'Blackmaw Counter-Offensive'. Segundo os jogadores, precisa de reputação Amistoso com Timbermaw Hold.",
+            ruRU = "Голова у Varrox Bleakhoof, последнего босса. Идет после цепочки «Blackmaw Counter-Offensive». По словам игроков, нужна репутация «Дружелюбие» с Крепостью Древобрюхов.",
+            koKR = "마지막 보스 Varrox Bleakhoof가 머리를 가지고 있습니다. 'Blackmaw Counter-Offensive' 연계 퀘스트 다음에 받을 수 있습니다. 플레이어 제보에 따르면 나무구렁 요새 평판이 우호 이상이어야 합니다.",
+            zhCN = "最后一个首领Varrox Bleakhoof身上有头颅。此任务在“Blackmaw Counter-Offensive”任务链之后。据玩家反馈，需要木喉要塞声望达到友善。",
+            zhTW = "最後一個首領Varrox Bleakhoof身上有頭顱。此任務在「Blackmaw Counter-Offensive」任務鏈之後。據玩家回報，需要木喉要塞聲望達到友好。",
+        },
+        FEARDRED_O = {
+            deDE = "Tötet Master Feardred und bringt sein Amulett zu Korsa.",
+            frFR = "Tuez Master Feardred et apportez son amulette à Korsa.",
+            esES = "Mata a Master Feardred y llévale su amuleto a Korsa.",
+            esMX = "Mata a Master Feardred y llévale su amuleto a Korsa.",
+            itIT = "Uccidi Master Feardred e porta il suo amuleto a Korsa.",
+            ptBR = "Mate Master Feardred e leve o amuleto dele para Korsa.",
+            ruRU = "Убейте Master Feardred и принесите его амулет Korsa.",
+            koKR = "Master Feardred를 처치하고 그의 목걸이를 Korsa에게 가져가세요.",
+            zhCN = "杀死Master Feardred，把他的护身符交给Korsa。",
+            zhTW = "殺死Master Feardred，把他的護身符交給Korsa。",
+        },
+        THIN_O = {
+            deDE = "Tötet 6 Legashi Hellraisers, 4 Legashi Soulstealers und 2 Legashi Blackguards für Korsa vor Legashi Stronghold.",
+            frFR = "Tuez 6 Legashi Hellraisers, 4 Legashi Soulstealers et 2 Legashi Blackguards pour Korsa, devant Legashi Stronghold.",
+            esES = "Mata a 6 Legashi Hellraisers, 4 Legashi Soulstealers y 2 Legashi Blackguards para Korsa, a las afueras de Legashi Stronghold.",
+            esMX = "Mata a 6 Legashi Hellraisers, 4 Legashi Soulstealers y 2 Legashi Blackguards para Korsa, a las afueras de Legashi Stronghold.",
+            itIT = "Uccidi 6 Legashi Hellraisers, 4 Legashi Soulstealers e 2 Legashi Blackguards per Korsa, fuori da Legashi Stronghold.",
+            ptBR = "Mate 6 Legashi Hellraisers, 4 Legashi Soulstealers e 2 Legashi Blackguards para Korsa, do lado de fora de Legashi Stronghold.",
+            ruRU = "Убейте 6 Legashi Hellraisers, 4 Legashi Soulstealers и 2 Legashi Blackguards для Korsa у Legashi Stronghold.",
+            koKR = "Legashi Stronghold 밖의 Korsa를 위해 Legashi Hellraiser 6마리, Legashi Soulstealer 4마리, Legashi Blackguard 2마리를 처치하세요.",
+            zhCN = "为Legashi Stronghold外的Korsa杀死6个Legashi Hellraiser、4个Legashi Soulstealer和2个Legashi Blackguard。",
+            zhTW = "為Legashi Stronghold外的Korsa殺死6個Legashi Hellraiser、4個Legashi Soulstealer和2個Legashi Blackguard。",
+        },
+        SATYR_O = {
+            deDE = "Helft Graal, aus Legashi Stronghold auszubrechen, und benachrichtigt dann Korsa vor Legashi Stronghold.",
+            frFR = "Aidez Graal à s'évader de Legashi Stronghold, puis prévenez Korsa devant Legashi Stronghold.",
+            esES = "Ayuda a Graal a escapar de Legashi Stronghold y después avisa a Korsa a las afueras de Legashi Stronghold.",
+            esMX = "Ayuda a Graal a escapar de Legashi Stronghold y después avisa a Korsa a las afueras de Legashi Stronghold.",
+            itIT = "Aiuta Graal a evadere da Legashi Stronghold, poi avvisa Korsa fuori da Legashi Stronghold.",
+            ptBR = "Ajude Graal a fugir de Legashi Stronghold e depois avise Korsa do lado de fora de Legashi Stronghold.",
+            ruRU = "Помогите Graal вырваться из Legashi Stronghold, затем сообщите об этом Korsa у Legashi Stronghold.",
+            koKR = "Graal이 Legashi Stronghold에서 탈출하도록 도운 뒤, Legashi Stronghold 밖의 Korsa에게 알리세요.",
+            zhCN = "帮助Graal逃出Legashi Stronghold，然后通知Legashi Stronghold外的Korsa。",
+            zhTW = "幫助Graal逃出Legashi Stronghold，然後通知Legashi Stronghold外的Korsa。",
+        },
+        RETURN_O = {
+            deDE = "Kehrt zu Gatekeeper Rageroar in Ursolan zurück.",
+            frFR = "Retournez voir Gatekeeper Rageroar à Ursolan.",
+            esES = "Vuelve con Gatekeeper Rageroar en Ursolan.",
+            esMX = "Vuelve con Gatekeeper Rageroar en Ursolan.",
+            itIT = "Torna da Gatekeeper Rageroar a Ursolan.",
+            ptBR = "Volte a Gatekeeper Rageroar em Ursolan.",
+            ruRU = "Вернитесь к Gatekeeper Rageroar в Ursolan.",
+            koKR = "Ursolan의 Gatekeeper Rageroar에게 돌아가세요.",
+            zhCN = "回到Ursolan的Gatekeeper Rageroar那里。",
+            zhTW = "回到Ursolan的Gatekeeper Rageroar那裡。",
+        },
+        REINF_O = {
+            deDE = "Sprecht mit Gorn One Eye in der Holzschlundfeste und bittet ihn um Verstärkung.",
+            frFR = "Parlez à Gorn One Eye au Repaire des Grumegueules et demandez-lui des renforts.",
+            esES = "Habla con Gorn One Eye en el Bastión Fauces de Madera y pídele refuerzos.",
+            esMX = "Habla con Gorn One Eye en el Bastión Fauces de Madera y pídele refuerzos.",
+            itIT = "Parla con Gorn One Eye a Timbermaw Hold e chiedigli dei rinforzi.",
+            ptBR = "Fale com Gorn One Eye em Timbermaw Hold e peça reforços a ele.",
+            ruRU = "Поговорите с Gorn One Eye в Крепости Древобрюхов и попросите у него подкрепление.",
+            koKR = "나무구렁 요새의 Gorn One Eye와 대화하여 지원군을 요청하세요.",
+            zhCN = "与木喉要塞的Gorn One Eye交谈，请他派出援军。",
+            zhTW = "與木喉要塞的Gorn One Eye交談，請他派出援軍。",
+        },
+        BLOOD_O = {
+            deDE = "Tötet Chieftain Bloodmaw und bringt seinen Streitkolben zu Gorn One Eye in der Holzschlundfeste.",
+            frFR = "Tuez Chieftain Bloodmaw et apportez sa masse à Gorn One Eye au Repaire des Grumegueules.",
+            esES = "Mata a Chieftain Bloodmaw y llévale su maza a Gorn One Eye en el Bastión Fauces de Madera.",
+            esMX = "Mata a Chieftain Bloodmaw y llévale su maza a Gorn One Eye en el Bastión Fauces de Madera.",
+            itIT = "Uccidi Chieftain Bloodmaw e porta la sua mazza a Gorn One Eye a Timbermaw Hold.",
+            ptBR = "Mate Chieftain Bloodmaw e leve a maça dele para Gorn One Eye em Timbermaw Hold.",
+            ruRU = "Убейте Chieftain Bloodmaw и принесите его булаву Gorn One Eye в Крепость Древобрюхов.",
+            koKR = "Chieftain Bloodmaw를 처치하고 그의 철퇴를 나무구렁 요새의 Gorn One Eye에게 가져가세요.",
+            zhCN = "杀死Chieftain Bloodmaw，把他的锤子交给木喉要塞的Gorn One Eye。",
+            zhTW = "殺死Chieftain Bloodmaw，把他的錘子交給木喉要塞的Gorn One Eye。",
+        },
+        BLOOD_N = {
+            deDE = "Chieftain Bloodmaw ist im Teufelswald, südlich der Holzschlundfeste.",
+            frFR = "Chieftain Bloodmaw se trouve à Gangrebois, au sud du Repaire des Grumegueules.",
+            esES = "Chieftain Bloodmaw está en Frondavil, al sur del Bastión Fauces de Madera.",
+            esMX = "Chieftain Bloodmaw está en Frondavil, al sur del Bastión Fauces de Madera.",
+            itIT = "Chieftain Bloodmaw si trova a Felwood, a sud di Timbermaw Hold.",
+            ptBR = "Chieftain Bloodmaw fica na Selva Maleva, ao sul de Timbermaw Hold.",
+            ruRU = "Chieftain Bloodmaw находится в Оскверненном лесу, к югу от Крепости Древобрюхов.",
+            koKR = "Chieftain Bloodmaw는 나무구렁 요새 남쪽, 악령의 숲에 있습니다.",
+            zhCN = "Chieftain Bloodmaw在费伍德森林，木喉要塞以南。",
+            zhTW = "Chieftain Bloodmaw在費伍德森林，木喉要塞以南。",
+        },
+        COUNTER_O = {
+            deDE = "Pflanzt das Timbermaw War Banner bei Legashi Stronghold in Azshara auf. Tötet Prince Halanox und meldet Euren Sieg Gatekeeper Rageroar in Ursolan.",
+            frFR = "Plantez le Timbermaw War Banner à Legashi Stronghold en Azshara. Tuez Prince Halanox, puis annoncez votre victoire à Gatekeeper Rageroar à Ursolan.",
+            esES = "Planta el Timbermaw War Banner en Legashi Stronghold, en Azshara. Mata a Prince Halanox e informa de tu victoria a Gatekeeper Rageroar en Ursolan.",
+            esMX = "Planta el Timbermaw War Banner en Legashi Stronghold, en Azshara. Mata a Prince Halanox e informa de tu victoria a Gatekeeper Rageroar en Ursolan.",
+            itIT = "Pianta il Timbermaw War Banner a Legashi Stronghold, in Azshara. Uccidi Prince Halanox e riferisci la vittoria a Gatekeeper Rageroar a Ursolan.",
+            ptBR = "Finque o Timbermaw War Banner em Legashi Stronghold, em Azshara. Mate Prince Halanox e informe sua vitória a Gatekeeper Rageroar em Ursolan.",
+            ruRU = "Установите Timbermaw War Banner у Legashi Stronghold в Азшаре. Убейте Prince Halanox и доложите о победе Gatekeeper Rageroar в Ursolan.",
+            koKR = "아즈샤라의 Legashi Stronghold에 Timbermaw War Banner를 꽂으세요. Prince Halanox를 처치하고 Ursolan의 Gatekeeper Rageroar에게 승리를 보고하세요.",
+            zhCN = "在艾萨拉的Legashi Stronghold插上Timbermaw War Banner。杀死Prince Halanox，然后向Ursolan的Gatekeeper Rageroar报告胜利。",
+            zhTW = "在艾薩拉的Legashi Stronghold插上Timbermaw War Banner。殺死Prince Halanox，然後向Ursolan的Gatekeeper Rageroar報告勝利。",
+        },
+        COUNTER_N = {
+            deDE = "Elitequest: Nehmt für Prince Halanox eine Gruppe mit.",
+            frFR = "Quête élite : venez en groupe pour Prince Halanox.",
+            esES = "Misión de élite: lleva un grupo para Prince Halanox.",
+            esMX = "Misión de élite: lleva un grupo para Prince Halanox.",
+            itIT = "Missione élite: porta un gruppo per Prince Halanox.",
+            ptBR = "Missão de elite: leve um grupo para Prince Halanox.",
+            ruRU = "Элитное задание: на Prince Halanox идите группой.",
+            koKR = "정예 퀘스트: Prince Halanox는 파티로 상대하세요.",
+            zhCN = "精英任务：请组队对付Prince Halanox。",
+            zhTW = "精英任務：請組隊對付Prince Halanox。",
+        },
+        -- bmchain (2.1.1): the three quests at the start of the chain.
+        LEGASHI_O = {
+            deDE = "Tötet 5 Legashi Satyrs, 5 Legashi Rogues und 5 Legashi Hellcallers für Ekkal in den Ruinen von Eldarath.",
+            frFR = "Tuez 5 Legashi Satyrs, 5 Legashi Rogues et 5 Legashi Hellcallers pour Ekkal aux Ruines d'Eldarath.",
+            esES = "Mata a 5 Legashi Satyrs, 5 Legashi Rogues y 5 Legashi Hellcallers para Ekkal en las Ruinas de Eldarath.",
+            esMX = "Mata a 5 Legashi Satyrs, 5 Legashi Rogues y 5 Legashi Hellcallers para Ekkal en las Ruinas de Eldarath.",
+            itIT = "Uccidi 5 Legashi Satyrs, 5 Legashi Rogues e 5 Legashi Hellcallers per Ekkal alle Rovine di Eldarath.",
+            ptBR = "Mate 5 Legashi Satyrs, 5 Legashi Rogues e 5 Legashi Hellcallers para Ekkal nas Ruínas de Eldarath.",
+            ruRU = "Убейте 5 Legashi Satyrs, 5 Legashi Rogues и 5 Legashi Hellcallers для Ekkal в Руинах Эльдарата.",
+            koKR = "엘다라스 폐허의 Ekkal을 위해 Legashi Satyr 5마리, Legashi Rogue 5마리, Legashi Hellcaller 5마리를 처치하세요.",
+            zhCN = "为埃达拉斯废墟的Ekkal杀死5个Legashi Satyr、5个Legashi Rogue和5个Legashi Hellcaller。",
+            zhTW = "為埃達拉斯廢墟的Ekkal殺死5個Legashi Satyr、5個Legashi Rogue和5個Legashi Hellcaller。",
+        },
+        REPORT_O = {
+            deDE = "Sprecht mit Gatekeeper Rageroar in Ursolan.",
+            frFR = "Parlez à Gatekeeper Rageroar à Ursolan.",
+            esES = "Habla con Gatekeeper Rageroar en Ursolan.",
+            esMX = "Habla con Gatekeeper Rageroar en Ursolan.",
+            itIT = "Parla con Gatekeeper Rageroar a Ursolan.",
+            ptBR = "Fale com Gatekeeper Rageroar em Ursolan.",
+            ruRU = "Поговорите с Gatekeeper Rageroar в Ursolan.",
+            koKR = "Ursolan의 Gatekeeper Rageroar와 대화하세요.",
+            zhCN = "与Ursolan的Gatekeeper Rageroar交谈。",
+            zhTW = "與Ursolan的Gatekeeper Rageroar交談。",
+        },
+        REPORT_N = {
+            deDE = "Benötigt den Ruf 'Neutral' bei der Holzschlundfeste.",
+            frFR = "Nécessite d'être Neutre avec le Repaire des Grumegueules.",
+            esES = "Requiere reputación Neutral con el Bastión Fauces de Madera.",
+            esMX = "Requiere reputación Neutral con el Bastión Fauces de Madera.",
+            itIT = "Richiede la reputazione Neutrale con Timbermaw Hold.",
+            ptBR = "Requer reputação Neutro com Timbermaw Hold.",
+            ruRU = "Требуется репутация «Равнодушие» у Крепости Древобрюхов.",
+            koKR = "나무구렁 요새 평판 중립이 필요합니다.",
+            zhCN = "需要木喉要塞中立声望。",
+            zhTW = "需要木喉要塞中立聲望。",
+        },
+        SCOUTS_O = {
+            deDE = "Findet den Spähtrupp der Blackmaw bei den Lagern der Legashi östlich von Ursolan.",
+            frFR = "Retrouvez le groupe d'éclaireurs Blackmaw près des camps Legashi à l'est d'Ursolan.",
+            esES = "Encuentra al grupo de exploradores Blackmaw cerca de los campamentos Legashi al este de Ursolan.",
+            esMX = "Encuentra al grupo de exploradores Blackmaw cerca de los campamentos Legashi al este de Ursolan.",
+            itIT = "Trova la squadra di esploratori Blackmaw vicino agli accampamenti Legashi a est di Ursolan.",
+            ptBR = "Encontre o grupo de batedores Blackmaw perto dos acampamentos Legashi a leste de Ursolan.",
+            ruRU = "Найдите разведывательный отряд Blackmaw у лагерей Legashi к востоку от Ursolan.",
+            koKR = "Ursolan 동쪽 Legashi 야영지 근처에서 Blackmaw 정찰대를 찾으세요.",
+            zhCN = "在Ursolan以东的Legashi营地附近找到Blackmaw侦察队。",
+            zhTW = "在Ursolan以東的Legashi營地附近找到Blackmaw偵察隊。",
+        },
+        FEED_N = {
+            deDE = "Wiederholbar. Laut Abschlusstext verfüttert Ihr das Fleisch an einen hungrigen Peitscher, der eine Samenkapsel ausspuckt. Wo er steht, ist noch nicht bekannt; bitte meldet es auf Discord.",
+            frFR = "Répétable. D'après son texte de fin, vous donnez la chair à un fouetteur affamé, qui recrache une gousse. On ne sait pas encore où il se trouve ; merci de le signaler sur Discord.",
+            esES = "Repetible. Según su texto final, le das la carne a un azotador hambriento, que escupe una vaina de semillas. Aún no se sabe dónde está; avisa en Discord.",
+            esMX = "Repetible. Según su texto final, le das la carne a un azotador hambriento, que escupe una vaina de semillas. Aún no se sabe dónde está; avisa en Discord.",
+            itIT = "Ripetibile. Secondo il testo di completamento dai la carne a un frustatore affamato, che sputa un baccello di semi. Dove si trovi non si sa ancora; segnalalo su Discord.",
+            ptBR = "Repetível. Pelo texto de conclusão, você dá a carne a um chicoteador faminto, que cospe uma vagem de sementes. Ainda não se sabe onde ele fica; avise no Discord.",
+            ruRU = "Повторяемое. По тексту завершения вы скармливаете плоть голодному хлестуну, и он выплевывает семенной стручок. Где он находится, пока неизвестно; сообщите, пожалуйста, в Discord.",
+            koKR = "반복 퀘스트입니다. 완료 문구에 따르면 굶주린 채찍덩굴에게 살점을 먹이면 씨앗 꼬투리를 뱉어냅니다. 위치는 아직 알려지지 않았으니 Discord에 제보해 주세요.",
+            zhCN = "可重复。按完成文本，你把肉喂给一只饥饿的鞭笞者，它会吐出一个种子荚。它的位置尚不清楚，请在Discord上报告。",
+            zhTW = "可重複。依完成文字，你把肉餵給一隻飢餓的鞭笞者，牠會吐出一個種子莢。牠的位置尚不清楚，請在Discord上回報。",
+        },
+    }
+    local USE = {
+        [97173] = { pickup = "TIMEAR_P", turnin = "TIMEAR_P" },
+        [97198] = { pickup = "MULN", turnin = "MULN" },
+        [92345] = { pickup = "TRUESONG" },
+        [92069] = { pickup = "OGTINC", turnin = "OGTINC" },
+        [97327] = { pickup = "EKKAL", turnin = "EKKAL" },
+        [96246] = { pickup = "EKKAL", turnin = "EKKAL" },
+        [92065] = { pickup = "RAGEROAR", turnin = "RAGEROAR", note = "RECLAIM_N" },
+        [86746] = { objective = "LEGASHI_O", pickup = "EKKAL", turnin = "EKKAL" }, -- bmchain (2.1.1)
+        [86752] = { objective = "REPORT_O", pickup = "EKKAL", turnin = "RAGEROAR", note = "REPORT_N" },
+        [86791] = { objective = "SCOUTS_O", pickup = "RAGEROAR", turnin = "KORSA" },
+        [86777] = { objective = "FEARDRED_O", pickup = "KORSA", turnin = "KORSA" },
+        [86792] = { objective = "THIN_O", pickup = "KORSA", turnin = "KORSA" },
+        [86796] = { objective = "SATYR_O", pickup = "GRAAL_P", turnin = "KORSA" },
+        [86797] = { objective = "RETURN_O", pickup = "KORSA", turnin = "RAGEROAR" },
+        [86798] = { objective = "REINF_O", pickup = "RAGEROAR", turnin = "GORN" },
+        [87346] = { objective = "BLOOD_O", pickup = "GORN", turnin = "GORN", note = "BLOOD_N" },
+        [86814] = { objective = "COUNTER_O", pickup = "GORN", turnin = "RAGEROAR", note = "COUNTER_N" },
+        [92070] = { turnin = "UNELE" },
+        [92066] = { pickup = "NOK", turnin = "NOK" },
+        [92067] = { note = "FEED_N" },
+    }
+    for _, lang in ipairs({ "deDE", "frFR", "esES", "esMX", "itIT", "ptBR", "ruRU", "koKR", "zhCN", "zhTW" }) do
+        local content = FDJ.ContentLocales[lang]
+        if content then
+            content.quests = content.quests or {}
+            for questID, fields in pairs(USE) do
+                local entry = content.quests[questID] or {}
+                content.quests[questID] = entry
+                for field, key in pairs(fields) do
+                    if entry[field] == nil then entry[field] = T[key][lang] end
+                end
+            end
+        end
+    end
+end
+
+-- marshstep (2.0.13, M 19 Nov 2026: "this starts at line is not getting
+-- translated"): Journey to the Marsh (1947), step 1 of Rituals of Power:
+-- objective, start and hand-in (the quest's name comes from the game).
+local JOURNEY_MARSH = {
+    deDE = { "Sprecht mit Tabetha.", "Euer Magierlehrer in einer Hauptstadt: Jennea Cannon (Sturmwind), Bink (Eisenschmiede), Deino (Orgrimmar), Ursyn Ghull (Donnerfels) oder Anastasia Hartwell (Unterstadt)", "Tabetha, Düstermarschen" },
+    frFR = { "Parlez à Tabetha.", "Votre maître des mages dans une capitale : Jennea Cannon (Hurlevent), Bink (Forgefer), Deino (Orgrimmar), Ursyn Ghull (Les Pitons-du-Tonnerre) ou Anastasia Hartwell (Fossoyeuse)", "Tabetha, marécage d'Âprefange" },
+    esES = { "Habla con Tabetha.", "Tu instructor de magos en una capital: Jennea Cannon (Ventormenta), Bink (Forjaz), Deino (Orgrimmar), Ursyn Ghull (Cima del Trueno) o Anastasia Hartwell (Entrañas)", "Tabetha, Marjal Revolcafango" },
+    itIT = { "Parla con Tabetha.", "Il tuo istruttore dei maghi in una capitale: Jennea Cannon (Roccavento), Bink (Forgiardente), Deino (Orgrimmar), Ursyn Ghull (Picco del Tuono) o Anastasia Hartwell (Sepulcria)", "Tabetha, Acquitrino Mortale" },
+    ptBR = { "Fale com Tabetha.", "Seu instrutor de magos em uma capital: Jennea Cannon (Ventobravo), Bink (Altaforja), Deino (Orgrimmar), Ursyn Ghull (Penhasco do Trovão) ou Anastasia Hartwell (Cidade Baixa)", "Tabetha, Pântano Vadeoso" },
+    ruRU = { "Поговорите с Табетой.", "Ваш наставник магов в столице: Дженни Кэннон (Штормград), Бинк (Стальгорн), Дейно (Оргриммар), Урсин Гулл (Громовой Утес) или Анастасия Хартвелл (Подгород)", "Табета, Пылевые топи" },
+    koKR = { "타베사와 대화하십시오.", "수도의 마법사 상급 교관: 제니아 캐논 (스톰윈드), 빙크 (아이언포지), 데이노 (오그리마), 어신 걸 (썬더 블러프) 또는 아나스타샤 하트웰 (언더시티)", "타베사, 먼지진흙 습지대" },
+    zhCN = { "与塔贝萨谈话。", "主城里的法师训练师：詹妮亚·卡农（暴风城）、宾克（铁炉堡）、戴诺（奥格瑞玛）、乌尔辛·古尔（雷霆崖）或安娜丝塔西娅·哈特维尔（幽暗城）", "塔贝萨，尘泥沼泽" },
+    zhTW = { "與塔貝薩談話。", "主城裡的法師訓練師：詹妮亞·卡農（暴風城）、賓克（鐵爐堡）、戴諾（奧格瑪）、烏爾辛·古爾（雷霆崖）或安娜絲塔西婭·哈特維爾（幽暗城）", "塔貝薩，塵泥沼澤" },
+}
+-- sidepickup: the start per faction (the quest list's faction)
+local JOURNEY_MARSH_SIDE = {
+    deDE = { "Euer Magierlehrer in einer Hauptstadt: Jennea Cannon (Sturmwind) oder Bink (Eisenschmiede)", "Euer Magierlehrer in einer Hauptstadt: Deino (Orgrimmar), Ursyn Ghull (Donnerfels) oder Anastasia Hartwell (Unterstadt)" },
+    frFR = { "Votre maître des mages dans une capitale : Jennea Cannon (Hurlevent) ou Bink (Forgefer)", "Votre maître des mages dans une capitale : Deino (Orgrimmar), Ursyn Ghull (Les Pitons-du-Tonnerre) ou Anastasia Hartwell (Fossoyeuse)" },
+    esES = { "Tu instructor de magos en una capital: Jennea Cannon (Ventormenta) o Bink (Forjaz)", "Tu instructor de magos en una capital: Deino (Orgrimmar), Ursyn Ghull (Cima del Trueno) o Anastasia Hartwell (Entrañas)" },
+    itIT = { "Il tuo istruttore dei maghi in una capitale: Jennea Cannon (Roccavento) o Bink (Forgiardente)", "Il tuo istruttore dei maghi in una capitale: Deino (Orgrimmar), Ursyn Ghull (Picco del Tuono) o Anastasia Hartwell (Sepulcria)" },
+    ptBR = { "Seu instrutor de magos em uma capital: Jennea Cannon (Ventobravo) ou Bink (Altaforja)", "Seu instrutor de magos em uma capital: Deino (Orgrimmar), Ursyn Ghull (Penhasco do Trovão) ou Anastasia Hartwell (Cidade Baixa)" },
+    ruRU = { "Ваш наставник магов в столице: Дженни Кэннон (Штормград) или Бинк (Стальгорн)", "Ваш наставник магов в столице: Дейно (Оргриммар), Урсин Гулл (Громовой Утес) или Анастасия Хартвелл (Подгород)" },
+    koKR = { "수도의 마법사 상급 교관: 제니아 캐논 (스톰윈드) 또는 빙크 (아이언포지)", "수도의 마법사 상급 교관: 데이노 (오그리마), 어신 걸 (썬더 블러프) 또는 아나스타샤 하트웰 (언더시티)" },
+    zhCN = { "主城里的法师训练师：詹妮亚·卡农（暴风城）或宾克（铁炉堡）", "主城里的法师训练师：戴诺（奥格瑞玛）、乌尔辛·古尔（雷霆崖）或安娜丝塔西娅·哈特维尔（幽暗城）" },
+    zhTW = { "主城裡的法師訓練師：詹妮亞·卡農（暴風城）或賓克（鐵爐堡）", "主城裡的法師訓練師：戴諾（奧格瑪）、烏爾辛·古爾（雷霆崖）或安娜絲塔西婭·哈特維爾（幽暗城）" },
+}
+for lang, t in pairs(JOURNEY_MARSH) do
+    local side = JOURNEY_MARSH_SIDE[lang]
+    if side then t[4], t[5] = side[1], side[2] end
+    local content = FDJ.ContentLocales[lang]
+    if content then
+        content.quests = content.quests or {}
+        local q = content.quests[1947] or {}
+        q.objective, q.pickup, q.turnin = t[1], t[2], t[3]
+        q.pickupAlliance, q.pickupHorde = t[4], t[5]
+        content.quests[1947] = q
+    end
+end
+
+-- BEGIN l10n210
+-- (2.1.0, M 19 Nov 2026: "why don't you just translate it to all the other
+-- languages that we have?"): The Talisman of Kazdor and its chain, Materials of
+-- Significance and its chain, and the other quest-page lines new in 2.1.0 (the
+-- pylon crystals, the Mana Sieve, the vial's entrance, Woodwyrd's new spot,
+-- Nazeer Bloodpike, "Leave the temple", Journey to the Marsh's name). Official
+-- names where known: Wowhead Forever's German pages (the six new quests' names
+-- and objectives) and the Forever client's own names (The Manor, Ravenholdt,
+-- Journey to the Marsh, Katherine the Pure, Mathias Shaw, Brave Stonetorch, the
+-- infernals, Elegant Letter); the rest translated by hand. The game's own quest
+-- title still comes first when the journal's language is the client's.
+do
+    local LANGS = { "deDE", "frFR", "esES", "itIT", "ptBR", "ruRU", "koKR", "zhCN", "zhTW" }
+    local QUESTS = {
+        [80411] = {
+            name = { "Der Talisman von Kazdor", "Le talisman de Kazdor", "El talismán de Kazdor", "Il Talismano di Kazdor", "O Talismã de Kazdor", "Талисман Каздора", "카즈도르의 부적", "卡兹多尔护符", "卡茲多爾護符" },
+            objective = { "Findet den Talisman von Kazdor in Zul'Farrak. Bringt ihn anschließend zu Fahrad im Ravenholdt-Anwesen. Ihr müsst diese Aufgabe alleine erledigen.", "Trouvez le talisman de Kazdor dans Zul’Farrak, puis apportez-le à Fahrad au manoir de Ravenholdt. Vous devez accomplir ce travail seul.", "Encuentra el talismán de Kazdor en Zul'Farrak. Después, llévaselo a Fahrad en la Mansión Ravenholdt. Debes hacer el trabajo solo.", "Trova il Talismano di Kazdor a Zul'Farrak, poi portalo a Fahrad al Maniero di Ravenholdt. Devi completare il lavoro da solo.", "Encontre o Talismã de Kazdor em Zul'Farrak. Depois, leve-o a Fahrad na Mansão Corvoforte. Você deve fazer o trabalho sozinho.", "Найдите талисман Каздора в Зул'Фарраке, затем отнесите его Фахраду в поместье Черного Ворона. Работу нужно выполнить в одиночку.", "줄파락에서 카즈도르의 부적을 찾은 뒤 라벤홀트 장원의 파라드에게 가져가십시오. 이 일은 혼자서 해야 합니다.", "在祖尔法拉克找到卡兹多尔护符，然后把它交给拉文霍德庄园的法拉德。你必须独自完成这项工作。", "在祖爾法拉克找到卡茲多爾護符，然後把它交給拉文霍德莊園的法拉德。你必須獨自完成這項工作。" },
+            note = { "Schurken: Erledigt Das Anwesen, Ravenholdt, Das Horn von Xelthos und Das Auge von Bhossca. Kehrt mit Stufe 45 in eine Hauptstadt zurück, um Fahrads Brief zu holen. Erledigt im Ravenholdt-Anwesen Schande über mich, indem Ihr mit Fahrad sprecht; danach bietet er Der Talisman von Kazdor an. Betretet Zul'Farrak allein.", "Voleurs : terminez Ravenholdt, le manoir, La Corne de Xelthos et L’Œil de Bhossca. Au niveau 45, retournez dans une capitale pour recevoir la lettre de Fahrad. Au manoir de Ravenholdt, terminez Pas deux fois en parlant à Fahrad ; il propose ensuite Le talisman de Kazdor. Entrez seul dans Zul’Farrak.", "Pícaros: completad Mansión Ravenholdt, El Cuerno de Xelthos y El ojo de Bhossca. A nivel 45, volved a una capital para recibir la carta de Fahrad. En la Mansión Ravenholdt, completad No me engañarás dos veces hablando con Fahrad; después ofrece El talismán de Kazdor. Entrad solos en Zul'Farrak.", "Ladri: completa Il maniero, Ravenholdt, Il Corno di Xelthos e L'Occhio di Bhossca. Al livello 45 torna in una capitale per la lettera di Fahrad. Al Maniero di Ravenholdt completa Non mi fregherai due volte parlando con Fahrad; poi offre Il Talismano di Kazdor. Entra a Zul'Farrak da solo.", "Ladinos: concluam Corvoforte, a mansão, A Trompa de Xelthos e O Olho de Bhossca. No nível 45, voltem a uma capital para receber a carta de Fahrad. Na Mansão Corvoforte, concluam Não me engana duas vezes falando com Fahrad; depois ele oferece O Talismã de Kazdor. Entrem sozinhos em Zul'Farrak.", "Разбойники: выполните «Поместье, Черный Ворон», «Рог Кселтоса» и «Глаз Бхосски». На 45-м уровне вернитесь в столицу за письмом Фахрада. В поместье Черного Ворона выполните «Дважды не обманешь», поговорив с Фахрадом; затем он предложит «Талисман Каздора». Входите в Зул'Фаррак в одиночку.", "도적: 라벤홀트 장원, 젤토스의 뿔, 보스카의 눈을 완료하십시오. 45레벨이 되면 수도로 돌아가 파라드의 편지를 받으십시오. 라벤홀트 장원에서 파라드와 대화해 두 번은 속지 않는다를 완료하면 카즈도르의 부적을 줍니다. 줄파락에는 혼자 들어가십시오.", "盗贼：完成拉文霍德庄园、谢尔索斯号角和波斯卡之眼。达到45级后回到主城领取法拉德的信。在拉文霍德庄园与法拉德交谈，完成不会再上当；之后他会给你卡兹多尔护符。独自进入祖尔法拉克。", "盜賊：完成拉文霍德莊園、澤索司號角和伯絲卡之眼。達到45級後回到主城領取法拉德的信。在拉文霍德莊園與法拉德交談，完成不會再上當；之後他會給你卡茲多爾護符。獨自進入祖爾法拉克。" },
+        },
+        [6681] = {
+            name = { "Das Anwesen, Ravenholdt", "Ravenholdt, le manoir", "Mansión Ravenholdt", "Il maniero, Ravenholdt", "Corvoforte, a mansão", "Поместье, Черный Ворон", "라벤홀트 장원", "拉文霍德庄园", "拉文霍德莊園" },
+            objective = { "Bringt das Ravenholdt-Siegel zu Fahrad im Ravenholdt-Anwesen, das versteckt in den Hügeln von Hillsbrad liegt.", "Apportez le Sceau de Ravenholdt à Fahrad, au manoir de Ravenholdt, caché dans les collines de Hautebrande.", "Lleva el Sello de Ravenholdt a Fahrad en la Mansión Ravenholdt, oculta en las colinas de Trabalomas.", "Porta il Sigillo di Ravenholdt a Fahrad al Maniero di Ravenholdt, nascosto tra i colli di Monteverde.", "Leve o Selo de Corvoforte a Fahrad na Mansão Corvoforte, escondida nas colinas de Eira dos Montes.", "Отнесите печать Черного Ворона Фахраду в поместье Черного Ворона, скрытое в холмах Хилсбрада.", "라벤홀트 인장을 힐스브래드 언덕에 숨겨진 라벤홀트 장원의 파라드에게 가져가십시오.", "把拉文霍德徽记交给隐藏在希尔斯布莱德丘陵中的拉文霍德庄园的法拉德。", "把拉文霍德徽記交給隱藏在希爾斯布萊德丘陵中的拉文霍德莊園的法拉德。" },
+            description = { "Holt den Brief, der diese Quest startet. Horde: die Option eines Schurkenlehrers „May I have it, please.“ Allianz: Meister Mathias Shaw in Sturmwind.", "Obtenez la lettre qui lance cette quête. Horde : l’option d’un maître des voleurs « May I have it, please. » Alliance : Maître Mathias Shaw à Hurlevent.", "Consigue la carta que inicia esta misión. Horda: la opción de un instructor de pícaros «May I have it, please.» Alianza: Maestro Mathias Shaw en Ventormenta.", "Ottieni la lettera che avvia questa missione. Orda: l'opzione di un istruttore dei ladri \"May I have it, please.\" Alleanza: Maestro Mathias Shaw a Roccavento.", "Pegue a carta que inicia esta missão. Horda: a opção de um instrutor de ladinos \"May I have it, please.\" Aliança: Mestre Mathias Shaw em Ventobravo.", "Получите письмо, с которого начинается задание. Орда: вариант наставника разбойников «May I have it, please.» Альянс: Мастер Матиас Шоу в Штормграде.", "이 퀘스트를 시작하는 편지를 받으십시오. 호드: 도적 교관의 대화 선택지 \"May I have it, please.\" 얼라이언스: 스톰윈드의 단장 마티아스 쇼.", "领取开始此任务的信件。部落：盗贼训练师的对话选项“May I have it, please.”联盟：暴风城的马迪亚斯·肖尔。", "領取開始此任務的信件。部落：盜賊訓練師的對話選項「May I have it, please.」聯盟：暴風城的馬迪亞斯·肖爾。" },
+            warning = { "Lernt zuerst Fallen entdecken: Wenn Ihr an der verminten Truhe im Höhlengang zum Anwesen vorbeigeht, ist die Prüfung bestanden (Fahrad lehrt es auch).", "Apprenez d’abord Détection des pièges : passer devant le coffre piégé du passage de la grotte vers le manoir termine l’épreuve (Fahrad l’enseigne aussi).", "Aprende primero Detectar trampas: al pasar junto al cofre con trampa del pasadizo de la cueva hacia la mansión superas la prueba (Fahrad también la enseña).", "Impara prima Individua Trappole: passando accanto al forziere con trappola nel passaggio della grotta verso il maniero completi la prova (anche Fahrad la insegna).", "Aprenda primeiro Detectar Armadilhas: passar pelo baú com armadilha na passagem da caverna para a mansão conclui o teste (Fahrad também ensina).", "Сначала изучите «Обнаружение ловушек»: пройдя мимо сундука с ловушкой в пещерном проходе к поместью, вы пройдете испытание (Фахрад тоже ему обучает).", "먼저 함정 탐지를 배우십시오. 장원으로 가는 동굴 통로의 함정 상자 옆을 지나가면 시험이 완료됩니다(파라드에게서도 배울 수 있습니다).", "先学会侦测陷阱：走过通往庄园的洞穴通道里的陷阱箱子即可完成考验（法拉德也会传授）。", "先學會偵測陷阱：走過通往莊園的洞穴通道裡的陷阱箱子即可完成考驗（法拉德也會傳授）。" },
+            pickup = { "Eleganter Brief, von einem Schurkenlehrer", "Lettre élégante, d’un maître des voleurs", "Carta elegante, de un instructor de pícaros", "Lettera elegante, da un istruttore dei ladri", "Carta Elegante, de um instrutor de ladinos", "Изящное письмо от наставника разбойников", "도적 교관에게서 받는 고급스러워 보이는 편지", "优美的信件，来自盗贼训练师", "優美的信件，來自盜賊訓練師" },
+        },
+        [80526] = {
+            name = { "Schande über mich", "Pas deux fois", "No me engañarás dos veces", "Non mi fregherai due volte", "Não me engana duas vezes", "Дважды не обманешь", "두 번은 속지 않는다", "不会再上当", "不會再上當" },
+            objective = { "Sprecht mit Fahrad, wenn Ihr bereit seid, seinen Plan anzuhören.", "Parlez à Fahrad quand vous êtes prêt à entendre son plan.", "Habla con Fahrad cuando estés listo para oír su plan.", "Parla con Fahrad quando sei pronto ad ascoltare il suo piano.", "Fale com Fahrad quando estiver pronto para ouvir o plano dele.", "Поговорите с Фахрадом, когда будете готовы выслушать его план.", "그의 계획을 들을 준비가 되면 파라드와 대화하십시오.", "准备好听取他的计划时，与法拉德交谈。", "準備好聽取他的計畫時，與法拉德交談。" },
+            description = { "Mit Stufe 45 und erledigten Aufträgen von C geht in eine Hauptstadt: Fahrads Brief im Briefkasten schickt Euch zum Ravenholdt-Anwesen. Nehmt die Quest an, sprecht erneut mit Fahrad und gebt sie bei ihm ab.", "Au niveau 45, une fois les travaux de C terminés, allez dans une capitale : la lettre de Fahrad dans la boîte aux lettres vous envoie au manoir de Ravenholdt. Acceptez la quête, parlez de nouveau à Fahrad et rendez-la-lui.", "A nivel 45, con los trabajos de C terminados, ve a una capital: la carta de Fahrad en el buzón te envía a la Mansión Ravenholdt. Acepta la misión, vuelve a hablar con Fahrad y entrégasela.", "Al livello 45, finiti i lavori di C, vai in una capitale: la lettera di Fahrad nella cassetta della posta ti manda al Maniero di Ravenholdt. Accetta la missione, parla di nuovo con Fahrad e consegnala a lui.", "No nível 45, com os serviços de C concluídos, vá a uma capital: a carta de Fahrad na caixa de correio manda você à Mansão Corvoforte. Aceite a missão, fale de novo com Fahrad e entregue-a a ele.", "На 45-м уровне, выполнив работы для C, отправляйтесь в столицу: письмо Фахрада в почтовом ящике отправит вас в поместье Черного Ворона. Примите задание, снова поговорите с Фахрадом и сдайте его ему.", "45레벨이 되고 C의 일을 모두 끝냈다면 수도로 가십시오. 우편함의 파라드 편지가 라벤홀트 장원으로 안내합니다. 퀘스트를 받고 파라드와 다시 대화한 뒤 그에게 완료하십시오.", "达到45级并完成C的工作后前往主城：邮箱里法拉德的信会让你前往拉文霍德庄园。接受任务，再次与法拉德交谈，然后向他交付任务。", "達到45級並完成C的工作後前往主城：郵箱裡法拉德的信會讓你前往拉文霍德莊園。接受任務，再次與法拉德交談，然後向他交付任務。" },
+        },
+        [81790] = {
+            name = { "Bedeutende Materialien", "Matériaux d’importance", "Materiales significativos", "Materiali significativi", "Materiais significativos", "Значимые материалы", "의미 있는 재료", "重要的材料", "重要的材料" },
+            objective = { "Verwendet die Hinweise in Gregorys Notiz, um herauszufinden, wo Ihr die magischen Komponenten findet, die für das Ritual benötigt werden. Ihr werdet dafür die Hilfe von Verbündeten brauchen.", "Utilisez les indices de la note de Gregory pour trouver où se trouvent les composants magiques nécessaires au rituel. Vous aurez besoin de l’aide d’alliés.", "Usa las pistas de la nota de Gregory para averiguar dónde encontrar los componentes mágicos necesarios para el ritual. Necesitarás la ayuda de aliados.", "Usa gli indizi nella nota di Gregory per capire dove trovare i componenti magici necessari al rituale. Ti servirà l'aiuto di alleati.", "Use as pistas no bilhete de Gregory para descobrir onde encontrar os componentes mágicos necessários para o ritual. Você precisará da ajuda de aliados.", "Воспользуйтесь подсказками из записки Грегори, чтобы узнать, где найти магические компоненты для ритуала. Вам понадобится помощь союзников.", "그레고리의 쪽지에 있는 단서로 의식에 필요한 마법 재료를 어디서 찾을 수 있는지 알아내십시오. 동료의 도움이 필요합니다.", "根据格雷戈里便条中的提示，找出仪式所需魔法材料的位置。你需要盟友的帮助。", "根據格雷戈里便條中的提示，找出儀式所需魔法材料的位置。你需要盟友的幫助。" },
+            warning = { "Lange Questreihe: Teil der Allianz-Paladin-Geschichte, zu der auch Ein Bruder in Not gehört", "Longue suite de quêtes : elle fait partie de l’histoire des paladins de l’Alliance qui comprend aussi Un frère dans le besoin", "Cadena larga: forma parte de la historia de paladines de la Alianza que incluye Un hermano necesitado", "Catena lunga: fa parte della storia dei paladini dell'Alleanza che comprende anche Un fratello nel bisogno", "Cadeia longa: faz parte da história dos paladinos da Aliança que também tem Um irmão em apuros", "Длинная цепочка: часть сюжета паладинов Альянса, в который входит и «Брат в беде»", "긴 연계 퀘스트: 곤경에 빠진 형제가 포함된 얼라이언스 성기사 이야기의 일부입니다", "长任务线：属于联盟圣骑士剧情的一部分，其中也包括“危难中的兄弟”", "長任務線：屬於聯盟聖騎士劇情的一部分，其中也包括「危難中的兄弟」" },
+            note = { "Allianz-Paladin-Quest. So schaltet Ihr sie frei: Das blutige Schreiben, dann Auf der Suche nach Aeonas (beim Smaragdrefugium zuerst mit Aeonas' Pferd interagieren, dann seiner Spur folgen), dann mit Aeonas und Gregory im Teufelswald sprechen: Gregory bietet Bedeutende Materialien an. Die Teile kommen aus dem Teufelswald, Maraudon, den Schwarzfelstiefen und dem Vorgebirge des Hügellands.", "Quête de paladin de l’Alliance. Pour la débloquer : La missive ensanglantée, puis À la recherche d’Aeonas (au Sanctuaire d’Émeraude, interagissez d’abord avec le cheval d’Aeonas, puis suivez sa piste), puis parlez à Aeonas et à Gregory à Gangrebois : Gregory propose Matériaux d’importance. Ses composants viennent de Gangrebois, de Maraudon, des Profondeurs de Rochenoire et des Contreforts de Hautebrande.", "Misión de paladín de la Alianza. Cómo desbloquearla: La misiva ensangrentada, luego En busca de Aeonas (en el Santuario Esmeralda, interactúa primero con el caballo de Aeonas y luego sigue su rastro), y después habla con Aeonas y Gregory en Frondavil: Gregory ofrece Materiales significativos. Sus partes vienen de Frondavil, Maraudon, las Profundidades de Roca Negra y las Laderas de Trabalomas.", "Missione da paladino dell'Alleanza. Come sbloccarla: La missiva insanguinata, poi Alla ricerca di Aeonas (al Santuario di Smeraldo interagisci prima con il cavallo di Aeonas, poi segui le sue tracce), poi parla con Aeonas e Gregory a Boscovile: Gregory offre Materiali significativi. I componenti vengono da Boscovile, Maraudon, Profondità di Roccianera e Colli di Monteverde.", "Missão de paladino da Aliança. Como desbloquear: A Missiva Ensanguentada, depois Em busca de Aeonas (no Santuário Esmeralda, interaja primeiro com o cavalo de Aeonas e depois siga o rastro dele), depois fale com Aeonas e Gregory na Selva Maleva: Gregory oferece Materiais significativos. As partes vêm da Selva Maleva, de Maraudon, do Abismo Rocha Negra e do Contraforte de Eira dos Montes.", "Задание паладинов Альянса. Как его открыть: «Окровавленное послание», затем «В поисках Эонаса» (в Изумрудном святилище сначала взаимодействуйте с конем Эонаса, затем идите по его следу), затем поговорите с Эонасом и Грегори в Оскверненном лесу: Грегори предложит «Значимые материалы». Компоненты добываются в Оскверненном лесу, Мародоне, Глубинах Черной горы и Предгорьях Хилсбрада.", "얼라이언스 성기사 퀘스트입니다. 여는 방법: 피 묻은 서신, 그다음 에오나스를 찾아서(에메랄드 성소에서 먼저 에오나스의 말과 상호작용한 뒤 그의 흔적을 따라가십시오), 그다음 악령의 숲에서 에오나스와 그레고리와 대화하면 그레고리가 의미 있는 재료를 줍니다. 재료는 악령의 숲, 마라우돈, 검은바위 나락, 힐스브래드 구릉지에서 얻습니다.", "联盟圣骑士任务。解锁方法：血迹斑斑的信件，然后是寻找埃欧纳斯（在翡翠圣地先与埃欧纳斯的马互动，再追踪他的足迹），然后在费伍德森林与埃欧纳斯和格雷戈里交谈：格雷戈里会给你重要的材料。材料来自费伍德森林、玛拉顿、黑石深渊和希尔斯布莱德丘陵。", "聯盟聖騎士任務。解鎖方法：血跡斑斑的信件，然後是尋找埃歐納斯（在翡翠聖地先與埃歐納斯的馬互動，再追蹤他的足跡），然後在費伍德森林與埃歐納斯和格雷戈里交談：格雷戈里會給你重要的材料。材料來自費伍德森林、瑪拉頓、黑石深淵和希爾斯布萊德丘陵。" },
+        },
+        [81766] = {
+            name = { "Das blutige Schreiben", "La missive ensanglantée", "La misiva ensangrentada", "La missiva insanguinata", "A Missiva Ensanguentada", "Окровавленное послание", "피 묻은 서신", "血迹斑斑的信件", "血跡斑斑的信件" },
+            objective = { "Bringt das Schreiben zu Katharina der Reinen in der Kathedrale des Lichts in Stormwind.", "Apportez la missive à Katherine la Pure, à la cathédrale de la Lumière de Hurlevent.", "Lleva la misiva a Katherine la Pura en la Catedral de la Luz de Ventormenta.", "Porta la missiva a Katherine la Pura nella Cattedrale della Luce di Roccavento.", "Leve a missiva para Katherine, a Pura, na Catedral da Luz em Ventobravo.", "Отнесите послание Катерине Чистой в Собор Света в Штормграде.", "서신을 스톰윈드 빛의 대성당에 있는 성기사 캐서린에게 가져가십시오.", "把信件交给暴风城光明大教堂的纯洁的凯瑟琳。", "把信件交給暴風城光明大教堂的純潔的凱薩琳。" },
+            pickup = { "Blutiges Schreiben, gefunden bei der Leiche des „Paladins“", "Missive ensanglantée, trouvée sur le corps du « paladin »", "Misiva ensangrentada, hallada en el cuerpo del «paladín»", "Missiva insanguinata, trovata sul corpo del \"paladino\"", "Missiva Ensanguentada, encontrada no corpo do \"paladino\"", "Окровавленное послание, найденное на теле «паладина»", "\"성기사\"의 시체에서 발견한 피 묻은 서신", "血迹斑斑的信件，在“圣骑士”的尸体上找到", "血跡斑斑的信件，在「聖騎士」的屍體上找到" },
+        },
+        [96476] = {
+            name = { "Auf der Suche nach Aeonas", "À la recherche d’Aeonas", "En busca de Aeonas", "Alla ricerca di Aeonas", "Em busca de Aeonas", "В поисках Эонаса", "에오나스를 찾아서", "寻找埃欧纳斯", "尋找埃歐納斯" },
+            objective = { "Sucht beim Smaragdrefugium im Teufelswald nach Hinweisen auf Aeonas den Verteidigten.", "Cherchez des traces d’Aeonas au Sanctuaire d’Émeraude, à Gangrebois.", "Busca rastros de Aeonas en el Santuario Esmeralda de Frondavil.", "Cerca tracce di Aeonas al Santuario di Smeraldo, a Boscovile.", "Procure sinais de Aeonas no Santuário Esmeralda, na Selva Maleva.", "Поищите следы Эонаса в Изумрудном святилище в Оскверненном лесу.", "악령의 숲 에메랄드 성소에서 에오나스의 흔적을 찾으십시오.", "在费伍德森林的翡翠圣地寻找埃欧纳斯的踪迹。", "在費伍德森林的翡翠聖地尋找埃歐納斯的蹤跡。" },
+            description = { "Interagiert beim Smaragdrefugium zuerst mit Aeonas' Pferd (Streitross der Silbernen Hand, 51.0, 81.8) und folgt dann Aeonas' Spur im Teufelswald zu ihm (45.0, 52.0). Sprecht dann mit Aeonas und Gregory: Gregory bietet Bedeutende Materialien an.", "Au Sanctuaire d’Émeraude, interagissez d’abord avec le cheval d’Aeonas (destrier de la Main d’argent, 51.0, 81.8), puis suivez sa piste à Gangrebois jusqu’à lui (45.0, 52.0). Parlez ensuite à Aeonas et à Gregory : Gregory propose Matériaux d’importance.", "En el Santuario Esmeralda, interactúa primero con el caballo de Aeonas (destrero de la Mano de Plata, 51.0, 81.8) y después sigue su rastro por Frondavil hasta él (45.0, 52.0). Luego habla con Aeonas y Gregory: Gregory ofrece Materiales significativos.", "Al Santuario di Smeraldo interagisci prima con il cavallo di Aeonas (destriero della Mano d'Argento, 51.0, 81.8), poi segui le sue tracce a Boscovile fino a lui (45.0, 52.0). Poi parla con Aeonas e Gregory: Gregory offre Materiali significativi.", "No Santuário Esmeralda, interaja primeiro com o cavalo de Aeonas (corcel da Mão de Prata, 51.0, 81.8) e depois siga o rastro dele na Selva Maleva até ele (45.0, 52.0). Depois fale com Aeonas e Gregory: Gregory oferece Materiais significativos.", "В Изумрудном святилище сначала взаимодействуйте с конем Эонаса (боевой конь Серебряной Длани, 51.0, 81.8), затем идите по его следу в Оскверненном лесу до него самого (45.0, 52.0). Потом поговорите с Эонасом и Грегори: Грегори предложит «Значимые материалы».", "에메랄드 성소에서 먼저 에오나스의 말(은빛 성기사단 군마, 51.0, 81.8)과 상호작용한 뒤, 악령의 숲에서 그의 흔적을 따라 에오나스에게 가십시오(45.0, 52.0). 그다음 에오나스와 그레고리와 대화하면 그레고리가 의미 있는 재료를 줍니다.", "在翡翠圣地先与埃欧纳斯的马（白银之手战马，51.0, 81.8）互动，然后在费伍德森林追踪他的足迹找到他（45.0, 52.0）。之后与埃欧纳斯和格雷戈里交谈：格雷戈里会给你重要的材料。", "在翡翠聖地先與埃歐納斯的馬（白銀之手戰馬，51.0, 81.8）互動，然後在費伍德森林追蹤他的足跡找到他（45.0, 52.0）。之後與埃歐納斯和格雷戈里交談：格雷戈里會給你重要的材料。" },
+        },
+        [1947] = {
+            name = { "Reise in die Marschen", "Voyager vers le Marais", "Viaje al pantano", "Viaggio nella palude", "Jornada ao pântano", "Путь в болото", "습지대로의 여행", "沼泽之旅", "沼澤之旅" },
+        },
+    }
+    local PLACES = {
+        ["Fahrad, Ravenholdt Manor, Alterac Mountains"] = { "Fahrad, Ravenholdt-Anwesen, Alteracgebirge", "Fahrad, manoir de Ravenholdt, Montagnes d’Alterac", "Fahrad, Mansión Ravenholdt, Montañas de Alterac", "Fahrad, Maniero di Ravenholdt, Montagne d'Alterac", "Fahrad, Mansão Corvoforte, Montanhas de Alterac", "Фахрад, поместье Черного Ворона, Альтеракские горы", "파라드, 라벤홀트 장원, 알터랙 산맥", "法拉德，拉文霍德庄园，奥特兰克山脉", "法拉德，拉文霍德莊園，奧特蘭克山脈" },
+        ["Fahrad — Ravenholdt Manor"] = { "Fahrad — Ravenholdt-Anwesen", "Fahrad — manoir de Ravenholdt", "Fahrad — Mansión Ravenholdt", "Fahrad — Maniero di Ravenholdt", "Fahrad — Mansão Corvoforte", "Фахрад — поместье Черного Ворона", "파라드 — 라벤홀트 장원", "法拉德 — 拉文霍德庄园", "法拉德 — 拉文霍德莊園" },
+        ["Found inside Zul'Farrak, on your solo run"] = { "Fundort: in Zul'Farrak, bei Eurem Solo-Lauf", "Se trouve dans Zul’Farrak, lors de votre passage en solo", "Se encuentra en Zul'Farrak, en tu incursión en solitario", "Si trova a Zul'Farrak, durante la tua incursione in solitaria", "Encontrado em Zul'Farrak, na sua incursão solo", "Находится в Зул'Фарраке, во время одиночного прохождения", "혼자 들어간 줄파락 안에서 찾을 수 있습니다", "在祖尔法拉克中，单人进入时找到", "在祖爾法拉克中，單人進入時找到" },
+        ["Horde: from a rogue trainer (\"May I have it, please.\"). Alliance: from Mathias Shaw, Stormwind"] = { "Horde: von einem Schurkenlehrer („May I have it, please.“). Allianz: von Meister Mathias Shaw, Sturmwind", "Horde : d’un maître des voleurs (« May I have it, please. »). Alliance : de Maître Mathias Shaw, Hurlevent", "Horda: de un instructor de pícaros («May I have it, please.»). Alianza: del Maestro Mathias Shaw, Ventormenta", "Orda: da un istruttore dei ladri (\"May I have it, please.\"). Alleanza: dal Maestro Mathias Shaw, Roccavento", "Horda: de um instrutor de ladinos (\"May I have it, please.\"). Aliança: do Mestre Mathias Shaw, Ventobravo", "Орда: у наставника разбойников («May I have it, please.»). Альянс: у Мастера Матиаса Шоу, Штормград", "호드: 도적 교관에게서 (\"May I have it, please.\"). 얼라이언스: 스톰윈드의 단장 마티아스 쇼에게서", "部落：来自盗贼训练师（“May I have it, please.”）。联盟：来自暴风城的马迪亚斯·肖尔", "部落：來自盜賊訓練師（「May I have it, please.」）。聯盟：來自暴風城的馬迪亞斯·肖爾" },
+        ["Gregory, near Bloodvenom Falls, Felwood (44.6, 52.0)"] = { "Gregory, bei den Blutgiftfällen, Teufelswald (44.6, 52.0)", "Gregory, près de la cascade, Gangrebois (44.6, 52.0)", "Gregory, cerca de la cascada, Frondavil (44.6, 52.0)", "Gregory, vicino alla cascata, Boscovile (44.6, 52.0)", "Gregory, perto da cachoeira, Selva Maleva (44.6, 52.0)", "Грегори, у водопада, Оскверненный лес (44.6, 52.0)", "그레고리, 폭포 근처, 악령의 숲 (44.6, 52.0)", "格雷戈里，瀑布附近，费伍德森林（44.6, 52.0）", "格雷戈里，瀑布附近，費伍德森林（44.6, 52.0）" },
+        ["Gregory — Bloodvenom Falls, Felwood"] = { "Gregory — Blutgiftfälle, Teufelswald", "Gregory — près de la cascade, Gangrebois", "Gregory — cerca de la cascada, Frondavil", "Gregory — vicino alla cascata, Boscovile", "Gregory — perto da cachoeira, Selva Maleva", "Грегори — у водопада, Оскверненный лес", "그레고리 — 폭포 근처, 악령의 숲", "格雷戈里 — 瀑布附近，费伍德森林", "格雷戈里 — 瀑布附近，費伍德森林" },
+        ["Dropped by the infernals (Infernal Bodyguards, Infernal Sentries) in Shatter Scar Vale, northern Felwood"] = { "Beute der Höllenbestien (Höllenbestienleibwache, Höllenbestienwachposten) im Tal der Höllenbestien im Norden des Teufelswalds", "Butin des infernaux (Garde du corps infernal, Infernal Sentinelle) dans leur vallée au nord de Gangrebois", "Botín de los infernales (Guardaespaldas Infernal, Argos Infernal) en su valle del norte de Frondavil", "Bottino degli infernali (Guardia del corpo infernale, Sentinella infernale) nella loro valle a nord di Boscovile", "Saque dos infernais (Guarda-costas Infernal, Sentinela Infernal) no vale deles, no norte da Selva Maleva", "Добыча с инферналов (инфернал-телохранитель, караульный-инфернал) в их долине на севере Оскверненного леса", "악령의 숲 북쪽 골짜기의 지옥불정령(지옥의 호위병, 지옥의 보초병)이 떨어뜨립니다", "费伍德森林北部山谷中的地狱火（地狱火保镖、地狱火哨兵）掉落", "費伍德森林北部山谷中的地獄火（地獄火保鏢、地獄火哨兵）掉落" },
+        ["Infernals — Shatter Scar Vale, Felwood"] = { "Höllenbestien — Norden des Teufelswalds", "Infernaux — nord de Gangrebois", "Infernales — norte de Frondavil", "Infernali — nord di Boscovile", "Infernais — norte da Selva Maleva", "Инферналы — север Оскверненного леса", "지옥불정령 — 악령의 숲 북쪽", "地狱火 — 费伍德森林北部", "地獄火 — 費伍德森林北部" },
+        ["From the grave mound in Princess Theradras's area of Maraudon"] = { "Vom Grabhügel im Bereich von Prinzessin Theradras in Maraudon", "Sur le tertre funéraire de la zone de la Princesse Theradras, à Maraudon", "Del túmulo de la zona de la Princesa Theradras en Maraudon", "Dal tumulo nella zona della Principessa Theradras a Maraudon", "Do túmulo na área da Princesa Theradras em Maraudon", "С могильного холма в зале Принцессы Терадрас в Мародоне", "마라우돈의 공주 테라드라스 구역에 있는 무덤 더미에서", "在玛拉顿瑟莱德丝公主所在区域的坟堆中获得", "在瑪拉頓瑟萊德絲公主所在區域的墳堆中獲得" },
+        ["Bought from Plugger Spazzring in the Grim Guzzler, Blackrock Depths"] = { "Bei Stöpsel Zapfring in der Taverne der Schwarzfelstiefen gekauft", "Acheté à Lanfiche Brouillecircuit, à la taverne des Profondeurs de Rochenoire", "Se compra a Plugger Aropatoso en la taberna de las Profundidades de Roca Negra", "Si compra da Plugger Spazzring nella taverna delle Profondità di Roccianera", "Comprado de Birra Guardachave na taverna do Abismo Rocha Negra", "Покупается у Штоппора Наливалса в таверне Глубин Черной горы", "검은바위 나락 선술집의 플러거 스파즈링에게서 구입", "在黑石深渊酒吧向普拉格购买", "在黑石深淵酒吧向普拉格購買" },
+        ["Reward from the quest A Newly Discovered Purpose...: Brave Stonetorch, Hillsbrad Foothills (67.4, 14.8)"] = { "Belohnung der Quest Eine neu entdeckte Bestimmung: Kriegerheld Stonetorch, Vorgebirge des Hügellands (67.4, 14.8)", "Récompense de la quête Un nouveau but… : Brave Torchepierre, Contreforts de Hautebrande (67.4, 14.8)", "Recompensa de la misión Un propósito recién descubierto...: Valiente Stonetorch, Laderas de Trabalomas (67.4, 14.8)", "Ricompensa della missione Uno scopo appena scoperto...: Valoroso Stonetorch, Colli di Monteverde (67.4, 14.8)", "Recompensa da missão Um propósito recém-descoberto...: Bravo Litolume, Contraforte de Eira dos Montes (67.4, 14.8)", "Награда за задание «Новообретенная цель...»: Отважный Каменный Факел, Предгорья Хилсбрада (67.4, 14.8)", "새로 발견한 목적... 퀘스트 보상: 투사 스톤토치, 힐스브래드 구릉지 (67.4, 14.8)", "任务“新发现的使命……”的奖励：勇者石炬，希尔斯布莱德丘陵（67.4, 14.8）", "任務「新發現的使命……」的獎勵：勇者石炬，希爾斯布萊德丘陵（67.4, 14.8）" },
+        ["Brave Stonetorch — Hillsbrad Foothills"] = { "Kriegerheld Stonetorch — Vorgebirge des Hügellands", "Brave Torchepierre — Contreforts de Hautebrande", "Valiente Stonetorch — Laderas de Trabalomas", "Valoroso Stonetorch — Colli di Monteverde", "Bravo Litolume — Contraforte de Eira dos Montes", "Отважный Каменный Факел — Предгорья Хилсбрада", "투사 스톤토치 — 힐스브래드 구릉지", "勇者石炬 — 希尔斯布莱德丘陵", "勇者石炬 — 希爾斯布萊德丘陵" },
+        ["Given by Gregory when you accept the quest"] = { "Wird von Gregory bei Annahme der Quest übergeben", "Remis par Gregory à l'acceptation de la quête", "Te lo da Gregory al aceptar la misión", "Consegnato da Gregory quando accetti la missione", "Entregue por Gregory ao aceitar a missão", "Выдается Грегори при принятии задания", "퀘스트를 수락하면 그레고리가 줍니다", "接受任务时由格雷戈里给予", "接受任務時由格雷戈里給予" },
+        ["Found on the body of the \"paladin\": the search for the \"merchant\" was a trap"] = { "Bei der Leiche des „Paladins“ gefunden: Die Suche nach dem „Händler“ war eine Falle", "Trouvée sur le corps du « paladin » : la recherche du « marchand » était un piège", "Hallada en el cuerpo del «paladín»: la búsqueda del «mercader» era una trampa", "Trovata sul corpo del \"paladino\": la ricerca del \"mercante\" era una trappola", "Encontrada no corpo do \"paladino\": a busca pelo \"mercador\" era uma armadilha", "Найдено на теле «паладина»: поиски «торговца» были ловушкой", "\"성기사\"의 시체에서 발견: \"상인\"을 찾는 일은 함정이었습니다", "在“圣骑士”的尸体上找到：寻找“商人”是个陷阱", "在「聖騎士」的屍體上找到：尋找「商人」是個陷阱" },
+        ["Katherine the Pure, Cathedral of Light, Stormwind"] = { "Katharina die Reine, Kathedrale des Lichts, Sturmwind", "Katherine la Pure, cathédrale de la Lumière, Hurlevent", "Katherine la Pura, Catedral de la Luz, Ventormenta", "Katherine la Pura, Cattedrale della Luce, Roccavento", "Katherine, a Pura, Catedral da Luz, Ventobravo", "Катерина Чистая, Собор Света, Штормград", "성기사 캐서린, 빛의 대성당, 스톰윈드", "纯洁的凯瑟琳，光明大教堂，暴风城", "純潔的凱薩琳，光明大教堂，暴風城" },
+        ["Katherine the Pure — Cathedral of Light, Stormwind"] = { "Katharina die Reine — Kathedrale des Lichts, Sturmwind", "Katherine la Pure — cathédrale de la Lumière, Hurlevent", "Katherine la Pura — Catedral de la Luz, Ventormenta", "Katherine la Pura — Cattedrale della Luce, Roccavento", "Katherine, a Pura — Catedral da Luz, Ventobravo", "Катерина Чистая — Собор Света, Штормград", "성기사 캐서린 — 빛의 대성당, 스톰윈드", "纯洁的凯瑟琳 — 光明大教堂，暴风城", "純潔的凱薩琳 — 光明大教堂，暴風城" },
+        ["Aeonas the Vindicated, Felwood (45.0, 52.0)"] = { "Aeonas der Verteidigte, Teufelswald (45.0, 52.0)", "Aeonas, Gangrebois (45.0, 52.0)", "Aeonas, Frondavil (45.0, 52.0)", "Aeonas, Boscovile (45.0, 52.0)", "Aeonas, Selva Maleva (45.0, 52.0)", "Эонас, Оскверненный лес (45.0, 52.0)", "에오나스, 악령의 숲 (45.0, 52.0)", "埃欧纳斯，费伍德森林（45.0, 52.0）", "埃歐納斯，費伍德森林（45.0, 52.0）" },
+        ["Aeonas the Vindicated — Felwood"] = { "Aeonas der Verteidigte — Teufelswald", "Aeonas — Gangrebois", "Aeonas — Frondavil", "Aeonas — Boscovile", "Aeonas — Selva Maleva", "Эонас — Оскверненный лес", "에오나스 — 악령의 숲", "埃欧纳斯 — 费伍德森林", "埃歐納斯 — 費伍德森林" },
+        ["Aeonas's horse — Emerald Sanctuary, Felwood"] = { "Aeonas' Pferd — Smaragdrefugium, Teufelswald", "Cheval d’Aeonas — Sanctuaire d’Émeraude, Gangrebois", "Caballo de Aeonas — Santuario Esmeralda, Frondavil", "Cavallo di Aeonas — Santuario di Smeraldo, Boscovile", "Cavalo de Aeonas — Santuário Esmeralda, Selva Maleva", "Конь Эонаса — Изумрудное святилище, Оскверненный лес", "에오나스의 말 — 에메랄드 성소, 악령의 숲", "埃欧纳斯的马 — 翡翠圣地，费伍德森林", "埃歐納斯的馬 — 翡翠聖地，費伍德森林" },
+        ["From the Pylon Shard crystal at the Magram village, Desolace (68.1, 79.1)"] = { "Vom Pylonensplitter-Kristall im Dorf der Magram, Desolace (68.1, 79.1)", "Du cristal d’éclat de pylône au village des Magram, Désolace (68.1, 79.1)", "Del cristal de fragmento de pilón del poblado Magram, Desolace (68.1, 79.1)", "Dal cristallo di scheggia di pilone al villaggio dei Magram, Desolanda (68.1, 79.1)", "Do cristal de lasca de pilar na aldeia Magram, Desolação (68.1, 79.1)", "Из кристалла-осколка пилона в деревне Маграм, Пустоши (68.1, 79.1)", "잊혀진 땅 마그람 마을의 수정탑 파편 수정에서 (68.1, 79.1)", "来自凄凉之地玛格拉姆村的水晶塔碎片水晶（68.1, 79.1）", "來自淒涼之地瑪格拉姆村的水晶塔碎片水晶（68.1, 79.1）" },
+        ["From the Pylon Shard crystal at the Gelkis village, Desolace (36.1, 85.6)"] = { "Vom Pylonensplitter-Kristall im Dorf der Gelkis, Desolace (36.1, 85.6)", "Du cristal d’éclat de pylône au village des Gelkis, Désolace (36.1, 85.6)", "Del cristal de fragmento de pilón del poblado Gelkis, Desolace (36.1, 85.6)", "Dal cristallo di scheggia di pilone al villaggio dei Gelkis, Desolanda (36.1, 85.6)", "Do cristal de lasca de pilar na aldeia Gelkis, Desolação (36.1, 85.6)", "Из кристалла-осколка пилона в деревне Гелкис, Пустоши (36.1, 85.6)", "잊혀진 땅 겔키스 마을의 수정탑 파편 수정에서 (36.1, 85.6)", "来自凄凉之地吉尔吉斯村的水晶塔碎片水晶（36.1, 85.6）", "來自淒涼之地吉爾吉斯村的水晶塔碎片水晶（36.1, 85.6）" },
+        ["Pylon Fragment — the crystal at the Magram village, Desolace"] = { "Pylonenfragment — der Kristall im Dorf der Magram, Desolace", "Fragment de pylône — le cristal du village des Magram, Désolace", "Fragmento de pilón — el cristal del poblado Magram, Desolace", "Frammento di pilone — il cristallo al villaggio dei Magram, Desolanda", "Fragmento de pilar — o cristal da aldeia Magram, Desolação", "Фрагмент пилона — кристалл в деревне Маграм, Пустоши", "수정탑 조각 — 잊혀진 땅 마그람 마을의 수정", "水晶塔残片 — 凄凉之地玛格拉姆村的水晶", "水晶塔殘片 — 淒涼之地瑪格拉姆村的水晶" },
+        ["Pylon Shard — the crystal at the Gelkis village, Desolace"] = { "Pylonensplitter — der Kristall im Dorf der Gelkis, Desolace", "Éclat de pylône — le cristal du village des Gelkis, Désolace", "Fragmento de pilón — el cristal del poblado Gelkis, Desolace", "Scheggia di pilone — il cristallo al villaggio dei Gelkis, Desolanda", "Lasca de pilar — o cristal da aldeia Gelkis, Desolação", "Осколок пилона — кристалл в деревне Гелкис, Пустоши", "수정탑 파편 — 잊혀진 땅 겔키스 마을의 수정", "水晶塔碎片 — 凄凉之地吉尔吉斯村的水晶", "水晶塔碎片 — 淒涼之地吉爾吉斯村的水晶" },
+        ["On the top floor of the big temple in Shen'dralas (46.0, 78.1)"] = { "Im obersten Stockwerk des großen Tempels in Shen'dralas (46.0, 78.1)", "À l’étage supérieur du grand temple de Shen'dralas (46.0, 78.1)", "En el piso superior del gran templo de Shen'dralas (46.0, 78.1)", "All'ultimo piano del grande tempio di Shen'dralas (46.0, 78.1)", "No andar de cima do grande templo de Shen'dralas (46.0, 78.1)", "На верхнем этаже большого храма Shen'dralas (46.0, 78.1)", "Shen'dralas 큰 사원의 맨 위층 (46.0, 78.1)", "Shen'dralas大神殿的顶层（46.0, 78.1）", "Shen'dralas大神殿的頂層（46.0, 78.1）" },
+        ["Mana Sieve — top floor of the big temple, Shen'dralas"] = { "Manasieb — oberstes Stockwerk des großen Tempels, Shen'dralas", "Tamis de mana — étage supérieur du grand temple, Shen'dralas", "Tamiz de maná — piso superior del gran templo, Shen'dralas", "Setaccio di mana — ultimo piano del grande tempio, Shen'dralas", "Peneira de Mana — andar de cima do grande templo, Shen'dralas", "Сито маны — верхний этаж большого храма, Shen'dralas", "마나 체 — 큰 사원의 맨 위층, Shen'dralas", "法力筛 — 大神殿顶层，Shen'dralas", "法力篩 — 大神殿頂層，Shen'dralas" },
+        ["Maraudon Entrance — the Vial of Earth Song Water is inside (the small geyser in Rotgrip's pools)"] = { "Eingang von Maraudon — die Phiole ist drinnen (der kleine Geysir in Faulschnappers Becken)", "Entrée de Maraudon — la fiole est à l’intérieur (le petit geyser des bassins de Grippe-charogne)", "Entrada de Maraudon — el vial está dentro (el pequeño géiser de las pozas de Escamapodrida)", "Ingresso di Maraudon — la fiala è dentro (il piccolo geyser nelle vasche di Rotgrip)", "Entrada de Maraudon — o frasco está lá dentro (o pequeno gêiser nos lagos de Putrigarra)", "Вход в Мародон — флакон внутри (маленький гейзер в водоемах Гнилопасти)", "마라우돈 입구 — 약병은 안에 있습니다(썩은아귀의 웅덩이에 있는 작은 간헐천)", "玛拉顿入口 — 水瓶在里面（洛特格里普水池中的小间歇泉）", "瑪拉頓入口 — 水瓶在裡面（洛特格里普水池中的小間歇泉）" },
+        ["Woodwyrd — Forlorn Gardens, Shen'dralas"] = { "Woodwyrd — Verlassene Gärten, Shen'dralas", "Woodwyrd — Jardins abandonnés, Shen'dralas", "Woodwyrd — Jardines Abandonados, Shen'dralas", "Woodwyrd — Giardini Abbandonati, Shen'dralas", "Woodwyrd — Jardins Abandonados, Shen'dralas", "Woodwyrd — Заброшенные сады, Shen'dralas", "Woodwyrd — 버려진 정원, Shen'dralas", "Woodwyrd — 被遗忘的花园，Shen'dralas", "Woodwyrd — 被遺忘的花園，Shen'dralas" },
+        ["Woodwyrd, Forlorn Gardens, Shen'dralas (69.9, 72.1)"] = { "Woodwyrd, Verlassene Gärten, Shen'dralas (69.9, 72.1)", "Woodwyrd, Jardins abandonnés, Shen'dralas (69.9, 72.1)", "Woodwyrd, Jardines Abandonados, Shen'dralas (69.9, 72.1)", "Woodwyrd, Giardini Abbandonati, Shen'dralas (69.9, 72.1)", "Woodwyrd, Jardins Abandonados, Shen'dralas (69.9, 72.1)", "Woodwyrd, Заброшенные сады, Shen'dralas (69.9, 72.1)", "Woodwyrd, 버려진 정원, Shen'dralas (69.9, 72.1)", "Woodwyrd，被遗忘的花园，Shen'dralas（69.9, 72.1）", "Woodwyrd，被遺忘的花園，Shen'dralas（69.9, 72.1）" },
+        ["Nazeer Bloodpike — Brackenwall Village, Dustwallow Marsh"] = { "Nazeer Bloodpike — Brackenwall, Düstermarschen", "Nazeer Bloodpike — Brackenwall, marécage d'Âprefange", "Nazeer Bloodpike — Poblado Murohelecho, Marjal Revolcafango", "Nazeer Bloodpike — Brackenwall, Acquitrino Mortale", "Nazeer Bloodpike — Brackenwall, Pântano Vadeoso", "Nazeer Bloodpike — Brackenwall, Пылевые топи", "Nazeer Bloodpike — 브래컨월 마을, 먼지진흙 습지대", "Nazeer Bloodpike — 蕨墙村，尘泥沼泽", "Nazeer Bloodpike — 蕨牆村，塵泥沼澤" },
+        ["Nazeer Bloodpike, Brackenwall Village, Dustwallow Marsh"] = { "Nazeer Bloodpike, Brackenwall, Düstermarschen", "Nazeer Bloodpike, Brackenwall, marécage d'Âprefange", "Nazeer Bloodpike, Poblado Murohelecho, Marjal Revolcafango", "Nazeer Bloodpike, Brackenwall, Acquitrino Mortale", "Nazeer Bloodpike, Brackenwall, Pântano Vadeoso", "Nazeer Bloodpike, Brackenwall, Пылевые топи", "Nazeer Bloodpike, 브래컨월 마을, 먼지진흙 습지대", "Nazeer Bloodpike，蕨墙村，尘泥沼泽", "Nazeer Bloodpike，蕨牆村，塵泥沼澤" },
+        ["Speak with Nazeer Bloodpike in Brackenwall Village."] = { "Sprecht mit Nazeer Bloodpike in Brackenwall.", "Parlez à Nazeer Bloodpike à Brackenwall.", "Habla con Nazeer Bloodpike en el Poblado Murohelecho.", "Parla con Nazeer Bloodpike a Brackenwall.", "Fale com Nazeer Bloodpike em Brackenwall.", "Поговорите с Nazeer Bloodpike в Brackenwall.", "브래컨월 마을의 Nazeer Bloodpike와 대화하십시오.", "与蕨墙村的Nazeer Bloodpike谈话。", "與蕨牆村的Nazeer Bloodpike談話。" },
+        ["Leave the temple"] = { "Verlasst den Tempel", "Quittez le temple", "Sal del templo", "Esci dal tempio", "Saia do templo", "Покиньте храм", "사원에서 나가십시오", "离开神殿", "離開神殿" },
+    }
+    FDJ.ContentLocales = FDJ.ContentLocales or {}
+    for i, lang in ipairs(LANGS) do
+        local content = FDJ.ContentLocales[lang] or {}
+        FDJ.ContentLocales[lang] = content
+        content.quests = content.quests or {}
+        content.places = content.places or {}
+        for id, fields in pairs(QUESTS) do
+            local q = content.quests[id] or {}
+            content.quests[id] = q
+            for field, list in pairs(fields) do
+                if q[field] == nil then q[field] = list[i] end
+            end
+        end
+        -- The Talisman's solo line: the same words as C's jobs (roguejobs).
+        local rogue = content.quests[78261]
+        if rogue and rogue.warning and content.quests[80411].warning == nil then
+            content.quests[80411].warning = rogue.warning
+        end
+        for english, list in pairs(PLACES) do
+            if content.places[english] == nil then content.places[english] = list[i] end
+        end
+    end
+end
+-- END l10n210
+
+-- BEGIN l10n210b
+-- (2.1.0, M 19 Nov 2026): the whole Alliance Paladin storyline now shown in
+-- Materials of Significance's chain (the Strange Orb quests, A Brother In
+-- Need, By The Light's Grace, Aeonas the Vindicated, Some Good News, The
+-- Mysterious Merchant, Elrick, Paladin of the Silver Hand), their starts,
+-- hand-ins and map spots, and The Medallion of Faith's note and repeatable
+-- entry, in every language. Official names where known (the Forever client's own
+-- name packs: Delgren the Purifier, Katherine the Pure, Innkeeper Janene,
+-- Elrick, Aurius; Il faut le détruire); the rest translated by hand.
+do
+    local LANGS = { "deDE", "frFR", "esES", "itIT", "ptBR", "ruRU", "koKR", "zhCN", "zhTW" }
+    local QUESTS = {
+        [78088] = {
+            name = { "Ein seltsames Artefakt", "Un étrange artefact", "Un artefacto extraño", "Uno strano manufatto", "Um artefato estranho", "Странный артефакт", "이상한 유물", "奇怪的神器", "奇怪的神器" },
+            objective = { "Plündert die Seltsame Kugel oben auf dem Turm von Althalaxx an der Dunkelküste und bringt sie zu Delgren dem Läuterer im Eschental.", "Prenez l’Orbe étrange au sommet de la tour d’Althalaxx, à Sombrivage, et apportez-le à Delgren le Purificateur, à Orneval.", "Coge el Orbe extraño de lo alto de la Torre de Althalaxx en Costa Oscura y llévaselo a Delgren el Purificador en Vallefresno.", "Prendi il Globo strano in cima alla Torre di Althalaxx a Rivafosca e portalo a Delgren il Purificatore a Valtetra.", "Pegue o Orbe Estranho no alto da Torre de Althalaxx, na Costa Negra, e leve-o a Dinis, o Purificador, no Vale Gris.", "Заберите странную сферу с вершины башни Алталакса на Темных берегах и отнесите ее Делгрену Очистителю в Ясеневый лес.", "어둠의 해안 알살락스의 탑 꼭대기에서 이상한 보주를 챙겨 잿빛 골짜기의 수호자 델그렌에게 가져가십시오.", "拾取黑海岸阿尔萨拉克斯之塔顶部的奇怪的宝珠，把它交给灰谷的净化者德尔格伦。", "拾取黑海岸阿爾薩拉克斯之塔頂部的奇怪的寶珠，把它交給梣谷的淨化者德爾葛蘭。" },
+        },
+        [78089] = {
+            name = { "Rat aus Sturmwind", "Conseil de Hurlevent", "Consejo de Ventormenta", "Consiglio da Roccavento", "Conselho de Ventobravo", "Совет из Штормграда", "스톰윈드의 조언", "暴风城的建议", "暴風城的建議" },
+            objective = { "Sprecht mit Katharina der Reinen in der Kathedrale des Lichts in Sturmwind.", "Parlez à Katherine la Pure, à la cathédrale de la Lumière de Hurlevent.", "Habla con Katherine la Pura en la Catedral de la Luz de Ventormenta.", "Parla con Katherine la Pura nella Cattedrale della Luce di Roccavento.", "Fale com Katherine, a Pura, na Catedral da Luz em Ventobravo.", "Поговорите с Катериной Чистой в Соборе Света в Штормграде.", "스톰윈드 빛의 대성당에 있는 성기사 캐서린과 대화하십시오.", "与暴风城光明大教堂的纯洁的凯瑟琳谈话。", "與暴風城光明大教堂的純潔的凱薩琳談話。" },
+        },
+        [78090] = {
+            name = { "Eine zweite Meinung", "Un second avis", "Una segunda opinión", "Un secondo parere", "Uma segunda opinião", "Второе мнение", "다른 의견", "第二意见", "第二意見" },
+            objective = { "Sprecht mit Ursula Deline im Magierviertel von Sturmwind.", "Parlez à Ursula Deline dans le quartier des Mages de Hurlevent.", "Habla con Ursula Deline en el Barrio de los Magos de Ventormenta.", "Parla con Ursula Deline nel Quartiere dei Maghi di Roccavento.", "Fale com Ursula Deline no Distrito dos Magos de Ventobravo.", "Поговорите с Урсулой Делайн в Квартале магов Штормграда.", "스톰윈드 마법사 지구에 있는 우르술라 델린과 대화하십시오.", "与暴风城法师区的厄苏拉·德林谈话。", "與暴風城法師區的厄蘇拉·德林談話。" },
+        },
+        [78091] = {
+            name = { "Das Salz verdienen", "Mériter son sel", "Ganarse la sal", "Guadagnarsi il sale", "Fazendo por merecer", "Заслужить соль", "소금값 하기", "赚取盐份", "賺取鹽份" },
+            objective = { "Sammelt 14 Beschwörersalz von den Orcs der Schwarzfels im Rotkammgebirge und kehrt zu Ursula Deline zurück.", "Récupérez 14 sels d’invocateur sur les orcs Rochenoire des Carmines et retournez voir Ursula Deline.", "Consigue 14 sales de invocador de los orcos Roca Negra de las Montañas Crestagrana y vuelve con Ursula Deline.", "Raccogli 14 Sali dell'evocatore dagli orchi Roccianera delle Montagne Crestarossa e torna da Ursula Deline.", "Colete 14 Sais de Evocador dos orcs Rocha Negra nas Montanhas Cristarrubra e volte até Ursula Deline.", "Добудьте 14 солей призывателя у орков Черной горы в Красногорье и вернитесь к Урсуле Делайн.", "붉은마루 산맥의 검은바위 오크에게서 소환사의 소금 14개를 모아 우르술라 델린에게 돌아가십시오.", "从赤脊山的黑石兽人身上收集14份召唤者之盐，然后回到厄苏拉·德林那里。", "從赤脊山的黑石獸人身上收集14份召喚者之鹽，然後回到厄蘇拉·德林那裡。" },
+        },
+        [78092] = {
+            name = { "Es muss zerstört werden", "Il faut le détruire", "Debe ser destruido", "Deve essere distrutto", "Precisa ser destruído", "Его нужно уничтожить", "파괴해야 한다", "必须摧毁它", "必須摧毀它" },
+            objective = { "Sammelt 12 Partikel von Mannoroth von den Dämonen in der Dämonensturzschlucht im Eschental und benutzt dort den Speer des Mannoroth, um die Kugel zu zerstören.", "Récupérez 12 particules de Mannoroth sur les démons du canyon de la Chute-du-Démon, à Orneval, puis utilisez-y la Lance de Mannoroth pour détruire l’orbe.", "Consigue 12 motas de Mannoroth de los demonios del Cañón de la Caída Demoníaca, en Vallefresno, y usa allí la Lanza de Mannoroth para destruir el orbe.", "Raccogli 12 Granelli di Mannoroth dai demoni del Canyon della Caduta del Demone a Valtetra, poi usa lì la Lancia di Mannoroth per distruggere il globo.", "Colete 12 Ciscos de Mannoroth dos demônios no Desfiladeiro da Queda do Demônio, no Vale Gris, e use lá a Lança de Mannoroth para destruir o orbe.", "Добудьте 12 частиц Маннорота у демонов в Каньоне Падшего Демона в Ясеневом лесу, а затем используйте там копье Маннорота, чтобы уничтожить сферу.", "잿빛 골짜기 악마 몰락의 협곡에 있는 악마에게서 마노로스의 티끌 12개를 모은 뒤, 그곳에서 마노로스의 창을 사용해 보주를 파괴하십시오.", "从灰谷恶魔坠落峡谷的恶魔身上收集12份玛诺洛斯微粒，然后在那里使用玛诺洛斯之矛摧毁宝珠。", "從梣谷惡魔墜落峽谷的惡魔身上收集12份瑪諾洛斯微粒，然後在那裡使用瑪諾洛斯之矛摧毀寶珠。" },
+        },
+        [78093] = {
+            name = { "Rückkehr zu Delgren", "Retour auprès de Delgren", "Regreso con Delgren", "Ritorno da Delgren", "De volta a Delgren", "Возвращение к Делгрену", "델그렌에게 돌아가기", "回到德尔格伦那里", "回到德爾葛蘭那裡" },
+            objective = { "Bringt die Kugelfragmente zu Delgren dem Läuterer im Eschental. Belohnung: Umhang des göttlichen Sturms.", "Apportez les fragments d’orbe à Delgren le Purificateur, à Orneval. Récompense : Cape de la tempête divine.", "Lleva los fragmentos del orbe a Delgren el Purificador en Vallefresno. Recompensa: Capa de la tormenta divina.", "Porta i frammenti del globo a Delgren il Purificatore a Valtetra. Ricompensa: Mantello della Tempesta Divina.", "Leve os fragmentos do orbe a Dinis, o Purificador, no Vale Gris. Recompensa: Manto da Tempestade Divina.", "Отнесите фрагменты сферы Делгрену Очистителю в Ясеневый лес. Награда: плащ божественной бури.", "보주 조각을 잿빛 골짜기의 수호자 델그렌에게 가져가십시오. 보상: 신성한 폭풍의 망토.", "把宝珠碎片交给灰谷的净化者德尔格伦。奖励：神圣风暴斗篷。", "把寶珠碎片交給梣谷的淨化者德爾葛蘭。獎勵：神聖風暴斗篷。" },
+        },
+        [96438] = {
+            name = { "Schlacht am Zirkel der Mannoroc", "Bataille au convent de Mannoroc", "Batalla en el Aquelarre Mannoroc", "Battaglia alla Congrega Mannoroc", "Batalha no Covil Mannoroc", "Битва у ковена Маннорок", "마노로크 집회장의 전투", "玛诺洛克集会所之战", "瑪諾洛克集會所之戰" },
+            objective = { "Untersucht den Zerbrochenen Kriegshammer am Zirkel der Mannoroc in Desolace.", "Examinez le marteau de guerre brisé au convent de Mannoroc, en Désolace.", "Investiga el martillo de guerra roto en el Aquelarre Mannoroc, en Desolace.", "Esamina il Martello da guerra spezzato alla Congrega Mannoroc, a Desolanda.", "Investigue o Martelo de Guerra Quebrado no Covil Mannoroc, em Desolação.", "Осмотрите сломанный боевой молот у ковена Маннорок в Пустошах.", "잊혀진 땅 마노로크 집회장에 있는 부서진 전투망치를 조사하십시오.", "调查凄凉之地玛诺洛克集会所的破损的战锤。", "調查淒涼之地瑪諾洛克集會所的破損的戰錘。" },
+        },
+        [79939] = {
+            name = { "Der zerbrochene Hammer", "Le marteau brisé", "El martillo roto", "Il martello spezzato", "O martelo quebrado", "Сломанный молот", "부서진 망치", "破损的战锤", "破損的戰錘" },
+            objective = { "Findet den Zerrissenen Brief (laut einem Spieler von einem Beschwörer der Brennenden Klinge) und kehrt zu Katharina der Reinen zurück.", "Trouvez la lettre déchirée (selon un joueur, sur un invocateur de la Lame ardente) et retournez voir Katherine la Pure.", "Encuentra la carta rota (según un jugador, de un invocador del Filo Ardiente) y vuelve con Katherine la Pura.", "Trova la Lettera strappata (secondo un giocatore, da un Evocatore della Lama Ardente) e torna da Katherine la Pura.", "Encontre a Carta Rasgada (segundo um jogador, de um Evocador da Lâmina Ardente) e volte até Katherine, a Pura.", "Найдите разорванное письмо (по словам игрока, у призывателя из клана Пылающего Клинка) и вернитесь к Катерине Чистой.", "찢어진 편지를 찾아(플레이어 제보: 불타는 칼날단 소환사에게서) 성기사 캐서린에게 돌아가십시오.", "找到撕破的信（据玩家说来自燃刃召唤者），然后回到纯洁的凯瑟琳那里。", "找到撕破的信（據玩家說來自燃刃召喚者），然後回到純潔的凱薩琳那裡。" },
+        },
+        [79940] = {
+            name = { "Ein verlorener Bruder", "Un frère perdu", "Un hermano perdido", "Un fratello perduto", "Um irmão perdido", "Пропавший брат", "잃어버린 형제", "失踪的兄弟", "失蹤的兄弟" },
+            objective = { "Hört Katharina der Reinen zu, was sie über den Hammer und Aeonas erzählt.", "Écoutez ce que Katherine la Pure dit du marteau et d’Aeonas.", "Escucha lo que Katherine la Pura cuenta sobre el martillo y Aeonas.", "Ascolta Katherine la Pura parlare del martello e di Aeonas.", "Ouça o que Katherine, a Pura, conta sobre o martelo e Aeonas.", "Выслушайте рассказ Катерины Чистой о молоте и Эонасе.", "망치와 에오나스에 대한 성기사 캐서린의 이야기를 들으십시오.", "听纯洁的凯瑟琳讲述战锤和埃欧纳斯的事。", "聽純潔的凱薩琳講述戰錘和埃歐納斯的事。" },
+        },
+        [79945] = {
+            name = { "Befehle des Großkreuzfahrers", "Les ordres du grand croisé", "Órdenes del Gran Cruzado", "Ordini del Gran Crociato", "Ordens do Grão-cruzado", "Приказы великого крестоносца", "대십자군 기사의 명령", "大十字军战士的命令", "大十字軍戰士的命令" },
+            objective = { "Laut Spielern: Sprecht mit dem Angellehrer an den Docks von Menethil, nehmt das kleine Boot südlich der Docks zu Aeonas' Hütte an der Küste, untersucht den gefallenen Scharlachroten Kreuzfahrer, besiegt den Elite-Attentäter der Stufe 40 und plündert die Befehle. Benutzt sie und kehrt zu Katharina der Reinen zurück.", "Selon les joueurs : parlez au maître de pêche près des quais de Port de Menethil, prenez la petite barque au sud des quais jusqu’à la cabane d’Aeonas sur la côte, examinez le croisé écarlate tombé, vainquez l’assassin élite de niveau 40 et prenez les ordres. Utilisez-les et retournez voir Katherine la Pure.", "Según los jugadores: habla con el instructor de pesca junto a los muelles de Puerto de Menethil, toma el pequeño bote al sur de los muelles hasta la cabaña de Aeonas en la costa, examina al cruzado escarlata caído, derrota al asesino élite de nivel 40 y saquea las órdenes. Úsalas y vuelve con Katherine la Pura.", "Secondo i giocatori: parla con l'istruttore di pesca vicino ai moli di Porto di Menethil, prendi la piccola barca a sud dei moli fino alla capanna di Aeonas sulla costa, esamina il Crociato Scarlatto caduto, sconfiggi l'assassino élite di livello 40 e prendi gli ordini. Usali e torna da Katherine la Pura.", "Segundo os jogadores: fale com o instrutor de pesca perto das docas do Porto de Menethil, pegue o pequeno barco ao sul das docas até a cabana de Aeonas no litoral, examine o cruzado escarlate caído, derrote o assassino de elite de nível 40 e saqueie as ordens. Use-as e volte até Katherine, a Pura.", "По словам игроков: поговорите с наставником рыбной ловли у причалов Гавани Менетилов, доплывите на лодочке к югу от причалов до хижины Эонаса на побережье, осмотрите павшего крестоносца Алого ордена, победите элитного убийцу 40-го уровня и заберите приказы. Используйте их и вернитесь к Катерине Чистой.", "플레이어 제보: 메네실 항구 부두 옆의 낚시 상급 기술자와 대화하고, 부두 남쪽의 작은 배를 타고 해안의 에오나스 오두막으로 가서 쓰러진 붉은십자군을 살펴본 뒤 40레벨 정예 암살자를 처치하고 명령서를 챙기십시오. 명령서를 사용한 뒤 성기사 캐서린에게 돌아가십시오.", "据玩家说：与米奈希尔港码头边的钓鱼训练师交谈，乘坐码头南边的小船前往海岸上埃欧纳斯的小屋，检查倒下的血色十字军，击败40级精英刺客并拾取命令。使用命令后回到纯洁的凯瑟琳那里。", "據玩家說：與米奈希爾港碼頭邊的釣魚訓練師交談，乘坐碼頭南邊的小船前往海岸上埃歐納斯的小屋，檢查倒下的血色十字軍，擊敗40級精英刺客並拾取命令。使用命令後回到純潔的凱薩琳那裡。" },
+        },
+        [79946] = {
+            name = { "Ein Bruder in Not", "Un frère dans le besoin", "Un hermano necesitado", "Un fratello nel bisogno", "Um irmão em apuros", "Брат в беде", "곤경에 빠진 형제", "危难中的兄弟", "危難中的兄弟" },
+            objective = { "Findet Aeonas im Scharlachroten Kloster.", "Trouvez Aeonas dans le Monastère écarlate.", "Encuentra a Aeonas en el Monasterio Escarlata.", "Trova Aeonas nel Monastero Scarlatto.", "Encontre Aeonas no Monastério Escarlate.", "Найдите Эонаса в Монастыре Алого ордена.", "붉은십자군 수도원에서 에오나스를 찾으십시오.", "在血色修道院找到埃欧纳斯。", "在血色修道院找到埃歐納斯。" },
+            warning = { "Lange Questreihe: Sie beginnt mit der Seltsamen Kugel an der Dunkelküste", "Longue suite de quêtes : elle commence avec l’Orbe étrange à Sombrivage", "Cadena larga: empieza con el Orbe extraño en Costa Oscura", "Catena lunga: inizia con il Globo strano a Rivafosca", "Cadeia longa: começa com o Orbe Estranho na Costa Negra", "Длинная цепочка: начинается со странной сферы на Темных берегах", "긴 연계 퀘스트: 어둠의 해안의 이상한 보주에서 시작합니다", "长任务线：从黑海岸的奇怪的宝珠开始", "長任務線：從黑海岸的奇怪的寶珠開始" },
+            note = { "Aeonas ist in der hinteren Kammer der Kathedrale. Hört Katharinas Gespräch über Aeonas zu Ende an, bevor Ihr geht: Laut Spielern kann das Überspringen den nächsten Schritt blockieren. Die Reihe davor (laut Spielern): die Kette der Seltsamen Kugel an der Dunkelküste, dann Katharinas Quests ab Stufe 35.\n\nAls Nächstes, von Aeonas im Dungeon:", "Aeonas est dans la salle du fond de la cathédrale. Écoutez jusqu’au bout ce que Katherine dit d’Aeonas avant de partir : selon les joueurs, l’ignorer peut bloquer l’étape suivante. La suite d’avant (selon les joueurs) : la chaîne de l’Orbe étrange de Sombrivage, puis les quêtes de Katherine à partir du niveau 35.\n\nEnsuite, d’Aeonas dans le donjon :", "Aeonas está en la cámara del fondo de la catedral. Escucha entera la charla de Katherine sobre Aeonas antes de irte: según los jugadores, saltarla puede bloquear el paso siguiente. La cadena anterior (según los jugadores): la del Orbe extraño de Costa Oscura y luego las misiones de Katherine desde el nivel 35.\n\nDespués, de Aeonas dentro de la mazmorra:", "Aeonas è nella camera in fondo alla cattedrale. Ascolta fino in fondo il discorso di Katherine su Aeonas prima di andartene: secondo i giocatori saltarlo può bloccare il passo successivo. La catena precedente (secondo i giocatori): quella del Globo strano a Rivafosca, poi le missioni di Katherine dal livello 35.\n\nPoi, da Aeonas dentro la spedizione:", "Aeonas está na câmara dos fundos da catedral. Ouça toda a conversa de Katherine sobre Aeonas antes de sair: segundo os jogadores, pulá-la pode bloquear o passo seguinte. A cadeia anterior (segundo os jogadores): a do Orbe Estranho na Costa Negra e depois as missões de Katherine a partir do nível 35.\n\nEm seguida, de Aeonas dentro da masmorra:", "Эонас в дальнем зале собора. Дослушайте рассказ Катерины об Эонасе, прежде чем уходить: по словам игроков, если пропустить его, следующий шаг может не открыться. Цепочка до этого (по словам игроков): странная сфера с Темных берегов, затем задания Катерины с 35-го уровня.\n\nДалее, от Эонаса в подземелье:", "에오나스는 대성당 안쪽 방에 있습니다. 떠나기 전에 에오나스에 대한 캐서린의 이야기를 끝까지 들으십시오. 플레이어 제보에 따르면 건너뛰면 다음 단계가 막힐 수 있습니다. 그 전의 연계(플레이어 제보): 어둠의 해안의 이상한 보주 연계, 그다음 35레벨부터 캐서린의 퀘스트.\n\n다음은 던전 안의 에오나스에게서:", "埃欧纳斯在大教堂后面的房间里。离开前把凯瑟琳关于埃欧纳斯的话听完：据玩家说，跳过可能会卡住下一步。之前的任务线（据玩家说）：黑海岸的奇怪的宝珠任务线，然后是凯瑟琳35级起的任务。\n\n接下来，地下城里的埃欧纳斯：", "埃歐納斯在大教堂後面的房間裡。離開前把凱薩琳關於埃歐納斯的話聽完：據玩家說，跳過可能會卡住下一步。之前的任務線（據玩家說）：黑海岸的奇怪的寶珠任務線，然後是凱薩琳35級起的任務。\n\n接下來，地城裡的埃歐納斯：" },
+        },
+        [79963] = {
+            name = { "Durch die Gnade des Lichts", "Par la grâce de la Lumière", "Por la gracia de la Luz", "Per grazia della Luce", "Pela graça da Luz", "Милостью Света", "빛의 은총으로", "圣光的恩典", "聖光的恩典" },
+            objective = { "Heilt Aeonas (laut Spielern: vollständig).", "Soignez Aeonas (selon les joueurs : entièrement).", "Sana a Aeonas (según los jugadores: por completo).", "Cura Aeonas (secondo i giocatori: completamente).", "Cure Aeonas (segundo os jogadores: totalmente).", "Исцелите Эонаса (по словам игроков: полностью).", "에오나스를 치유하십시오(플레이어 제보: 생명력을 가득).", "治疗埃欧纳斯（据玩家说：治满）。", "治療埃歐納斯（據玩家說：治滿）。" },
+            note = { "Folgt auf Ein Bruder in Not, in der Kathedrale.\n\nDann, in Sturmwind:", "Suit Un frère dans le besoin, dans la cathédrale.\n\nEnsuite, à Hurlevent :", "Sigue a Un hermano necesitado, dentro de la catedral.\n\nDespués, en Ventormenta:", "Segue Un fratello nel bisogno, nella cattedrale.\n\nPoi, a Roccavento:", "Vem depois de Um irmão em apuros, dentro da catedral.\n\nDepois, em Ventobravo:", "Следует за «Брат в беде», в соборе.\n\nЗатем, в Штормграде:", "곤경에 빠진 형제 다음, 대성당 안에서.\n\n그다음 스톰윈드에서:", "接在危难中的兄弟之后，在大教堂里。\n\n然后在暴风城：", "接在危難中的兄弟之後，在大教堂裡。\n\n然後在暴風城：" },
+        },
+        [79970] = {
+            name = { "Aeonas der Verteidigte", "Aeonas le Défendu", "Aeonas el Reivindicado", "Aeonas il Riabilitato", "Aeonas, o Vindicado", "Эонас Оправданный", "누명을 벗은 에오나스", "沉冤得雪的埃欧纳斯", "沉冤得雪的埃歐納斯" },
+            objective = { "Trefft Euch mit Aeonas in der Kathedrale des Lichts in Sturmwind.", "Rejoignez Aeonas à la cathédrale de la Lumière de Hurlevent.", "Reúnete con Aeonas en la Catedral de la Luz de Ventormenta.", "Incontra Aeonas nella Cattedrale della Luce di Roccavento.", "Encontre Aeonas na Catedral da Luz em Ventobravo.", "Встретьтесь с Эонасом в Соборе Света в Штормграде.", "스톰윈드 빛의 대성당에서 에오나스를 만나십시오.", "在暴风城光明大教堂与埃欧纳斯会面。", "在暴風城光明大教堂與埃歐納斯會面。" },
+            note = { "Nach Durch die Gnade des Lichts. Die Reihe geht in Sturmwind mit Gute Neuigkeiten weiter, bis zu Bedeutende Materialien (Maraudon, Schwarzfelstiefen).", "Après Par la grâce de la Lumière. La suite continue à Hurlevent avec De bonnes nouvelles, jusqu’à Matériaux d’importance (Maraudon, Profondeurs de Rochenoire).", "Después de Por la gracia de la Luz. La cadena sigue en Ventormenta con Buenas noticias, hasta Materiales significativos (Maraudon, Profundidades de Roca Negra).", "Dopo Per grazia della Luce. La catena prosegue a Roccavento con Buone notizie, fino a Materiali significativi (Maraudon, Profondità di Roccianera).", "Depois de Pela graça da Luz. A cadeia continua em Ventobravo com Boas notícias, até Materiais significativos (Maraudon, Abismo Rocha Negra).", "После «Милостью Света». Цепочка продолжается в Штормграде заданием «Хорошие новости» и доходит до «Значимых материалов» (Мародон, Глубины Черной горы).", "빛의 은총으로 다음. 연계는 스톰윈드에서 좋은 소식으로 이어져 의미 있는 재료(마라우돈, 검은바위 나락)까지 갑니다.", "接在圣光的恩典之后。任务线在暴风城以好消息继续，一直到重要的材料（玛拉顿、黑石深渊）。", "接在聖光的恩典之後。任務線在暴風城以好消息繼續，一直到重要的材料（瑪拉頓、黑石深淵）。" },
+        },
+        [81762] = {
+            name = { "Gute Neuigkeiten", "De bonnes nouvelles", "Buenas noticias", "Buone notizie", "Boas notícias", "Хорошие новости", "좋은 소식", "好消息", "好消息" },
+            objective = { "Sprecht mit Katharina der Reinen in der Kathedrale des Lichts in Sturmwind.", "Parlez à Katherine la Pure, à la cathédrale de la Lumière de Hurlevent.", "Habla con Katherine la Pura en la Catedral de la Luz de Ventormenta.", "Parla con Katherine la Pura nella Cattedrale della Luce di Roccavento.", "Fale com Katherine, a Pura, na Catedral da Luz em Ventobravo.", "Поговорите с Катериной Чистой в Соборе Света в Штормграде.", "스톰윈드 빛의 대성당에 있는 성기사 캐서린과 대화하십시오.", "与暴风城光明大教堂的纯洁的凯瑟琳谈话。", "與暴風城光明大教堂的純潔的凱薩琳談話。" },
+        },
+        [81764] = {
+            name = { "Der geheimnisvolle Händler", "Le mystérieux marchand", "El mercader misterioso", "Il mercante misterioso", "O mercador misterioso", "Таинственный торговец", "수수께끼의 상인", "神秘的商人", "神秘的商人" },
+            objective = { "Reist nach Theramore und findet den geheimnisvollen Händler.", "Rendez-vous à Theramore et trouvez le mystérieux marchand.", "Viaja a Theramore y encuentra al mercader misterioso.", "Raggiungi Theramore e trova il mercante misterioso.", "Vá até Theramore e encontre o mercador misterioso.", "Отправляйтесь в Терамор и найдите таинственного торговца.", "테라모어로 가서 수수께끼의 상인을 찾으십시오.", "前往塞拉摩，找到神秘的商人。", "前往塞拉摩，找到神秘的商人。" },
+        },
+        [81765] = {
+            name = { "Elrick, Paladin der Silbernen Hand", "Elrick, paladin de la Main d’argent", "Elrick, paladín de la Mano de Plata", "Elrick, paladino della Mano d'Argento", "Elrick, paladino da Mão de Prata", "Элрик, паладин ордена Серебряной Длани", "은빛 성기사단의 성기사 엘릭", "白银之手圣骑士埃尔里克", "白銀之手聖騎士埃爾里克" },
+            objective = { "Sprecht mit Elrick, um mehr zu erfahren.", "Parlez à Elrick pour en savoir plus.", "Habla con Elrick para saber más.", "Parla con Elrick per saperne di più.", "Fale com Elrick para saber mais.", "Поговорите с Элриком, чтобы узнать больше.", "엘릭과 대화해 더 알아보십시오.", "与埃尔里克谈话，了解更多情况。", "與埃爾里克談話，了解更多情況。" },
+            warning = { "In einer Gruppe mit anderen Paladinen kann nur einer die Notiz aufheben, die Elrick fallen lässt (das Blutige Schreiben). Habt Ihr sie nicht bekommen, gebt die Quest nicht bei der Gastwirtin ab: Brecht sie ab und macht sie noch einmal.", "Dans un groupe avec d’autres paladins, un seul peut ramasser la note que lâche Elrick (la Missive ensanglantée). Si vous ne l’avez pas eue, ne rendez pas la quête à l’aubergiste : abandonnez-la et refaites-la.", "En un grupo con otros paladines solo uno puede coger la nota que suelta Elrick (la Misiva ensangrentada). Si no la conseguiste, no entregues la misión a la tabernera: abandónala y hazla de nuevo.", "In un gruppo con altri paladini solo uno può raccogliere il biglietto che lascia cadere Elrick (la Missiva insanguinata). Se non l'hai preso, non consegnare la missione alla locandiera: abbandonala e rifalla.", "Num grupo com outros paladinos só um pode pegar o bilhete que Elrick deixa cair (a Missiva Ensanguentada). Se você não o pegou, não entregue a missão à estalajadeira: abandone-a e faça de novo.", "В группе с другими паладинами записку, которую роняет Элрик (окровавленное послание), может поднять только один. Если она вам не досталась, не сдавайте задание хозяйке таверны: откажитесь от него и выполните заново.", "다른 성기사와 파티 중이면 엘릭이 떨어뜨린 쪽지(피 묻은 서신)는 한 명만 주울 수 있습니다. 쪽지를 얻지 못했다면 여관주인에게 퀘스트를 완료하지 말고 포기한 뒤 다시 하십시오.", "与其他圣骑士组队时，只有一人能拾取埃尔里克掉落的便条（血迹斑斑的信件）。如果你没拿到，不要向旅店老板交任务：放弃任务后重做。", "與其他聖騎士組隊時，只有一人能拾取埃爾里克掉落的便條（血跡斑斑的信件）。如果你沒拿到，不要向旅店老闆交任務：放棄任務後重做。" },
+        },
+        [5122] = {
+            note = { "Malors Truhe in der Scharlachroten Bastion enthält das Medaillon. Gebt es Aurius in der Kapelle, bevor Ihr gegen den Baron kämpft.", "Le coffre de Malor, dans le bastion Écarlate, contient le médaillon. Donnez-le à Aurius dans la chapelle avant d’affronter le baron.", "El cofre de Malor, en el Bastión Escarlata, guarda el medallón. Dáselo a Aurius en la capilla antes de luchar contra el barón.", "Il forziere di Malor nel Bastione Scarlatto contiene il medaglione. Dallo ad Aurius nella cappella prima di affrontare il Barone.", "O cofre de Malor, no Bastião Escarlate, guarda o medalhão. Entregue-o a Aurius na capela antes de enfrentar o Barão.", "Медальон лежит в сундуке Малора в Бастионе Алого ордена. Отдайте его Аурию в часовне до боя с бароном.", "붉은십자군 성채에 있는 말로르의 금고에 메달이 있습니다. 남작과 싸우기 전에 예배당의 아우리우스에게 주십시오.", "马洛尔的保险箱在血色堡垒里，里面有奖章。在与男爵战斗之前，把它交给礼拜堂里的奥里克斯。", "馬洛爾的保險箱在血色堡壘裡，裡面有獎章。在與男爵戰鬥之前，把它交給禮拜堂裡的奧里克斯。" },
+        },
+        [-5122] = {
+            note = { "Wiederholbar, nach dem ersten Das Medaillon des Glaubens.", "Répétable, après le premier Le médaillon de foi.", "Repetible, después del primer El medallón de Fe.", "Ripetibile, dopo la prima Il medaglione della fede.", "Repetível, depois do primeiro O Medalhão da Fé.", "Повторяемое, после первого «Медальона Веры».", "반복 가능, 첫 번째 신념의 메달 이후.", "可重复，在第一次信仰奖章之后。", "可重複，在第一次信仰獎章之後。" },
+        },
+    }
+    local PLACES = {
+        ["Strange Orb, top of the Tower of Althalaxx, Darkshore"] = { "Seltsame Kugel, Spitze des Turms von Althalaxx, Dunkelküste", "Orbe étrange, sommet de la tour d’Althalaxx, Sombrivage", "Orbe extraño, cima de la Torre de Althalaxx, Costa Oscura", "Globo strano, cima della Torre di Althalaxx, Rivafosca", "Orbe Estranho, alto da Torre de Althalaxx, Costa Negra", "Странная сфера, вершина башни Алталакса, Темные берега", "이상한 보주, 알살락스의 탑 꼭대기, 어둠의 해안", "奇怪的宝珠，阿尔萨拉克斯之塔顶部，黑海岸", "奇怪的寶珠，阿爾薩拉克斯之塔頂部，黑海岸" },
+        ["Strange Orb"] = { "Seltsame Kugel", "Orbe étrange", "Orbe extraño", "Globo strano", "Orbe Estranho", "Странная сфера", "이상한 보주", "奇怪的宝珠", "奇怪的寶珠" },
+        ["On top of the Tower of Althalaxx, Darkshore (about 56.2, 26.4)"] = { "Oben auf dem Turm von Althalaxx, Dunkelküste (etwa 56.2, 26.4)", "Au sommet de la tour d’Althalaxx, Sombrivage (vers 56.2, 26.4)", "En lo alto de la Torre de Althalaxx, Costa Oscura (hacia 56.2, 26.4)", "In cima alla Torre di Althalaxx, Rivafosca (circa 56.2, 26.4)", "No alto da Torre de Althalaxx, Costa Negra (cerca de 56.2, 26.4)", "На вершине башни Алталакса, Темные берега (около 56.2, 26.4)", "어둠의 해안 알살락스의 탑 꼭대기 (약 56.2, 26.4)", "黑海岸阿尔萨拉克斯之塔顶部（约56.2, 26.4）", "黑海岸阿爾薩拉克斯之塔頂部（約56.2, 26.4）" },
+        ["Strange Orb — Tower of Althalaxx, Darkshore"] = { "Seltsame Kugel — Turm von Althalaxx, Dunkelküste", "Orbe étrange — tour d’Althalaxx, Sombrivage", "Orbe extraño — Torre de Althalaxx, Costa Oscura", "Globo strano — Torre di Althalaxx, Rivafosca", "Orbe Estranho — Torre de Althalaxx, Costa Negra", "Странная сфера — башня Алталакса, Темные берега", "이상한 보주 — 알살락스의 탑, 어둠의 해안", "奇怪的宝珠 — 阿尔萨拉克斯之塔，黑海岸", "奇怪的寶珠 — 阿爾薩拉克斯之塔，黑海岸" },
+        ["On top of the tower"] = { "Oben auf dem Turm", "Au sommet de la tour", "En lo alto de la torre", "In cima alla torre", "No alto da torre", "На вершине башни", "탑 꼭대기", "塔顶", "塔頂" },
+        ["Delgren the Purifier, Maestra's Post, Ashenvale"] = { "Delgren der Läuterer, Maestras Posten, Eschental", "Delgren le Purificateur, Poste de Maestra, Orneval", "Delgren el Purificador, Puesto de Maestra, Vallefresno", "Delgren il Purificatore, Avamposto di Maestra, Valtetra", "Dinis, o Purificador, Posto de Maestra, Vale Gris", "Делгрен Очиститель, застава Маэстры, Ясеневый лес", "수호자 델그렌, 마에스트라 주둔지, 잿빛 골짜기", "净化者德尔格伦，迈斯特拉岗哨，灰谷", "淨化者德爾葛蘭，梅斯特拉崗哨，梣谷" },
+        ["Delgren the Purifier, Ashenvale"] = { "Delgren der Läuterer, Eschental", "Delgren le Purificateur, Orneval", "Delgren el Purificador, Vallefresno", "Delgren il Purificatore, Valtetra", "Dinis, o Purificador, Vale Gris", "Делгрен Очиститель, Ясеневый лес", "수호자 델그렌, 잿빛 골짜기", "净化者德尔格伦，灰谷", "淨化者德爾葛蘭，梣谷" },
+        ["Delgren the Purifier — Ashenvale"] = { "Delgren der Läuterer — Eschental", "Delgren le Purificateur — Orneval", "Delgren el Purificador — Vallefresno", "Delgren il Purificatore — Valtetra", "Dinis, o Purificador — Vale Gris", "Делгрен Очиститель — Ясеневый лес", "수호자 델그렌 — 잿빛 골짜기", "净化者德尔格伦 — 灰谷", "淨化者德爾葛蘭 — 梣谷" },
+        ["Ursula Deline, Mage Quarter, Stormwind"] = { "Ursula Deline, Magierviertel, Sturmwind", "Ursula Deline, quartier des Mages, Hurlevent", "Ursula Deline, Barrio de los Magos, Ventormenta", "Ursula Deline, Quartiere dei Maghi, Roccavento", "Ursula Deline, Distrito dos Magos, Ventobravo", "Урсула Делайн, Квартал магов, Штормград", "우르술라 델린, 마법사 지구, 스톰윈드", "厄苏拉·德林，法师区，暴风城", "厄蘇拉·德林，法師區，暴風城" },
+        ["Spear of Mannoroth, Demon Fall Canyon, Ashenvale"] = { "Speer des Mannoroth, Dämonensturzschlucht, Eschental", "Lance de Mannoroth, canyon de la Chute-du-Démon, Orneval", "Lanza de Mannoroth, Cañón de la Caída Demoníaca, Vallefresno", "Lancia di Mannoroth, Canyon della Caduta del Demone, Valtetra", "Lança de Mannoroth, Desfiladeiro da Queda do Demônio, Vale Gris", "Копье Маннорота, Каньон Падшего Демона, Ясеневый лес", "마노로스의 창, 악마 몰락의 협곡, 잿빛 골짜기", "玛诺洛斯之矛，恶魔坠落峡谷，灰谷", "瑪諾洛斯之矛，惡魔墜落峽谷，梣谷" },
+        ["Spear of Mannoroth — Demon Fall Canyon, Ashenvale"] = { "Speer des Mannoroth — Dämonensturzschlucht, Eschental", "Lance de Mannoroth — canyon de la Chute-du-Démon, Orneval", "Lanza de Mannoroth — Cañón de la Caída Demoníaca, Vallefresno", "Lancia di Mannoroth — Canyon della Caduta del Demone, Valtetra", "Lança de Mannoroth — Desfiladeiro da Queda do Demônio, Vale Gris", "Копье Маннорота — Каньон Падшего Демона, Ясеневый лес", "마노로스의 창 — 악마 몰락의 협곡, 잿빛 골짜기", "玛诺洛斯之矛 — 恶魔坠落峡谷，灰谷", "瑪諾洛斯之矛 — 惡魔墜落峽谷，梣谷" },
+        ["Shattered Orb, Demon Fall Canyon, Ashenvale"] = { "Zersplitterte Kugel, Dämonensturzschlucht, Eschental", "Orbe brisé, canyon de la Chute-du-Démon, Orneval", "Orbe destrozado, Cañón de la Caída Demoníaca, Vallefresno", "Globo frantumato, Canyon della Caduta del Demone, Valtetra", "Orbe Estilhaçado, Desfiladeiro da Queda do Demônio, Vale Gris", "Разбитая сфера, Каньон Падшего Демона, Ясеневый лес", "산산조각 난 보주, 악마 몰락의 협곡, 잿빛 골짜기", "破碎的宝珠，恶魔坠落峡谷，灰谷", "破碎的寶珠，惡魔墜落峽谷，梣谷" },
+        ["Shattered Orb — Demon Fall Canyon, Ashenvale"] = { "Zersplitterte Kugel — Dämonensturzschlucht, Eschental", "Orbe brisé — canyon de la Chute-du-Démon, Orneval", "Orbe destrozado — Cañón de la Caída Demoníaca, Vallefresno", "Globo frantumato — Canyon della Caduta del Demone, Valtetra", "Orbe Estilhaçado — Desfiladeiro da Queda do Demônio, Vale Gris", "Разбитая сфера — Каньон Падшего Демона, Ясеневый лес", "산산조각 난 보주 — 악마 몰락의 협곡, 잿빛 골짜기", "破碎的宝珠 — 恶魔坠落峡谷，灰谷", "破碎的寶珠 — 惡魔墜落峽谷，梣谷" },
+        ["Broken Warhammer, Mannoroc Coven, Desolace"] = { "Zerbrochener Kriegshammer, Zirkel der Mannoroc, Desolace", "Marteau de guerre brisé, convent de Mannoroc, Désolace", "Martillo de guerra roto, Aquelarre Mannoroc, Desolace", "Martello da guerra spezzato, Congrega Mannoroc, Desolanda", "Martelo de Guerra Quebrado, Covil Mannoroc, Desolação", "Сломанный боевой молот, ковен Маннорок, Пустоши", "부서진 전투망치, 마노로크 집회장, 잊혀진 땅", "破损的战锤，玛诺洛克集会所，凄凉之地", "破損的戰錘，瑪諾洛克集會所，淒涼之地" },
+        ["Broken Warhammer — Mannoroc Coven, Desolace"] = { "Zerbrochener Kriegshammer — Zirkel der Mannoroc, Desolace", "Marteau de guerre brisé — convent de Mannoroc, Désolace", "Martillo de guerra roto — Aquelarre Mannoroc, Desolace", "Martello da guerra spezzato — Congrega Mannoroc, Desolanda", "Martelo de Guerra Quebrado — Covil Mannoroc, Desolação", "Сломанный боевой молот — ковен Маннорок, Пустоши", "부서진 전투망치 — 마노로크 집회장, 잊혀진 땅", "破损的战锤 — 玛诺洛克集会所，凄凉之地", "破損的戰錘 — 瑪諾洛克集會所，淒涼之地" },
+        ["Orders, looted from the assassin at Aeonas's hut, Wetlands coast"] = { "Befehle, vom Attentäter an Aeonas' Hütte erbeutet, Küste des Sumpflands", "Ordres, pris sur l’assassin à la cabane d’Aeonas, côte des Paluns", "Órdenes, saqueadas al asesino en la cabaña de Aeonas, costa de Los Humedales", "Ordini, presi all'assassino alla capanna di Aeonas, costa delle Paludi", "Ordens, saqueadas do assassino na cabana de Aeonas, litoral do Pantanal", "Приказы, снятые с убийцы у хижины Эонаса, побережье Болотины", "명령서, 에오나스의 오두막에서 암살자에게서 획득, 저습지 해안", "命令，从埃欧纳斯小屋的刺客身上拾取，湿地海岸", "命令，從埃歐納斯小屋的刺客身上拾取，濕地海岸" },
+        ["Aeonas, rear chamber of the Cathedral, Scarlet Monastery"] = { "Aeonas, hintere Kammer der Kathedrale, Scharlachrotes Kloster", "Aeonas, salle du fond de la cathédrale, Monastère écarlate", "Aeonas, cámara del fondo de la catedral, Monasterio Escarlata", "Aeonas, camera in fondo alla cattedrale, Monastero Scarlatto", "Aeonas, câmara dos fundos da catedral, Monastério Escarlate", "Эонас, дальний зал собора, Монастырь Алого ордена", "에오나스, 대성당 안쪽 방, 붉은십자군 수도원", "埃欧纳斯，大教堂后面的房间，血色修道院", "埃歐納斯，大教堂後面的房間，血色修道院" },
+        ["Aeonas, rear chamber of the Cathedral, inside the dungeon"] = { "Aeonas, hintere Kammer der Kathedrale, im Dungeon", "Aeonas, salle du fond de la cathédrale, dans le donjon", "Aeonas, cámara del fondo de la catedral, dentro de la mazmorra", "Aeonas, camera in fondo alla cattedrale, dentro la spedizione", "Aeonas, câmara dos fundos da catedral, dentro da masmorra", "Эонас, дальний зал собора, в подземелье", "에오나스, 대성당 안쪽 방, 던전 안", "埃欧纳斯，大教堂后面的房间，地下城内", "埃歐納斯，大教堂後面的房間，地城內" },
+        ["Aeonas, inside the dungeon"] = { "Aeonas, im Dungeon", "Aeonas, dans le donjon", "Aeonas, dentro de la mazmorra", "Aeonas, dentro la spedizione", "Aeonas, dentro da masmorra", "Эонас, в подземелье", "에오나스, 던전 안", "埃欧纳斯，地下城内", "埃歐納斯，地城內" },
+        ["Aeonas, Cathedral of Light, Stormwind"] = { "Aeonas, Kathedrale des Lichts, Sturmwind", "Aeonas, cathédrale de la Lumière, Hurlevent", "Aeonas, Catedral de la Luz, Ventormenta", "Aeonas, Cattedrale della Luce, Roccavento", "Aeonas, Catedral da Luz, Ventobravo", "Эонас, Собор Света, Штормград", "에오나스, 빛의 대성당, 스톰윈드", "埃欧纳斯，光明大教堂，暴风城", "埃歐納斯，光明大教堂，暴風城" },
+        ["Aeonas the Vindicated, Cathedral of Light, Stormwind"] = { "Aeonas der Verteidigte, Kathedrale des Lichts, Sturmwind", "Aeonas, cathédrale de la Lumière, Hurlevent", "Aeonas, Catedral de la Luz, Ventormenta", "Aeonas, Cattedrale della Luce, Roccavento", "Aeonas, Catedral da Luz, Ventobravo", "Эонас, Собор Света, Штормград", "에오나스, 빛의 대성당, 스톰윈드", "埃欧纳斯，光明大教堂，暴风城", "埃歐納斯，光明大教堂，暴風城" },
+        ["Aeonas the Vindicated — Cathedral of Light, Stormwind"] = { "Aeonas der Verteidigte — Kathedrale des Lichts, Sturmwind", "Aeonas — cathédrale de la Lumière, Hurlevent", "Aeonas — Catedral de la Luz, Ventormenta", "Aeonas — Cattedrale della Luce, Roccavento", "Aeonas — Catedral da Luz, Ventobravo", "Эонас — Собор Света, Штормград", "에오나스 — 빛의 대성당, 스톰윈드", "埃欧纳斯 — 光明大教堂，暴风城", "埃歐納斯 — 光明大教堂，暴風城" },
+        ["Elrick, Theramore Inn, Dustwallow Marsh (66.4, 45.4)"] = { "Elrick, Gasthaus von Theramore, Düstermarschen (66.4, 45.4)", "Elrick, auberge de Theramore, marécage d'Âprefange (66.4, 45.4)", "Elrick, posada de Theramore, Marjal Revolcafango (66.4, 45.4)", "Elrick, locanda di Theramore, Acquitrino Mortale (66.4, 45.4)", "Elrick, estalagem de Theramore, Pântano Vadeoso (66.4, 45.4)", "Элрик, таверна Терамора, Пылевые топи (66.4, 45.4)", "엘릭, 테라모어 여관, 먼지진흙 습지대 (66.4, 45.4)", "埃尔里克，塞拉摩旅店，尘泥沼泽（66.4, 45.4）", "埃爾里克，塞拉摩旅店，塵泥沼澤（66.4, 45.4）" },
+        ["Elrick — Theramore Inn, Dustwallow Marsh"] = { "Elrick — Gasthaus von Theramore, Düstermarschen", "Elrick — auberge de Theramore, marécage d'Âprefange", "Elrick — posada de Theramore, Marjal Revolcafango", "Elrick — locanda di Theramore, Acquitrino Mortale", "Elrick — estalagem de Theramore, Pântano Vadeoso", "Элрик — таверна Терамора, Пылевые топи", "엘릭 — 테라모어 여관, 먼지진흙 습지대", "埃尔里克 — 塞拉摩旅店，尘泥沼泽", "埃爾里克 — 塞拉摩旅店，塵泥沼澤" },
+        ["Innkeeper Janene, Theramore Inn, Dustwallow Marsh (66.6, 45.2)"] = { "Gastwirtin Janene, Gasthaus von Theramore, Düstermarschen (66.6, 45.2)", "Janene l'aubergiste, auberge de Theramore, marécage d'Âprefange (66.6, 45.2)", "Tabernero Janene, posada de Theramore, Marjal Revolcafango (66.6, 45.2)", "Locandiera Janene, locanda di Theramore, Acquitrino Mortale (66.6, 45.2)", "Estalajadeira Janine, estalagem de Theramore, Pântano Vadeoso (66.6, 45.2)", "Хозяйка таверны Джанин, таверна Терамора, Пылевые топи (66.6, 45.2)", "여관주인 지나인, 테라모어 여관, 먼지진흙 습지대 (66.6, 45.2)", "旅店老板詹妮，塞拉摩旅店，尘泥沼泽（66.6, 45.2）", "旅店老闆詹妮，塞拉摩旅店，塵泥沼澤（66.6, 45.2）" },
+        ["Innkeeper Janene — Theramore Inn, Dustwallow Marsh"] = { "Gastwirtin Janene — Gasthaus von Theramore, Düstermarschen", "Janene l'aubergiste — auberge de Theramore, marécage d'Âprefange", "Tabernero Janene — posada de Theramore, Marjal Revolcafango", "Locandiera Janene — locanda di Theramore, Acquitrino Mortale", "Estalajadeira Janine — estalagem de Theramore, Pântano Vadeoso", "Хозяйка таверны Джанин — таверна Терамора, Пылевые топи", "여관주인 지나인 — 테라모어 여관, 먼지진흙 습지대", "旅店老板詹妮 — 塞拉摩旅店，尘泥沼泽", "旅店老闆詹妮 — 塞拉摩旅店，塵泥沼澤" },
+    }
+    FDJ.ContentLocales = FDJ.ContentLocales or {}
+    for i, lang in ipairs(LANGS) do
+        local content = FDJ.ContentLocales[lang] or {}
+        FDJ.ContentLocales[lang] = content
+        content.quests = content.quests or {}
+        content.places = content.places or {}
+        for id, fields in pairs(QUESTS) do
+            local q = content.quests[id] or {}
+            content.quests[id] = q
+            for field, list in pairs(fields) do
+                if q[field] == nil then q[field] = list[i] end
+            end
+        end
+        for english, list in pairs(PLACES) do
+            if content.places[english] == nil then content.places[english] = list[i] end
+        end
+    end
+end
+-- END l10n210b
+
+-- BEGIN l10n210c
+-- (2.1.0): The Medallion of Faith's start and hand-in, and the name and
+-- objective the journal had in English only (Italian; Portuguese and Chinese
+-- objectives). The repeatable entry copies these at login.
+do
+    local LANGS = { "deDE", "frFR", "esES", "itIT", "ptBR", "ruRU", "koKR", "zhCN", "zhTW" }
+    local AURIUS = { "Aurius, Stratholme", "Aurius, Stratholme", "Aurius, Stratholme", "Aurius, Stratholme", "Aurius, Stratholme",
+        "Аурий, Стратхольм", "아우리우스, 스트라솔름", "奥里克斯，斯坦索姆", "奧里克斯，斯坦索姆" }
+    local MEDALLION = {
+        itIT = { name = "Il medaglione della fede", objective = "Recupera il Medaglione della fede da Malor lo Zelante nel Bastione Scarlatto e riportalo ad Aurius." },
+        ptBR = { objective = "Recupere o Medalhão da Fé de Malor, o Zeloso, no Bastião Escarlate e traga-o de volta a Aurius." },
+        zhCN = { objective = "从血色堡垒的狂热的马洛尔那里取回信仰奖章，交给奥里克斯。" },
+        zhTW = { objective = "從血色堡壘的狂熱的馬洛爾那裡取回信仰獎章，交給奧里克斯。" },
+    }
+    FDJ.ContentLocales = FDJ.ContentLocales or {}
+    for i, lang in ipairs(LANGS) do
+        local content = FDJ.ContentLocales[lang] or {}
+        FDJ.ContentLocales[lang] = content
+        content.places = content.places or {}
+        content.quests = content.quests or {}
+        if content.places["Aurius, Stratholme"] == nil then content.places["Aurius, Stratholme"] = AURIUS[i] end
+        local add = MEDALLION[lang]
+        if add then
+            local q = content.quests[5122] or {}
+            content.quests[5122] = q
+            for field, text in pairs(add) do if q[field] == nil then q[field] = text end end
+        end
+    end
+end
+-- END l10n210c
+
+-- BEGIN l10n210d
+-- (2.1.0): Nostro's Compendium (Dire Maul: North, warriors and paladins): its
+-- note, start and hand-in, which the journal had in English only.
+do
+    local LANGS = { "deDE", "frFR", "esES", "itIT", "ptBR", "ruRU", "koKR", "zhCN", "zhTW" }
+    local FIELDS = {
+        note = { "Krieger und Paladine. Danach gibt Lydros Die Schmiedung von Quel'Serrar, die in Onyxias Hort abgeschlossen wird.", "Guerriers et paladins. Lydros donne ensuite Le forgeage de Quel'Serrar, qui se termine dans le repaire d’Onyxia.", "Guerreros y paladines. Después Lydros da La forja de Quel'Serrar, que se completa en la Guarida de Onyxia.", "Guerrieri e paladini. Poi Lydros dà La forgiatura di Quel'Serrar, che si completa nell'Antro di Onyxia.", "Guerreiros e paladinos. Depois, Lydros dá A Forja de Quel'Serrar, que é concluída no Covil da Onyxia.", "Воины и паладины. Затем Лидрос дает задание «Ковка Кель'Серрара», которое завершается в Логове Ониксии.", "전사와 성기사. 그다음 리드로스가 쿠엘세라 벼리기를 주며, 이 퀘스트는 오닉시아의 둥지에서 완료됩니다.", "战士和圣骑士。之后莱德罗斯会给你铸造奎尔塞拉，这个任务在奥妮克希亚的巢穴中完成。", "戰士和聖騎士。之後萊德羅斯會給你鑄造奎爾塞拉，這個任務在奧妮克希亞的巢穴中完成。" },
+        pickup = { "Forors Kompendium des Drachentötens (seltene Beute in Düsterbruch)", "Le guide de Dagharn du tueur de dragons (butin rare de Haches-Tripes)", "Compendium of Dragon Slaying de Foror (botín raro de La Masacre)", "Compendio di Foror sull'uccisione dei draghi (bottino raro di Dire Maul)", "Compêndio de Foror sobre Matar Dragões (saque raro do Gládio Cruel)", "«Справочник Форора по убийству драконов» (редкая добыча в Забытом городе)", "폴로르의 용사냥 개론 (혈투의 전장 희귀 전리품)", "弗洛尔的屠龙技术纲要（厄运之槌的稀有掉落）", "弗洛爾的屠龍技術綱要（厄運之槌的稀有掉落）" },
+        turnin = { "Wissenshüter Lydros, Athenaeum, Düsterbruch", "Gardien du savoir Lydros, Athenaeum, Haches-Tripes", "Tradicionalista Lydros, El Athenaeum, La Masacre", "Custode del sapere Lydros, Athenaeum, Dire Maul", "Guarda-saber Lydros, Ateneu, Gládio Cruel", "Хранитель мудрости Лидрос, Атенеум, Забытый город", "현자 리드로스, 도서관, 혈투의 전장", "博学者莱德罗斯，图书馆，厄运之槌", "博學者萊德羅斯，圖書館，厄運之槌" },
+    }
+    FDJ.ContentLocales = FDJ.ContentLocales or {}
+    for i, lang in ipairs(LANGS) do
+        local content = FDJ.ContentLocales[lang] or {}
+        FDJ.ContentLocales[lang] = content
+        content.quests = content.quests or {}
+        local q = content.quests[7507] or {}
+        content.quests[7507] = q
+        for field, list in pairs(FIELDS) do
+            if q[field] == nil then q[field] = list[i] end
+        end
+    end
+end
+-- END l10n210d
+
+-- BEGIN l10n210e
+-- (2.1.0): Extinguishing the Idol (Razorfen Downs): the warning at the top.
+do
+    local LANGS = { "deDE", "frFR", "esES", "itIT", "ptBR", "ruRU", "koKR", "zhCN", "zhTW" }
+    local WARNING = {
+        "Stellt sicher, dass jeder Spieler eurer Gruppe den vorherigen Schritt abgeschlossen hat, bevor ihr diese Quest startet.",
+        "Assurez-vous que chaque joueur du groupe a terminé l'étape précédente avant de lancer cette quête.",
+        "Asegúrate de que todos los jugadores del grupo hayan completado el paso anterior antes de empezar esta misión.",
+        "Assicurati che ogni giocatore del gruppo abbia completato il passaggio precedente prima di avviare questa missione.",
+        "Certifique-se de que todos os jogadores do grupo tenham concluído a etapa anterior antes de iniciar esta missão.",
+        "Убедитесь, что все игроки группы выполнили предыдущий этап, прежде чем начинать это задание.",
+        "이 퀘스트를 시작하기 전에 파티원 모두가 이전 단계를 완료했는지 확인하세요.",
+        "开始此任务前，请确保队伍中的每位玩家都已完成上一步。",
+        "開始此任務前，請確認隊伍中的每位玩家都已完成上一步。",
+    }
+    FDJ.ContentLocales = FDJ.ContentLocales or {}
+    for i, lang in ipairs(LANGS) do
+        local content = FDJ.ContentLocales[lang] or {}
+        FDJ.ContentLocales[lang] = content
+        content.quests = content.quests or {}
+        local q = content.quests[3525] or {}
+        content.quests[3525] = q
+        if q.warning == nil then q.warning = WARNING[i] end
+    end
+end
+-- END l10n210e

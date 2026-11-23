@@ -1,0 +1,1142 @@
+---------------------------------------------------------------------------------------
+--  UI/Options/Tabs/TabRadialMenu.lua — OPTIONS TAB — Radial Menu
+---------------------------------------------------------------------------------------
+--  What it does: Radial Menu keybind plus a visual wheel editor inside the tab: the wheel's title
+--  sits on top with arrows either side to page through your wheels (click the title to rename it),
+--  and one pip per wheel below it (click selects, drag reorders the wheels),
+--  a "-" / "+" disc in the wheel's centre removes a wheel / opens a preset menu (Interface, Emotes,
+--  Misc, Blank Wheel) to add one, and an accent "Add Slice" slice on the wheel adds a slice.
+--  Right-click a slice removes it (never the last); drag a slice onto another to reorder; click it
+--  to pick a UI action from a searchable dropdown, or drop a spell, item, toy, mount or macro on it.
+--  Architecture / how it works:
+--    • Reads and writes only through Core/RadialMenu/Data.lua (CM.RadialCreateWheel,
+--      CM.RadialSetSlot, CM.RadialAddSlice...), which re-store the secure wheel (queued in combat).
+--    • The wheel row is a custom frame (ctx:PlaceFrame) with a pool of 8 slice buttons; it
+--      redraws from the DB on every Options.Sync (registered as a control).
+--    • No master toggle: an unbound key disables the radial menu.
+--    • Party Wheel Spells (under the style dropdown): char.partyWheelSpells (spell-ID CSV, SpellMultiSelect) →
+--      CM.PartyWheelRefresh(true) (Core/RadialMenu/PartyWheel.lua) re-routes the bar keys.
+--  Does not: Store wheels (Core/RadialMenu/Data.lua) or draw the in-game wheel (View.lua).
+--  Related: Core/RadialMenu/{Data,Actions}.lua, UI/Options/OptionsPanel.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+local L = CM.L
+local _G = _G
+
+-- WoW API
+local ClearCursor = _G.ClearCursor
+local CreateColor = _G.CreateColor
+local CreateFrame = _G.CreateFrame
+local GetBindingKey = _G.GetBindingKey
+local GetCursorInfo = _G.GetCursorInfo
+local UIParent = _G.UIParent
+
+-- Lua stdlib
+local ipairs = _G.ipairs
+local pairs = _G.pairs
+local math = _G.math
+local select = _G.select
+local format = _G.string.format
+local tostring = _G.tostring
+local type = _G.type
+
+local UI = CM.UI
+local C = UI.Colors
+local LAYOUT = CM.RadialLayout
+
+local BIND_NAME = "Combat Mode - Radial Menu"
+local WHEELS_LABEL = L["Radial Menu Wheels"]
+local ART_DIR = "Interface\\AddOns\\CombatMode\\Assets\\radial\\radial_"
+local WEDGE_ALPHA = 0.7
+local DRAG_SCALE = 1.15 -- the dragged slice grows like the aimed slice of the live wheel (View.lua HOVER_SCALE)
+local DRAG_SCALE_SPEED = 18
+local HUB_GLYPH_SIZE = 18
+local HUB_ALPHA_DIM = 0.4
+local EDITOR_SCALE = 0.7
+local AREA = 360
+local TITLE_W = 140
+local TITLE_H = 32
+local PIP_SIZE = 22
+local PIP_GAP = 4
+local PIP_H = 26
+local ARROW_SIZE = 20
+-- Ring the wheel art's slices span, from the middle (art pixels, scaled by EDITOR_SCALE); the inner
+-- edge is the active style's `ring`.
+local RING_OUTER = 215
+local BG_KEEP = 600 -- art pixels of the background drawn in the editor (full width of the visible fade)
+local SLICE_BTN = 40
+local STYLE_VALUES = { forever = L["Forever"], minimal = L["Minimal"] }
+local STYLE_ORDER = { "forever", "minimal" }
+
+local selected = 1
+
+local function Say(text)
+  print(CM.Constants.BasePrintMsg .. "|cff909090: " .. text .. "|r")
+end
+
+local function CurrentWheel()
+  return CM.RadialGetWheels()[selected]
+end
+
+local function Resync()
+  UI.Options.Sync()
+end
+
+---------------------------------------------------------------------------------------
+-- Slice action menu (the options dropdown, opened beside a slice)
+---------------------------------------------------------------------------------------
+local CLEAR_ID = "__clear"
+local menuValues, menuOrder = { [CLEAR_ID] = L["Clear Slice"] }, {}
+local menuHeaders = {
+  __ui = L["UI Actions"],
+  __emote = L["Emotes"],
+  __command = L["Commands"],
+  __marker = L["Markers"],
+  __slice = L["Slice"],
+}
+for header, title in pairs(menuHeaders) do
+  menuValues[header] = title
+end
+for _, section in ipairs({
+  { "__ui", nil },
+  { "__emote", "emote" },
+  { "__command", "command" },
+  { "__marker", "marker" },
+}) do
+  menuOrder[#menuOrder + 1] = section[1]
+  for _, action in ipairs(CM.RadialActions.list) do
+    if action.group == section[2] and CM.RadialActions.IsAvailable(action) then
+      menuValues[action.id] = action.label
+      menuOrder[#menuOrder + 1] = action.id
+    end
+  end
+end
+menuOrder[#menuOrder + 1] = "__slice"
+menuOrder[#menuOrder + 1] = CLEAR_ID
+
+local sliceMenu
+local menuSlot
+-- The slice whose dropdown is open keeps its wedge lit; the wheel row registers how to repaint.
+local pinnedSlot
+local onPinChange
+
+local function SetPinnedSlot(slot)
+  pinnedSlot = slot
+  if onPinChange then
+    onPinChange()
+  end
+end
+
+local function OpenSliceMenu(slot, anchor)
+  if not sliceMenu then
+    local host = CreateFrame("Frame", nil, UIParent)
+    host:Hide()
+    sliceMenu = UI.MakeDropdown(host, {
+      label = L["Slice"],
+      values = menuValues,
+      order = menuOrder,
+      headers = menuHeaders,
+      get = function()
+        local wheel = CurrentWheel()
+        local entry = wheel and wheel.slots and wheel.slots[menuSlot]
+        return entry and entry.kind == "action" and entry.id or nil
+      end,
+      set = function(id)
+        CM.RadialSetSlot(selected, menuSlot, id ~= CLEAR_ID and { kind = "action", id = id } or nil)
+        Resync()
+      end,
+    })
+    sliceMenu.onClosed = function()
+      SetPinnedSlot(nil)
+    end
+  end
+  menuSlot = slot
+  local wheel = CurrentWheel()
+  local entry = wheel and wheel.slots and wheel.slots[slot]
+  -- OpenAt closes a menu that is already open (firing onClosed), so pin after it.
+  sliceMenu.OpenAt(anchor, entry and (CM.RadialEntryInfo(entry)) or L["Choose an action"], 220)
+  SetPinnedSlot(slot)
+end
+
+-- "+" menu: the preset wheels (CM.RadialPresetList) and a blank one.
+local BLANK_ID = "__blank"
+local wheelMenu
+
+local function OpenWheelMenu(anchor)
+  if not wheelMenu then
+    local host = CreateFrame("Frame", nil, UIParent)
+    host:Hide()
+    local headers = { __presets = L["Presets"] }
+    local values, order =
+      { [BLANK_ID] = L["New Wheel"], __presets = L["Presets"] }, { BLANK_ID, "__presets" }
+    for _, preset in ipairs(CM.RadialPresetList()) do
+      values[preset.key] = preset.label
+      order[#order + 1] = preset.key
+    end
+    wheelMenu = UI.MakeDropdown(host, {
+      label = L["Wheel"],
+      values = values,
+      order = order,
+      headers = headers,
+      valueColors = { [BLANK_ID] = C.accent },
+      get = function()
+        return nil
+      end,
+      set = function(key)
+        local index = CM.RadialCreateWheel(nil, key ~= BLANK_ID and key or nil)
+        if index then
+          selected = index
+        else
+          Say(format(L["You can have up to %d wheels."], LAYOUT.MAX_WHEELS))
+        end
+        Resync()
+      end,
+    })
+  end
+  wheelMenu.OpenAt(anchor, false, 160)
+end
+
+---------------------------------------------------------------------------------------
+-- Wheel row
+---------------------------------------------------------------------------------------
+local function ApplyDrop(slot)
+  if not GetCursorInfo() then
+    return false
+  end
+  local entry = CM.RadialEntryFromCursor()
+  if not entry then
+    Say(L["That can't go on a wheel. Use a spell, item, toy, mount or macro."])
+    return true
+  end
+  ClearCursor()
+  CM.RadialSetSlot(selected, slot, entry)
+  Resync()
+  return true
+end
+
+local function BuildSliceButton(area, slot)
+  local button = CreateFrame("Button", nil, area)
+  button:SetSize(SLICE_BTN, SLICE_BTN)
+  button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+
+  local over = CM.RadialBuildSlotChrome(button)
+
+  button.iconLabel = CM.RadialCreateIconLabel(over, 9)
+
+  -- Same plus glyph as the option sliders' step buttons.
+  button.plus = over:CreateTexture(nil, "OVERLAY")
+  CM.SetAtlas(button.plus, "common-icon-plus", true)
+  local plusH = button.plus:GetHeight() or 16
+  local plusW = button.plus:GetWidth() or 16
+  if plusH > 0 then
+    button.plus:SetSize(plusW * 12 / plusH, 12)
+  end
+  button.plus:SetPoint("CENTER")
+  button.plus:SetDesaturated(true)
+  button.plus:SetVertexColor(C.text[1], C.text[2], C.text[3])
+
+  button.slot = slot
+  button:SetScript("OnEnter", function(self)
+    local wheel = CurrentWheel()
+    local entry = wheel and wheel.slots and wheel.slots[self.slot]
+    if entry then
+      UI.ShowTooltip(self, {
+        title = (CM.RadialEntryInfo(entry)),
+        text = L["Drag a spell, item, toy, mount or macro here, or click to change the action."],
+        warning = "Right-click to remove this slice.",
+      }, "ANCHOR_RIGHT")
+    else
+      UI.ShowTooltip(self, {
+        title = L["Empty Slice"],
+        text = L["Drag a spell, item, toy, mount or macro here, or click to set an action. Empty slices are left out of the wheel."],
+        warning = "Right-click to remove this slice.",
+      }, "ANCHOR_RIGHT")
+    end
+  end)
+  button:SetScript("OnLeave", function()
+    UI.HideTooltip()
+  end)
+  button:SetScript("OnClick", function(self, mouseButton)
+    if mouseButton == "RightButton" then
+      if not CM.RadialRemoveSlice(selected, self.slot) then
+        Say(L["A wheel needs at least one slice."])
+      end
+      UI.HideTooltip()
+      Resync()
+    elseif not ApplyDrop(self.slot) then
+      OpenSliceMenu(self.slot, self)
+    end
+  end)
+  button:SetScript("OnReceiveDrag", function(self)
+    ApplyDrop(self.slot)
+  end)
+  return button
+end
+
+local function Tooltip(button, text)
+  UI.AttachTooltip(button, text, "ANCHOR_TOP")
+end
+
+-- Page arrow: the Ally Cycle HUD's cycle arrow (housing floor arrow), turned to point sideways.
+local function MakeArrow(parent, side)
+  local button = CreateFrame("Button", nil, parent)
+  button:SetSize(24, 24)
+  local icon = button:CreateTexture(nil, "ARTWORK")
+  CM.SetAtlas(icon, "housing-floor-arrow-up-default", false)
+  icon:SetSize(ARROW_SIZE, ARROW_SIZE)
+  icon:SetPoint("CENTER")
+  icon:SetRotation(side == "left" and math.pi / 2 or -math.pi / 2)
+  icon:SetAlpha(0.75)
+  button:HookScript("OnEnter", function()
+    icon:SetAlpha(1)
+  end)
+  button:HookScript("OnLeave", function()
+    icon:SetAlpha(0.75)
+  end)
+  return button
+end
+
+local function BuildTitle(row)
+  local title = CreateFrame("Button", nil, row)
+  title:SetSize(TITLE_W, TITLE_H)
+  title:SetPoint("TOP", row, "TOP", 0, 0)
+  title.text = UI.CreateFontString(title, "OVERLAY", UI.Fonts.header, "GameFontNormalLarge")
+  title.text:SetPoint("CENTER")
+  title.text:SetWidth(TITLE_W - 8)
+  title.text:SetWordWrap(false)
+  title.text:SetTextColor(C.text[1], C.text[2], C.text[3])
+  Tooltip(title, L["Click to rename this wheel"])
+
+  local box = CreateFrame("Frame", nil, row, "BackdropTemplate")
+  box:SetAllPoints(title)
+  box:SetFrameLevel(title:GetFrameLevel() + 5)
+  UI.StyleField(box)
+  box:Hide()
+  local edit = CreateFrame("EditBox", nil, box)
+  edit:SetPoint("TOPLEFT", box, "TOPLEFT", 8, 0)
+  edit:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -8, 0)
+  edit:SetAutoFocus(false)
+  edit:SetMaxLetters(LAYOUT.NAME_MAX)
+  edit:SetFontObject(_G.GameFontHighlight)
+  edit:SetJustifyH("CENTER")
+  edit:SetTextColor(C.text[1], C.text[2], C.text[3])
+  edit:SetScript("OnEnterPressed", function(self)
+    self:ClearFocus()
+  end)
+  edit:SetScript("OnEscapePressed", function(self)
+    box:Hide()
+    self:ClearFocus()
+  end)
+  edit:SetScript("OnEditFocusLost", function(self)
+    if box:IsShown() then
+      box:Hide()
+      CM.RadialRenameWheel(selected, self:GetText())
+      Resync()
+    end
+  end)
+  title:SetScript("OnClick", function()
+    local wheel = CurrentWheel()
+    edit:SetText(wheel and CM.RadialWheelName(wheel, selected) or "")
+    box:Show()
+    edit:SetFocus()
+    edit:HighlightText()
+  end)
+  return title
+end
+
+local function PlaceAt(frame, area, dx, dy, radius)
+  frame:ClearAllPoints()
+  frame:SetPoint("CENTER", area, "CENTER", dx * radius, dy * radius)
+end
+
+local function BuildWheelRow(ctx)
+  local row = CreateFrame("Frame", nil, ctx.content)
+  -- The wheel art has empty margin around its ring, so the area may overlap the pip row a little.
+  local wheelTop = TITLE_H + PIP_H - 6
+  local hintTop = wheelTop + AREA + 8
+  local height = hintTop + 34
+  row:SetHeight(height)
+
+  -- Title with the page arrows either side; clicking the title renames the wheel.
+  local title = BuildTitle(row)
+  local prev = MakeArrow(row, "left")
+  prev:SetPoint("RIGHT", title, "LEFT", -8, 0)
+  Tooltip(prev, L["Previous wheel"])
+  prev:SetScript("OnClick", function()
+    selected = math.max(1, selected - 1)
+    Resync()
+  end)
+  local nextButton = MakeArrow(row, "right")
+  nextButton:SetPoint("LEFT", title, "RIGHT", 8, 0)
+  Tooltip(nextButton, L["Next wheel"])
+  nextButton:SetScript("OnClick", function()
+    selected = math.min(#CM.RadialGetWheels(), selected + 1)
+    Resync()
+  end)
+
+  -- One pip per wheel under the title (the in-game wheel's page dots): click selects a wheel, drag
+  -- reorders. `pipOrder[position] = wheel index` previews the order while dragging.
+  local pipRow = CreateFrame("Frame", nil, row)
+  pipRow:SetHeight(PIP_H)
+  pipRow:SetFrameLevel(row:GetFrameLevel() + 20) -- above the wheel area, which overlaps it
+  pipRow:SetPoint("TOP", row, "TOP", 0, -(TITLE_H + 2))
+  local pips, pipOrder, pipPos = {}, nil, nil
+  local pipTotal, lastPipDrag = 0, 0
+  local pipHeld -- wheel index of the pip the mouse button is held on (pressed or dragging)
+  local PaintPips
+  -- Each pip eases toward its target spot / size / opacity (tx, tsize, talpha) so reordering, the
+  -- press lift and the dimming all glide instead of snapping.
+  local PIP_EASE = 20
+  local pipAnim = CreateFrame("Frame", nil, pipRow)
+  local function ApplyPip(pip)
+    pip:SetSize(pip.csize, pip.csize)
+    pip:SetAlpha(pip.calpha)
+    pip:ClearAllPoints()
+    pip:SetPoint("CENTER", pipRow, "LEFT", pip.cx, 0)
+  end
+  local function StepPips(_, elapsed)
+    local k = math.min(1, elapsed * PIP_EASE)
+    local moving = false
+    for index = 1, pipTotal do
+      local pip = pips[index]
+      pip.cx = pip.cx + (pip.tx - pip.cx) * k
+      pip.csize = pip.csize + (pip.tsize - pip.csize) * k
+      pip.calpha = pip.calpha + (pip.talpha - pip.calpha) * k
+      if
+        math.abs(pip.tx - pip.cx) < 0.05
+        and math.abs(pip.tsize - pip.csize) < 0.05
+        and math.abs(pip.talpha - pip.calpha) < 0.01
+      then
+        pip.cx, pip.csize, pip.calpha = pip.tx, pip.tsize, pip.talpha
+      else
+        moving = true
+      end
+      ApplyPip(pip)
+    end
+    if not moving then
+      pipAnim:SetScript("OnUpdate", nil)
+    end
+  end
+  function PaintPips()
+    local step = PIP_SIZE + PIP_GAP
+    pipRow:SetWidth(math.max(pipTotal * step - PIP_GAP, 1))
+    for position = 1, pipTotal do
+      local index = pipOrder and pipOrder[position] or position
+      local pip = pips[index]
+      local on = index == selected
+      -- The held pip grows and stays on top while the others dim.
+      local lifted = pipHeld == index
+      pip.tx = (position - 1) * step + PIP_SIZE / 2
+      pip.tsize = lifted and PIP_SIZE * 1.4 or PIP_SIZE
+      pip.talpha = pipHeld and not lifted and 0.55 or 1
+      if not pip:IsShown() or not pip.cx then
+        pip.cx, pip.csize, pip.calpha = pip.tx, pip.tsize, pip.talpha
+        ApplyPip(pip)
+      end
+      pip:SetFrameLevel(pipRow:GetFrameLevel() + (lifted and 5 or 1))
+      pip.off:SetShown(not on)
+      pip.active:SetShown(on)
+      pip.glow:SetShown(on)
+      pip.fill:SetShown(on)
+      pip:Show()
+    end
+    for index = pipTotal + 1, LAYOUT.MAX_WHEELS do
+      pips[index]:Hide()
+    end
+    pipAnim:SetScript("OnUpdate", StepPips)
+  end
+  local function PipUnderCursor()
+    local step = PIP_SIZE + PIP_GAP
+    local x = _G.GetCursorPosition() / pipRow:GetEffectiveScale() - (pipRow:GetLeft() or 0)
+    return math.max(1, math.min(pipTotal, math.floor(x / step) + 1))
+  end
+  local function EndPipDrag()
+    pipOrder, pipPos = nil, nil
+    pipRow:SetScript("OnUpdate", nil)
+  end
+  for index = 1, LAYOUT.MAX_WHEELS do
+    local pip = CreateFrame("Button", nil, pipRow)
+    pip:SetSize(PIP_SIZE, PIP_SIZE)
+    local function Layer(layer, level, file)
+      local tex = pip:CreateTexture(nil, layer, nil, level)
+      tex:SetAllPoints()
+      tex:SetTexture(ART_DIR .. file)
+      tex:SetTexCoord(8 / 64, 56 / 64, 8 / 64, 56 / 64)
+      return tex
+    end
+    pip.off = Layer("ARTWORK", 0, "pip_off.tga")
+    pip.active = Layer("ARTWORK", 1, "pip_active.tga")
+    pip.glow = Layer("BACKGROUND", 0, "pip_glow.tga")
+    pip.fill = Layer("OVERLAY", 0, "pip_fill.tga")
+    pip:Hide()
+    Tooltip(pip, function()
+      return {
+        title = CM.RadialWheelName(CM.RadialGetWheels()[index], index),
+        text = L["Click to select this wheel, drag to reorder"],
+      }
+    end)
+    pip:SetScript("OnClick", function()
+      if _G.GetTime() - lastPipDrag < 0.1 then
+        return
+      end
+      selected = index
+      Resync()
+    end)
+    pip:RegisterForDrag("LeftButton")
+    pip:SetScript("OnMouseDown", function(_, button)
+      if button == "LeftButton" then
+        pipHeld = index
+        UI.HideTooltip()
+        PaintPips()
+      end
+    end)
+    -- Pips slide under the cursor while dragging and re-fire OnEnter: keep the tooltip down until release.
+    pip:HookScript("OnEnter", function()
+      if pipHeld then
+        UI.HideTooltip()
+      end
+    end)
+    pip:SetScript("OnMouseUp", function()
+      if pipHeld and not pipOrder then
+        pipHeld = nil
+        PaintPips()
+      end
+    end)
+    pip:SetScript("OnDragStart", function()
+      if pipTotal < 2 then
+        return
+      end
+      pipHeld = index
+      UI.HideTooltip()
+      selected = index
+      pipPos = index
+      pipOrder = {}
+      for position = 1, pipTotal do
+        pipOrder[position] = position
+      end
+      pipRow:SetScript("OnUpdate", function()
+        local target = PipUnderCursor()
+        while pipPos ~= target do
+          local nextPos = pipPos + (target > pipPos and 1 or -1)
+          pipOrder[pipPos], pipOrder[nextPos] = pipOrder[nextPos], pipOrder[pipPos]
+          pipPos = nextPos
+        end
+        PaintPips()
+      end)
+    end)
+    pip:SetScript("OnDragStop", function()
+      local to = pipPos
+      -- Pips are interchangeable buttons: hand each position the look of the button sitting there, so
+      -- the committed order doesn't slide them back.
+      if pipOrder then
+        local state = {}
+        for position = 1, pipTotal do
+          local from = pips[pipOrder[position]]
+          state[position] = { from.cx, from.csize, from.calpha }
+        end
+        for position = 1, pipTotal do
+          local target = pips[position]
+          target.cx, target.csize, target.calpha =
+            state[position][1], state[position][2], state[position][3]
+        end
+      end
+      EndPipDrag()
+      pipHeld = nil
+      lastPipDrag = _G.GetTime()
+      if to then
+        CM.RadialMoveWheel(index, to)
+        selected = to
+      end
+      Resync()
+    end)
+    pip:SetScript("OnHide", function()
+      pipHeld = nil
+      if pipOrder then
+        EndPipDrag()
+      end
+    end)
+    pips[index] = pip
+  end
+
+  -- The wheel: background art, the slices, and the accent "Add Slice" slice in the next position.
+  local area = CreateFrame("Frame", nil, row)
+  area:SetSize(AREA, AREA)
+  area:SetPoint("TOP", row, "TOP", 0, -wheelTop)
+
+  local bg = area:CreateTexture(nil, "BACKGROUND")
+  bg:SetPoint("CENTER")
+  local dividers = CM.RadialCreateDividers(area)
+
+  -- The next free slice itself lights up in the accent colour (the in-game highlight art, tinted)
+  -- and carries the "Add Slice" label; the button is just its click area.
+  local wedge = area:CreateTexture(nil, "BORDER")
+  wedge:SetAlpha(WEDGE_ALPHA)
+  wedge:SetVertexColor(C.accent[1], C.accent[2], C.accent[3])
+
+  -- A hovered slice "activates" its wedge like the live wheel does, in this wheel's own highlight
+  -- colour (the accent stays the Add Slice wedge's).
+  local shownCount = 0
+  local hoverWedge = area:CreateTexture(nil, "BORDER", nil, 1)
+  hoverWedge:Hide()
+
+  -- Reorder drag state: `preview[position] = source slot` shows the wheel as it would end up.
+  local Update, preview, dragFrom, dragTo
+  local pressed -- slice the mouse button is held on (it grows like a dragged one before any drag starts)
+  -- The lit wedge turns to its slice; while a slice is dragged it glides there (wedgeCur chases
+  -- wedgeTarget) instead of jumping.
+  local wedgeCur, wedgeTarget
+  local function ApplyWedge()
+    local style = CM.RadialStyle()
+    local o = style.overlay[shownCount]
+    if not (o and wedgeCur) then
+      return
+    end
+    local a = wedgeCur
+    local x = o[3] * math.cos(a) + o[4] * math.sin(a)
+    local y = -o[3] * math.sin(a) + o[4] * math.cos(a)
+    hoverWedge:SetTexture(ART_DIR .. style.art .. "sel_" .. shownCount .. ".tga")
+    hoverWedge:SetVertexColor(CM.RadialWheelColor(selected))
+    hoverWedge:SetSize(o[1] * EDITOR_SCALE, o[2] * EDITOR_SCALE)
+    hoverWedge:ClearAllPoints()
+    hoverWedge:SetPoint("CENTER", area, "CENTER", x * EDITOR_SCALE, y * EDITOR_SCALE)
+    hoverWedge:SetRotation(-a)
+    hoverWedge:Show()
+  end
+
+  local function ShowHoverWedge(slot)
+    if not CM.RadialStyle().overlay[shownCount] then
+      return
+    end
+    wedgeTarget = CM.RadialSlotAngle(slot, shownCount)
+    if not (dragFrom and hoverWedge:IsShown() and wedgeCur) then
+      wedgeCur = wedgeTarget
+    end
+    ApplyWedge()
+  end
+
+  local buttons = {}
+  for slot = 1, LAYOUT.MAX_SLICES do
+    buttons[slot] = BuildSliceButton(area, slot)
+    -- The whole slice is the click target (see `hit` below), not just the icon.
+    buttons[slot]:EnableMouse(false)
+  end
+  -- One mouse target over the whole ring: the slice under the cursor (nearest slice direction) is
+  -- hovered, clicked and dropped on, forwarding to that slice's button (or the Add Slice slice).
+  local liveCount = 0
+  local addIndex
+  local addSlice
+  local hit = CreateFrame("Button", nil, area)
+  hit:SetAllPoints(area)
+  hit:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+  local hovered
+  local inside = false
+
+  local function SliceAtCursor()
+    local cx, cy = _G.GetCursorPosition()
+    local ax, ay = area:GetCenter()
+    local scale = area:GetEffectiveScale()
+    if not (cx and ax and scale) or shownCount < 1 then
+      return nil
+    end
+    local dx, dy = cx / scale - ax, cy / scale - ay
+    local dist = math.sqrt(dx * dx + dy * dy)
+    if dist < CM.RadialStyle().ring * EDITOR_SCALE or dist > RING_OUTER * EDITOR_SCALE then
+      return nil
+    end
+    local best, bestDot
+    for slot = 1, shownCount do
+      local sx, sy = CM.RadialSlotDir(slot, shownCount)
+      local dot = sx * dx + sy * dy
+      if not bestDot or dot > bestDot then
+        best, bestDot = slot, dot
+      end
+    end
+    return best
+  end
+
+  local function HoverTarget(slot)
+    if slot and slot == addIndex then
+      return addSlice
+    end
+    return slot and slot <= liveCount and buttons[slot] or nil
+  end
+
+  -- Lit wedge: the slice whose dropdown is open, else the hovered one (never the Add Slice slice).
+  local function PaintWedge()
+    local slot = dragTo or pinnedSlot or hovered
+    if slot and slot <= liveCount and slot ~= addIndex then
+      ShowHoverWedge(slot)
+    else
+      hoverWedge:Hide()
+      wedgeCur = nil
+    end
+  end
+  onPinChange = PaintWedge
+
+  -- Anchor offsets are in the button's own scaled units: divide by the scale to stay centred in place.
+  local function PlaceButton(button)
+    local scale = button.scale or 1
+    button:SetScale(scale)
+    button:ClearAllPoints()
+    button:SetPoint("CENTER", area, "CENTER", button.cx / scale, button.cy / scale)
+  end
+
+  -- Glide animation: slice buttons and the lit wedge ease toward their targets while reordering.
+  -- The dragged slice also grows and lights up like the aimed slice of the live wheel.
+  local glide = CreateFrame("Frame", nil, area)
+  glide:SetScript("OnUpdate", function(_, elapsed)
+    local k = 1 - math.exp(-20 * elapsed)
+    local kScale = math.min(1, elapsed * DRAG_SCALE_SPEED)
+    for slot = 1, liveCount do
+      local button = buttons[slot]
+      if button.cx then
+        local held = (dragFrom or pressed) == slot
+        button.SetSlotState(held and "selected" or "normal")
+        local moving = button.cx ~= button.tx or button.cy ~= button.ty
+        if moving then
+          if math.abs(button.tx - button.cx) + math.abs(button.ty - button.cy) < 0.3 then
+            button.cx, button.cy = button.tx, button.ty
+          else
+            button.cx = button.cx + (button.tx - button.cx) * k
+            button.cy = button.cy + (button.ty - button.cy) * k
+          end
+        end
+        local scale = button.scale or 1
+        local target = held and DRAG_SCALE or 1
+        if scale ~= target then
+          scale = scale + (target - scale) * kScale
+          button.scale = math.abs(target - scale) < 0.001 and target or scale
+          moving = true
+        end
+        if moving then
+          PlaceButton(button)
+        end
+      end
+    end
+    if wedgeCur and wedgeTarget and wedgeCur ~= wedgeTarget then
+      local twoPi = math.pi * 2
+      local diff = (wedgeTarget - wedgeCur + math.pi) % twoPi - math.pi
+      if math.abs(diff) < 0.003 then
+        wedgeCur = wedgeTarget
+      else
+        wedgeCur = wedgeCur + diff * k
+      end
+      ApplyWedge()
+    end
+  end)
+
+  local function SetHovered(slot)
+    if slot == hovered then
+      return
+    end
+    local old = HoverTarget(hovered)
+    if old and old.GetScript and old:GetScript("OnLeave") then
+      old:GetScript("OnLeave")(old)
+    end
+    hovered = slot
+    local new = HoverTarget(slot)
+    if new and new:GetScript("OnEnter") then
+      new:GetScript("OnEnter")(new)
+    end
+    PaintWedge()
+  end
+
+  hit:SetScript("OnEnter", function()
+    inside = true
+  end)
+  hit:SetScript("OnLeave", function()
+    inside = false
+    SetHovered(nil)
+    pressed = nil
+  end)
+  hit:SetScript("OnMouseDown", function(_, mouseButton)
+    local slot = mouseButton == "LeftButton" and SliceAtCursor() or nil
+    local wheel = CurrentWheel()
+    if slot and slot <= liveCount and wheel and wheel.slots and wheel.slots[slot] then
+      pressed = slot
+    end
+  end)
+  hit:SetScript("OnMouseUp", function()
+    pressed = nil
+  end)
+  hit:SetScript("OnUpdate", function()
+    if dragFrom then
+      -- The dragged slice trades places with its neighbours, one step at a time along the
+      -- shortest way round the wheel, until it reaches the slice under the cursor. Going past
+      -- the first or last slice wraps to the other end as a single swap.
+      local to = SliceAtCursor()
+      if to and to <= liveCount and to ~= dragTo then
+        while dragTo ~= to do
+          local forward = (to - dragTo) % liveCount
+          local step = forward <= liveCount - forward and 1 or -1
+          local nextPos = (dragTo - 1 + step) % liveCount + 1
+          preview[dragTo], preview[nextPos] = preview[nextPos], preview[dragTo]
+          dragTo = nextPos
+        end
+        Update()
+      end
+    elseif inside then
+      SetHovered(SliceAtCursor())
+    end
+  end)
+  hit:SetScript("OnClick", function(_, mouseButton)
+    local target = HoverTarget(hovered)
+    if target and target:GetScript("OnClick") then
+      target:GetScript("OnClick")(target, mouseButton)
+    end
+  end)
+  hit:SetScript("OnReceiveDrag", function()
+    local target = HoverTarget(hovered)
+    if target and target ~= addSlice then
+      ApplyDrop(target.slot)
+    end
+  end)
+
+  -- Drag a filled slice around the wheel to reorder: its wedge stays lit while the other slices
+  -- shift out of the way (preview); releasing keeps the new order.
+  local function EndDrag()
+    dragFrom, dragTo, preview = nil, nil, nil
+  end
+  hit:RegisterForDrag("LeftButton")
+  hit:SetScript("OnDragStart", function()
+    local slot = SliceAtCursor()
+    local wheel = CurrentWheel()
+    local entry = slot and slot <= liveCount and wheel and wheel.slots and wheel.slots[slot]
+    if not entry then
+      return
+    end
+    SetHovered(nil)
+    UI.HideTooltip()
+    dragFrom, dragTo = slot, slot
+    preview = {}
+    for i = 1, liveCount do
+      preview[i] = i
+    end
+    PaintWedge()
+  end)
+  hit:SetScript("OnDragStop", function()
+    local order = preview
+    pressed = nil
+    EndDrag()
+    if order then
+      CM.RadialReorderSlots(selected, order)
+    end
+    Resync()
+  end)
+  hit:SetScript("OnHide", function()
+    pressed = nil
+    EndDrag()
+  end)
+
+  addSlice = CreateFrame("Button", nil, area)
+  addSlice:EnableMouse(false)
+  addSlice:SetSize(90, 56)
+  addSlice.text = UI.CreateFontString(addSlice, "OVERLAY", UI.Fonts.button, "GameFontNormal")
+  addSlice.text:SetPoint("CENTER")
+  addSlice.text:SetWidth(84)
+  addSlice.text:SetText(L["Add Slice"])
+  addSlice.text:SetTextColor(1, 1, 1)
+  addSlice:SetScript("OnEnter", function()
+    wedge:SetAlpha(1)
+  end)
+  addSlice:SetScript("OnLeave", function()
+    wedge:SetAlpha(WEDGE_ALPHA)
+  end)
+  addSlice:SetScript("OnClick", function()
+    if not CM.RadialAddSlice(selected) then
+      Say(format(L["A wheel holds up to %d slices."], LAYOUT.MAX_SLICES))
+    end
+    Resync()
+  end)
+
+  -- Wheel management in the middle of the wheel: a disc split in two halves with the regular
+  -- button look (gradient fill + outline, brighter while hovered): "-" on the left removes this
+  -- wheel, "+" on the right adds one.
+  -- Sits in the hole of the wheel art (about 105px across), a bit smaller than the hole.
+  local HUB = 76
+  local hub = CreateFrame("Frame", nil, area)
+  hub:SetSize(HUB, HUB)
+  hub:SetPoint("CENTER", area, "CENTER", 0, 0)
+  hub:SetFrameLevel(area:GetFrameLevel() + 5)
+  local function Gradient(texture, top, bottom)
+    texture:SetGradient(
+      "VERTICAL",
+      CreateColor(bottom[1], bottom[2], bottom[3], bottom[4] or 1),
+      CreateColor(top[1], top[2], top[3], top[4] or 1)
+    )
+  end
+  local function MakeHalf(side, glyph, tip)
+    local half = CreateFrame("Button", nil, hub)
+    half:SetSize(HUB / 2, HUB)
+    half:SetPoint(side, hub, side, 0, 0)
+    -- Both textures are cut to the disc by masks spanning the whole hub.
+    local border = half:CreateTexture(nil, "BACKGROUND")
+    border:SetAllPoints()
+    border:SetColorTexture(1, 1, 1, 1)
+    Gradient(border, C.controlBorderTop, C.controlBorderBottom)
+    border.mask = half:CreateMaskTexture()
+    border.mask:SetSize(HUB, HUB)
+    border.mask:SetPoint("CENTER", hub, "CENTER", 0, 0)
+    CM.SetAtlasMask(border.mask, "CircleMaskScalable")
+    border:AddMaskTexture(border.mask)
+    local fill = half:CreateTexture(nil, "ARTWORK")
+    fill:SetPoint("TOPLEFT", half, "TOPLEFT", 1, -1)
+    fill:SetPoint("BOTTOMRIGHT", half, "BOTTOMRIGHT", -1, 1)
+    fill:SetColorTexture(1, 1, 1, 1)
+    fill.mask = half:CreateMaskTexture()
+    fill.mask:SetSize(HUB - 2, HUB - 2)
+    fill.mask:SetPoint("CENTER", hub, "CENTER", 0, 0)
+    CM.SetAtlasMask(fill.mask, "CircleMaskScalable")
+    fill:AddMaskTexture(fill.mask)
+    half.fill = fill
+    function half:SetHover(on)
+      if on then
+        Gradient(fill, C.buttonHoverTop, C.buttonHover)
+      else
+        Gradient(fill, C.controlFillTop, C.controlFill)
+      end
+    end
+    half:SetHover(false)
+    -- The same plus / minus glyphs as the option sliders' step buttons.
+    local icon = half:CreateTexture(nil, "OVERLAY")
+    CM.SetAtlas(icon, glyph == "+" and "common-icon-plus" or "common-icon-minus", true)
+    local iconH = icon:GetHeight() or 16
+    local iconW = icon:GetWidth() or 16
+    if iconH > 0 then
+      icon:SetSize(iconW * HUB_GLYPH_SIZE / iconH, HUB_GLYPH_SIZE)
+    end
+    icon:SetPoint("CENTER", half, "CENTER", side == "LEFT" and 1 or -1, 0)
+    icon:SetDesaturated(true)
+    icon:SetVertexColor(C.text[1], C.text[2], C.text[3])
+    half.icon = icon
+    half:HookScript("OnEnter", function(self)
+      self:SetHover(true)
+    end)
+    half:HookScript("OnLeave", function(self)
+      self:SetHover(false)
+    end)
+    UI.AttachTooltip(half, tip, "ANCHOR_TOP")
+    return half
+  end
+  local removeWheel = MakeHalf(
+    "LEFT",
+    "-",
+    { title = L["Remove Wheel"], text = L["Deletes this wheel and all of its slices."] }
+  )
+  removeWheel:SetScript("OnClick", function()
+    if #CM.RadialGetWheels() <= 1 then
+      Say(L["You need at least one wheel."])
+      return
+    end
+    UI.Confirm(L["Remove this wheel and all of its slices?"], function()
+      CM.RadialDeleteWheel(selected)
+      Resync()
+    end)
+  end)
+  local addWheel = MakeHalf(
+    "RIGHT",
+    "+",
+    { title = L["Add Wheel"], text = L["Pick a preset wheel or a blank one."] }
+  )
+  addWheel:SetScript("OnClick", function(self)
+    if #CM.RadialGetWheels() >= LAYOUT.MAX_WHEELS then
+      Say(format(L["You can have up to %d wheels."], LAYOUT.MAX_WHEELS))
+      return
+    end
+    OpenWheelMenu(self)
+  end)
+
+  local hint = UI.CreateFontString(row, "OVERLAY", UI.Fonts.desc, "GameFontHighlightSmall")
+  hint:SetPoint("TOP", row, "TOP", 0, -hintTop)
+  hint:SetWidth(AREA + 80)
+  hint:SetJustifyH("CENTER")
+  hint:SetWordWrap(true)
+  hint:SetTextColor(C.textDim[1], C.textDim[2], C.textDim[3])
+  hint:SetText(
+    L["Click a slice to choose its action, or drop a spell, item, toy, mount or macro on it.\nDrag a slice to reorder it. Right-click a slice to remove it."]
+  )
+
+  function Update()
+    local wheels = CM.RadialGetWheels()
+    local total = #wheels
+    selected = math.max(1, math.min(selected, total))
+    local wheel = wheels[selected]
+    title.text:SetText(CM.RadialWheelName(wheel, selected))
+    pipTotal = total
+    PaintPips()
+    prev:SetAlpha(selected > 1 and 1 or 0.35)
+    nextButton:SetAlpha(selected < total and 1 or 0.35)
+    addWheel.dim = total >= LAYOUT.MAX_WHEELS
+    addWheel:SetAlpha(addWheel.dim and HUB_ALPHA_DIM or 1)
+    removeWheel.dim = total <= 1
+    removeWheel:SetAlpha(removeWheel.dim and HUB_ALPHA_DIM or 1)
+
+    -- One extra position while there is room: the Add Slice slice.
+    local n = CM.RadialSliceCount(wheel)
+    local canAdd = n < LAYOUT.MAX_SLICES
+    local shown = canAdd and (n + 1) or n
+    shownCount = shown
+    liveCount = n
+    addIndex = canAdd and (n + 1) or nil
+    hovered = nil
+    PaintWedge()
+    local style = CM.RadialStyle()
+    CM.RadialPaintBackground(bg, shown, EDITOR_SCALE)
+    -- Minimal's art is a big soft vignette that overhangs the wheel area and stretches the scrolled
+    -- content; its fade is invisible past BG_KEEP art pixels, so draw only that part.
+    local keep = math.min(style.bg, BG_KEEP)
+    local margin = (1 - keep / style.bg) / 2
+    bg:SetSize(keep * EDITOR_SCALE, keep * EDITOR_SCALE)
+    bg:SetTexCoord(margin, 1 - margin, margin, 1 - margin)
+    CM.RadialPlaceDividers(dividers, area, shown, EDITOR_SCALE)
+    local radius = LAYOUT.ICON_RADIUS * EDITOR_SCALE
+    for slot = 1, LAYOUT.MAX_SLICES do
+      local button = buttons[slot]
+      if slot > n then
+        button:Hide()
+        button.cx = nil
+      else
+        -- While reordering, each button glides to the position it would end up in.
+        local pos = slot
+        if preview then
+          for position, source in ipairs(preview) do
+            if source == slot then
+              pos = position
+            end
+          end
+        end
+        local dx, dy = CM.RadialSlotDir(pos, shown)
+        button.tx, button.ty = dx * radius, dy * radius
+        if not (preview and button.cx) then
+          button.cx, button.cy = button.tx, button.ty
+          PlaceButton(button)
+        end
+        local entry = wheel.slots and wheel.slots[slot]
+        local _, icon, iconText, art = CM.RadialEntryInfo(entry)
+        button.SetSlotArt(art)
+        if entry and icon then
+          CM.RadialSetIcon(button.icon, icon, button.iconLabel, iconText)
+          button.plus:Hide()
+        elseif entry then
+          button.iconLabel:SetText("")
+          button.icon:SetColorTexture(0, 0, 0, 0) -- the slot disc shows through
+          button.plus:Hide()
+        else
+          button.iconLabel:SetText("")
+          button.icon:SetColorTexture(0, 0, 0, 0) -- the slot disc shows through
+          button.plus:Show()
+        end
+        button:Show()
+      end
+    end
+    if canAdd then
+      local dx, dy = CM.RadialSlotDir(n + 1, shown)
+      PlaceAt(addSlice, area, dx, dy, radius)
+      addSlice:Show()
+      local o = style.overlay[shown]
+      if o then
+        local a = CM.RadialSlotAngle(n + 1, shown)
+        local x = o[3] * math.cos(a) + o[4] * math.sin(a)
+        local y = -o[3] * math.sin(a) + o[4] * math.cos(a)
+        wedge:SetTexture(ART_DIR .. style.art .. "sel_" .. shown .. ".tga")
+        wedge:SetSize(o[1] * EDITOR_SCALE, o[2] * EDITOR_SCALE)
+        wedge:ClearAllPoints()
+        wedge:SetPoint("CENTER", area, "CENTER", x * EDITOR_SCALE, y * EDITOR_SCALE)
+        wedge:SetRotation(-a)
+        wedge:Show()
+      end
+    else
+      addSlice:Hide()
+      wedge:Hide()
+    end
+  end
+
+  UI.Options.RegisterControl({ frame = row, height = height, Refresh = Update })
+  Update()
+  return row, height
+end
+
+---------------------------------------------------------------------------------------
+-- Tab
+---------------------------------------------------------------------------------------
+UI.Options.AddTab({
+  id = "radialmenu",
+  label = L["Radial Menu"],
+  build = function(ctx)
+    if #CM.RadialGetWheels() == 0 then
+      CM.RadialCreateWheel()
+    end
+
+    ctx:Header({ text = L["RADIAL MENU"] })
+
+    ctx:Description({
+      text = L["Create quick access wheels for spells, items, macros, emotes, and interface shortcuts."],
+    })
+
+    ctx:Keybind({
+      label = L["Radial Menu Keybind"],
+      desc = L["Hold to open the radial menu, aim at a slice, then release to activate it. Scroll to switch between wheels."],
+      get = function()
+        return GetBindingKey(BIND_NAME)
+      end,
+      set = function(key)
+        CM.TryApplyBindingChange(L["radial menu keybinding"], function()
+          CM.AssignNamedKeybind(BIND_NAME, key)
+          CM.RadialRefresh()
+        end)
+      end,
+    })
+
+    ctx:Dropdown({
+      label = L["Radial Menu Style"],
+      desc = L["Choose the appearance of the Radial Menu wheels."],
+      values = STYLE_VALUES,
+      order = STYLE_ORDER,
+      get = function()
+        return CM.DB.global.radialStyle or "minimal"
+      end,
+      set = function(value)
+        CM.DB.global.radialStyle = value
+        CM.RadialRefresh()
+        UI.Options.Sync()
+      end,
+    })
+
+    ctx:SpellMultiSelect({
+      label = L["Party Wheel Spells"],
+      desc = L["Helpful spells that open a party targeting wheel while their key is held. Flick toward a party member and release to cast on them, or return to the center to cast on yourself. Tap to cast on your friendly target, or yourself if none is selected."],
+      charSpecific = true,
+      spellFilter = CM.PartyWheelIsEligibleSpell,
+      get = function()
+        return CM.DB.char.partyWheelSpells or ""
+      end,
+      set = function(value)
+        CM.DB.char.partyWheelSpells = value and _G.strtrim(value) or ""
+        if CM.PartyWheelRefresh then
+          CM.PartyWheelRefresh(true)
+        end
+      end,
+      disabled = function()
+        return not CM.DB.char.reticleTargeting or CM.DB.char.macroInjectionClickCastOnly
+      end,
+    })
+
+    ctx:Gap()
+    local row, height = BuildWheelRow(ctx)
+    ctx:PlaceFrame(row, height)
+    -- Custom row: add the search metadata ctx:Place would have attached (also what the wizard focuses).
+    if ctx.search then
+      UI.Options.RegisterControl({
+        frame = row,
+        height = height,
+        search = {
+          label = WHEELS_LABEL,
+          desc = L["Edit the slices of each wheel, rename wheels and add or remove wheels."],
+          tab = ctx.search.tab,
+          group = ctx.search.group,
+          section = ctx.section,
+        },
+      })
+    end
+  end,
+})

@@ -30,7 +30,7 @@ HealBot_Config = {
 ["PrivFocus"] = "x",
 ["SpecProfAtSave"] = "1:1",
 ["MacroUse10"] = false,
-["LastAutoSkinChangeType"] = "Solo",
+["LastAutoSkinChangeType"] = "Party",
 ["DisableOnSpec"] = {
 ["Priest"] = false,
 },
@@ -49,10 +49,10 @@ HealBot_Config = {
 HealBot_Config_Spells = {
 ["EnabledSpellTarget"] = {
 ["Button5"] = true,
-["Left"] = true,
-["Right"] = true,
-["Middle"] = true,
 ["Button4"] = true,
+["Right"] = true,
+["Left"] = true,
+["Middle"] = true,
 },
 ["EnabledSpellTrinket1"] = {
 },
@@ -171,16 +171,15 @@ HealBot_Config_Buffs = {
 ["SoundBuffChan"] = 2,
 ["CheckManaDrink"] = true,
 ["BuffWatch"] = true,
-["ListSortOrder"] = 1,
+["CustomBuffCheck"] = {
+false,
+false,
+false,
+},
 ["ListSortFilterTag"] = "",
 ["AlwaysShowSelf"] = false,
 ["BuffCustomWatchInCombat"] = true,
-["CustomBuffName"] = {
-"",
-"",
-"",
-"",
-},
+["ListSortOrder"] = 1,
 ["LongBuffTimer"] = 120,
 ["BuffWatchInCombat"] = true,
 ["HealBotBuffColR"] = {
@@ -199,10 +198,11 @@ HealBot_Config_Buffs = {
 ["SoundBuffWarning"] = false,
 ["CBshownHB"] = true,
 ["ListSortFilter"] = 1,
-["CustomBuffCheck"] = {
-false,
-false,
-false,
+["CustomBuffName"] = {
+"",
+"",
+"",
+"",
 },
 ["WarnRange_Bar"] = 2,
 ["SoundBuffPlay"] = "Elf Bell Toll",
@@ -222,7 +222,7 @@ false,
 ["16"] = "None",
 ["17"] = "None",
 ["13"] = "None",
-["12"] = "None",
+["12"] = "Divine Spirit",
 ["11"] = "Power Word: Fortitude",
 ["18"] = "None",
 },
@@ -326,5 +326,5 @@ HealBot_ActionIconsData_Loadouts = {
 ["Standard:1"] = "lodJlK4kjU4a8d",
 }
 HealBot_Spell_Loadouts = {
-"fkvtVPomqW)oV3nCGaLCJevPk1ccrqQ3SsqEZhctCLTPioe)BV2EjGPpqpPO1Bw7zg7zxkHULM)Ax5ooWY)c48TLYAq7QMEuRfDX0uA(hqL2TUPTUXNSSLX4Gldp1eBQ(xejB72dANa(DGdNx8TOLLYpczhLkHmyNqerxQFaK1pIjx93HZzId7eyP02oMYMUI4)I8XX(4eFmMUAMnBQ)Nz(4l(4CeZiCbHtq8eKacYajgxqkiiheKecYsKNLhDZhEr)R7e9epi8T(Cx7Exiq2HE4nrdok2nZZtIgnLy6R4LQgtrduYV2xTBoD0SjMEj0bNS)20wPh605zjlURuSRKDuybxpGFTS8minfIktXBwMB7QhME8chB5gv8kR5jXZJm9RfNCa)uizjMcRkaN9NnLD7nfr)9IS3EaXJn9CqPCq885Q7Sa1gqb(r1ah5JsL(289fNHUlWM(FtObglEXZSuUe0ncMBUttP)m",
+"fkvxVjomqW)o39goqGsEJevPk1ccrqQVzLG8MpeM4kBtr8q8V9A7LaMEGoPO1BwNzM4XdLq3sZFTRChhy5FbC(2sznODttpQ1IUyA6q7ex7M26gTR5dOYVUSLX4GTt)lIKTD7bTta)oWHZl(w0Ys5hHSJsLqgStiIOlZpaY6hXKB(7W5mXHDcCuABhtzBxr8pr(6yFDIVgtxnZ2n1)YmF9fFDoIzeUGWjiEcsabzGeJlifeKdcscbzjYZYJ(Zhor)R7e9epi8S(Cx7Exiq2H7WBIg8P4nxEEs0OPetFfVu1ykAGs(1lt7MthnBIPxcDWj7RnTv6HqqEwYI7gf7gztcl46b8RLLNbPPquzkEZYCBx9q0XlCSLBuXRSMNeppY0VwCYb8tHKLykSQaC2F2u2T3ue93lYE7aep20ZbLYbXZNBUZcuBaf4ZNboYhLk9T89fNHUlWM(Fj0aJf)XZSuUe0ncMl3PP0F(d",
 }

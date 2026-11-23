@@ -1,0 +1,1255 @@
+local _, ns = ...
+local L = ns.L
+
+--------------------------------------------------
+-- RAID FRAMES
+-- Raid tiles on the party frames' Raid-Style tile kit; secure group headers hand out the units (the
+-- roster can change in combat) and a restricted snippet places the groups. Also the main tank frames.
+--------------------------------------------------
+
+--------------------------------------------------
+-- 1. MODULE REGISTRATION
+--------------------------------------------------
+ns.RaidFrames = ns.RaidFrames or {}
+local RF = ns.RaidFrames
+ns.modules["RaidFrames"] = RF
+
+LibStub("AceEvent-3.0"):Embed(RF)
+
+--------------------------------------------------
+-- 2. UPVALUES / CONSTANTS
+--------------------------------------------------
+local pairs, ipairs, pcall, type = pairs, ipairs, pcall, type
+local math_floor, math_ceil = math.floor, math.ceil
+local CreateFrame, InCombatLockdown = CreateFrame, InCombatLockdown
+local LEM = LibStub("FlareEditMode")
+local K = ns.UnitFrames and ns.UnitFrames.Kit
+local PF = ns.PartyFrames
+
+local MAX_GROUPS, GROUP_SIZE, MAX_RAID = 8, 5, 40
+local MAX_TANKS = 4
+local TILE_TEMPLATE = "SecureUnitButtonTemplate,PingableUnitFrameTemplate,BackdropTemplate"
+local DEFAULT_POSITION = { point = "LEFT", x = 2, y = 0 }
+local TANK_DEFAULT_POSITION = { point = "BOTTOMLEFT", x = 2, y = 106 }
+local RANGE_INTERVAL = 1   -- a safety re-check: range comes from UNIT_IN_RANGE_UPDATE
+local READY_CHECK_HOLD = 6
+local INSIDE = { "INSIDE_TOP", "INSIDE_TOPLEFT", "INSIDE_TOPRIGHT", "INSIDE_CENTER", "INSIDE_LEFT", "INSIDE_RIGHT",
+                 "INSIDE_BOTTOM", "INSIDE_BOTTOMLEFT", "INSIDE_BOTTOMRIGHT" }
+-- the raid's aura places, all inside the tile (Top, Centre and Bottom span the width)
+local RAID_PLACES = {
+    { text = L["Off"],          value = "OFF",                isRadio = true },
+    { text = L["Top"],          value = "INSIDE_TOP",         isRadio = true },
+    { text = L["Top Left"],     value = "INSIDE_TOPLEFT",     isRadio = true },
+    { text = L["Top Right"],    value = "INSIDE_TOPRIGHT",    isRadio = true },
+    { text = L["Centre"],       value = "INSIDE_CENTER",      isRadio = true },
+    { text = L["Centre Left"],  value = "INSIDE_LEFT",        isRadio = true },
+    { text = L["Centre Right"], value = "INSIDE_RIGHT",       isRadio = true },
+    { text = L["Bottom"],       value = "INSIDE_BOTTOM",      isRadio = true },
+    { text = L["Bottom Left"],  value = "INSIDE_BOTTOMLEFT",  isRadio = true },
+    { text = L["Bottom Right"], value = "INSIDE_BOTTOMRIGHT", isRadio = true },
+}
+local SAMPLE_RAIDS = { small = 2, medium = 5, large = 8 }   -- Edit Mode sample raids: groups shown
+local DEFAULT_W, DEFAULT_H = 90, 60
+local CLASS_ORDER = "WARRIOR,DRUID,PALADIN,SHAMAN,PRIEST,MAGE,WARLOCK,HUNTER,ROGUE"
+local ROLE_ORDER = "TANK,HEALER,DAMAGER,NONE"
+local SAMPLE_ROLE_RANK = { TANK = 1, HEALER = 2, DAMAGER = 3 }
+
+-- Tile setup in the restricted environment (the header may create a tile in combat, when sizes and
+-- clicks are protected), then InitTile
+local INIT_SNIPPET = [[
+    local header = self:GetParent()
+    self:SetWidth(header:GetAttribute("tileWidth") or 90)
+    self:SetHeight(header:GetAttribute("tileHeight") or 44)
+    self:SetAttribute("*type1", "target")
+    self:SetAttribute("*type2", "togglemenu")
+    header:CallMethod("InitTile", self:GetName())
+]]
+
+-- Group mode: places the groups in use as rows or columns. Restricted, so it also runs in combat.
+-- labelRoom: Group Numbers' room above each row (column headings take none).
+local LAYOUT_SNIPPET = [[
+    if self:GetAttribute("mode") ~= "group" then return end
+    local rows = self:GetAttribute("rows")
+    local w, h = self:GetAttribute("tileW"), self:GetAttribute("tileH")
+    local gap, ggap = self:GetAttribute("gap"), self:GetAttribute("groupGap")
+    local room = rows and (self:GetAttribute("labelRoom") or 0) or 0
+    h = h + room
+    -- Growth: from the middle, or from one end of the frame (its full size). Rows: DOWN from the top,
+    -- UP from the bottom; columns (6.4.1, a player: stuck in the middle): DOWN from the left (Right),
+    -- UP from the right (Left)
+    local grow = self:GetAttribute("grow") or "CENTER"
+    local used = 0
+    local order = newtable()
+    for k = 1, 8 do
+        local c = self:GetFrameRef("c" .. k)
+        if c and c:GetAttribute("unit") then
+            used = used + 1
+            order[used] = self:GetFrameRef("g" .. k)
+        end
+    end
+    if used == 0 then return end
+    local span = rows and h or w
+    local across = 5 * (rows and w or h) + 4 * gap
+    local total = used * span + (used - 1) * ggap
+    local full = 8 * span + 7 * ggap
+    for i = 1, used do
+        local g = order[i]
+        local offset = (i - 1) * (span + ggap) - total / 2
+        if grow == "DOWN" then
+            offset = (i - 1) * (span + ggap) - full / 2
+        elseif grow == "UP" then
+            offset = full / 2 - span - (i - 1) * (span + ggap)
+        end
+        g:ClearAllPoints()
+        if rows then
+            g:SetPoint("TOPLEFT", self, "CENTER", -across / 2, -offset - room)
+        else
+            g:SetPoint("TOPLEFT", self, "CENTER", offset, across / 2)
+        end
+    end
+]]
+-- a group's first tile changing unit re-runs the layout
+local WRAP_SNIPPET = [[ if name == "unit" then control:RunAttribute("layout") end ]]
+
+-- Edit Mode samples: groups of a tank, a healer and three damage dealers
+local SAMPLE_NAMES = {
+    "Thalorien", "Elysande", "Morwen", "Sylvara", "Kestrel", "Brannoc", "Ysolde", "Garrick", "Liora", "Tamsin",
+    "Orwyn", "Fenna", "Draven", "Isolde", "Corwin", "Maelis", "Torvald", "Seraphine", "Jorund", "Aveline",
+    "Bastian", "Rowena", "Caelum", "Edric", "Nimue", "Halvard", "Oriel", "Thessaly", "Varric", "Wenna",
+    "Aldric", "Brisa", "Cedran", "Dalia", "Emeric", "Faelan", "Gwyneth", "Hollis", "Ingrid", "Jessamy",
+}
+local SAMPLE_TANKS   = { "WARRIOR", "DRUID", "WARRIOR", "PALADIN", "WARRIOR", "DRUID", "WARRIOR", "WARRIOR" }
+local SAMPLE_HEALERS = { "PRIEST", "DRUID", "PALADIN", "PRIEST", "SHAMAN", "PRIEST", "DRUID", "PRIEST" }
+local SAMPLE_DPS     = { "MAGE", "ROGUE", "WARLOCK", "HUNTER", "MAGE", "ROGUE", "WARRIOR", "WARLOCK", "HUNTER", "MAGE",
+                         "ROGUE", "WARLOCK", "HUNTER", "MAGE", "ROGUE", "WARLOCK", "HUNTER", "MAGE", "ROGUE", "WARLOCK",
+                         "HUNTER", "MAGE", "ROGUE", "WARLOCK" }
+local SAMPLES = {}
+do
+    local dps = 0
+    for i = 1, MAX_RAID do
+        local group, slot = math_ceil(i / GROUP_SIZE), (i - 1) % GROUP_SIZE + 1
+        local role, class
+        if slot == 1 then role, class = "TANK", SAMPLE_TANKS[group]
+        elseif slot == 2 then role, class = "HEALER", SAMPLE_HEALERS[group]
+        else dps = dps + 1; role, class = "DAMAGER", SAMPLE_DPS[dps] end
+        SAMPLES[i] = { name = SAMPLE_NAMES[i], class = class, role = role,
+                       health = 0.35 + ((i * 37) % 63) / 100, power = 0.4 + ((i * 53) % 55) / 100 }
+    end
+    SAMPLES[1].leader = true
+    SAMPLES[3].marker, SAMPLES[3].highlight = 8, "Magic"
+    SAMPLES[7].ready = "ready"
+    SAMPLES[9].status = "IncomingResurrection"
+    SAMPLES[12].dead, SAMPLES[12].health = true, 0
+    SAMPLES[21].marker = 1
+    for i = 1, MAX_RAID do
+        if i % 3 == 0 then SAMPLES[i].buffs = 1 + i % 2 end
+        if i % 4 == 1 then SAMPLES[i].debuffs = 1 + i % 3 end
+    end
+    SAMPLES[4].debuffs = 1
+end
+
+--------------------------------------------------
+-- 3. SETTINGS ACCESS
+--------------------------------------------------
+local holder, tankHolder
+local headers = {}          -- g1..g8 (group mode), all (role / class sort), tanks
+local tiles = {}            -- every live tile
+local previewTiles, tankPreview = {}, {}
+local pendingLayout = false
+local readyHold             -- C_Timer handle while a finished check's results stay up
+local sampleRaid = "medium"   -- Edit Mode's sample raid (not saved)
+local rosterPending = false   -- a roster pass is scheduled
+
+local function GetDb()
+    local db = K and K.GetDb()
+    return db and db.raid
+end
+
+-- Edit Mode, unless a fight ended its previews (ns.OnEditFight)
+local function IsEditing()
+    return ns.EditPreviewing()
+end
+
+local function TileSize()
+    local db = GetDb()
+    return (db and db.width) or DEFAULT_W, (db and db.height) or DEFAULT_H
+end
+
+local function TankSize()
+    local db = GetDb()
+    local mt = db and db.mainTanks or {}
+    return mt.w or 182, mt.h or 60
+end
+
+-- The tile settings: the raid db plus fixed values (no cast bar, one row of three auras, striped
+-- absorbs)
+local FIXED = { castbar = false, auraMax = 3, auraPerRow = 3 }
+-- main tank settings of their own (db.mainTanks), falling back to the raid's
+local TANK_OWN = { powerHeight = true, buffs = true, debuffs = true, dispels = true, dispelHighlight = true,
+                   auraSize = true, buffSize = true, debuffSize = true, hideBuffs = true, onlyMyBuffs = true, dispellableOnly = true,
+                   auraSort = true, auraReverse = true, auraMineFirst = true,
+                   powerManaOnly = true, powerText = true, tankTargets = true }
+local function View(sizeFn, own)
+    return setmetatable({}, { __index = function(_, key)
+        local db = GetDb()
+        if not db then return nil end
+        if key == "width" then return (sizeFn()) end
+        if key == "height" then return (select(2, sizeFn())) end
+        if FIXED[key] ~= nil then return FIXED[key] end
+        if own and own[key] and db.mainTanks and db.mainTanks[key] ~= nil then return db.mainTanks[key] end
+        return db[key]
+    end })
+end
+local raidView = View(TileSize)
+local tankView = View(TankSize, TANK_OWN)
+
+local raidCtx = {
+    Settings = function() return raidView end,
+    PreviewData = function(f) return f.sample or SAMPLES[1] end,
+    ReadyHold = function() return readyHold end,
+    fontKey = "raid",   -- the raid frames' fonts (PartyFrames.lua PF.FontKey)
+}
+local tankCtx = {
+    Settings = function() return tankView end,
+    PreviewData = function(f) return f.sample or SAMPLES[1] end,
+    ReadyHold = function() return readyHold end,
+    fontKey = "raid",
+}
+-- for the settings previews' sample tiles
+RF.PreviewCtx, RF.PreviewSamples = raidCtx, SAMPLES
+
+local function Mode()
+    local db = GetDb()
+    return (db and db.sort ~= "GROUP" and db.sort) and "flat" or "group"
+end
+
+-- Growth: "CENTER", "DOWN" or "UP"; rows only (columns grow from the middle)
+local function Grow()
+    local db = GetDb()
+    return db and db.grow or "CENTER"
+end
+
+local function Rows()
+    local db = GetDb()
+    return not db or db.orientation ~= "COLUMNS"
+end
+
+--------------------------------------------------
+-- 4. TILES
+--------------------------------------------------
+local Tile = PF and PF.Tile
+
+-- Tank Targets (main tank frames): what each main tank is targeting, below or right of its frame. A
+-- secure button, child of the tank's tile: the header runs the tile's unit snippet as it hands the
+-- tile its unit, in combat too, and the snippet gives the button "<tank>target". A unit watch shows
+-- it while that target exists; a light poll paints it (no event says a tank's target changed).
+local TT = { HEIGHT = 18, GAP = 2, frames = {} }
+TT.SNIPPET = [[
+    local target = self:GetFrameRef("fuiTankTarget")
+    if not target then return end
+    local unit = self:GetAttribute("unit")
+    if unit then target:SetAttribute("unit", unit .. "target") else target:SetAttribute("unit", nil) end
+]]
+
+function TT.Place()
+    local db = GetDb()
+    local v = db and db.mainTanks and db.mainTanks.tankTargets
+    return (v == "BOTTOM" or v == "RIGHT") and v or "OFF"
+end
+
+function TT.Update(t)
+    local unit = t:GetAttribute("unit")
+    if not unit or not UnitExists(unit) then return end
+    t.Health:SetMinMaxValues(0, UnitHealthMax(unit))
+    t.Health:SetValue(UnitHealth(unit))
+    t.Health:SetStatusBarColor(K.GetHealthColor(unit, ns.ClassColorsOn(GetDb())))
+    t.Name:SetText(ns.UnitDisplayName(unit))
+end
+
+function TT.Create(f)
+    local t = CreateFrame("Button", nil, f, "SecureUnitButtonTemplate,BackdropTemplate")
+    t:SetAttribute("*type1", "target")
+    t:SetAttribute("*type2", "togglemenu")
+    t:RegisterForClicks("AnyUp")
+    t:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8" })
+    t:SetBackdropColor(0, 0, 0, 0.7)
+    t.Health = K.CreateBar(t, t:GetFrameLevel() + 1)
+    t.Health:SetPoint("TOPLEFT", 1, -1)
+    t.Health:SetPoint("BOTTOMRIGHT", -1, 1)
+    local overlay = CreateFrame("Frame", nil, t)
+    overlay:SetAllPoints()
+    overlay:SetFrameLevel(t:GetFrameLevel() + 3)
+    t.Name = overlay:CreateFontString(nil, "OVERLAY")
+    t.Name:SetPoint("LEFT", 4, 0)
+    t.Name:SetPoint("RIGHT", -4, 0)
+    t.Name:SetJustifyH("LEFT")
+    t.Name:SetWordWrap(false)
+    t:SetScript("OnShow", TT.Update)
+    t:Hide()
+    SecureHandlerSetFrameRef(f, "fuiTankTarget", t)
+    f:SetAttribute("refreshUnitChange", TT.SNIPPET)
+    f.TankTarget = t
+    TT.frames[#TT.frames + 1] = t
+end
+
+-- Edit Mode: a sample target beside each sample tank (a plain frame)
+function TT.PlaceSample(f, w, hh)
+    local place = TT.Place()
+    local s = f.SampleTarget
+    if place == "OFF" then
+        if s then s:Hide() end
+        return
+    end
+    if not s then
+        s = CreateFrame("Frame", nil, f, "BackdropTemplate")
+        s:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8" })
+        s:SetBackdropColor(0, 0, 0, 0.7)
+        s.Health = K.CreateBar(s, s:GetFrameLevel() + 1)
+        s.Health:SetPoint("TOPLEFT", 1, -1)
+        s.Health:SetPoint("BOTTOMRIGHT", -1, 1)
+        s.Health:SetMinMaxValues(0, 1)
+        s.Health:SetValue(0.7)
+        s.Health:SetStatusBarColor(0.8, 0.1, 0.1)
+        s.Name = s.Health:CreateFontString(nil, "OVERLAY")
+        s.Name:SetPoint("LEFT", 4, 0)
+        s.Name:SetPoint("RIGHT", -4, 0)
+        s.Name:SetJustifyH("LEFT")
+        s.Name:SetWordWrap(false)
+        s.Name:SetText(L["Target"])
+        f.SampleTarget = s
+    end
+    local db, kdb = GetDb(), K.GetDb()
+    s.Health:SetStatusBarTexture(K.GetBarTexture(db and db.texture))
+    K.ApplyFont(s.Name, K.Font("raid", "names"), -2)
+    s:ClearAllPoints()
+    if place == "RIGHT" then
+        s:SetPoint("TOPLEFT", f, "TOPRIGHT", TT.GAP, 0)
+        s:SetSize(w, hh)
+    else
+        s:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 0, -TT.GAP)
+        s:SetSize(w, TT.HEIGHT)
+    end
+    s:Show()
+end
+
+-- out of combat (LayoutTanks): place, look and the unit watch
+function TT.Layout()
+    local place = TT.Place()
+    local db = GetDb()
+    local w, hh = TankSize()
+    local tex = K.GetBarTexture(db and db.texture)
+    local kdb = K.GetDb()
+    for _, t in ipairs(TT.frames) do
+        local f = t:GetParent()
+        t:ClearAllPoints()
+        if place == "RIGHT" then
+            t:SetPoint("TOPLEFT", f, "TOPRIGHT", TT.GAP, 0)
+            t:SetSize(w, hh)
+        else
+            t:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 0, -TT.GAP)
+            t:SetSize(w, TT.HEIGHT)
+        end
+        t.Health:SetStatusBarTexture(tex)
+        K.ApplyFont(t.Name, K.Font("raid", "names"), -2)
+        local unit = f:GetAttribute("unit")
+        t:SetAttribute("unit", unit and (unit .. "target") or nil)
+        if place == "OFF" or IsEditing() then
+            UnregisterUnitWatch(t)
+            t:Hide()
+        else
+            RegisterUnitWatch(t)
+        end
+    end
+end
+
+-- Lua setup of a tile the header created (called from INIT_SNIPPET)
+local function InitTile(header, name)
+    local f = _G[name]
+    if not f or f.flareTile then return end
+    f.flareTile = true
+    f.ctx = header.ctx
+    f.auraPositions = INSIDE
+    f:RegisterForClicks("AnyUp")
+    if type(f.SetRolesets) == "function" then pcall(f.SetRolesets, f, "unitFrames") end
+    f:SetScript("OnEnter", Tile.OnEnter)
+    f:SetScript("OnLeave", Tile.OnLeave)
+    -- after the scripts: a click-cast addon wraps OnEnter / OnLeave as it registers the frame
+    _G.ClickCastFrames = _G.ClickCastFrames or {}
+    _G.ClickCastFrames[f] = true
+    Tile.Build(f, nil)
+    if header.ctx == tankCtx then TT.Create(f) end
+    f:HookScript("OnAttributeChanged", function(self, attr, value)
+        if attr == "unit" then
+            Tile.SetUnit(self, value)
+        end
+    end)
+    tiles[#tiles + 1] = f
+    if not InCombatLockdown() then pcall(Tile.Layout, f) end
+end
+
+local function NewHeader(name, parent, ctx, count)
+    local h = CreateFrame("Frame", name, parent, "SecureGroupHeaderTemplate")
+    h.ctx = ctx
+    h.InitTile = InitTile
+    h:SetAttribute("template", TILE_TEMPLATE)
+    h:SetAttribute("showRaid", true)
+    h:SetAttribute("initialConfigFunction", INIT_SNIPPET)
+    h:SetAttribute("minWidth", 0.1)
+    h:SetAttribute("minHeight", 0.1)
+    h.count = count
+    return h
+end
+
+-- Creates all of a header's tiles out of combat: a startingIndex before the first unit forces them
+local function Precreate(h)
+    if h.precreated then return end
+    h.precreated = true
+    local parent = h:GetParent()
+    local wasShown = parent:IsShown()
+    parent:Show()
+    h:Show()
+    h:SetAttribute("startingIndex", 1 - h.count)
+    h:SetAttribute("startingIndex", 1)
+    if not wasShown then parent:Hide() end
+end
+
+-- Group Numbers' room above each row
+local function LabelRoom()
+    local db = GetDb()
+    if not (db and db.groupNumbers and Mode() == "group" and Rows()) then return 0 end
+    local font = K.Font("raid", "names")
+    return ((font and font.size) or 12) + 4
+end
+
+local function StyleGroupLabel(label, k)
+    K.ApplyFont(label, K.Font("raid", "names"))
+    label:SetText(L["Group %d"]:format(k))
+    label:SetTextColor(1, 0.82, 0)
+    label:SetJustifyH("LEFT")
+end
+
+-- shown while the group has players (the header has a size)
+local function AddGroupLabel(h, k)
+    local label = h:CreateFontString(nil, "OVERLAY")
+    StyleGroupLabel(label, k)
+    h.Label = label
+    h:HookScript("OnSizeChanged", function(self, w, hh)
+        local db = GetDb()
+        local on = db and db.groupNumbers and Mode() == "group" and not IsEditing()
+        self.Label:SetShown(on and (Rows() and w > 1 or not Rows() and hh > 1) or false)
+    end)
+end
+
+local function EnsureHeaders()
+    if Mode() == "group" then
+        for k = 1, MAX_GROUPS do
+            if not headers[k] then
+                local h = NewHeader("FlareUI_RaidGroup" .. k, holder, raidCtx, GROUP_SIZE)
+                h:SetAttribute("groupFilter", tostring(k))
+                headers[k] = h
+                AddGroupLabel(h, k)
+                Precreate(h)
+                -- the group's first tile tells the layout snippet whether the group is in use
+                holder:SetFrameRef("g" .. k, h)
+                holder:SetFrameRef("c" .. k, h[1])
+                SecureHandlerWrapScript(h[1], "OnAttributeChanged", holder, WRAP_SNIPPET)
+            end
+        end
+    elseif not headers.all then
+        local h = NewHeader("FlareUI_RaidAll", holder, raidCtx, MAX_RAID)
+        h:SetAttribute("groupFilter", "1,2,3,4,5,6,7,8")
+        h:SetAttribute("maxColumns", MAX_GROUPS)
+        h:SetAttribute("unitsPerColumn", GROUP_SIZE)
+        -- the header lays out several columns as it makes them: it needs their direction first
+        h:SetAttribute("point", Rows() and "LEFT" or "TOP")
+        h:SetAttribute("columnAnchorPoint", Rows() and "TOP" or "LEFT")
+        headers.all = h
+        Precreate(h)
+    end
+end
+
+--------------------------------------------------
+-- 5. LAYOUT
+--------------------------------------------------
+-- Spacing, Group Spacing and the main tanks' Spacing are measured between the bars (11-13, Marcus): 0
+-- makes the bars touch (the tiles' margins, where the borders sit, overlap). Saved values gain the
+-- two margins once, so a setup looks as it did (raid.barSpacing).
+local function Gaps(db)
+    local pad = 2 * K.INSET
+    if not rawget(db, "barSpacing") then
+        if rawget(db, "spacing") ~= nil then db.spacing = db.spacing + pad end
+        if rawget(db, "groupSpacing") ~= nil then db.groupSpacing = db.groupSpacing + pad end
+        local mt = rawget(db, "mainTanks")
+        if type(mt) == "table" and rawget(mt, "spacing") ~= nil then mt.spacing = mt.spacing + pad end
+        db.barSpacing = true
+    end
+    local tanks = db.mainTanks and db.mainTanks.spacing or 10
+    return (db.spacing or 10) - pad, (db.groupSpacing or 10) - pad, tanks - pad
+end
+
+-- the frame's own size: the largest raid, so its centre (where the raid grows from) stays put
+local function HolderSize()
+    local db = GetDb()
+    local w, h = TileSize()
+    local gap, ggap = Gaps(db)
+    h = h + LabelRoom()
+    if Rows() then
+        return GROUP_SIZE * w + (GROUP_SIZE - 1) * gap, MAX_GROUPS * h + (MAX_GROUPS - 1) * ggap
+    end
+    return MAX_GROUPS * w + (MAX_GROUPS - 1) * ggap, GROUP_SIZE * h + (GROUP_SIZE - 1) * gap
+end
+
+local function ConfigureHeader(h, w, hh, gap, ggap)
+    local rows = Rows()
+    -- the raid's rows of five stack from the frame's bottom on Growth Up
+    local columnAnchor = rows and (h == headers.all and Grow() == "UP" and "BOTTOM" or "TOP")
+        or (h == headers.all and Grow() == "UP" and "RIGHT" or "LEFT")
+    h:SetAttribute("_ignore", "batch")
+    h:SetAttribute("tileWidth", w)
+    h:SetAttribute("tileHeight", hh)
+    h:SetAttribute("point", rows and "LEFT" or "TOP")
+    h:SetAttribute("xOffset", rows and gap or 0)
+    h:SetAttribute("yOffset", rows and 0 or -gap)
+    h:SetAttribute("columnSpacing", ggap)
+    h:SetAttribute("columnAnchorPoint", columnAnchor)
+    h:SetAttribute("_ignore", nil)
+    -- the header adds its anchors to a tile's old ones: a changed point would keep both
+    for i = 1, h.count or 0 do
+        local f = h[i]
+        if f then
+            f:ClearAllPoints()
+            f:SetSize(w, hh)
+        end
+    end
+    -- a change outside the batch makes the header lay out again
+    h:SetAttribute("flareRefresh", (h:GetAttribute("flareRefresh") or 0) + 1)
+end
+
+local function LayoutGroups()
+    local db = GetDb()
+    local w, hh = TileSize()
+    local gap, ggap = Gaps(db)
+    local mode = Mode()
+    holder:SetAttribute("mode", mode)
+    holder:SetAttribute("rows", Rows())
+    holder:SetAttribute("tileW", w)
+    holder:SetAttribute("tileH", hh)
+    holder:SetAttribute("gap", gap)
+    holder:SetAttribute("groupGap", ggap)
+    holder:SetAttribute("labelRoom", LabelRoom())
+    holder:SetAttribute("grow", Grow())
+    for k = 1, MAX_GROUPS do
+        local h = headers[k]
+        if h then
+            ConfigureHeader(h, w, hh, gap, ggap)
+            h:SetShown(mode == "group" and not IsEditing())
+            StyleGroupLabel(h.Label, k)
+            h.Label:ClearAllPoints()
+            h.Label:SetPoint("BOTTOMLEFT", h, "TOPLEFT", 1, 2)
+            local hw, hh2 = h:GetSize()
+            h.Label:SetShown((db.groupNumbers and mode == "group" and (Rows() and hw > 1 or not Rows() and hh2 > 1)) and true or false)
+        end
+    end
+    local all = headers.all
+    if all then
+        ConfigureHeader(all, w, hh, gap, ggap)
+        local sort = db.sort or "GROUP"
+        all:SetAttribute("groupBy", sort == "CLASS" and "CLASS" or "ASSIGNEDROLE")
+        all:SetAttribute("groupingOrder", sort == "CLASS" and CLASS_ORDER or ROLE_ORDER)
+        -- Growth: the rows of five stack from the frame's top or bottom, the columns from its left or
+        -- right (or round its middle)
+        local grow = Grow()
+        local rows = Rows()
+        all:ClearAllPoints()
+        if grow == "DOWN" then
+            all:SetPoint(rows and "TOP" or "LEFT", holder, rows and "TOP" or "LEFT")
+        elseif grow == "UP" then
+            all:SetPoint(rows and "BOTTOM" or "RIGHT", holder, rows and "BOTTOM" or "RIGHT")
+        else
+            all:SetPoint("CENTER", holder, "CENTER")
+        end
+        all:SetShown(mode == "flat" and not IsEditing())
+    end
+    holder:SetSize(HolderSize())
+    holder:Execute([[ self:RunAttribute("layout") ]])
+end
+
+local function LayoutTanks()
+    if not tankHolder then return end
+    local db = GetDb()
+    local w, hh = TankSize()
+    local _, _, gap = Gaps(db)
+    -- Tank Targets below the frames: the room for them between the tanks
+    if TT.Place() == "BOTTOM" then gap = gap + TT.HEIGHT + TT.GAP end
+    local h = headers.tanks
+    h:SetAttribute("_ignore", "batch")
+    h:SetAttribute("tileWidth", w)
+    h:SetAttribute("tileHeight", hh)
+    -- the raid's Growth Up stacks them from the bottom
+    local up = Rows() and Grow() == "UP"
+    h:SetAttribute("point", up and "BOTTOM" or "TOP")
+    h:SetAttribute("yOffset", up and gap or -gap)
+    h:SetAttribute("_ignore", nil)
+    -- as in ConfigureHeader: the header adds its anchors to a tile's old ones
+    for i = 1, h.count do
+        if h[i] then
+            h[i]:ClearAllPoints()
+            h[i]:SetSize(w, hh)
+        end
+    end
+    h:SetAttribute("flareRefresh", (h:GetAttribute("flareRefresh") or 0) + 1)
+    h:ClearAllPoints()
+    h:SetPoint(up and "BOTTOM" or "TOP", tankHolder, up and "BOTTOM" or "TOP")
+    h:SetShown(not IsEditing())
+    tankHolder:SetSize(w, MAX_TANKS * hh + (MAX_TANKS - 1) * gap)
+    TT.Layout()
+end
+
+-- Edit Mode: the sample raid of the size being set, laid out as the live one would be
+local function PlacePreview()
+    local db = GetDb()
+    local w, hh = TileSize()
+    local gap, ggap = Gaps(db)
+    local groups = SAMPLE_RAIDS[sampleRaid] or 5
+    local rows = Rows()
+    local room = LabelRoom()
+    local span = rows and (hh + room) or w
+    local across = GROUP_SIZE * (rows and w or hh) + (GROUP_SIZE - 1) * gap
+    local total = groups * span + (groups - 1) * ggap
+    -- Role and Class sorts fill rows of five in order, as the live header does
+    local grow = Grow()
+    local full = MAX_GROUPS * span + (MAX_GROUPS - 1) * ggap
+    local count = groups * GROUP_SIZE
+    local order = {}
+    for i = 1, count do order[i] = i end
+    local sort = db.sort or "GROUP"
+    if sort ~= "GROUP" then
+        local rank = {}
+        for i = 1, count do
+            local s = SAMPLES[i]
+            if sort == "ROLE" then
+                rank[i] = SAMPLE_ROLE_RANK[s.role] or 4
+            else
+                rank[i] = (CLASS_ORDER:find(s.class or "") or 999)
+            end
+        end
+        table.sort(order, function(a, b)
+            if rank[a] ~= rank[b] then return rank[a] < rank[b] end
+            return a < b
+        end)
+    end
+    local placeOf = {}
+    for k, i in ipairs(order) do placeOf[i] = k end
+    for i, f in ipairs(previewTiles) do
+        if i <= count then
+            local k = placeOf[i]
+            local g, slot = math_ceil(k / GROUP_SIZE), (k - 1) % GROUP_SIZE
+            local offset = (g - 1) * (span + ggap) - total / 2
+            if grow == "DOWN" then
+                offset = (g - 1) * (span + ggap) - full / 2
+            elseif grow == "UP" then
+                offset = full / 2 - span - (g - 1) * (span + ggap)
+            end
+            local x, y
+            if rows then
+                x, y = -across / 2 + slot * (w + gap), -offset - room
+            else
+                x, y = offset, across / 2 - slot * (hh + gap)
+            end
+            f:ClearAllPoints()
+            f:SetPoint("TOPLEFT", holder, "CENTER", x, y)
+            f:Show()
+        else
+            f:Hide()
+        end
+    end
+    -- sample group numbers, on a layer above the samples
+    holder.sampleLabels = holder.sampleLabels or {}
+    if not holder.sampleLabelLayer then
+        holder.sampleLabelLayer = CreateFrame("Frame", nil, holder)
+        holder.sampleLabelLayer:SetAllPoints(holder)
+    end
+    holder.sampleLabelLayer:SetFrameLevel(holder:GetFrameLevel() + 30)
+    for g = 1, MAX_GROUPS do
+        local label = holder.sampleLabels[g]
+        if not label then
+            label = holder.sampleLabelLayer:CreateFontString(nil, "OVERLAY")
+            holder.sampleLabels[g] = label
+        end
+        StyleGroupLabel(label, g)
+        local first = previewTiles[(g - 1) * GROUP_SIZE + 1]
+        label:ClearAllPoints()
+        if first and g <= groups and db.groupNumbers and Mode() == "group" then
+            label:SetPoint("BOTTOMLEFT", first, "TOPLEFT", 1, 2)
+            label:Show()
+        else
+            label:Hide()
+        end
+    end
+
+    local tw, th = TankSize()
+    local _, _, tgap = Gaps(db)
+    -- Tank Targets below the frames take room between them, as live
+    if TT.Place() == "BOTTOM" then tgap = tgap + TT.HEIGHT + TT.GAP end
+    local tanksUp = Rows() and Grow() == "UP"
+    for i, f in ipairs(tankPreview) do
+        f:ClearAllPoints()
+        if tanksUp then
+            f:SetPoint("BOTTOM", tankHolder, "BOTTOM", 0, (i - 1) * (th + tgap))
+        else
+            f:SetPoint("TOP", tankHolder, "TOP", 0, -(i - 1) * (th + tgap))
+        end
+        f:SetShown(db.mainTanks and db.mainTanks.enabled ~= false)
+        TT.PlaceSample(f, tw, th)
+    end
+    if tankHolder then tankHolder:SetSize(tw, MAX_TANKS * th + (MAX_TANKS - 1) * tgap) end
+end
+
+local function SampleTile(parent, ctx, sample)
+    local f = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    f.ctx = ctx
+    f.noAuras = true
+    f.sample = sample
+    Tile.Build(f, nil)
+    f:Hide()
+    pcall(Tile.Layout, f)   -- fonts and sizes before it is ever shown
+    return f
+end
+
+local function EnsurePreview()
+    if #previewTiles > 0 then return end
+    for i = 1, MAX_RAID do previewTiles[i] = SampleTile(holder, raidCtx, SAMPLES[i]) end
+    if tankHolder then
+        tankPreview[1] = SampleTile(tankHolder, tankCtx, SAMPLES[1])
+        tankPreview[2] = SampleTile(tankHolder, tankCtx, SAMPLES[6])
+    end
+end
+
+--------------------------------------------------
+-- 6. POSITION AND VISIBILITY
+--------------------------------------------------
+local function LayoutStore(key, layoutName)
+    local db = GetDb()
+    if not db then return nil end
+    layoutName = layoutName or LEM:GetActiveLayoutName() or "Modern"
+    db[key] = db[key] or {}
+    -- (a layout with no spot of its own reads the profile's home layout's: ProfileLayout.lua)
+    return ns.LayoutHome(db[key], layoutName)
+end
+
+local function ApplyPosition(layoutName)
+    if InCombatLockdown() then pendingLayout = true return end
+    local store = LayoutStore("layouts", layoutName)
+    local pos = (store and store.point) and store or DEFAULT_POSITION
+    holder:ClearAllPoints()
+    holder:SetPoint(pos.point, UIParent, pos.point, pos.x or 0, pos.y or 0)
+    if tankHolder then
+        local t = LayoutStore("tankLayouts", layoutName)
+        local tpos = (t and t.point) and t or TANK_DEFAULT_POSITION
+        tankHolder:ClearAllPoints()
+        tankHolder:SetPoint(tpos.point, UIParent, tpos.point, tpos.x or 0, tpos.y or 0)
+    end
+end
+
+local function Mover(key)
+    return function(_, layoutName, point, x, y)
+        local store = LayoutStore(key, layoutName)
+        if store then store.point, store.x, store.y = point, math_floor(x + 0.5), math_floor(y + 0.5) end
+    end
+end
+
+local function TanksOn()
+    local db = GetDb()
+    return db and db.mainTanks and db.mainTanks.enabled == true or false
+end
+
+-- plain frames, so this also works in combat
+local function HideSamples()
+    for _, f in ipairs(previewTiles) do f:Hide() end
+    for _, label in ipairs(holder.sampleLabels or {}) do label:Hide() end
+    for _, f in ipairs(tankPreview) do f:Hide() end
+end
+
+-- in a raid only; in Edit Mode the samples show instead of the live tiles
+local function ApplyVisibility()
+    if InCombatLockdown() then pendingLayout = true return end
+    local editing = IsEditing()
+    for _, frame in ipairs({ holder, tankHolder }) do
+        if editing then
+            UnregisterStateDriver(frame, "visibility")
+            frame:SetShown(frame == holder or TanksOn())
+        elseif frame == holder or TanksOn() then
+            RegisterStateDriver(frame, "visibility", "[group:raid] show; [@raid1,exists] show; hide")
+        else
+            UnregisterStateDriver(frame, "visibility")
+            frame:Hide()
+        end
+    end
+    if not editing then HideSamples() end
+end
+
+--------------------------------------------------
+-- 7. REFRESH
+--------------------------------------------------
+local function Refresh()
+    if not holder then return end
+    if InCombatLockdown() then pendingLayout = true return end
+    pendingLayout = false
+    EnsureHeaders()
+    LayoutGroups()
+    LayoutTanks()
+    local editing = IsEditing()
+    -- live tiles are hidden in Edit Mode: laid out on exit, not on every change
+    if not editing then
+        for _, f in ipairs(tiles) do
+            local ok, err = pcall(Tile.Layout, f)
+            if not ok then geterrorhandler()(err) end
+        end
+    end
+    ApplyPosition()
+    ApplyVisibility()
+    if editing then
+        -- only the samples of the raid size shown
+        EnsurePreview()
+        PlacePreview()
+        for _, list in ipairs({ previewTiles, tankPreview }) do
+            for _, f in ipairs(list) do
+                if f:IsShown() then
+                    pcall(Tile.Layout, f)
+                    Tile.UpdateAll(f)
+                end
+            end
+        end
+    else
+        for _, f in ipairs(tiles) do
+            if f:IsVisible() and f.fuiUnit then Tile.UpdateAll(f); Tile.UpdateRange(f) end
+        end
+    end
+end
+
+function RF:Refresh()
+    Refresh()
+end
+
+--------------------------------------------------
+-- 8. EDIT MODE SETTINGS
+--------------------------------------------------
+local RebuildSettings
+
+-- The Auras section for the raid and main tank frames (each with its get / set and view); a place
+-- that clashes with another kind's is greyed out
+local function AuraItems(get, set, d, view)
+    local AURA_FIELDS = { "buffs", "debuffs", "dispels" }
+    local function Place(field)
+        return function(_, rootDescription, data)
+            for _, p in ipairs(RAID_PLACES) do
+                local radio = rootDescription:CreateRadio(p.text,
+                    function(value) return get(field)() == value end,
+                    function(value) data.set(nil, value) end, p.value)
+                if p.value ~= "OFF" and radio.SetEnabled then
+                    for _, other in ipairs(AURA_FIELDS) do
+                        if other ~= field and Tile.PlacesClash(p.value, view[other]) then radio:SetEnabled(false) end
+                    end
+                end
+            end
+        end
+    end
+    local items = {
+        { name = L["Buffs"], kind = LEM.SettingType.Dropdown, default = d.buffs, values = RAID_PLACES, generator = Place("buffs"),
+          get = get("buffs"), set = set("buffs"),
+          desc = L["Buffs as Blizzard's raid frames pick them: mostly your own heals over time and buffs."] },
+        { name = L["Debuffs"], kind = LEM.SettingType.Dropdown, default = d.debuffs, values = RAID_PLACES, generator = Place("debuffs"),
+          get = get("debuffs"), set = set("debuffs"),
+          desc = L["Debuffs as Blizzard's raid frames pick them: boss and role debuffs, priority debuffs, and the ones you can dispel."] },
+        { name = L["Hide Buffs"], kind = LEM.SettingType.Dropdown, default = "PERMANENT",
+          values = {
+              { text = L["Off"], value = "OFF", isRadio = true },
+              { text = L["Permanent"], value = "PERMANENT", isRadio = true },
+              { text = L["Longer Than 15 Minutes"], value = "900", isRadio = true },
+              { text = L["Longer Than 10 Minutes"], value = "600", isRadio = true },
+              { text = L["Longer Than 5 Minutes"], value = "300", isRadio = true },
+              { text = L["Longer Than 1 Minute"], value = "60", isRadio = true },
+          },
+          get = get("hideBuffs", "PERMANENT"), set = set("hideBuffs"),
+          desc = L["Leaves long buffs off the raid frames:\n* Permanent: buffs with no duration\n* Longer Than: buffs whose full duration is longer, and permanent ones"] },
+        { name = L["Dispel Highlight"], kind = LEM.SettingType.Dropdown, default = d.dispelHighlight or "mine",
+          values = { { text = L["Off"], value = "off", isRadio = true }, { text = L["Dispellable by Me"], value = "mine", isRadio = true },
+                     { text = L["Dispellable by the Group"], value = "all", isRadio = true } },
+          desc = L["A dispellable debuff colours the frame's border in its type's colour."],
+          get = get("dispelHighlight", "mine"), set = set("dispelHighlight") },
+        { name = L["Dispel Icons"], kind = LEM.SettingType.Dropdown, default = d.dispels, values = RAID_PLACES, generator = Place("dispels"),
+          get = get("dispels"), set = set("dispels"),
+          desc = L["The symbol of each debuff type you can dispel (Magic, Curse, Disease, Poison)."] },
+        { name = L["Buff Size"], kind = LEM.SettingType.Slider, default = d.auraSize or 14, minValue = 8, maxValue = 30, valueStep = 1,
+          get = function() return ns.AuraSize(view, false, d.auraSize or 14) end, set = set("buffSize") },
+        { name = L["Debuff Size"], kind = LEM.SettingType.Slider, default = d.auraSize or 14, minValue = 8, maxValue = 30, valueStep = 1,
+          get = function() return ns.AuraSize(view, true, d.auraSize or 14) end, set = set("debuffSize") },
+        { name = L["Only My Buffs"], kind = LEM.SettingType.Checkbox, default = true,
+          get = get("onlyMyBuffs", true), set = set("onlyMyBuffs"),
+          desc = L["Only the buffs you cast (your heals over time, your blessings). Off: everyone's buffs."] },
+        { name = L["Dispellable Debuffs Only"], kind = LEM.SettingType.Checkbox, default = false,
+          get = get("dispellableOnly", false), set = set("dispellableOnly"),
+          desc = L["Only the debuffs you can dispel, plus boss debuffs and other important ones, as on Blizzard's raid frames."] },
+    }
+    return items
+end
+
+local function BuildSettings()
+    local d = ns.defaults and ns.defaults.profile.unitframes.raid or {}
+    local function get(key, default)
+        return function()
+            local db = GetDb()
+            local v = db and db[key]
+            if v == nil then return default end
+            return v
+        end
+    end
+    local function set(key)
+        return function(_, value)
+            local db = GetDb()
+            if not db then return end
+            db[key] = value
+            Refresh()
+        end
+    end
+    local Section, settings = K.EditSections()
+    Section("Raid", {
+        { name = L["Sample Raid"], kind = LEM.SettingType.Dropdown, default = "medium",
+          values = { { text = L["10 Players"], value = "small", isRadio = true }, { text = L["25 Players"], value = "medium", isRadio = true },
+                     { text = L["40 Players"], value = "large", isRadio = true } },
+          desc = L["Edit Mode only: how many sample players show, to see the raid grow from the middle."],
+          get = function() return sampleRaid end,
+          set = function(_, value)
+              sampleRaid = value
+              Refresh()
+          end },
+        -- (columns too since 6.4.1; there Down / Up read as Right / Left, as on the party frames in a row)
+        { name = L["Growth"], kind = LEM.SettingType.Dropdown, default = "CENTER",
+          values = function()
+              if not Rows() then
+                  return { { text = L["From the Middle"], value = "CENTER", isRadio = true },
+                           { text = L["Right"], value = "DOWN", isRadio = true }, { text = L["Left"], value = "UP", isRadio = true } }
+              end
+              return { { text = L["From the Middle"], value = "CENTER", isRadio = true },
+                       { text = L["Down"], value = "DOWN", isRadio = true }, { text = L["Up"], value = "UP", isRadio = true } }
+          end,
+          desc = L["Which way the raid grows as groups join. Rows grow down or up, columns right or left. The main tank frames follow rows."],
+          get = get("grow", "CENTER"), set = set("grow") },
+        { name = L["Sort By"], kind = LEM.SettingType.Dropdown, default = "GROUP",
+          values = { { text = L["Group"], value = "GROUP", isRadio = true }, { text = L["Role"], value = "ROLE", isRadio = true },
+                     { text = L["Class"], value = "CLASS", isRadio = true } },
+          desc = L["Group keeps each raid group together. Role and Class fill rows of five, tanks or classes first."],
+          get = get("sort", "GROUP"), set = set("sort") },
+        { name = L["Groups"], kind = LEM.SettingType.Dropdown, default = "ROWS",
+          values = { { text = L["Rows"], value = "ROWS", isRadio = true }, { text = L["Columns"], value = "COLUMNS", isRadio = true } },
+          get = get("orientation", "ROWS"),
+          -- (Growth's choices read Right / Left for columns: the dialog redraws them)
+          set = function(layoutName, value)
+              set("orientation")(layoutName, value)
+              if LEM.RefreshOpenSettings then LEM:RefreshOpenSettings() end
+          end },
+        -- (between the bars: 0 makes them touch; Gaps migrates old values first)
+        { name = L["Spacing"], kind = LEM.SettingType.Slider, default = d.spacing or 10, minValue = 0, maxValue = 40, valueStep = 1,
+          get = function() Gaps(GetDb()); return get("spacing", 10)() end, set = set("spacing"),
+          desc = L["The gap between the bars. 0 makes them touch."] },
+        { name = L["Group Spacing"], kind = LEM.SettingType.Slider, default = d.groupSpacing or 10, minValue = 0, maxValue = 60, valueStep = 1,
+          get = function() Gaps(GetDb()); return get("groupSpacing", 10)() end, set = set("groupSpacing"),
+          desc = L["The gap between the groups, measured between the bars."] },
+        { name = L["Group Numbers"], kind = LEM.SettingType.Checkbox, default = d.groupNumbers ~= false, get = get("groupNumbers", false), set = set("groupNumbers"),
+          hidden = function() return Mode() ~= "group" end },
+        { name = L["Main Tank Frames"], kind = LEM.SettingType.Checkbox, default = false,
+          get = function() return TanksOn() end,
+          set = function(_, value)
+              local db = GetDb()
+              if not db then return end
+              db.mainTanks = db.mainTanks or {}
+              db.mainTanks.enabled = value
+              Refresh()
+          end,
+          desc = L["The raid's main tanks in a small frame of their own (set by the raid leader)."] },
+    })
+
+    Section("Frame", {
+        { name = L["Width"], kind = LEM.SettingType.Slider, default = DEFAULT_W, minValue = 40, maxValue = 200, valueStep = 1,
+          get = get("width", DEFAULT_W), set = set("width") },
+        { name = L["Height"], kind = LEM.SettingType.Slider, default = DEFAULT_H, minValue = 20, maxValue = 100, valueStep = 1,
+          get = get("height", DEFAULT_H), set = set("height") },
+        { name = L["Power Bar Height"], kind = LEM.SettingType.Slider, default = d.powerHeight or 4, minValue = 0, maxValue = 15, valueStep = 1,
+          get = get("powerHeight", 4), set = set("powerHeight"), formatter = function(value) return value == 0 and _G.OFF or value end },
+        { name = L["Health Text"], kind = LEM.SettingType.Dropdown, default = d.healthText or "none", values = K.HEALTH_TEXT_MODES,
+          get = get("healthText", "none"), set = set("healthText") },
+        { name = L["Power Text"], kind = LEM.SettingType.Dropdown, default = "none", values = K.POWER_TEXT_MODES,
+          get = get("powerText", "none"), set = set("powerText") },
+        { name = L["Power Bar for Mana Users Only"], kind = LEM.SettingType.Checkbox, default = false,
+          get = get("powerManaOnly", false), set = set("powerManaOnly"),
+          desc = L["Power bars only for classes that use mana. Warriors and rogues get the room for health instead."] },
+        -- (in Frame since 6.3.3: it changes how the frame behaves, not how it looks; main tanks follow it)
+        { name = L["Range Check"], kind = LEM.SettingType.Checkbox, default = true,
+          desc = L["The frame fades while the unit is out of range."],
+          get = get("rangeCheck", true), set = set("rangeCheck") },
+    })
+
+    Section("Look", {
+        { name = L["Bar Texture"], kind = LEM.SettingType.Dropdown, default = d.texture, values = K.BuildTextureValues(),
+          get = get("texture", d.texture), set = set("texture") },
+        { name = L["Border"], kind = LEM.SettingType.Dropdown, default = d.border, values = K.BuildBorderValues(false),
+          -- (every style, Forever Style too: raid tiles are never on its plate, 11-13)
+          get = get("border", d.border), set = set("border") },
+        -- (11-13, was always striped; the main tanks follow it)
+        { name = L["Absorb Texture"], kind = LEM.SettingType.Dropdown, default = d.absorbTexture or "FlareUI Striped", values = K.BuildAbsorbValues(),
+          get = get("absorbTexture", "FlareUI Striped"), set = set("absorbTexture"),
+          desc = L["The texture of the shield (absorb) over the health bar."] },
+        -- (main tanks follow it)
+        K.BgOpacitySetting(K.BAR_BG_OPACITY, get("bgOpacity", K.BAR_BG_OPACITY), set("bgOpacity")),
+        K.ClassColorSetting(function() return ns.ClassColorsOn(GetDb()) end, set("classColor")),
+        K.SmoothBarsSetting(get("smoothBars", false), set("smoothBars")),
+    })
+
+    Section("Auras", ns.AuraOrder.With(AuraItems(get, set, d, raidView), get, set))
+
+    local iconItems = {}
+    local sample = { ctx = raidCtx }   -- the icon switches read the raid settings through it
+    for _, key in ipairs(Tile.ICON_ORDER) do
+        iconItems[#iconItems + 1] = { name = Tile.ICON_LABELS[key], kind = LEM.SettingType.Checkbox, default = true,
+            get = function() return Tile.IconShown(key, sample) end,
+            set = function(_, value)
+                local store = Tile.IconStore(key, true, sample)
+                if not store then return end
+                store.shown = value
+                Refresh()
+            end }
+    end
+    Section("Icons", iconItems)
+    return settings
+end
+
+local function BuildTankSettings()
+    -- a main tank setting: its own, else the raid's (TANK_OWN), else the default
+    local function get(key, default)
+        return function()
+            local db = GetDb()
+            local mt = db and db.mainTanks
+            local v = mt and mt[key]
+            if v == nil and TANK_OWN[key] and db then v = db[key] end
+            if v == nil then return default end
+            return v
+        end
+    end
+    local function set(key)
+        return function(_, value)
+            local db = GetDb()
+            if not db then return end
+            db.mainTanks = db.mainTanks or {}
+            db.mainTanks[key] = value
+            Refresh()
+        end
+    end
+    local raidD = ns.defaults and ns.defaults.profile.unitframes.raid or {}
+    local d = setmetatable({}, { __index = function(_, k)
+        local own = raidD.mainTanks and raidD.mainTanks[k]
+        if own ~= nil then return own end
+        return raidD[k]
+    end })
+    local Section, settings = K.EditSections()
+    Section("Frame", {
+        { name = L["Width"], kind = LEM.SettingType.Slider, default = 182, minValue = 40, maxValue = 240, valueStep = 1, get = get("w", 182), set = set("w") },
+        { name = L["Height"], kind = LEM.SettingType.Slider, default = 60, minValue = 20, maxValue = 100, valueStep = 1, get = get("h", 60), set = set("h") },
+        { name = L["Power Bar Height"], kind = LEM.SettingType.Slider, default = d.powerHeight or 4, minValue = 0, maxValue = 15, valueStep = 1,
+          get = get("powerHeight", 4), set = set("powerHeight"), formatter = function(value) return value == 0 and _G.OFF or value end },
+        -- (between the bars, as the raid's Spacing: 0 makes them touch)
+        { name = L["Spacing"], kind = LEM.SettingType.Slider, default = 10, minValue = 0, maxValue = 40, valueStep = 1,
+          get = function() Gaps(GetDb()); return get("spacing", 10)() end, set = set("spacing"),
+          desc = L["The gap between the bars. 0 makes them touch."] },
+        { name = L["Tank Targets"], kind = LEM.SettingType.Dropdown, default = "OFF",
+          values = { { text = L["Off"], value = "OFF", isRadio = true },
+                     { text = L["Bottom of the Frame"], value = "BOTTOM", isRadio = true },
+                     { text = L["Right of the Frame"], value = "RIGHT", isRadio = true } },
+          get = get("tankTargets", "OFF"), set = set("tankTargets"),
+          desc = L["What each main tank is targeting, in a small frame below or right of theirs."] },
+    })
+    Section("Auras", ns.AuraOrder.With(AuraItems(get, set, d, tankView), get, set))
+    return settings
+end
+
+RebuildSettings = function()
+    if not holder then return end
+    LEM:AddFrameSettings(holder, BuildSettings())
+end
+
+--------------------------------------------------
+-- 9. EVENTS
+--------------------------------------------------
+local function ForTiles(fn)
+    for _, f in ipairs(tiles) do
+        if f.fuiUnit and f:IsVisible() then fn(f) end
+    end
+end
+
+function RF:OnGlobalEvent(event, ...)
+    if event == "PLAYER_REGEN_ENABLED" then
+        if pendingLayout then Refresh() end
+        return
+    end
+    if IsEditing() then return end
+    if event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
+        -- one pass for a burst (a raid forming); tiles the headers gave a new unit since it began
+        -- were already drawn in full (SetTileUnit)
+        if not rosterPending then
+            rosterPending = true
+            local burstStart = GetTime()
+            C_Timer.After(0.2, function()
+                rosterPending = false
+                if IsEditing() then return end
+                ForTiles(function(f)
+                    if not (f.unitSetAt and f.unitSetAt >= burstStart) then Tile.UpdateAll(f) end
+                end)
+            end)
+        end
+        return
+    end
+    if event == "READY_CHECK_FINISHED" then
+        if readyHold then readyHold:Cancel() end
+        readyHold = C_Timer.NewTimer(READY_CHECK_HOLD, function()
+            readyHold = nil
+            for _, f in ipairs(tiles) do f.lastReady = nil; if f.fuiUnit then Tile.UpdateReadyCheck(f) end end
+        end)
+    elseif event == "READY_CHECK" then
+        if readyHold then readyHold:Cancel(); readyHold = nil end
+    end
+    local update
+    if event == "PLAYER_TARGET_CHANGED" then
+        update = Tile.UpdateTarget
+    elseif event == "RAID_TARGET_UPDATE" then
+        update = Tile.UpdateRaidIcon
+    elseif event == "READY_CHECK" or event == "READY_CHECK_CONFIRM" or event == "READY_CHECK_FINISHED" then
+        update = Tile.UpdateReadyCheck
+    elseif event == "INCOMING_SUMMON_CHANGED" or event == "INCOMING_RESURRECT_CHANGED" then
+        update = Tile.UpdateStatus
+    elseif event == "PARTY_LEADER_CHANGED" then
+        update = Tile.UpdateLeader
+    elseif event == "PLAYER_ROLES_ASSIGNED" then
+        ForTiles(Tile.UpdateRole)
+        update = Tile.UpdatePower
+    end
+    if update then ForTiles(update) end
+end
+
+local GLOBAL_EVENTS = {
+    "GROUP_ROSTER_UPDATE", "PARTY_LEADER_CHANGED", "RAID_TARGET_UPDATE", "PLAYER_TARGET_CHANGED",
+    "PLAYER_ROLES_ASSIGNED", "READY_CHECK", "READY_CHECK_CONFIRM", "READY_CHECK_FINISHED",
+    "INCOMING_SUMMON_CHANGED", "INCOMING_RESURRECT_CHANGED", "PLAYER_ENTERING_WORLD",
+    "PLAYER_REGEN_ENABLED",
+}
+
+-- Range comes from UNIT_IN_RANGE_UPDATE; every second the tiles re-check it (in case an event was
+-- missed) and their aura reach, which has no event
+local function StartRangeTicker()
+    -- one fifth of the tiles per tick, so a 40-man raid never checks them all in one frame
+    local slice = 0
+    C_Timer.NewTicker(RANGE_INTERVAL / 5, function()
+        if not holder:IsShown() or IsEditing() then return end
+        slice = slice % 5 + 1
+        for i = slice, #tiles, 5 do
+            local f = tiles[i]
+            if f.fuiUnit and f:IsVisible() then Tile.UpdateRange(f) end
+        end
+    end)
+    -- Tank Targets: a tank's target has no event of its own
+    C_Timer.NewTicker(0.3, function()
+        if TT.Place() == "OFF" then return end
+        for _, t in ipairs(TT.frames) do
+            if t:IsVisible() then TT.Update(t) end
+        end
+    end)
+end
+
+-- Edit Mode: the party and raid frames overlap, so each gets its own strata (party on top) and their
+-- tiles never interleave. Children keep the strata they were created with, hence the recursion.
+local GROUP_LAYERS = { FlareUI_Party = "MEDIUM", FlareUI_Raid = "LOW", FlareUI_RaidTanks = "LOW" }
+local function SetLayer(frame, strata)
+    frame:SetFrameStrata(strata)
+    for _, child in ipairs({ frame:GetChildren() }) do SetLayer(child, strata) end
+end
+local function StackGroupFrames()
+    if InCombatLockdown() then return end
+    local editing = IsEditing()
+    for name, strata in pairs(GROUP_LAYERS) do
+        local frame = _G[name]
+        if frame then SetLayer(frame, editing and strata or "LOW") end
+    end
+end
+
+-- hide Blizzard's raid frames (the raid manager stays)
+local function HideBlizzardRaid()
+    if _G.CompactRaidFrameContainer then K.HardHide("CompactRaidFrameContainer") end
+end
+
+--------------------------------------------------
+-- 10. PUBLIC
+--------------------------------------------------
+function RF:ShouldLoad()
+    local db = K and K.GetDb()
+    return db and db.enabled and db.raid and db.raid.enabled and Tile and true or false
+end
+
+function RF:Init()
+    if self.initialized or not (K and Tile) then return end
+    if InCombatLockdown() then
+        -- secure frames cannot be created in combat (a /reload mid-fight): wait for it to end
+        self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+            self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+            self:Init()
+        end)
+        return
+    end
+    self.initialized = true
+
+    holder = CreateFrame("Frame", "FlareUI_Raid", UIParent, "SecureHandlerStateTemplate")
+    holder:SetFrameStrata("LOW")
+    holder:SetClampedToScreen(true)
+    holder:SetSize(400, 400)
+    holder.editModeName = "FlareUI Raid Frames"
+    holder:SetAttribute("layout", LAYOUT_SNIPPET)
+
+    tankHolder = CreateFrame("Frame", "FlareUI_RaidTanks", UIParent, "SecureHandlerStateTemplate")
+    tankHolder:SetFrameStrata("LOW")
+    tankHolder:SetClampedToScreen(true)
+    tankHolder:SetSize(110, 120)
+    tankHolder.editModeName = "FlareUI Main Tanks"
+    local tanks = NewHeader("FlareUI_RaidTanksHeader", tankHolder, tankCtx, MAX_TANKS)
+    tanks:SetAttribute("groupFilter", "MAINTANK")
+    -- no more than the frame has room for, and tiles can't be made in combat
+    tanks:SetAttribute("unitsPerColumn", MAX_TANKS)
+    tanks:SetAttribute("maxColumns", 1)
+    headers.tanks = tanks
+    Precreate(tanks)
+
+    Refresh()
+
+    LEM:AddFrame(holder, Mover("layouts"), DEFAULT_POSITION, "FlareUI Raid Frames")
+    LEM:AddFrameSettings(holder, BuildSettings())
+    LEM:AddFrame(tankHolder, Mover("tankLayouts"), TANK_DEFAULT_POSITION, "FlareUI Main Tanks")
+    LEM:AddFrameSettings(tankHolder, BuildTankSettings())
+    HideBlizzardRaid()
+
+    for _, event in ipairs(GLOBAL_EVENTS) do self:RegisterEvent(event, "OnGlobalEvent") end
+
+    LEM:RegisterCallback("layout", function(layoutName) ApplyPosition(layoutName) end)
+    LEM:RegisterCallback("enter", function()
+        Refresh()
+        RebuildSettings()
+        StackGroupFrames()
+    end)
+    local function EndPreview()
+        HideSamples()
+        StackGroupFrames()
+        Refresh()
+    end
+    LEM:RegisterCallback("exit", EndPreview)
+    ns.OnEditFight(function()
+        if IsEditing() then Refresh() StackGroupFrames() else EndPreview() end
+    end)
+
+    StartRangeTicker()
+    C_Timer.After(0, Refresh)
+end

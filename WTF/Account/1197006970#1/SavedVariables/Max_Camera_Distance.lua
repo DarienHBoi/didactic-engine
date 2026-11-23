@@ -1,27 +1,39 @@
 
 MaxCameraDistanceDB = {
-["__migrations"] = {
-["perCharacterProfiles"] = {
+["profiles"] = {
+["Skeleton - CAMWOW EU4 Realm 2 PvP"] = {
+["groundEffectFade"] = 500,
+["groundEffectDist"] = 367,
+["minimap"] = {
+["minimapPos"] = 198.9599319740732,
 },
-["staticCVarDefaults"] = true,
+["cameraYawMoveSpeed"] = 231,
+["foreverGroundEffectsOverride"] = true,
+["cameraPitchMoveSpeed"] = 181,
+["afkMode"] = true,
+["cameraIndirectOffset"] = 5.800000000000001,
+["afkDelay"] = 30,
+["groundEffectDensity"] = 256,
+},
+["Skeleton Bone"] = {
+["minimap"] = {
+["minimapPos"] = 200.0741797257164,
+},
+},
+["Bone Storage"] = {
+["groundEffectDist"] = 497,
+},
 },
 ["profileKeys"] = {
 ["Skeleton - CAMWOW EU4 Realm 2 PvP"] = "Skeleton - CAMWOW EU4 Realm 2 PvP",
+["Skeleton Bone"] = "Skeleton Bone",
+["Bone Storage"] = "Bone Storage",
+["Bone - "] = "Bone - ",
 },
-["profiles"] = {
-["Skeleton - CAMWOW EU4 Realm 2 PvP"] = {
-["afkMode"] = true,
-["groundEffectDensity"] = 256,
-["groundEffectDist"] = 481,
-["cameraYawMoveSpeed"] = 231,
-["cameraIndirectOffset"] = 5.800000000000001,
-["minimap"] = {
-["minimapPos"] = 248.1547743617811,
+["__migrations"] = {
+["perCharacterProfiles"] = {
+["Bone - "] = true,
 },
-["afkDelay"] = 30,
-["cameraPitchMoveSpeed"] = 181,
-["groundEffectFade"] = 500,
-["foreverGroundEffectsOverride"] = true,
-},
+["staticCVarDefaults"] = true,
 },
 }

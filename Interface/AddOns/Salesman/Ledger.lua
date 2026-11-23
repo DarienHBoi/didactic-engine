@@ -7,19 +7,59 @@ local function valid(v)
 end
 
 local function book(db)
-    db.ledger = db.ledger or { entries = {}, total = 0, count = 0 }
+    db.ledger = db.ledger or { entries = {}, total = 0, count = 0, byKey = {} }
     return db.ledger
+end
+
+-- Per-item totals ({count, total} by recipe key). A ledger saved before they existed is rebuilt from its entries once.
+local function perItem(b)
+    if not b.byKey then
+        b.byKey = {}
+        for _, e in ipairs(b.entries or {}) do
+            if e.key and valid(e.copper) then
+                local r = b.byKey[e.key] or { count = 0, total = 0 }
+                r.count, r.total = r.count + 1, r.total + e.copper
+                b.byKey[e.key] = r
+            end
+        end
+    end
+    return b.byKey
 end
 
 -- Adds money earned (copper). Bad amounts are ignored. The running total and count survive the entry cap.
 function S.Ledger.add(db, name, copper, key, now, source)
     if type(db) ~= "table" or not valid(copper) then return false end
     local b = book(db)
+    local pk = perItem(b)
     b.entries[#b.entries + 1] = { t = now or 0, name = name, copper = copper, key = key, source = source }
     while #b.entries > S.Ledger.MAX do table.remove(b.entries, 1) end
     b.total = b.total + copper
     b.count = b.count + 1
+    if key then
+        local r = pk[key] or { count = 0, total = 0 }
+        r.count, r.total = r.count + 1, r.total + copper
+        pk[key] = r
+    end
     return true
+end
+
+-- Sales count and gold earned for one recipe key (0, 0 when none).
+function S.Ledger.byKey(db, key)
+    if not (db and db.ledger and key) then return 0, 0 end
+    local r = perItem(db.ledger)[key]
+    if not r then return 0, 0 end
+    return r.count, r.total
+end
+
+-- The n biggest earners as {key, count, total}, most gold first.
+function S.Ledger.top(db, n)
+    local out = {}
+    if db and db.ledger then
+        for key, r in pairs(perItem(db.ledger)) do out[#out + 1] = { key = key, count = r.count, total = r.total } end
+    end
+    table.sort(out, function(a, b) if a.total ~= b.total then return a.total > b.total end return a.key < b.key end)
+    while #out > (n or 10) do table.remove(out) end
+    return out
 end
 
 function S.Ledger.total(db) return db and db.ledger and db.ledger.total or 0 end

@@ -1,5 +1,9 @@
 
 TaxiSpikeDB = {
+["minimap"] = {
+["hidden"] = false,
+["angle"] = 15.77548342969795,
+},
 ["log"] = {
 "PROBE start 2026-11-08 02:24:42",
 "build 16001",
@@ -141,9 +145,5 @@ TaxiSpikeDB = {
 "WHO [1-20 c-\"Warlock\"] ok=true err=nil events=0 results=50 first=Marikatten Marre L8 Orgrimmar",
 "WHO [c-\"Warlock\" z-\"Durotar\"] ok=true err=nil events=0 results=50 first=Marikatten Marre L8 Orgrimmar",
 "PROBE done 02:25:18 - now /reload to save",
-},
-["minimap"] = {
-["hidden"] = false,
-["angle"] = 15.77548342969795,
 },
 }

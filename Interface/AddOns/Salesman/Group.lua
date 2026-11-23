@@ -50,3 +50,19 @@ function S.Group.shortName(name)
     local tail = name:match("^.-%s%-%s(.+)$")
     return tail or name
 end
+
+-- Row labels for one list: the short tail ("Minor Agility") unless another item in the list has the same tail, then
+-- the slot stays ("Bracer - Minor Agility") so Bracer, Boots and Cloak rows can be told apart.
+function S.Group.labeler(items)
+    local count = {}
+    for _, r in ipairs(items or {}) do
+        local t = S.Group.shortName(r.name)
+        count[t] = (count[t] or 0) + 1
+    end
+    return function(name)
+        if type(name) ~= "string" then return "" end
+        local t = S.Group.shortName(name)
+        if (count[t] or 0) > 1 then return (name:gsub("^Enchant%s+", "")) end
+        return t
+    end
+end

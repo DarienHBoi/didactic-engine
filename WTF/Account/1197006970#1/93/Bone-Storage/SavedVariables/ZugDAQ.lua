@@ -1,0 +1,5 @@
+
+ZugDAQ_ProfCharDB = {
+["professions"] = {
+},
+}

@@ -1,0 +1,50 @@
+## Interface: 16001
+## Title: |cffeceff2Map|r|cffffc828Seek|r
+## Notes: Search the world map for vendors, trainers, items, quests, mailboxes and more. Uses the data from Questie and QuestieDB.
+## Notes-deDE: Durchsuche die Weltkarte nach Händlern, Lehrern, Gegenständen, Quests, Briefkästen und mehr. Nutzt die Daten von Questie und QuestieDB.
+## Notes-esES: Busca en el mapa del mundo vendedores, instructores, objetos, misiones, buzones y más. Usa los datos de Questie y QuestieDB.
+## Notes-esMX: Busca en el mapa del mundo vendedores, instructores, objetos, misiones, buzones y más. Usa los datos de Questie y QuestieDB.
+## Notes-frFR: Cherchez sur la carte du monde marchands, maîtres, objets, quêtes, boîtes aux lettres et plus. Utilise les données de Questie et QuestieDB.
+## Notes-itIT: Cerca sulla mappa del mondo mercanti, istruttori, oggetti, missioni, cassette postali e altro. Usa i dati di Questie e QuestieDB.
+## Notes-koKR: 세계 지도에서 상인, 상급자, 아이템, 퀘스트, 우체통 등을 검색합니다. Questie와 QuestieDB의 데이터를 사용합니다.
+## Notes-ptBR: Busque no mapa-múndi vendedores, instrutores, itens, missões, caixas de correio e mais. Usa os dados do Questie e do QuestieDB.
+## Notes-ruRU: Поиск на карте мира торговцев, учителей, предметов, заданий, почтовых ящиков и многого другого. Использует данные Questie и QuestieDB.
+## Notes-zhCN: 在世界地图上搜索商人、训练师、物品、任务、邮箱等。使用Questie和QuestieDB的数据。
+## Notes-zhTW: 在世界地圖上搜尋商人、訓練師、物品、任務、郵箱等。使用Questie和QuestieDB的資料。
+## Author: Corey Caruana
+## Version: 1.4.0
+## Category: Map
+## Dependencies: QuestieDB
+## OptionalDeps: Questie, OpenMap, TomTom, EllesmereUI
+## SavedVariables: MapSeekDB
+## X-Category: Map & Minimap
+## X-License: All Rights Reserved
+## X-Curse-Project-ID: 1793406
+## IconTexture: Interface\AddOns\MapSeek\Media\icon
+
+Locales\Locale.lua
+Locales\deDE.lua [AllowLoadTextLocale deDE]
+Locales\esES.lua [AllowLoadTextLocale esES]
+Locales\esMX.lua [AllowLoadTextLocale esMX]
+Locales\frFR.lua [AllowLoadTextLocale frFR]
+Locales\itIT.lua [AllowLoadTextLocale itIT]
+Locales\koKR.lua [AllowLoadTextLocale koKR]
+Locales\ptBR.lua [AllowLoadTextLocale ptBR]
+Locales\ruRU.lua [AllowLoadTextLocale ruRU]
+Locales\zhCN.lua [AllowLoadTextLocale zhCN]
+Locales\zhTW.lua [AllowLoadTextLocale zhTW]
+Core.lua
+Map.lua
+Index.lua
+Towns.lua
+Search.lua
+Suggest.lua
+Areas.lua
+Pins.lua
+RouteNet.lua
+Route.lua
+FarmNet.lua
+Farm.lua
+UI.lua
+FarmList.lua
+Settings.lua

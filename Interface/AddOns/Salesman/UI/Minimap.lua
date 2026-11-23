@@ -22,7 +22,7 @@ end
 
 function S.UI.updateBadge()
     if not button or not button.badge then return end
-    local n = (S.DB and S.DB.char and S.Customers.unreadCount(S.DB.char)) or 0
+    local n = (S.Mod.on("customers") and S.DB and S.DB.char and S.Customers.unreadCount(S.DB.char)) or 0
     button.badge:SetText(n > 0 and tostring(n) or "")
 end
 
@@ -61,8 +61,10 @@ function S.UI.initMinimapButton()
         GameTooltip:AddLine("Salesman")
         GameTooltip:AddLine("Click: open window", 1, 1, 1)
         GameTooltip:AddLine("Drag: move this button", 1, 1, 1)
-        local n = (S.DB and S.DB.char and S.Customers.unreadCount(S.DB.char)) or 0
+        local n = (S.Mod.on("customers") and S.DB and S.DB.char and S.Customers.unreadCount(S.DB.char)) or 0
         if n > 0 then GameTooltip:AddLine(n .. " unread customer(s)", 1, 0.82, 0) end
+        local wait = (S.Mod.on("maillog") and S.DB and S.DB.char and S.MailLog.uncollectedAH(S.DB.char.mailLog)) or 0
+        if wait > 0 then GameTooltip:AddLine("AH gold waiting in your mailbox: " .. S.Money.format(wait), 1, 0.5, 0) end
         GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -71,3 +73,6 @@ function S.UI.initMinimapButton()
     button:SetShown(not S.DB.global.minimapHidden)
     S.UI.updateBadge()
 end
+
+-- Switched off or on in NectarKit: the unread badge follows the Customers module at once.
+S.Mod.listen("customers", function() if S.UI.updateBadge then S.UI.updateBadge() end end)

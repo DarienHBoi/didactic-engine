@@ -1,0 +1,288 @@
+---------------------------------------------------------------------------------------
+--  Core/AllyCycle/Target.lua — ALLYCYCLE — friendly-hard-target identity
+---------------------------------------------------------------------------------------
+--  What it does: Resolves whether the hard target is an Ally HUD unit, plus name,
+--  role, class color, raid-marker index, cycle index, and range alpha.
+--  Architecture / how it works:
+--    • CM.AllyCycleTarget: IsFriendlyHardTarget, GetDisplayName, GetClassRGB,
+--      GetClassFileRGB, GetRoleAtlas, GetRoleAtlasFor, GetRaidTargetIndex, ApplyRaidMarker, GetIndex, FormatIndex,
+--      GetRangeAlpha, IsDead, IsOffline, IsPlayer. GetDisplayName is the first name only ("..."
+--      when secret); the Party Wheel plates use it too.
+--    • CM.IsAllyCycleFriendlyHardTarget is implemented here (party/raid roster +
+--      Skip Self + assist). Friendly NPCs (Interact) are not HUD units.
+--    • Secret-safe: PublicBool / issecretvalue; raid index is presence not math;
+--      range encodes secret UnitInRange in ColorMixin alpha (no Lua compare).
+--      UnitGroupRolesAssigned is pcall-guarded (Classic stubs can exist and throw).
+--  Does not: Own cluster chrome, fade/slide, or the health-bar widget.
+--  Related: Core/AllyCycle/HealthBar.lua, Motion.lua, HUD.lua, Cycle.lua, AllyCycle.lua
+---------------------------------------------------------------------------------------
+local _, CM = ...
+local _G = _G
+
+-- WoW API
+local CreateColor = _G.CreateColor
+local GetClassColor = _G.GetClassColor
+local GetRaidTargetIndex = _G.GetRaidTargetIndex
+local SetRaidTargetIconTexture = _G.SetRaidTargetIconTexture
+local UnitCanAssist = _G.UnitCanAssist
+local UnitCanAttack = _G.UnitCanAttack
+local UnitClass = _G.UnitClass
+local UnitExists = _G.UnitExists
+local UnitGroupRolesAssigned = _G.UnitGroupRolesAssigned
+local UnitInParty = _G.UnitInParty
+local UnitInRaid = _G.UnitInRaid
+local UnitInRange = _G.UnitInRange
+local UnitIsConnected = _G.UnitIsConnected
+local UnitIsDeadOrGhost = _G.UnitIsDeadOrGhost
+local UnitIsUnit = _G.UnitIsUnit
+local UnitName = _G.UnitName
+local EvaluateColorFromBoolean = _G.C_CurveUtil and _G.C_CurveUtil.EvaluateColorFromBoolean
+
+-- Lua stdlib
+local issecretvalue = _G.issecretvalue
+local pcall = _G.pcall
+local tostring = _G.tostring
+local type = _G.type
+
+local Target = {}
+CM.AllyCycleTarget = Target
+
+local ROLE_ATLASES = {
+  TANK = "UI-Frame-TankIcon",
+  HEALER = "UI-Frame-HealerIcon",
+  DAMAGER = "UI-Frame-DpsIcon",
+  NONE = "UI-Frame-DpsIcon",
+}
+
+local RAID_TARGET_TEXTURE = [[Interface\TargetingFrame\UI-RaidTargetingIcons]]
+local RAID_TARGET_TEXTURE_ROWS = 4
+local RAID_TARGET_TEXTURE_COLUMNS = 4
+
+-- Encode range in ColorMixin alpha so secret UnitInRange never enters a Lua compare.
+local COLOR_IN_RANGE = CreateColor and CreateColor(1, 1, 1, 1)
+local COLOR_OUT_OF_RANGE = CreateColor and CreateColor(1, 1, 1, 0.3)
+
+Target.RAID_TARGET_TEXTURE = RAID_TARGET_TEXTURE
+
+local IsSecret = CM.Safe.IsSecret
+local PublicBool = CM.Safe.PublicBool
+
+-- SecureGroupHeader roster is party/raid (+ self). Interact NPCs can be assistable.
+local function IsAllyCycleRosterUnit(unit)
+  if UnitInParty and PublicBool(UnitInParty(unit)) == true then
+    return true
+  end
+  if UnitInRaid then
+    local raidIndex = UnitInRaid(unit)
+    if IsSecret(raidIndex) then
+      return false
+    end
+    if type(raidIndex) == "number" then
+      return true
+    end
+  end
+  return false
+end
+
+--- A pet Ally Cycle can land on (Also Cycle Through: Your Pet / Party Pets); false when both are off.
+function Target.IsExtraUnit(unit)
+  return CM.IsAllyCycleExtraUnit ~= nil and CM.IsAllyCycleExtraUnit(unit) == true
+end
+
+function Target.IsFriendlyHardTarget()
+  if not UnitExists("target") then
+    return false
+  end
+  if UnitIsUnit and UnitIsUnit("target", "player") then
+    if not CM.IsAllyCycleSkipPlayer or CM.IsAllyCycleSkipPlayer() then
+      return false
+    end
+    return true
+  end
+  if not IsAllyCycleRosterUnit("target") and not Target.IsExtraUnit("target") then
+    return false
+  end
+  local attack = UnitCanAttack and UnitCanAttack("player", "target")
+  local pubAttack = PublicBool(attack)
+  if pubAttack == true then
+    return false
+  end
+  local assist = UnitCanAssist and UnitCanAssist("player", "target")
+  local pubAssist = PublicBool(assist)
+  if pubAssist == false then
+    return false
+  end
+  if pubAssist == true then
+    return true
+  end
+  return false
+end
+
+function CM.IsAllyCycleFriendlyHardTarget()
+  return Target.IsFriendlyHardTarget()
+end
+
+function Target.IsDead(unit)
+  if not unit or not UnitIsDeadOrGhost then
+    return false
+  end
+  return PublicBool(UnitIsDeadOrGhost(unit)) == true
+end
+
+--- Disconnected: only a public false from UnitIsConnected counts (secret = online).
+function Target.IsOffline(unit)
+  if not unit or not UnitIsConnected or not UnitExists(unit) then
+    return false
+  end
+  local connected = UnitIsConnected(unit)
+  if issecretvalue and issecretvalue(connected) then
+    return false
+  end
+  return connected == false
+end
+
+function Target.IsPlayer(unit)
+  if not unit or not UnitIsUnit then
+    return false
+  end
+  return PublicBool(UnitIsUnit(unit, "player")) == true
+end
+
+function Target.GetDisplayName(unit, preview)
+  local name = UnitName and UnitName(unit)
+  if not preview and Target.IsPlayer(unit) then
+    return "You"
+  end
+  if IsSecret(name) or type(name) ~= "string" or name == "" then
+    return preview and "Ally" or "..."
+  end
+  -- First name only (follower / companion NPCs have full names: "Brann Bronzebeard" -> "Brann").
+  return name:match("^(%S+)") or name
+end
+
+--- Class colour for a class token ("MAGE"); white when unknown. The options preview uses it directly.
+function Target.GetClassFileRGB(classFile)
+  if IsSecret(classFile) or type(classFile) ~= "string" then
+    return 1, 1, 1
+  end
+  if GetClassColor then
+    local r, g, b = GetClassColor(classFile)
+    if r then
+      return r, g, b
+    end
+  end
+  return 1, 1, 1
+end
+
+function Target.GetClassRGB(unit)
+  -- A pet's class token is its family/template, not a class colour: plain white name.
+  if unit == "target" and Target.IsExtraUnit(unit) then
+    return 1, 1, 1
+  end
+  local _, classFile = UnitClass(unit)
+  return Target.GetClassFileRGB(classFile)
+end
+
+--- Role icon atlas for a role token (TANK / HEALER / DAMAGER); DPS when unknown.
+function Target.GetRoleAtlasFor(role)
+  return ROLE_ATLASES[role] or ROLE_ATLASES.DAMAGER
+end
+
+function Target.GetRoleAtlas(unit)
+  -- Pets have no group role: no atlas (the HUD draws its pet crest instead).
+  if unit == "target" and Target.IsExtraUnit(unit) then
+    return nil
+  end
+  local role
+  if UnitGroupRolesAssigned then
+    local ok, result = pcall(UnitGroupRolesAssigned, unit)
+    if ok then
+      role = result
+    end
+  end
+  if IsSecret(role) or type(role) ~= "string" or role == "" then
+    role = "NONE"
+  end
+  return ROLE_ATLASES[role] or ROLE_ATLASES.DAMAGER or ROLE_ATLASES.NONE
+end
+
+function Target.GetRaidTargetIndex(unit)
+  if unit and UnitExists(unit) and GetRaidTargetIndex then
+    return GetRaidTargetIndex(unit)
+  end
+end
+
+-- Apply Blizzard raid-target sheet. SetRaidTargetIconTexture accepts secret indices.
+function Target.ApplyRaidMarker(tex, idx)
+  if not tex then
+    return false
+  end
+  -- Under taint, a present marker is a *secret* number (issecretvalue = presence).
+  -- Never truth-test / compare / arithmetic the index in Lua.
+  local hasMarker = IsSecret(idx) or (type(idx) == "number" and idx >= 1 and idx <= 8)
+  if not hasMarker then
+    return false
+  end
+  tex:SetTexture(RAID_TARGET_TEXTURE)
+  if SetRaidTargetIconTexture then
+    SetRaidTargetIconTexture(tex, idx)
+    return true
+  end
+  if tex.SetSpriteSheetCell then
+    tex:SetSpriteSheetCell(idx, RAID_TARGET_TEXTURE_ROWS, RAID_TARGET_TEXTURE_COLUMNS)
+    return true
+  end
+  return false
+end
+
+function Target.GetIndex(unit)
+  if CM.GetAllyCycleIndex then
+    return CM.GetAllyCycleIndex(unit)
+  end
+end
+
+function Target.FormatIndex(current, total)
+  if type(total) ~= "number" or total < 1 then
+    return nil
+  end
+  local curText = "?"
+  if type(current) == "number" and current >= 1 then
+    curText = tostring(current)
+  end
+  return curText .. "/" .. tostring(total)
+end
+
+-- Range alpha for the cluster. Secret UnitInRange is encoded in ColorMixin alpha.
+function Target.GetRangeAlpha(unit, preview, outA)
+  if type(outA) ~= "number" then
+    outA = 0.3
+  end
+  if preview or not unit or unit == "player" or not UnitExists(unit) then
+    return 1
+  end
+  if not UnitInRange then
+    return 1
+  end
+  -- Your own pet is never "out of range" (UnitInRange reports false for it outside a group).
+  if UnitIsUnit and PublicBool(UnitIsUnit(unit, "pet")) == true then
+    return 1
+  end
+  local inRange, checkedRange = UnitInRange(unit)
+  -- Not a checkable unit (e.g. a pet while solo): never dim it.
+  if PublicBool(checkedRange) == false then
+    return 1
+  end
+  if IsSecret(inRange) then
+    if EvaluateColorFromBoolean and COLOR_IN_RANGE and COLOR_OUT_OF_RANGE then
+      local rangeColor = EvaluateColorFromBoolean(inRange, COLOR_IN_RANGE, COLOR_OUT_OF_RANGE)
+      if rangeColor and rangeColor.a ~= nil then
+        return rangeColor.a
+      end
+    end
+    return 1
+  end
+  if inRange == false then
+    return outA
+  end
+  return 1
+end

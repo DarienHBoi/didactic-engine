@@ -1,0 +1,391 @@
+local _, ns = ...
+
+--------------------------------------------------
+-- DIALOG
+-- FlareUI's yes / no questions in place of StaticPopups, which hang the client in the Gamepad UI
+-- when shown from addon code. Reads the pad itself: bottom face button yes, right face button no.
+--------------------------------------------------
+-- ns.Dialogs[key] fields:
+--   text                  "%s" takes ns.ShowDialog's textArg
+--   button1, button2      yes / no labels (button2 optional)
+--   button3, OnAlt(data)  an optional third answer after the two (11-13)
+--   OnAccept(data, text)  on yes; text is the edit box's
+--   OnCancel(data)        on no, Escape or the right face button
+--   hasEditBox, maxLetters, editText(data)
+--   hideOnEscape          Escape and the right face button answer no
+--   showAlert             exclamation mark beside the text
+--   padInput              reads the controller outside the Gamepad UI too
+--   reloads               yes reloads the UI after OnAccept (section 2)
+--   macro                 the secure button runs this macro (or function(data)); PreClick calls
+--                         OnMacro, OnAccept stays the pad's and combat's answer
+--   padSecure             with macro: pad yes / no are bound to the secure buttons
+ns.Dialogs = ns.Dialogs or {}
+
+--------------------------------------------------
+-- 1. ANSWERS
+--------------------------------------------------
+local WIDTH     = 360
+local PADDING   = 18
+local BUTTON_W  = 130
+local BUTTON_H  = 24
+local BUTTON_GAP = 12
+
+local frame, current, currentData
+
+local function PadLabel(key, label, padInput)
+    -- in the gamepad UI a pad button's binding text is its glyph
+    if not (ns.IsGamepadUI() or padInput) then return label end
+    local glyph = GetBindingText(key, 1)
+    if not glyph or glyph == "" or glyph == key then return label end
+    return glyph .. " " .. label
+end
+
+local function Close()
+    if frame then frame:Hide() end
+end
+
+-- the third button: its own answer, no reload
+local function AnswerAlt()
+    local def, data = current, currentData
+    current, currentData = nil, nil
+    Close()
+    ns.ButtonSound()
+    if def and def.OnAlt then def.OnAlt(data) end
+end
+
+local function Answer(yes)
+    local def, data = current, currentData
+    if not def then return Close() end
+    local text = def.hasEditBox and frame.EditBox:GetText() or nil
+    current, currentData = nil, nil
+    Close()
+    ns.ButtonSound()
+    if yes then
+        if def.reloads then ns.reloading = true end
+        if def.OnAccept then def.OnAccept(data, text) end
+        if def.reloads then ns.Reload() end
+    elseif def.OnCancel then
+        def.OnCancel(data)
+    end
+end
+
+--------------------------------------------------
+-- 2. RELOADING
+-- ReloadUI is protected on Forever: "yes" is a secure macro button on UIParent laid over the yes
+-- button, so the dialog stays unprotected. In combat, yes falls back to the /reload hint.
+--------------------------------------------------
+local reloadButton, secureReload, accepted
+
+-- The secure reload buttons (this dialog's and the settings window's) sit on a secure parent its
+-- state driver hides in a fight: a protected button can't hide itself in combat, and one left up
+-- invisible would keep taking the clicks meant for whatever is under it. Made out of combat.
+function ns.SecureReloadParent()
+    if ns.secureReloadParent then return ns.secureReloadParent end
+    if InCombatLockdown() then return UIParent end
+    local parent = CreateFrame("Frame", "FlareUI_ReloadParent", UIParent, "SecureHandlerStateTemplate")
+    parent:SetAllPoints(UIParent)
+    RegisterStateDriver(parent, "visibility", "[combat] hide; show")
+    ns.secureReloadParent = parent
+    return parent
+end
+
+local function GetReloadButton()
+    if reloadButton then return reloadButton end
+    reloadButton = CreateFrame("Button", "FlareUIDialogReload", ns.SecureReloadParent(), "SecureActionButtonTemplate, UIPanelButtonTemplate")
+    reloadButton:SetSize(BUTTON_W, BUTTON_H)
+    if ns.SkinButton then ns.SkinButton(reloadButton) end
+    -- above the dialog's strata, or the toplevel dialog takes the click
+    reloadButton:SetFrameStrata("TOOLTIP")
+    -- mouse and bound key both act on the press, whatever ActionButtonUseKeyDown says. The dialog
+    -- closes on that press, so an action waiting for the release would never come.
+    reloadButton:RegisterForClicks("AnyDown")
+    reloadButton:SetAttribute("useOnKeyDown", true)
+    reloadButton:SetAttribute("type", "macro")
+    reloadButton:SetScript("PreClick", function(self, _, down)
+        if not down then return end
+        -- a dialog closed in combat keeps its Enter binding until combat ends (the macro stops
+        -- itself in combat): Enter opens the chat, as it would without the dialog
+        if not current then
+            if InCombatLockdown() and IsKeyDown("ENTER") and ChatFrameUtil and ChatFrameUtil.OpenChat then ChatFrameUtil.OpenChat(nil) end
+            return
+        end
+        if accepted then return end
+        -- in combat the macro does nothing: yes takes the combat answer (OnAccept, then the /reload hint)
+        if InCombatLockdown() then
+            Answer(true)
+            return
+        end
+        accepted = true
+        ns.reloading = (self:GetAttribute("macrotext") or ""):find("/reload", 1, true) ~= nil
+        ns.ButtonSound()
+        local onYes = current.macro and current.OnMacro or (not current.macro and current.OnAccept)
+        if onYes then onYes(currentData) end
+    end)
+    -- a macro that does not reload leaves the UI up, so the dialog closes here
+    reloadButton:SetScript("PostClick", function()
+        if not (accepted and current and frame and frame:IsShown()) then return end
+        current, currentData = nil, nil
+        frame:Hide()
+    end)
+    reloadButton:Hide()
+    -- the secure yes goes with its parent in a fight: the dialog's own yes stands in (it gives the
+    -- combat answer), and steps back when the fight ends
+    local swap = CreateFrame("Frame")
+    swap:RegisterEvent("PLAYER_REGEN_DISABLED")
+    swap:RegisterEvent("PLAYER_REGEN_ENABLED")
+    swap:SetScript("OnEvent", function(_, event)
+        if not (secureReload and current and frame and frame:IsShown()) then return end
+        frame.Button1:SetShown(event == "PLAYER_REGEN_DISABLED")
+    end)
+    return reloadButton
+end
+
+-- Released with the dialog, or after combat: until then it can't hide, so it only goes invisible.
+-- A dialog still up when combat ends was opened in combat and uses its own yes button.
+local releaseWaiter
+local function ReleaseReloadButton()
+    if not secureReload then return end
+    if InCombatLockdown() then
+        if not releaseWaiter then
+            releaseWaiter = CreateFrame("Frame")
+            releaseWaiter:SetScript("OnEvent", function(waiter)
+                waiter:UnregisterEvent("PLAYER_REGEN_ENABLED")
+                ReleaseReloadButton()
+            end)
+        end
+        reloadButton:SetAlpha(0)
+        releaseWaiter:RegisterEvent("PLAYER_REGEN_ENABLED")
+        return
+    end
+    secureReload = false
+    reloadButton:Hide()
+    ClearOverrideBindings(frame)
+end
+
+--------------------------------------------------
+-- 3. KEYS AND CONTROLLER
+--------------------------------------------------
+-- Escape and Enter are taken, other keys propagate. Propagation can't change in combat, where only
+-- the buttons work.
+local function OnKeyDown(self, key)
+    -- in a fight the keys also reach the game (propagation is locked on): only the buttons answer
+    if InCombatLockdown() and self:GetPropagateKeyboardInput() then return end
+    -- with the secure reload button up, Enter goes on to its override binding
+    local handled = (key == "ESCAPE" and current and current.hideOnEscape) or (key == "ENTER" and not secureReload)
+    if not InCombatLockdown() then self:SetPropagateKeyboardInput(not handled) end
+    if key == "ESCAPE" and handled then
+        Answer(false)
+    elseif key == "ENTER" and handled then
+        Answer(true)
+    end
+end
+
+local PAD_YES = GAMEPAD_FACE_BOTTOM or "PAD1"
+local PAD_NO  = GAMEPAD_FACE_RIGHT or "PAD2"
+
+local function OnGamePadButtonDown(self, button)
+    local yes = button == PAD_YES
+    local no = button == PAD_NO and current and (current.hideOnEscape or current.button2)
+    if not InCombatLockdown() then self:SetPropagateKeyboardInput(not (yes or no)) end
+    if yes then
+        Answer(true)
+    elseif no then
+        Answer(false)
+    end
+end
+
+--------------------------------------------------
+-- 4. THE WINDOW
+--------------------------------------------------
+local function CreateDialogButton(parent, onClick)
+    local button = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+    button:SetSize(BUTTON_W, BUTTON_H)
+    if ns.SkinButton then ns.SkinButton(button) end
+    button:SetScript("OnClick", onClick)
+    return button
+end
+
+local function Build()
+    frame = CreateFrame("Frame", "FlareUIDialog", UIParent, "BackdropTemplate")
+    frame:SetWidth(WIDTH)
+    frame:SetPoint("TOP", UIParent, "TOP", 0, -135)
+    frame:SetFrameStrata("FULLSCREEN_DIALOG")
+    frame:SetToplevel(true)
+    frame:SetClampedToScreen(true)
+    frame:EnableMouse(true)
+    frame:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeSize = 16,
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    frame:SetBackdropColor(0.05, 0.05, 0.05, 0.95)
+    frame:SetBackdropBorderColor(ns.BORDER_COLOR.r, ns.BORDER_COLOR.g, ns.BORDER_COLOR.b, 1)
+    frame:Hide()
+    -- keep Blizzard's gamepad cursor out: a pad click would run FlareUI code inside its navigation
+    frame.smartNavigationIgnored = true
+
+    frame.Alert = frame:CreateTexture(nil, "ARTWORK")
+    frame.Alert:SetTexture("Interface\\DialogFrame\\UI-Dialog-Icon-AlertNew")
+    frame.Alert:SetSize(32, 32)
+    frame.Alert:SetPoint("TOPLEFT", PADDING, -PADDING + 4)
+
+    frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    frame.Text:SetJustifyH("CENTER")
+    frame.Text:SetSpacing(2)
+
+    frame.EditBox = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
+    frame.EditBox:SetSize(WIDTH - 2 * PADDING - 10, 22)
+    frame.EditBox:SetAutoFocus(false)
+    frame.EditBox:SetScript("OnEnterPressed", function() Answer(true) end)
+    frame.EditBox:SetScript("OnEscapePressed", function() Answer(false) end)
+
+    frame.Button1 = CreateDialogButton(frame, function() Answer(true) end)
+    frame.Button2 = CreateDialogButton(frame, function() Answer(false) end)
+    frame.Button3 = CreateDialogButton(frame, AnswerAlt)
+    -- a name, so a controller binding can click "no" (padSecure)
+    frame.PadNo = CreateFrame("Button", "FlareUIDialogPadNo", frame)
+    frame.PadNo:SetScript("OnClick", function() Answer(false) end)
+
+    frame:SetScript("OnKeyDown", OnKeyDown)
+    frame:SetScript("OnGamePadButtonDown", OnGamePadButtonDown)
+    frame:SetScript("OnShow", function() ns.WindowOpenSound() end)
+    frame:SetScript("OnHide", function(self)
+        self.EditBox:ClearFocus()
+        if not InCombatLockdown() then self:SetPropagateKeyboardInput(true) end
+        ReleaseReloadButton()
+        if current then
+            -- hidden from outside: no answer, no callback
+            current, currentData = nil, nil
+        end
+    end)
+end
+
+local function Layout(def, text)
+    frame.Button1:SetText(PadLabel(PAD_YES, def.button1 or OKAY or "Okay", def.padInput))
+    local yesWidth = ns.Settings.ButtonWidthForText(frame.Button1, BUTTON_W)
+    frame.Button1:SetWidth(yesWidth)
+    local secondButtonSpace = 0
+    if def.button2 then
+        frame.Button2:SetText(PadLabel(PAD_NO, def.button2, def.padInput))
+        local noWidth = ns.Settings.ButtonWidthForText(frame.Button2, BUTTON_W)
+        frame.Button2:SetWidth(noWidth)
+        secondButtonSpace = BUTTON_GAP + noWidth
+    end
+    if def.button3 then
+        frame.Button3:SetText(def.button3)
+        local altWidth = ns.Settings.ButtonWidthForText(frame.Button3, BUTTON_W)
+        frame.Button3:SetWidth(altWidth)
+        secondButtonSpace = secondButtonSpace + BUTTON_GAP + altWidth
+    end
+
+    local alertOffset = def.showAlert and 20 or 0
+    local sideSpace = 2 * (PADDING + alertOffset)
+    local width = math.max(WIDTH, sideSpace + yesWidth + secondButtonSpace)
+    frame:SetWidth(width)
+    frame.Alert:SetShown(def.showAlert and true or false)
+    frame.Text:ClearAllPoints()
+    frame.Text:SetPoint("TOP", frame, "TOP", alertOffset, -PADDING)
+    frame.Text:SetWidth(width - sideSpace)
+    frame.Text:SetText(text)
+
+    local height = PADDING + frame.Text:GetStringHeight()
+    if def.hasEditBox then
+        frame.EditBox:ClearAllPoints()
+        frame.EditBox:SetPoint("TOP", frame.Text, "BOTTOM", 0, -12)
+        frame.EditBox:Show()
+        height = height + 12 + frame.EditBox:GetHeight()
+    else
+        frame.EditBox:Hide()
+    end
+
+    frame.Button1:Show()
+    frame.Button1:ClearAllPoints()
+    frame.Button1:SetPoint("TOP", frame, "TOP", alertOffset - secondButtonSpace / 2, -height - 16)
+    if def.button2 then
+        frame.Button2:Show()
+        frame.Button2:ClearAllPoints()
+        frame.Button2:SetPoint("LEFT", frame.Button1, "RIGHT", BUTTON_GAP, 0)
+    else
+        frame.Button2:Hide()
+    end
+    if def.button3 then
+        frame.Button3:Show()
+        frame.Button3:ClearAllPoints()
+        frame.Button3:SetPoint("LEFT", def.button2 and frame.Button2 or frame.Button1, "RIGHT", BUTTON_GAP, 0)
+    else
+        frame.Button3:Hide()
+    end
+    frame:SetHeight(height + 16 + BUTTON_H + PADDING)
+end
+
+--------------------------------------------------
+-- 5. SHOWING
+--------------------------------------------------
+-- textArg fills "%s"; data is passed to OnAccept / OnCancel
+function ns.ShowDialog(key, textArg, data)
+    local def = ns.Dialogs[key]
+    if not def then return end
+    if not frame then Build() end
+    current, currentData = def, data
+    local text = def.text or ""
+    if textArg ~= nil then text = text:format(textArg) end
+    Layout(def, text)
+
+    -- propagation is locked in combat: a dialog that would not pass keys on takes none (buttons still work)
+    if InCombatLockdown() then
+        frame:EnableKeyboard(frame:GetPropagateKeyboardInput())
+    else
+        frame:EnableKeyboard(true)
+        frame:SetPropagateKeyboardInput(true)
+    end
+    local padSecure = def.padSecure and def.macro and not InCombatLockdown()
+    frame:EnableGamePadButton(not padSecure and (ns.IsGamepadUI() or def.padInput == true))
+
+    if def.hasEditBox then
+        frame.EditBox:SetMaxLetters(def.maxLetters or 0)
+        frame.EditBox:SetText(def.editText and def.editText(data) or "")
+    end
+    ReleaseReloadButton()
+    accepted = false
+    -- a reload button kept from before combat is protected: it cannot move until combat ends
+    local placeSecure = false
+    if (def.reloads or def.macro) and not InCombatLockdown() then
+        placeSecure = true
+        local macro = def.macro
+        if type(macro) == "function" then macro = macro(data) end
+        -- never reload or switch layouts mid-fight, from the dialog or a binding it left behind
+        GetReloadButton():SetAttribute("macrotext", "/stopmacro [combat]\n" .. (macro or "/reload"))
+        reloadButton:SetWidth(frame.Button1:GetWidth())
+        reloadButton:SetText(frame.Button1:GetText())
+        secureReload = true
+        SetOverrideBindingClick(frame, true, "ENTER", "FlareUIDialogReload", "LeftButton")
+        if padSecure then
+            SetOverrideBindingClick(frame, true, PAD_YES, "FlareUIDialogReload", "LeftButton")
+            SetOverrideBindingClick(frame, true, PAD_NO, "FlareUIDialogPadNo", "LeftButton")
+        end
+    end
+    frame:Show()
+    frame:Raise()
+    if placeSecure then
+        -- a protected frame cannot anchor to an insecure one: place it on UIParent at the yes button
+        local x, y = frame.Button1:GetCenter()
+        reloadButton:SetAlpha(1)
+        reloadButton:ClearAllPoints()
+        if x and y then
+            reloadButton:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
+        else
+            reloadButton:SetPoint("TOP", UIParent, "TOP", 0, -135 - frame:GetHeight() + BUTTON_H)
+        end
+        reloadButton:Show()
+        frame.Button1:Hide()
+    end
+    if def.hasEditBox then
+        frame.EditBox:SetFocus()
+        frame.EditBox:HighlightText()
+    end
+end
+
+function ns.AnyDialogShown()
+    return frame ~= nil and frame:IsShown()
+end

@@ -1,0 +1,14 @@
+## Interface: 16001
+## Title: |cffffd100Reaper|r
+## Category: Nectar
+## Notes: A quiet Shadow Word: Death signal: a small SW:D icon on your target's nameplate (and an optional soft glow on the action button) when it kills. /reaper
+## Author: Nectar
+## Version: 0.3
+## IconTexture: Interface\Icons\Spell_Shadow_DeathPact
+## SavedVariables: ReaperDB
+## OptionalDeps: DoesItDie, NectarKit
+
+Logic.lua
+Widgets.lua
+Main.lua
+Options.lua

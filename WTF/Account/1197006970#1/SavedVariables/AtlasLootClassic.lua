@@ -2,6 +2,7 @@
 AtlasLootClassicDB = {
 ["profileKeys"] = {
 ["Skeleton - CAMWOW EU4 Realm 2 PvP"] = "Skeleton - CAMWOW EU4 Realm 2 PvP",
+["Bone - "] = "Bone - ",
 },
 ["global"] = {
 ["__addonrevision"] = 1030000,
@@ -20,6 +21,8 @@ nil,
 0,
 },
 },
+},
+["Bone - "] = {
 },
 },
 }

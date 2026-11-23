@@ -1,0 +1,40 @@
+## Interface: 16001, 120007
+## Title: |cffffd100Forever|r Camp Guide
+## Notes: WoW Forever profession and camping guide: leveling 1-300, trainers, maps, known recipes and camp items.
+## Notes-esES: Guía de profesiones y campamento de WoW Forever: subir 1-300, instructores, mapas, recetas conocidas y objetos de campamento.
+## Notes-esMX: Guía de profesiones y campamento de WoW Forever: subir 1-300, instructores, mapas, recetas conocidas y objetos de campamento.
+## Version: 2.5.0
+## IconTexture: Interface\AddOns\ForeverCampGuide\Media\logo
+## SavedVariables: ForeverCampGuideDB
+## SavedVariablesPerCharacter: ForeverCampGuideCharDB
+## AddonCompartmentFunc: ForeverCampGuide_OnAddonCompartmentClick
+## X-Data-Source: https://www.wow-professions.com/forever
+
+Locale.lua
+Locale_UI_enUS.lua
+Locale_Data_enUS.lua
+Camping.lua
+Zones.lua
+NPCCoords.lua
+Guides\Alchemy.lua
+Guides\Blacksmithing.lua
+Guides\Enchanting.lua
+Guides\Engineering.lua
+Guides\Leatherworking.lua
+Guides\Tailoring.lua
+Guides\Cooking.lua
+Guides\FirstAid.lua
+Guides\Fishing.lua
+Guides\Mining.lua
+Guides\Herbalism.lua
+Guides\Skinning.lua
+Guides\FishingCooking.lua
+Guides\Merchant.lua
+Guides\Misc.lua
+Core.lua
+Logic.lua
+Widgets.lua
+Map.lua
+Pages.lua
+UI.lua
+Tracker.lua

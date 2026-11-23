@@ -1,0 +1,11 @@
+## Interface: 16001
+## Title: Nectar Sellers
+## Category: Nectar
+## Notes: Shows the seller on each auction house item buy row and tints sellers with several listings. /sellers
+## Author: Nectar
+## Version: 0.1
+## SavedVariables: NectarSellersDB
+## OptionalDeps: NectarKit
+
+Logic.lua
+Main.lua

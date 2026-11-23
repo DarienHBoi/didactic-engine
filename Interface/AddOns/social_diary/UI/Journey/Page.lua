@@ -1,0 +1,600 @@
+-- Your Diary's start page (JRN-11, JRN-13, JRN-15, JRN-16, JRN-21 to
+-- JRN-23): the logged-in character's own road, the journal's first
+-- section, in front of People.
+--
+-- The left page is the character's: their name in capitals like the
+-- bookplate's (UI/Journal/Front.lua), who they are and their level, then
+-- the recap, oldest first, one entry per level (one per week after the
+-- cap). Each entry is rubricated like a day on the timeline ("LEVEL 12",
+-- "so far" beside the one being played), with the faces of the people from
+-- the diary crossed at it at the rubric's end: class circles, a rival's
+-- ringed in rubric (JRN-22). One level is open at a time, the newest as
+-- the diary falls open; the others are their rubric alone, a contents
+-- line to open them by. The open one reads in three levels: the rubric,
+-- then its prose in the diary's own words (UI/Journey/Text/Prose.lua),
+-- each name a way to their page, the player's own note quoted in their
+-- hand, any first sighting written in later, in hindsight, in the diary's
+-- hand (JRN-23); then a ledger of the zones it was spent in, small, with dot
+-- leaders out to their times and a dungeon's doorway in the margin
+-- (JRN-15: the zone index's rows, now where they happened). An honest
+-- line about where the diary began goes before them all (JRN-13).
+--
+-- The right page shows where the open level happened (JRN-21): up to three
+-- close-up plates of map glued in (UI/Journey/Plate.lua), from any zone,
+-- each captioned in a few words and with the people met there written in
+-- the margin, a pencil leader from each name to their mark (JRN-22).
+-- Clicking a plate or a zone row shows that zone's whole map as one plate
+-- across the page (JRN-14), the open level only (other levels' roads and
+-- marks are left off), with a line under it and the way back to the plates
+-- it was opened from.
+--
+-- A late level spans many evenings, more than one right page holds
+-- (.claude/sittings-plan.md). So a level is read by sitting: where it was
+-- played in more than one, or has a run with a page, its sittings are
+-- listed under its open rubric, each a piece of the level (Recap.Pieces),
+-- and the right page shows one piece's plates (page.piece, an index into
+-- the entry's pieces), never the whole level's, with no scrolling and no
+-- turning on: the left page is the contents. A rubric opens its newest
+-- sitting (OpenLevel), a sitting's line that one (OpenPiece). A run that
+-- earned a page (a boss killed) is a page of the sitting it began in, its
+-- line indented under that sitting's (UI/Journey/Run.lua, the keepsake
+-- page; OpenRun). A level played in one sitting with no run page is
+-- spliced: no list, its rubric opens it whole, as before. Past the cap,
+-- weeks are read by sitting the same way. The zone's whole map stays the
+-- level's (the user, 28 Oct), and its way back is to the sitting open.
+--
+-- The left page's list is virtual (ns.UI.VirtualList): an item per rubric,
+-- paragraph and zone, each paragraph measured once to its own height, so
+-- the frame count stays fixed however long the road grows. The right page
+-- keeps three plates and hands them out to the slots each layout needs.
+--
+-- With nothing on the road yet, the page teaches what will be there, in
+-- the style of the empty People page (UI/Journal/Empty.lua): a word on why
+-- it is empty (the setting off, or nothing walked yet), a pencilled sample
+-- entry, and a pencilled plate with notes in the margin. It is a recap,
+-- never a tracker: nothing here counts quests, shows a bar or keeps a score.
+--
+-- The page is one module, ns.UI.YourDiary, in a file per question; this
+-- file, the last of them, builds it, refreshes it and turns it to. The
+-- others, their order and what they share: UI/Journey/Look.lua.
+
+local addonName, ns = ...
+
+local L = ns.L
+
+local Style = ns.Style
+local FONT = Style.FONT
+local YourDiary = ns.UI.YourDiary
+
+local BOOK = ns.UI.Journal.BOOK
+local LEFT_X, LEFT_W, RIGHT_X, RIGHT_W = BOOK.LEFT_X, BOOK.LEFT_W, BOOK.RIGHT_X, BOOK.RIGHT_W
+local BOOK_H, TOP = BOOK.BOOK_H, BOOK.TOP
+local SCROLLBAR_WIDTH = ns.UI.SCROLLBAR_WIDTH
+
+local HEAD, ENTRY, LEDGER, RIGHT_H = YourDiary.HEAD, YourDiary.ENTRY, YourDiary.LEDGER, YourDiary.RIGHT_H
+local LAYOUT, SNAPSHOT, CAPTION, LEADER = YourDiary.LAYOUT, YourDiary.SNAPSHOT, YourDiary.CAPTION, YourDiary.LEADER
+local LEADERS, FOOT, NOTHING, OFF = YourDiary.LEADERS, YourDiary.FOOT, YourDiary.NOTHING, YourDiary.OFF
+local FillHeader, EntryItems = YourDiary.FillHeader, YourDiary.EntryItems
+local PiecesOf, OpenPieceOf = YourDiary.PiecesOf, YourDiary.OpenPieceOf
+local BuildEntryRow, UpdateEntryRow = YourDiary.BuildEntryRow, YourDiary.UpdateEntryRow
+local LayoutFor, Handout = YourDiary.LayoutFor, YourDiary.Handout
+local NewNote, EnsurePools, ROW, Shared = YourDiary.NewNote, YourDiary.EnsurePools, YourDiary.ROW, YourDiary.Shared
+local DrawPlates, DrawFull = YourDiary.DrawPlates, YourDiary.DrawFull
+local DrawRun, HideRun, RunsOf = YourDiary.DrawRun, YourDiary.HideRun, YourDiary.RunsOf
+local DrawMatch, DrawEvening, HideMatch = YourDiary.DrawMatch, YourDiary.DrawEvening, YourDiary.HideMatch
+local MatchOf, SessionOf, SessionsOf = YourDiary.MatchOf, YourDiary.SessionOf, YourDiary.SessionsOf
+local PlatesOf = YourDiary.PlatesOf
+local BuildEmpty, FillEmpty = YourDiary.BuildEmpty, YourDiary.FillEmpty
+
+-- The piece of entry `e` holding time `t`: the index of the one it falls in,
+-- else of the last begun by then (a sliver left out, Recap.Pieces, is no
+-- piece), else the first. Nil where `e` is drawn whole.
+local function PieceAt(e, t)
+    local pieces = PiecesOf(e)
+    if e.spliced or #pieces == 0 then return nil end
+    local at = 1
+    for k, p in ipairs(pieces) do
+        if p.from <= t then at = k end
+    end
+    return at
+end
+
+-- Set below, and on the module for the files before this one.
+local OpenLevel, OpenPiece, OpenFull, OpenRun, OpenMatch, OpenMatches
+
+--------------------------------------------------------------------------
+-- The right page
+--------------------------------------------------------------------------
+
+-- The setting off with a road kept: said under the plates, with the way
+-- back.
+local function PlaceOff(full)
+    local page = YourDiary.page
+    page.off:ClearAllPoints()
+    page.keep:ClearAllPoints()
+    if full then
+        page.off:SetPoint("TOPLEFT", page.right, "TOPLEFT", OFF.fullX, -OFF.fullY)
+        page.keep:SetPoint("LEFT", page.off, "RIGHT", 8, 0)
+    else
+        page.off:SetPoint("TOPLEFT", page.right, "TOPLEFT", OFF.x, -OFF.y)
+        page.keep:SetPoint("TOPLEFT", page.off, "BOTTOMLEFT", 0, -2)
+    end
+end
+
+-- The run `id` of `e` (an entry or a piece), or nil where it is not one
+-- of its runs with a page.
+local function RunOf(e, id)
+    for _, visit in ipairs(RunsOf(e)) do
+        if visit.id == id then return visit end
+    end
+end
+
+-- What the right page shows of entry `e`: its open piece, or the entry
+-- whole where it is spliced.
+local function Shown(e)
+    return e and (OpenPieceOf(e) or e)
+end
+
+-- The right page for the open entry: the open piece's plates or one of its
+-- runs (UI/Journey/Run.lua), or one zone's full page, the entry's whole.
+-- Drawn as it opens or turns, from pools; never per frame.
+local function DrawRight()
+    local page = YourDiary.page
+    local recap = page.recap
+    local e = recap and recap.entries[page.open]
+    local piece = Shown(e)
+    for _, pool in ipairs(page.rightPools) do pool:Begin() end
+    page.links = {}
+    page.nothing:Hide()
+    for _, part in pairs({ page.foot.name, page.foot.meta, page.foot.hint }) do part:Hide() end
+    local shown = 0
+    local visit = e and page.mode == "run" and RunOf(piece, page.runVisit)
+    if not visit then HideRun() end
+    -- A battleground's pages (UI/Journey/Match.lua): one match, or the
+    -- evening's overview; the match's way back where its session has one.
+    local match, session = nil, nil
+    if e and page.mode == "match" then
+        local _, of
+        match, of = MatchOf(piece, page.matchId)
+        page.matchBack = of and ns.Matches.HasOverview(of) and of.key or nil
+    elseif e and page.mode == "matches" then
+        session = SessionOf(piece, page.session)
+    end
+    if not (match or session) then HideMatch() end
+    if e then
+        if visit then
+            shown = DrawRun(piece, visit)
+        elseif match then
+            shown = DrawMatch(piece, match, page.matchBack)
+        elseif session then
+            shown = DrawEvening(piece, session)
+        elseif page.mode == "full" and page.fullMap then
+            shown = DrawFull(e)
+        else
+            page.mode = "plates"
+            shown = DrawPlates(piece)
+        end
+    end
+    for i = shown + 1, #page.plates do page.plates[i]:Hide() end
+    for _, pool in ipairs(page.rightPools) do pool:Finish() end
+    PlaceOff(page.mode == "full")
+    -- (the right page drawn anew: the pad finds its plates and notes
+    -- again; with the pad down this does nothing)
+    ns.UI.Pad.Refresh()
+end
+
+--------------------------------------------------------------------------
+-- Construction and refresh
+--------------------------------------------------------------------------
+
+local function BuildPage(parent)
+    local page = { parent = parent, plates = {}, sheets = {}, moments = {}, mode = "plates", links = {} }
+    YourDiary.page = page
+    local INK = Style.INK
+
+    -- The character.
+    page.name = Style.Text(parent, FONT.title)
+    page.name:SetPoint("TOPLEFT", LEFT_X, -HEAD.name)
+    page.who = Style.Text(parent, FONT.faded)
+    page.who:SetPoint("TOPLEFT", LEFT_X, -HEAD.who)
+    page.rule = parent:CreateTexture(nil, "ARTWORK")
+    page.rule:SetSize(HEAD.ruleW, 1)
+    page.rule:SetPoint("TOPLEFT", LEFT_X, -HEAD.rule)
+    Style.Shade(page.rule, "HORIZONTAL", INK[1], INK[2], INK[3], Style.HAIRLINE, 0)
+
+    page.measure = Style.Text(parent, FONT.body)
+    page.measure:SetWidth(LEFT_W - SCROLLBAR_WIDTH - 2 - ENTRY.indent)
+    page.measure:SetWordWrap(true)
+    page.measure:SetSpacing(ENTRY.leading)
+    page.measure:Hide()
+
+    -- The entries.
+    local listH = BOOK_H - HEAD.list - HEAD.bottom
+    page.entries = ns.UI.Journal.List(parent, ENTRY.unit, ENTRY.rows, BuildEntryRow, UpdateEntryRow,
+        LEFT_W, "TOPLEFT", LEFT_X, -HEAD.list)
+    page.entries:SetNumRows(math.floor(listH / ENTRY.unit))
+
+    -- The right page: the plates, their captions and notes, the leaders
+    -- over the plates, and the full page's line.
+    page.right = CreateFrame("Frame", nil, parent)
+    page.right:SetPoint("TOPLEFT", RIGHT_X, -TOP)
+    page.right:SetSize(RIGHT_W, RIGHT_H)
+    page.leaders = CreateFrame("Frame", nil, page.right)
+    page.leaders:SetAllPoints(page.right)
+    page.leaders:SetFrameLevel(page.right:GetFrameLevel() + LEADERS.level)
+    page.leaderPool = Handout(function()
+        local stroke = page.leaders:CreateTexture(nil, "OVERLAY")
+        if stroke.SetSnapToPixelGrid then
+            stroke:SetSnapToPixelGrid(false)
+            stroke:SetTexelSnappingBias(0)
+        end
+        return stroke
+    end)
+    page.dotPool = Handout(function()
+        local dot = page.leaders:CreateTexture(nil, "OVERLAY")
+        if dot.SetSnapToPixelGrid then
+            dot:SetSnapToPixelGrid(false)
+            dot:SetTexelSnappingBias(0)
+        end
+        return dot
+    end)
+    page.headingPool = Handout(function()
+        local text = Style.Text(page.right, FONT.noteWritten)
+        text:SetWordWrap(true)
+        return text
+    end)
+    page.captionPool = Handout(function()
+        local text = Style.Text(page.right, FONT.body)
+        text:SetWordWrap(true)
+        text:SetSpacing(2)
+        return text
+    end)
+    page.notePool = Handout(NewNote)
+    -- Every registered kind's notes (JourneyMargin.Register): the cards
+    -- and slips, each kind's pool made here (page[spec.pool]), and the
+    -- lists of pools the page draws and the margin rolls back.
+    EnsurePools()
+
+    page.nothing = Style.Text(page.right, FONT.faded)
+    page.nothing:SetPoint("TOPLEFT", NOTHING.x, -NOTHING.y)
+    page.nothing:SetWidth(NOTHING.w)
+    page.nothing:Hide()
+
+    local foot = {}
+    page.foot = foot
+    foot.name = Style.Text(page.right, FONT.page)
+    foot.name:SetPoint("TOPLEFT", 12, -FOOT.y)
+    foot.meta = Style.Text(page.right, FONT.small)
+    -- No way back but the map itself: a click on it (FULLZOOM's DRAG), so
+    -- the hint says so.
+    foot.hint = Style.Text(page.right, FONT.small)
+    foot.hint:SetText(FOOT.words)
+    for _, part in pairs(foot) do part:Hide() end
+
+    -- The setting off with a road already kept: said under the plates.
+    page.off = Style.Text(page.right, FONT.small)
+    page.off:SetText(L["Your road is not being kept just now."])
+    page.keep = Style.Link(page.right, FONT.body, function()
+        ns.JourneyCapture.SetEnabled(true)
+        ns.UI.RefreshJourneyPage()
+    end)
+    page.keep:SetText(L["Keep it again"])
+    PlaceOff(false)
+
+    page.empty = BuildEmpty(parent)
+    return page
+end
+
+-- What the page shows: "entries" (a road to recap: anything kept, the
+-- stop or road still open included, or a level reached), or "on" or "off"
+-- for the empty page, by the setting.
+local function State()
+    local j = ns.Journey.Mine()
+    if ns.Journey.Any(j) then return "entries" end
+    return ns.JourneyCapture.On() and "on" or "off"
+end
+
+local function ShowRoad(shown)
+    local page = YourDiary.page
+    page.entries:SetShown(shown)
+    page.right:SetShown(shown)
+    page.empty:SetShown(not shown)
+end
+
+-- The left page's items for the recap as it is open now. `keep` holds the
+-- reader's place; `steady` (an entry's index) keeps that entry's rubric
+-- where it was on the page as others open and close round it.
+-- With the pad in hand the list is one level (EntryItems' Solo): the place
+-- is held on that level only, and another opens at its top.
+local function Rebuild(keep, steady)
+    local page = YourDiary.page
+    local solo = YourDiary.Solo()
+    if solo and page.soloOf ~= page.open then keep, steady = false, nil end
+    page.soloOf = solo and page.open or nil
+    local before = steady and page.rubrics and page.rubrics[steady]
+    local offset = page.entries.offset or 0
+    local items, rubrics = EntryItems(page.recap, page.now, page.fights)
+    page.items, page.rubrics = items, rubrics
+    page.newest = rubrics[#page.recap.entries]
+    page.entries:SetData(items, keep)
+    if before and rubrics[steady] then
+        page.entries:SetOffset(math.max(0, rubrics[steady] - (before - offset)))
+    end
+    -- (the rows were handed round: the pad's box finds its words again;
+    -- with the pad down this does nothing)
+    ns.UI.Pad.Refresh()
+end
+YourDiary.Rebuild = Rebuild
+
+-- What piece `k` of entry `i` opens on: its plates; where it has none (a
+-- sitting spent inside a dungeon: a run's door alone is no plate,
+-- Recap.DOOR_ONLY) and has a run with a page, its first run, rather than a
+-- page saying nothing was kept. "plates" for an entry drawn whole.
+local function ViewOf(piece)
+    if piece and piece.runs and piece.runs[1] and #PlatesOf(piece) == 0 then return "run", piece.runs[1].id end
+    -- (no plates and no run, but battlegrounds (a capped week spent in
+    -- them): the first session's overview, else its first match)
+    local s = piece and #PlatesOf(piece) == 0 and SessionsOf(piece)[1]
+    if s then
+        if ns.Matches.HasOverview(s) then return "matches", nil, s.key end
+        return "match", nil, nil, s.matches[1].id
+    end
+    return "plates", nil
+end
+
+-- The page's mode and what it shows, set as ViewOf says.
+local function SetView(page, piece)
+    page.mode, page.runVisit, page.session, page.matchId = ViewOf(piece)
+end
+
+-- Opens piece `k` of entry `i` (its newest when not given, or where `i`
+-- is spliced: the entry whole): the entry's prose on the left, the
+-- piece's plates on the right (ViewOf).
+function OpenPiece(i, k)
+    local page = YourDiary.page
+    if not (page and page.recap and page.recap.entries[i]) then return end
+    GameTooltip:Hide()
+    local e = page.recap.entries[i]
+    local pieces = PiecesOf(e)
+    if not (k and pieces[k]) then k = #pieces > 0 and #pieces or nil end
+    page.open, page.piece, page.pieceOf, page.fullMap = i, k, e, nil
+    SetView(page, OpenPieceOf(e))
+    Rebuild(true, i)
+    DrawRight()
+end
+
+-- Opens entry `i` at its newest piece: a rubric clicked.
+function OpenLevel(i)
+    OpenPiece(i, nil)
+end
+
+-- Where run `id` has its page: entry `i` and the index of its piece that
+-- holds it (nil where `i` is spliced and the entry holds it whole). Looked
+-- for in entry `i` first, then the others, newest first: a run begun in
+-- the level before is a page of that level's sitting.
+local function Holder(id, i)
+    local page = YourDiary.page
+    local entries = page.recap.entries
+    local function In(n)
+        local e = entries[n]
+        if not e then return nil end
+        local pieces = PiecesOf(e)
+        if e.spliced then return RunOf(e, id) and true or nil end
+        for k, p in ipairs(pieces) do
+            if RunOf(p, id) then return k end
+        end
+    end
+    local k = In(i)
+    if k then return i, k ~= true and k or nil end
+    for n = #entries, 1, -1 do
+        if n ~= i then
+            k = In(n)
+            if k then return n, k ~= true and k or nil end
+        end
+    end
+end
+
+-- Shows run `id` across the right page, in the piece of entry `i` (the
+-- open one when not given) that it began in: its line under that
+-- sitting, or its ledger row, clicked.
+function OpenRun(id, i)
+    local page = YourDiary.page
+    if not (page and page.recap and id) then return end
+    local n, k = Holder(id, i or page.open)
+    if not n then return end
+    GameTooltip:Hide()
+    page.open, page.piece, page.pieceOf = n, k, page.recap.entries[n]
+    page.mode, page.fullMap, page.runVisit = "run", nil, id
+    Rebuild(true, n)
+    DrawRight()
+end
+
+-- Where a battleground's page is: entry `i` and the index of its piece
+-- whose sessions `has(piece)` finds one in (a session belongs to the piece
+-- it began in, whole: Recap.Pieces). Entry `i` first, then the others,
+-- newest first. A battleground is never on an entry drawn whole
+-- (Recap.Pieces does not splice it).
+local function SessionHolder(has, i)
+    local page = YourDiary.page
+    local entries = page.recap.entries
+    local function In(n)
+        local e = entries[n]
+        if not e or e.spliced then return nil end
+        for k, p in ipairs(PiecesOf(e)) do
+            if has(p) then return k end
+        end
+    end
+    local k = i and In(i)
+    if k then return i, k end
+    for n = #entries, 1, -1 do
+        if n ~= i then
+            k = In(n)
+            if k then return n, k end
+        end
+    end
+end
+
+-- Shows match `id` across the right page (C, the board clipped), in the
+-- piece of entry `i` (the open one when not given) its session began in:
+-- its line under that sitting, or a ticket on the evening's overview,
+-- clicked. Its way back is to the overview, where the session has one.
+function OpenMatch(id, i)
+    local page = YourDiary.page
+    if not (page and page.recap and id) then return end
+    local n, k = SessionHolder(function(p) return MatchOf(p, id) ~= nil end, i or page.open)
+    if not n then return end
+    GameTooltip:Hide()
+    page.open, page.piece, page.pieceOf = n, k, page.recap.entries[n]
+    page.mode, page.fullMap, page.runVisit, page.matchId, page.session = "match", nil, nil, id, nil
+    -- (a Warsong told by time opens on its story, not the board view it
+    -- was left on: UI/Journey/MatchStory.lua)
+    page.matchBoard = nil
+    Rebuild(true, n)
+    DrawRight()
+end
+
+-- Shows the overview of the battleground session keyed `key` (its first
+-- match's id), titled "Battlegrounds": its line under the sitting it began
+-- in, or the way back from one of its matches, clicked.
+function OpenMatches(key, i)
+    local page = YourDiary.page
+    if not (page and page.recap and key) then return end
+    local n, k = SessionHolder(function(p) return SessionOf(p, key) ~= nil end, i or page.open)
+    if not n then return end
+    GameTooltip:Hide()
+    page.open, page.piece, page.pieceOf = n, k, page.recap.entries[n]
+    page.mode, page.fullMap, page.runVisit, page.matchId, page.session = "matches", nil, nil, nil, key
+    Rebuild(true, n)
+    DrawRight()
+end
+
+-- Shows `mapID`'s whole map across the right page, the entry `i` in ink
+-- (the open one when not given): the whole entry's, never a piece's. The
+-- piece open is kept, so the way back (Full.lua's Back: OpenPiece) is to
+-- it; another entry's opens at its newest.
+function OpenFull(mapID, i)
+    local page = YourDiary.page
+    if not (page and page.recap and mapID) then return end
+    GameTooltip:Hide()
+    i = i or page.open
+    page.open, page.mode, page.fullMap, page.runVisit = i, "full", mapID, nil
+    Rebuild(true, i)
+    DrawRight()
+end
+YourDiary.OpenLevel, YourDiary.OpenPiece, YourDiary.OpenFull, YourDiary.OpenRun = OpenLevel, OpenPiece, OpenFull,
+    OpenRun
+YourDiary.OpenMatch, YourDiary.OpenMatches = OpenMatch, OpenMatches
+
+-- `opening`: the page is being turned to, so it falls open at the newest
+-- entry and its plates. Otherwise (the diary changed while it lies open)
+-- it stays where it was read. Cheap when nothing changed: the recap is
+-- cached by version (JourneyRecap.For), and the page is only rebuilt when
+-- it, or the day (relative dates), moved on, or as it opens.
+function ns.UI.RefreshJourneyPage(opening)
+    local page = YourDiary.page
+    if not page then return end
+    -- Called by the book as it turns here: that is an opening.
+    if opening == nil then opening = true end
+    FillHeader()
+
+    local state = State()
+    page.state = state
+    local route = state == "entries"
+    ShowRoad(route)
+    local on = ns.JourneyCapture.On()
+    page.off:SetShown(route and not on)
+    page.keep:SetShown(route and not on)
+    if not route then
+        FillEmpty(page.empty, state == "on")
+        page.recap = nil
+        return
+    end
+
+    local recap, ctx = ns.JourneyRecap.For(ns.ownGUID)
+    if not recap then return end
+    local now = ns.Now()
+    local day = ns.DayStart(now)
+    local changed = recap ~= page.recap or day ~= page.day
+    if changed then
+        page.recap, page.ctx, page.day, page.now = recap, ctx, day, now
+        page.fights = ns.Journey.FightIndex()
+        page.witnesses = ns.Journey.WitnessIndex()
+        page.sheets, page.moments = {}, {}
+        -- A card just changed (CardSheet.lua) asks to stay on this page: the
+        -- new recap's entries are new tables, which a kept piece does not
+        -- recognise (OpenPieceOf: it would fall back to the newest), and a
+        -- piece's index may have moved, so it is found again by its time.
+        if page.holdAt and not opening and recap.entries[page.open] then
+            local e = recap.entries[page.open]
+            page.piece, page.pieceOf = PieceAt(e, page.holdAt), e
+        end
+    end
+    page.holdAt = nil
+    local count = #recap.entries
+    if opening or not page.open or page.open > count then
+        -- Fallen open on the newest entry's newest piece.
+        local e = recap.entries[count]
+        page.open, page.piece, page.pieceOf, page.fullMap = count, nil, nil, nil
+        SetView(page, OpenPieceOf(e))
+    end
+    if changed or opening then
+        Rebuild(not opening)
+        DrawRight()
+    end
+    page.fullView = nil
+    if opening and page.rubrics[page.open] then page.entries:SetOffset(page.rubrics[page.open] - 1) end
+end
+
+-- Draws the right page again as it is (/sd pen, after the pen changed).
+function ns.UI.RedrawJourneyPage()
+    local page = YourDiary.page
+    if page and page.recap and page.state == "entries" then DrawRight() end
+end
+
+-- Kept up to date while it lies open: a session, a note or a fight written
+-- elsewhere changes what the entries say.
+ns.On("SD_DIARY_CHANGED", function()
+    if ns.UI.JournalShowing("journey") then ns.UI.RefreshJourneyPage(false) end
+end)
+
+-- Test hook (tests, plate_dump.lua, /sd journey debug): the page's state.
+function ns.UI.JourneyPage()
+    return YourDiary.page
+end
+ns.UI.JourneyLook = { ENTRY = ENTRY, LEDGER = LEDGER, CAPTION = CAPTION, LEADER = LEADER, LAYOUT = LAYOUT, FOOT = FOOT,
+    ROW = ROW, Shared = Shared, SNAPSHOT = SNAPSHOT, LayoutFor = LayoutFor }
+
+-- A zone's whole map on the right page (JRN-14): at the open level when
+-- it was there, else the latest level that was.
+function ns.UI.OpenZoneSheet(mapID)
+    local page = YourDiary.page
+    if not (page and mapID) then return end
+    ns.UI.RefreshJourneyPage(false)
+    local recap = page.recap
+    if not recap then return end
+    local function Visited(e)
+        for _, place in ipairs(e and e.places or {}) do
+            if place.mapID == mapID then return true end
+        end
+        return false
+    end
+    local i = page.open
+    if not Visited(recap.entries[i]) then
+        for k = #recap.entries, 1, -1 do
+            if Visited(recap.entries[k]) then
+                i = k
+                break
+            end
+        end
+    end
+    OpenFull(mapID, i)
+end
+
+-- The green ribbon's page, the book's first (JRN-16; UI/Journal/Pages.lua).
+-- Turned to, it falls open at the newest entry.
+ns.UI.Journal.RegisterPage("journey", {
+    order = 10, ribbon = { colour = "green", label = L["Your Diary"] }, leaf = 1, buildOrder = 40,
+    build = function(container) BuildPage(container) end,
+    refresh = function() ns.UI.RefreshJourneyPage() end,
+    title = function() return YourDiary.page and YourDiary.page.name end,
+})

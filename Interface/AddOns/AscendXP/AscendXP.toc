@@ -1,0 +1,13 @@
+## Interface: 16001
+## Title: |cff43d9d4Ascend|r|cffffcf77XP|r
+## Notes: Dual-mode XP tracker with sleek top bar, gold/hour, quests and kill tracking for WoW Forever.
+## Author: Darktotem Inevitable
+## Version: 1.2.7
+## IconTexture: Interface\AddOns\AscendXP\Textures\crest.tga
+## OptionalDeps: Auctionator
+## SavedVariables: AscendXPSettings
+## SavedVariablesPerCharacter: AscendXPCharacter
+Money.lua
+BlizzardBar.lua
+Projection.lua
+Core.lua

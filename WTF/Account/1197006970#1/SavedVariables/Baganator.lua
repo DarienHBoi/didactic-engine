@@ -1,20 +1,20 @@
 
 BAGANATOR_CONFIG = {
+["Version"] = 1,
 ["CharacterSpecific"] = {
 ["sort_ignore_bank_slots_count"] = {
 ["Skeleton Bone-PvP"] = 0,
 },
-["sort_ignore_slots_count_2"] = {
-["Skeleton Bone-PvP"] = 0,
+["currencies_tracked_imported"] = {
 },
 ["currencies_tracked"] = {
 ["Skeleton Bone-PvP"] = {
 },
 },
-["currencies_tracked_imported"] = {
+["sort_ignore_slots_count_2"] = {
+["Skeleton Bone-PvP"] = 0,
 },
 },
-["Version"] = 1,
 ["Profiles"] = {
 ["DEFAULT"] = {
 ["guild_view_width"] = 14,
@@ -34,12 +34,12 @@ BAGANATOR_CONFIG = {
 ["default_special_empty"] = true,
 ["default_consumable"] = true,
 ["default_tradegoods"] = true,
-["default_recipe"] = true,
+["default_questitem"] = true,
 ["default_auto_equipment_sets"] = true,
 ["default_container"] = true,
-["default_hearthstone"] = true,
 ["default_key"] = true,
-["default_questitem"] = true,
+["default_hearthstone"] = true,
+["default_recipe"] = true,
 },
 ["show_search_box"] = true,
 ["debug_categories_search"] = false,
@@ -52,14 +52,14 @@ BAGANATOR_CONFIG = {
 ["item_upgrade"] = true,
 ["guild_bank"] = false,
 ["auction_house"] = false,
-["forge_of_bonds"] = false,
+["trade_partner"] = false,
 ["tradeskill"] = false,
 ["character_panel"] = false,
 ["scrapping_machine"] = true,
 ["item_interaction"] = true,
 ["mail"] = false,
 ["sockets"] = false,
-["trade_partner"] = false,
+["forge_of_bonds"] = false,
 ["bank"] = true,
 },
 ["icon_corners_auto_insert_applied"] = {
@@ -73,7 +73,7 @@ BAGANATOR_CONFIG = {
 ["category_edit_search_mode"] = "visual",
 ["icon_context_fading"] = true,
 ["warband_current_tab"] = 1,
-["category_item_grouping"] = true,
+["category_item_grouping"] = false,
 ["icon_top_left_corner_array"] = {
 "junk",
 "item_level",
@@ -118,14 +118,14 @@ BAGANATOR_CONFIG = {
 },
 ["bank_view_position"] = {
 "BOTTOMLEFT",
-355.0001831054688,
-525.8330078125,
+565.0007934570312,
+359.1664428710938,
 },
 ["recent_include_owned"] = false,
 ["guild_view_position_2"] = {
 "TOPLEFT",
-30,
--235,
+645.833251953125,
+-335,
 },
 ["category_sections"] = {
 ["1"] = {
@@ -139,28 +139,45 @@ BAGANATOR_CONFIG = {
 ["hide_special_container"] = {
 },
 ["bag_empty_space_at_top"] = false,
-["category_horizontal_spacing_2"] = 0.16,
+["category_horizontal_spacing_2"] = 0,
 ["category_default_import"] = 1,
 ["debug_categories"] = false,
 ["character_bank_current_tab"] = 1,
-["currencies_tracked_imported"] = 0,
-["currency_headers_collapsed"] = {
+["icon_bottom_left_corner_array"] = {
+"bag_type",
+"equipment_set",
 },
-["junk_plugin_ignored"] = {
-["none"] = true,
+["custom_categories"] = {
 },
-["currencies_tracked"] = {
-},
+["category_group_empty_slots"] = true,
+["guild_current_tab"] = 1,
 ["saved_searches"] = {
 },
-["lock_frames"] = false,
+["icon_equipment_set_border"] = true,
 ["category_modifications"] = {
-["default_container"] = {
+["default_reagent"] = {
+["addedItems"] = {
+["i:3771"] = true,
+},
 },
 ["default_weapon"] = {
 ["addedItems"] = {
 ["i:4693"] = true,
 ["i:2681"] = true,
+},
+},
+["default_container"] = {
+},
+["default_junk"] = {
+["addedItems"] = {
+["i:4538"] = true,
+["i:15284"] = true,
+["i:15467"] = true,
+["i:3201"] = true,
+["i:5351"] = true,
+["i:15500"] = true,
+["i:1155"] = true,
+["i:2072"] = true,
 },
 },
 ["default_projectile"] = {
@@ -172,6 +189,7 @@ BAGANATOR_CONFIG = {
 ["default_hearthstone"] = {
 ["addedItems"] = {
 ["i:6533"] = true,
+["i:3385"] = true,
 },
 },
 },
@@ -183,40 +201,15 @@ BAGANATOR_CONFIG = {
 ["icon_text_quality_colors"] = false,
 ["character_bank_view_width"] = 14,
 ["icon_text_font_size"] = 14,
-["bag_view_type"] = "category",
+["bag_icon_size"] = 37,
 ["sort_ignore_slots_count_2"] = 0,
 ["disabled_skins"] = {
 },
 ["bag_view_width"] = 15,
 ["sort_ignore_bank_slots_count"] = 0,
-["category_section_toggled"] = {
-},
-["character_select_position"] = {
-"RIGHT",
-"Baganator_CategoryViewBackpackViewFrameblizzard",
-"LEFT",
-0,
-0,
+["upgrade_plugin_ignored"] = {
 },
 ["debug_keywords"] = false,
-["new_items_flashing"] = true,
-["auto_sort_on_open"] = true,
-["category_migration"] = 5,
-["show_buttons_on_alt"] = false,
-["bag_view_show_bag_slots"] = true,
-["debug_timers"] = false,
-["guild_view_dialog_position"] = {
-"BOTTOM",
-"Baganator_GuildViewFrame",
-"TOP",
-0,
-0,
-},
-["bag_view_position"] = {
-"BOTTOMRIGHT",
--505.83251953125,
-448.3330078125,
-},
 ["skins"] = {
 ["blizzard"] = {
 ["no_frame_borders"] = false,
@@ -233,11 +226,36 @@ BAGANATOR_CONFIG = {
 ["empty_slot_background"] = false,
 },
 },
-["upgrade_plugin_ignored"] = {
+["bag_view_position"] = {
+"BOTTOMRIGHT",
+-435.00146484375,
+289.1666564941406,
+},
+["auto_sort_on_open"] = true,
+["category_migration"] = 5,
+["debug_timers"] = false,
+["bag_view_show_bag_slots"] = true,
+["show_buttons_on_alt"] = false,
+["guild_view_dialog_position"] = {
+"BOTTOM",
+"Baganator_SingleViewGuildViewFrameblizzard",
+"TOP",
+0,
+0,
+},
+["new_items_flashing"] = true,
+["character_select_position"] = {
+"RIGHT",
+"Baganator_CategoryViewBackpackViewFrameblizzard",
+"LEFT",
+0,
+0,
+},
+["category_section_toggled"] = {
 },
 ["show_sort_button_2"] = true,
 ["setting_anchors"] = false,
-["bag_icon_size"] = 37,
+["bag_view_type"] = "category",
 ["currency_panel_position"] = {
 "RIGHT",
 "Baganator_CategoryViewBackpackViewFrameblizzard",
@@ -245,15 +263,15 @@ BAGANATOR_CONFIG = {
 0,
 0,
 },
-["icon_equipment_set_border"] = true,
-["guild_current_tab"] = 1,
-["category_group_empty_slots"] = true,
-["custom_categories"] = {
+["lock_frames"] = false,
+["currencies_tracked"] = {
 },
-["icon_bottom_left_corner_array"] = {
-"bag_type",
-"equipment_set",
+["junk_plugin_ignored"] = {
+["none"] = true,
 },
+["currency_headers_collapsed"] = {
+},
+["currencies_tracked_imported"] = 0,
 },
 },
 }
